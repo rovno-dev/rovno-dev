@@ -48,6 +48,7 @@ export default function BottomAppBar() {
           </div>
 
           <Button
+
             shape={'round'}
             className="w-full h-[60px] gap-2"
             size="medium"

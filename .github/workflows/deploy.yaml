@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
+          command_timeout: 20m
           script: |
             cd ${{ secrets.PROJECT_PATH }}
             git fetch origin main && git reset --hard origin/main
