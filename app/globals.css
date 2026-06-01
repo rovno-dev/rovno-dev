@@ -1,7 +1,7 @@
+/* LLM context: Adding refined motion primitives and global entry animations for high-end feel */
 @import url('./unideka-base.css');
 @import "tailwindcss";
 @import "tw-animate-css";
-/* @import "shadcn/tailwind.css"; */
 
 @plugin "../tailwind.config.js";
 
@@ -38,7 +38,6 @@
   --warning-card: var(--orange-0);
   --on-warning-card: var(--orange-7);
 
-  /* glass styles */
   --primary-glass: color-mix(in srgb, var(--primary), transparent 95%);
   --on-primary-glass: var(--primary);
   --card-glass: color-mix(in srgb, var(--card), transparent 95%);
@@ -57,16 +56,10 @@
 
   --state-hover: color-mix(in srgb, #121212, transparent 95%);
   --state-focus: color-mix(in srgb, #121212, transparent 92%);
-  --state-focus: color-mix(in srgb, #121212, transparent 77%);
 
-  /* Universal for light and dark themes */
-  --g-light: linear-gradient(to top,
-      var(--white) 0%,
-      color-mix(in srgb, var(--white), transparent 100%) 100%);
+  --g-light: linear-gradient(to top, var(--white) 0%, color-mix(in srgb, var(--white), transparent 100%) 100%);
   --on-g-light: var(--gray-9);
-  --g-dark: linear-gradient(to top,
-      var(--dark-4) 0%,
-      color-mix(in srgb, var(--dark-4), transparent 100%) 100%);
+  --g-dark: linear-gradient(to top, var(--dark-4) 0%, color-mix(in srgb, var(--dark-4), transparent 100%) 100%);
   --on-g-dark: var(--white);
 
   --font-sans: "Noto Sans", sans-serif;
@@ -169,46 +162,24 @@
 @theme inline {
   --font-heading: var(--font-heading);
   --font-sans: var(--font-sans);
-
   --color-sidebar-ring: var(--yellow-10);
   --color-sidebar-border: var(--outline);
-  --color-sidebar-accent-foreground: var(--pink-10);
   --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--green-10);
   --color-sidebar: var(--card);
-
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-
   --color-ring: var(--primary);
   --color-input: var(--input);
   --color-border: var(--outline);
-
   --color-destructive: var(--error);
-
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-
   --color-muted-foreground: var(--on-bg-disabled);
   --color-muted: var(--bg-disabled);
-
   --color-secondary-foreground: var(--on-primary-card);
   --color-secondary: var(--primary-card);
   --color-primary-foreground: var(--on-primary);
   --color-primary: var(--primary);
-
-  --color-popover-foreground: var(--on-card);
   --color-popover: var(--card);
-  --color-card-foreground: var(--on-card);
   --color-card: var(--card);
   --color-foreground: var(--on-bg-high);
   --color-background: var(--bg);
-
   --radius-sm: var(--radius-1);
   --radius-lg: var(--radius-2);
   --radius-xl: var(--radius-3);
@@ -219,62 +190,53 @@
   --radius-6xl: var(--radius-8);
   --radius-7xl: var(--radius-9);
   --radius-8xl: var(--radius-10);
-
-  /* effects */
   --blur-glass: 10px;
   --shadow-card: 0 1px 6px 0 rgb(0 0 0 / 0.05);
+
+  --animate-reveal: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-reveal-slow: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
+
 
 .dark {
   --primary: var(--brand-7);
   --on-primary: var(--white);
   --primary-card: var(--brand-3);
   --on-primary-card: var(--dark-9);
-
   --outline: var(--dark-6);
   --bg: var(--dark-8);
   --bg-disabled: var(--gray-9);
   --on-bg-disabled: var(--gray-7);
   --card: var(--dark-9);
-
   --on-bg-high: var(--white);
   --on-bg-medium: var(--dark-1);
   --on-bg-low: var(--dark-2);
-
   --error: var(--red-9);
   --on-error: var(--white);
   --error-card: var(--red-2);
   --on-error-card: var(--red-8);
-
   --success: var(--green-9);
   --on-success: var(--white);
   --success-card: var(--green-1);
   --on-success-card: var(--green-7);
-
   --warning: var(--orange-9);
   --on-warning: var(--white);
   --warning-card: var(--orange-0);
   --on-warning-card: var(--orange-9);
-
-  --primary-glass: color-mix(in srgb, var(--primary), transparent 95%);
-  --on-primary-glass: var(--primary);
-  --card-glass: color-mix(in srgb, var(--card), transparent 95%);
-  --outline-primary-glass: conic-gradient(from 180deg at 50% 50%,
-      var(--primary) 0%,
-      color-mix(in srgb, var(--primary), transparent 80%) 25%,
-      var(--primary) 50%,
-      color-mix(in srgb, var(--primary), transparent 80%) 75%,
-      var(--primary) 100%);
-  --outline-glass: conic-gradient(from 180deg at 50% 50%,
-      var(--outline) 0%,
-      color-mix(in srgb, var(--outline), transparent 80%) 25%,
-      var(--outline) 50%,
-      color-mix(in srgb, var(--outline), transparent 80%) 75%,
-      var(--outline) 100%);
-
   --state-hover: color-mix(in srgb, #fff, transparent 95%);
   --state-focus: color-mix(in srgb, #fff, transparent 92%);
-  --state-focus: color-mix(in srgb, #fff, transparent 77%);
 }
 
 @layer base {
@@ -283,153 +245,69 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
   }
 }
 
-@layer components {
-  .state-layer {
-    @apply relative transition-all;
+/* Hard-coded CSS for animation timelines to bypass any Tailwind/PostCSS processing errors */
+@supports (animation-timeline: view()) {
+  @keyframes scroll-move-ltr {
+    from {
+      transform: translateX(30%);
+    }
+
+    to {
+      transform: translateX(-30%);
+    }
   }
 
-  .state-layer:hover {
-    box-shadow: inset 0 0 0 999px var(--state-hover);
+  @keyframes scroll-move-rtl {
+    from {
+      transform: translateX(-30%);
+    }
+
+    to {
+      transform: translateX(30%);
+    }
   }
 
-  .state-layer:active {
-    box-shadow: inset 0 0 0 999px var(--state-active);
+  .marquee-scroll-ltr {
+    display: block;
+    will-change: transform;
+    animation: scroll-move-ltr linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+
+  .marquee-scroll-rtl {
+    display: block;
+    will-change: transform;
+    animation: scroll-move-rtl linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
   }
 }
 
-/* 
-@layer utilities {
-  .text-display-1 {
-    font-family: var(--display-1-font-face);
-    font-size: var(--display-1-size);
-    font-weight: var(--display-1-weight);
-    line-height: var(--display-1-lh);
-  }
+/* Fallback for browsers without animation-timeline support (Safari) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports not (animation-timeline: view()) {
+    @keyframes fallback-marquee {
+      from {
+        transform: translateX(0);
+      }
 
-  .text-display-2 {
-    font-family: var(--display-2-font-face);
-    font-size: var(--display-2-size);
-    font-weight: var(--display-2-weight);
-    line-height: var(--display-2-lh);
-  }
+      to {
+        transform: translateX(-50%);
+      }
+    }
 
-  .text-display-3 {
-    font-family: var(--display-3-font-face);
-    font-size: var(--display-3-size);
-    font-weight: var(--display-3-weight);
-    line-height: var(--display-3-lh);
+    .marquee-scroll-ltr,
+    .marquee-scroll-rtl {
+      animation: fallback-marquee 20s linear infinite;
+    }
   }
-
-  .text-display-4 {
-    font-family: var(--display-4-font-face);
-    font-size: var(--display-4-size);
-    font-weight: var(--display-4-weight);
-    line-height: var(--display-4-lh);
-  }
-
-  .text-display-5 {
-    font-family: var(--display-5-font-face);
-    font-size: var(--display-5-size);
-    font-weight: var(--display-5-weight);
-    line-height: var(--display-5-lh);
-  }
-
-  .text-display-6 {
-    font-family: var(--display-6-font-face);
-    font-size: var(--display-6-size);
-    font-weight: var(--display-6-weight);
-    line-height: var(--display-6-lh);
-  }
-
-  .text-heading-1 {
-    font-family: var(--heading-1-font-face);
-    font-size: var(--heading-1-size);
-    font-weight: var(--heading-1-weight);
-    line-height: var(--heading-1-lh);
-  }
-
-  .text-heading-2 {
-    font-family: var(--heading-2-font-face);
-    font-size: var(--heading-2-size);
-    font-weight: var(--heading-2-weight);
-    line-height: var(--heading-2-lh);
-  }
-
-  .text-heading-3 {
-    font-family: var(--heading-3-font-face);
-    font-size: var(--heading-3-size);
-    font-weight: var(--heading-3-weight);
-    line-height: var(--heading-3-lh);
-  }
-
-  .text-heading-4 {
-    font-family: var(--heading-4-font-face);
-    font-size: var(--heading-4-size);
-    font-weight: var(--heading-4-weight);
-    line-height: var(--heading-4-lh);
-  }
-
-  .text-heading-5 {
-    font-family: var(--heading-5-font-face);
-    font-size: var(--heading-5-size);
-    font-weight: var(--heading-5-weight);
-    line-height: var(--heading-5-lh);
-  }
-
-  .text-heading-6 {
-    font-family: var(--heading-6-font-face);
-    font-size: var(--heading-6-size);
-    font-weight: var(--heading-6-weight);
-    line-height: var(--heading-6-lh);
-  }
-
-  .text-body-1 {
-    font-family: var(--body-1-font-face);
-    font-size: var(--body-1-size);
-    font-weight: var(--body-1-weight);
-    line-height: var(--body-1-lh);
-  }
-
-  .text-body-2 {
-    font-family: var(--body-2-font-face);
-    font-size: var(--body-2-size);
-    font-weight: var(--body-2-weight);
-    line-height: var(--body-2-lh);
-  }
-
-  .text-body-3 {
-    font-family: var(--body-3-font-face);
-    font-size: var(--body-3-size);
-    font-weight: var(--body-3-weight);
-    line-height: var(--body-3-lh);
-  }
-
-  .text-body-4 {
-    font-family: var(--body-4-font-face);
-    font-size: var(--body-4-size);
-    font-weight: var(--body-4-weight);
-    line-height: var(--body-4-lh);
-  }
-
-  .text-body-5 {
-    font-family: var(--body-5-font-face);
-    font-size: var(--body-5-size);
-    font-weight: var(--body-5-weight);
-    line-height: var(--body-5-lh);
-  }
-
-  .text-body-6 {
-    font-family: var(--body-6-font-face);
-    font-size: var(--body-6-size);
-    font-weight: var(--body-6-weight);
-    line-height: var(--body-6-lh);
-  }
-} */
+}

@@ -1,4 +1,4 @@
-/* LLM context: Refactoring expert-page.tsx to be purely dynamic using the passed expert prop. */
+/* LLM context: Updating expert page with immersive transitions and dynamic project card entry */
 
 "use client";
 
@@ -14,9 +14,15 @@ import { ExpertData } from "./_data";
 import { Project } from "../(Project)/data";
 import Link from "next/link";
 
-function ExpertProjectCard({ project }: { project: Project }) {
+function ExpertProjectCard({ project, index }: { project: Project, index: number }) {
   return (
-    <a href={project.href} target="_blank" rel="noopener noreferrer" className="group block">
+    <a
+      href={project.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
       <Card className="relative overflow-hidden rounded-4xl border border-(--outline) aspect-[594/395] bg-card ring-0 transition-all active:scale-[0.99]">
         <Image
           fill
@@ -37,11 +43,11 @@ function ExpertProjectCard({ project }: { project: Project }) {
 function ExpertHeroSection({ expert }: { expert: ExpertData }) {
   return (
     <Container variant="full-width" className="pt-4 md:pt-10">
-      <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group">
+      <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group animate-in fade-in zoom-in-95 duration-1000">
         <Image
           src={expert.avatar}
           fill
-          className="object-cover object-center"
+          className="object-cover object-center transition-transform duration-[2000ms]"
           alt={expert.name}
           priority
         />
@@ -50,7 +56,7 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
 
         <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-1">
           {expert.socials.map((social, key) => (
-            <Button variant={'text'} key={key} size={'icon-large'} asChild>
+            <Button variant={'text'} key={key} size={'icon-large'} asChild className="animate-reveal" style={{ animationDelay: `${400 + key * 100}ms` }}>
               <Link href={social.href} target="_blank" rel="noopener noreferrer">
                 {social.icon}
               </Link>
@@ -59,9 +65,9 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
         </div>
 
         <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-6 md:p-10">
-          <div className="flex items-center gap-3 mb-4 md:mb-6">
+          <div className="flex items-center gap-3 mb-4 md:mb-6 animate-reveal delay-200 fill-mode-both">
             <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
-            <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full" />
+            <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full duration-[2000ms]" />
           </div>
 
           <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
@@ -71,7 +77,8 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
                   key={index}
                   variant="tonal-card-static"
                   size="chip-large"
-                  className="bg-(--card)/50 backdrop-blur-md border-(--outline)/50 text-(--on-bg-high) whitespace-nowrap px-4 py-5 md:py-1"
+                  className="bg-(--card)/50 backdrop-blur-md border-(--outline)/50 text-(--on-bg-high) whitespace-nowrap px-4 py-5 md:py-1 animate-reveal fill-mode-both"
+                  style={{ animationDelay: `${300 + index * 50}ms` }}
                 >
                   {tag.icon && React.cloneElement(tag.icon as React.ReactElement<{ className?: string }>, { className: "size-4 fill-current" })}
                   {tag.label}
@@ -87,7 +94,6 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
 
 export default function ExpertPage({ expert }: { expert: ExpertData }) {
   const [activeTab, setActiveTab] = useState("Проекты");
-  // const tabs = ["Проекты", ...(expert.telegramChannel ? ["Будни"] : [])];
   const tabs = [
     "Проекты",
     // "Будни",
@@ -103,7 +109,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
 
       <Container variant="full-width" className="py-4 md:py-12">
         <div className="max-w-[1200px] mx-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10 animate-reveal delay-500 fill-mode-both">
             <TabsList variant="line" className="w-full justify-start md:justify-center overflow-x-auto overflow-y-hidden no-scrollbar border-b border-(--outline) rounded-none gap-2 md:gap-8 bg-transparent!">
               {tabs.map((tab) => (
                 <TabsTrigger
@@ -118,22 +124,12 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
           </Tabs>
 
           {activeTab === "Проекты" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 animate-in fade-in duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {expert.projects.map((project, idx) => (
-                <ExpertProjectCard key={idx} project={project} />
+                <ExpertProjectCard key={idx} project={project} index={idx} />
               ))}
             </div>
           )}
-
-          {/* {activeTab === "Будни" && expert.telegramChannel && (
-            <div className="w-full h-[800px] rounded-4xl overflow-hidden border border-(--outline) bg-card animate-in fade-in duration-500">
-              <iframe
-                src={`https://t.me/s/${expert.telegramChannel}`}
-                className="w-full h-full border-none"
-                title="Telegram Channel Preview"
-              />
-            </div>
-          )} */}
         </div>
       </Container>
     </div>

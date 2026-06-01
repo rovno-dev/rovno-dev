@@ -1,3 +1,4 @@
+/* LLM context: Keeping JS config focused on simple font-scaling utilities while moving experimental CSS to globals.css for parser safety. */
 import plugin from 'tailwindcss/plugin';
 
 export default plugin(function ({ addUtilities }) {
