@@ -48,14 +48,16 @@ export default function BottomAppBar() {
           </div>
 
           <Button
-
+            asChild
             shape={'round'}
             className="w-full h-[60px] gap-2"
             size="medium"
             onClick={() => setOpen(true)}
           >
-            <DesignServicesIcon className="size-[26px]!" />
-            <span className="text-display-4">Заказ</span>
+            <Link href={'https://forms.yandex.com/cloud/6936a4b1d0468820623c548e'}>
+              <DesignServicesIcon className="size-[26px]!" />
+              <span className="text-display-4">Заказ</span>
+            </Link>
           </Button>
 
         </div>

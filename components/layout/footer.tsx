@@ -1,3 +1,5 @@
+/* LLM context: Updating Footer social icons to support external links using Button asChild pattern */
+
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "../icons";
 import { Button } from "../ui/button";
@@ -5,6 +7,7 @@ import { Container } from "../ui/container";
 import RovnoLogotypeWordmark from "./rovno-dev-logotype/rovno-dev-logotype-wordmark";
 import { NavLink } from "./nav-link";
 import { ThemeSwitcher } from "./theme-switcher";
+import Link from "next/link";
 
 export default function Footer() {
   const footerSections = [
@@ -23,20 +26,20 @@ export default function Footer() {
         ROUTES.projects,
         ROUTES.about,
         ROUTES.journal,
-        ROUTES.job,
+        // ROUTES.job,
       ],
     },
     {
       id: 'journal',
       title: "Журнал Ровня",
       links: [
-        {
-          title: 'Стать редактором',
-          href: '/rovnya/become-editor',
-        },
+        // {
+        //   title: 'Стать редактором',
+        //   href: '/rovnya/become-editor',
+        // },
         {
           title: 'Предложить статью',
-          href: '/rovnya/dirrect-message',
+          href: 'https://t.me/rovno_dev?direct',
         },
       ]
     },
@@ -45,11 +48,11 @@ export default function Footer() {
       links: [
         {
           title: 'Пройти стажировку',
-          href: '/job/internship',
+          href: 'https://forms.yandex.com/u/69975d0849af47b15b4c80df',
         },
         {
           title: 'Повышение квалификации',
-          href: '/job/up-cvalification',
+          href: 'https://forms.yandex.com/u/69975d0849af47b15b4c80df',
         },
       ],
     }
@@ -84,10 +87,10 @@ interface SocialMediaIconsProps {
 
 function SocialMediaIcons({ className }: SocialMediaIconsProps) {
   const socialIcons = [
-    { icon: <TelegramLogotypeMonoIcon /> },
-    { icon: <VKLogotypeMonoIcon /> },
-    { icon: <DprofileLogotypeMonoIcon /> },
-    { icon: <PinterestLogotypeMonoIcon /> },
+    { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/rovno_dev" },
+    { icon: <VKLogotypeMonoIcon />, href: "https://vk.com/rovno_dev" },
+    { icon: <DprofileLogotypeMonoIcon />, href: "https://dprofile.ru/rovno_dev" },
+    { icon: <PinterestLogotypeMonoIcon />, href: "https://pinterest.com/rovno_dev" },
   ];
 
   return (
@@ -95,8 +98,10 @@ function SocialMediaIcons({ className }: SocialMediaIconsProps) {
       <h3 className="text-heading-3 text-(--on-bg-medium) sm:text-heading-2">Мы в соц. сетях</h3>
       <div className="flex gap-1 mt-2 sm:flex-wrap lg:flex-nowrap">
         {socialIcons.map((item, key) => (
-          <Button variant={'text'} key={key} size={'icon-large'}>
-            {item.icon}
+          <Button variant={'text'} key={key} size={'icon-large'} asChild>
+            <Link href={item.href} target="_blank" rel="noopener noreferrer">
+              {item.icon}
+            </Link>
           </Button>
         ))}
       </div>

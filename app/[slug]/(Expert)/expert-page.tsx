@@ -1,56 +1,83 @@
+/* LLM context: Refactoring expert-page.tsx to be purely dynamic using the passed expert prop. */
+
 "use client";
 
-import { Container } from "@/components/ui/container";
 import React, { useState } from "react";
+import Image from "next/image";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
+import { ExpertData } from "./_data";
+import { Project } from "../(Project)/data";
+import Link from "next/link";
 
-
-const tabs = ["Проекты", "Будни", "Речи", "События", "Награды", "Мысли вслух"];
-
-const projects = [
-  { title: "Vanguard: интернет-магазин электроники", image: "/images/vanguard.png", category: "Проекты" },
-  { title: "Чужой | ALX-9 - ИИ выставка", image: "/images/alien.png", category: "Проекты" },
-  { title: "Тепляков - иллюзионист | Айдентика", image: "/images/teplyakov.png", category: "Проекты" },
-  { title: "Underwear store | Flirty Girl", image: "/images/flirtygirl.png", category: "Проекты" },
-  { title: "Vanguard: интернет-магазин электроники", image: "/images/vanguard.png", category: "Проекты" },
-  { title: "Vanguard: интернет-магазин электроники", image: "/images/vanguard.png", category: "Проекты" }
-];
-
-const IconSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://w3.org">
-    <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
-    <path d="M7 4V10M4 7H10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
-function ExpertHeroSection() {
-  const expertTags = [
-    { label: "Со-основатель и Техдир", dot: false, icon: <IconSVG /> },
-    { label: "Автор тех самых стихов", dot: false, icon: null },
-    { label: "Создатель Unidoka UI", dot: false, icon: <IconSVG /> },
-    { label: "Основатель Вершин", dot: false, icon: <IconSVG /> },
-  ];
-
+function ExpertProjectCard({ project }: { project: Project }) {
   return (
-    <Container variant="full-width" className="pt-10">
-      <div className="relative w-full max-w-[1200px] mx-auto h-[480px] rounded-[2.5rem] overflow-hidden bg-[#141414] border border-white/5 group">
-        <div className="absolute inset-0">
-          <img src="/images/niyaz_gimmadiev.png" className="w-full h-full object-cover" alt="" />
+    <a href={project.href} target="_blank" rel="noopener noreferrer" className="group block">
+      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) aspect-[594/395] bg-card ring-0 transition-all active:scale-[0.99]">
+        <Image
+          fill
+          src={project.image}
+          alt={project.title}
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+          <h3 className="text-display-4 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+            {project.title}
+          </h3>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 z-20 flex flex-col justify-end items-center p-10 md:p-14 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4 w-full">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Нияз Гимадиев</h1>
-            <div className="w-7 h-7 bg-[#FF3B30] rounded-full flex items-center justify-center border border-white/10 shrink-0">
-              <span className="text-[10px] font-bold text-white">RT</span>
-            </div>
+      </Card>
+    </a>
+  );
+}
+
+function ExpertHeroSection({ expert }: { expert: ExpertData }) {
+  return (
+    <Container variant="full-width" className="pt-4 md:pt-10">
+      <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group">
+        <Image
+          src={expert.avatar}
+          fill
+          className="object-cover object-center"
+          alt={expert.name}
+          priority
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-(--bg) via-transparent to-transparent z-10" />
+
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-1">
+          {expert.socials.map((social, key) => (
+            <Button variant={'text'} key={key} size={'icon-large'} asChild>
+              <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                {social.icon}
+              </Link>
+            </Button>
+          ))}
+        </div>
+
+        <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-6 md:p-10">
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
+            <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full" />
           </div>
-          <div className="flex flex-wrap justify-center gap-2.5 max-w-[950px]">
-            {expertTags.map((tag, index) => (
-              <div key={index} className="flex items-center gap-2 bg-white/5 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10 text-[12px] font-medium">
-                {tag.icon && <span className="text-white/60">{tag.icon}</span>}
-                <span className="text-white/90">{tag.label}</span>
-              </div>
-            ))}
+
+          <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
+            <div className="flex flex-nowrap gap-2 md:flex-wrap md:justify-center pb-1">
+              {expert.tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="tonal-card-static"
+                  size="chip-large"
+                  className="bg-(--card)/50 backdrop-blur-md border-(--outline)/50 text-(--on-bg-high) whitespace-nowrap px-4 py-5 md:py-1"
+                >
+                  {tag.icon && React.cloneElement(tag.icon as React.ReactElement<{ className?: string }>, { className: "size-4 fill-current" })}
+                  {tag.label}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -58,62 +85,57 @@ function ExpertHeroSection() {
   );
 }
 
-export default function ExpertPage() {
+export default function ExpertPage({ expert }: { expert: ExpertData }) {
   const [activeTab, setActiveTab] = useState("Проекты");
-
-  const filteredProjects = activeTab === "Проекты" ? projects : [];
+  // const tabs = ["Проекты", ...(expert.telegramChannel ? ["Будни"] : [])];
+  const tabs = [
+    "Проекты",
+    // "Будни",
+    // "Речи", 
+    // "События", 
+    // "Награды", 
+    // "Мысли вслух"
+  ];
 
   return (
-    <>
-      <div className="pt-[70px]">
-        <ExpertHeroSection />
-      </div>
+    <div className="pb-20">
+      <ExpertHeroSection expert={expert} />
 
-      <Container variant="full-width" className="py-12">
+      <Container variant="full-width" className="py-4 md:py-12">
         <div className="max-w-[1200px] mx-auto">
-          <div className="flex justify-center items-center gap-8 border-b border-white/5 mb-10 overflow-x-auto pb-4 no-scrollbar">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`text-[15px] font-medium transition-all whitespace-nowrap relative ${activeTab === tab ? "text-white" : "text-gray-500 hover:text-gray-300"
-                  }`}
-              >
-                {tab}
-                {activeTab === tab && (
-                  <div className="absolute -bottom-[17px] left-0 right-0 h-[2px] bg-[#4A77FF]" />
-                )}
-              </button>
-            ))}
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10">
+            <TabsList variant="line" className="w-full justify-start md:justify-center overflow-x-auto overflow-y-hidden no-scrollbar border-b border-(--outline) rounded-none gap-2 md:gap-8 bg-transparent!">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className="px-4 md:px-0 data-[state=active]:text-(--primary)"
+                >
+                  {tab}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
 
-          {filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px]">
-              {filteredProjects.map((project, idx) => (
-                <div key={idx} className="group cursor-pointer">
-                  <div
-                    className="relative overflow-hidden rounded-[2rem] bg-[#141414] border border-white/5"
-                    style={{ width: '100%', aspectRatio: '594/395' }}
-                  >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex flex-col justify-end p-8">
-                      <h3 className="text-xl font-semibold leading-snug max-w-[85%]">{project.title}</h3>
-                    </div>
-                  </div>
-                </div>
+          {activeTab === "Проекты" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 animate-in fade-in duration-500">
+              {expert.projects.map((project, idx) => (
+                <ExpertProjectCard key={idx} project={project} />
               ))}
             </div>
-          ) : (
-            <div className="py-20 text-center text-gray-600">
-              <p>В разделе «{activeTab}» пока нет опубликованных материалов.</p>
-            </div>
           )}
+
+          {/* {activeTab === "Будни" && expert.telegramChannel && (
+            <div className="w-full h-[800px] rounded-4xl overflow-hidden border border-(--outline) bg-card animate-in fade-in duration-500">
+              <iframe
+                src={`https://t.me/s/${expert.telegramChannel}`}
+                className="w-full h-full border-none"
+                title="Telegram Channel Preview"
+              />
+            </div>
+          )} */}
         </div>
       </Container>
-    </>
+    </div>
   );
 }

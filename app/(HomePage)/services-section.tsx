@@ -1,3 +1,5 @@
+/* LLM context: Updating services-section.tsx to use the new children-based ShowcaseCard pattern */
+
 import { DiamondIcon, PublicIcon, StylusNoteIcon } from "@/components/icons";
 import { servicesIconsStyles, ShowcaseCard } from "@/components/layout/showcase-card";
 import { Badge } from "@/components/ui/badge";
@@ -5,28 +7,40 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
 export default function ServicesSection() {
+
+  const HARDCODED_LINKS = {
+    "design": "https://dprofile.ru/cases/search?query=rovno_dev&category=1&directions=1,2,3,4,5,6&hasAchievement=all&sortType=DATE",
+    "motion": "https://dprofile.ru/cases/search?query=rovno_dev&category=6&directions=30,31,32,33,34,35&hasAchievement=all&sortType=DATE",
+    "3D": "https://dprofile.ru/cases/search?query=itera&category=5&directions=26,27,28&hasAchievement=all&sortType=DATE",
+    "video": "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
+    "graphical": "https://dprofile.ru/cases/search?query=itera&category=2&directions=18,43,7,8,9&hasAchievement=all&sortType=DATE",
+  };
+
   const tags = [
-    { label: "UI/UX", count: 7 },
-    { label: "Motion-дизайн", count: 2 },
-    { label: "3D", count: 2 },
-    { label: "Видео", count: 1 },
-    { label: "Логотипы и айдентика", count: 3 },
+    { label: "UI/UX", count: 7, href: HARDCODED_LINKS.design },
+    { label: "Motion-дизайн", count: 2, href: HARDCODED_LINKS.motion },
+    { label: "3D", count: 2, href: HARDCODED_LINKS['3D'] },
+    { label: "Видео", count: 1, href: HARDCODED_LINKS.video },
+    { label: "Логотипы и айдентика", count: 3, href: HARDCODED_LINKS.graphical },
   ];
 
   const services = [
     {
+      href: "https://dprofile.ru/cases/search?query=rovno_dev&category=1&directions=1,2,3,4,5,6&hasAchievement=all&sortType=DATE",
       count: '7',
       title: "UX/UI для сайтов и приложений",
       id: '7',
       icon: <PublicIcon className={servicesIconsStyles} />
     },
     {
+      href: "https://dprofile.ru/cases/search?query=rovno_dev&category=5&directions=26,27,28&hasAchievement=all&sortType=DATE",
       count: '5',
       title: `Motion-дизайн и 3D`,
       id: '2',
       icon: <DiamondIcon className={servicesIconsStyles} />
     },
     {
+      href: "https://dprofile.ru/cases/search?query=itera&category=2&directions=18,43,7,8,9&hasAchievement=all&sortType=DATE",
       count: '3',
       title: "Логотипы и айдентика",
       id: '3',
@@ -48,20 +62,33 @@ export default function ServicesSection() {
               variant={'tonal-card'}
               shape={'round'}
               key={key}
+              asChild={!!tag.href}
             >
-              {tag.label}
-              <Badge size={'chip-small'} variant={'text-static'} className="text-primary">{tag.count}</Badge>
+              {tag.href ? (
+                <a href={tag.href}>
+                  {tag.label}
+                  <Badge size={'chip-small'} variant={'text-static'} className="text-primary">{tag.count}</Badge>
+                </a>
+              ) : (
+                <>
+                  {tag.label}
+                  <Badge size={'chip-small'} variant={'text-static'} className="text-primary">{tag.count}</Badge>
+                </>
+              )}
             </Button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:w-full sm:h-full">
-        {services.map((item, key) => {
-          return (
-            <ShowcaseCard id={item.id} key={key} count={item.count} icon={item.icon} title={item.title} />
-          )
-        })}
+        {services.map((item, key) => (
+          <ShowcaseCard id={item.id} key={key} count={item.count} href={item.href}>
+            {item.icon}
+            <p className="text-(--on-bg-high) text-heading-5 sm:text-heading-3 whitespace-normal">
+              {item.title}
+            </p>
+          </ShowcaseCard>
+        ))}
       </div>
     </Container>
   );

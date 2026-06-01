@@ -1,17 +1,19 @@
+/* LLM context: Forcing SVG internal paths to inherit current color in Button components to fix dark icons on primary buttons in light theme */
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "@radix-ui/react-slot" // Ensure you use the correct slot import
+import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
 export const buttonUnidekaVariants = {
-  filled: "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  outlined: "border border-border bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  tonal: "bg-[var(--primary-card)] text-[var(--on-primary-card)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  "tonal-card": "bg-card text-card-foreground border border-border/50 hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  "tonal-primary": "bg-[var(--primary-card)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  text: "bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  glass: "bg-[var(--primary-glass)] backdrop-blur-glass border border-[var(--outline-primary-glass)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:fill-current",
-  selected: "bg-[var(--primary-card)] text-primary border border-primary cursor-pointer [&_svg]:fill-current",
+  filled: "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  outlined: "border border-border bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  tonal: "bg-[var(--primary-card)] text-[var(--on-primary-card)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  "tonal-card": "bg-card text-card-foreground border border-border/50 hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  "tonal-primary": "bg-[var(--primary-card)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  text: "bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  glass: "bg-[var(--primary-glass)] backdrop-blur-glass border border-[var(--outline-primary-glass)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg_*]:fill-current",
+  selected: "bg-[var(--primary-card)] text-primary border border-primary cursor-pointer [&_svg_*]:fill-current",
 };
 
 export const chipSizes = {
@@ -39,9 +41,7 @@ const buttonVariants = cva(
       variant: buttonUnidekaVariants,
       size: {
         ...buttonSizes,
-
         ...iconButtonSizes,
-
         ...chipSizes,
       },
       shape: {

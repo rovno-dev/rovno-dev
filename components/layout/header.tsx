@@ -4,6 +4,7 @@ import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
 import { Button } from "../ui/button";
 import { NavLink } from "./nav-link";
 import { DesignServicesIcon } from "../icons";
+import { ROUTES } from "@/utils/constants/routes";
 
 export default function Header() {
   return (
@@ -22,16 +23,18 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex gap-4 text-sm">
-            <NavLink href="/projects">Проекты</NavLink>
-            <NavLink href="/about">О нас</NavLink>
-            <NavLink href="/jobs">Вакансии</NavLink>
-            <NavLink href="/journal">{'Журнал "Ровня"'}</NavLink>
+            <NavLink href={ROUTES.projects.href}>Проекты</NavLink>
+            <NavLink href={ROUTES.about.href}>О нас</NavLink>
+            {/* <NavLink href={ROUTES.job}>Вакансии</NavLink> */}
+            <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
           </nav>
         </div>
 
-        <Button className="hidden sm:flex">
-          <DesignServicesIcon />
-          Оформить заказ
+        <Button className="hidden sm:flex" asChild>
+          <Link href={"https://forms.yandex.com/cloud/6936a4b1d0468820623c548e"}>
+            <DesignServicesIcon />
+            Оформить заказ
+          </Link>
         </Button>
       </Container>
     </header >
