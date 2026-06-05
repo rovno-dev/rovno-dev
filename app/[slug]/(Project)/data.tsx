@@ -8,9 +8,111 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
-import { PROJECTS } from "../(slug)/(Project)/data";
-import type { Project } from "../(slug)/(Project)/data";
 
+/* ---------- Project type ---------- */
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  href?: string;
+  category?: string;
+  client?: string;
+  platform?: string;
+  period?: string;
+  techStack?: string[];
+  metrics?: { label: string; value: string; description: string }[];
+}
+
+/* ---------- Project data ---------- */
+export const PROJECTS: Record<string, Project> = {
+  alx: {
+    id: "alx",
+    title: "ALX",
+    description:
+      "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
+    image: "/images/projects/alx.png",
+    href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
+    category: "Айдентика",
+    client: "ALX",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Figma", "After Effects"],
+    metrics: [
+      {
+        label: "Узнаваемость",
+        value: "+60%",
+        description: "Рост узнаваемости бренда после ребрендинга",
+      },
+    ],
+  },
+  sadovod: {
+    id: "sadovod",
+    title: "Садовод",
+    description:
+      "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
+    image: "/images/projects/sadovod.png",
+    href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
+    category: "E-commerce",
+    client: "Садовод",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS"],
+    metrics: [
+      {
+        label: "Конверсия",
+        value: "+35%",
+        description: "Увеличение конверсии после редизайна",
+      },
+    ],
+  },
+  vanguard: {
+    id: "vanguard",
+    title: "Vanguard",
+    description:
+      "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда.",
+    image: "/images/projects/vanguard.png",
+    href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
+    category: "Fintech",
+    client: "Vanguard FinTech",
+    platform: "iOS & Android App",
+    period: "2023 - 2024",
+    techStack: ["React Native", "TypeScript", "GraphQL", "Node.js", "WebGL"],
+    metrics: [
+      {
+        label: "Конверсия",
+        value: "+45%",
+        description: "Рост регистраций",
+      },
+      {
+        label: "Отток",
+        value: "-20%",
+        description: "Снижение отказов",
+      },
+      {
+        label: "Оценка в App Store",
+        value: "4.9",
+        description: "Средняя оценка пользователей",
+      },
+    ],
+  },
+  courtElegance: {
+    id: "courtElegance",
+    title: "Court Elegance",
+    description:
+      "Разработка премиального веб-сайта для бутика мужской одежды.",
+    image: "/images/projects/court.png",
+    href: "#",
+    category: "E-commerce",
+    client: "Court Elegance",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Next.js", "TypeScript", "Framer Motion"],
+    metrics: [],
+  },
+};
+
+/* ---------- Page component ---------- */
 const projectsList = Object.values(PROJECTS);
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {

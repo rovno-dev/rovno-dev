@@ -8,6 +8,7 @@ import {
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
 import { Project, PROJECTS } from "../(Project)/data";
+// Note: PROJECTS is now defined in the same directory's data.tsx
 
 export interface ExpertTag {
   label: string;
