@@ -14,8 +14,13 @@ export const ROUTES = {
   },
   projects: {
     id: 'projects',
-    href: "https://dprofile.ru/rovno_dev",
+    href: "/projects",
     title: 'Проекты'
+  },
+  dprofileProjects: {
+    id: 'dprofileProjects',
+    href: "https://dprofile.ru/rovno_dev",
+    title: 'Проекты на Dprofile'
   },
   about: {
     id: 'about',

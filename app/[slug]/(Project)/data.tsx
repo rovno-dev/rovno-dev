@@ -1,90 +1,90 @@
-export interface Metric {
-  label: string;
-  value: string;
-  description: string;
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { PROJECTS } from "../(slug)/(Project)/data";
+import type { Project } from "../(slug)/(Project)/data";
+
+const projectsList = Object.values(PROJECTS);
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  return (
+    <a
+      href={project.href || "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+        <Image
+          fill
+          src={project.image}
+          alt={project.title}
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+          {project.category && (
+            <Badge
+              variant="glass-static"
+              size="chip-small"
+              className="text-white border-white/20 mb-2 w-fit"
+            >
+              {project.category}
+            </Badge>
+          )}
+          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+            {project.title}
+          </h3>
+        </div>
+        {/* Arrow button */}
+        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <Button
+            size="icon-small"
+            shape="round"
+            className="bg-white text-black hover:bg-white"
+          >
+            <KeyboardArrowRightIcon className="size-5!" />
+          </Button>
+        </div>
+      </Card>
+    </a>
+  );
 }
 
-export interface Project {
-  id: number;
-  title: string;
-  image: string;
-  category?: string;
-  href?: string;
-  description?: string;
-  client?: string;
-  platform?: string;
-  period?: string;
-  techStack?: string[];
-  metrics?: Metric[];
-}
+export default function ProjectsPage() {
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero */}
+      <section className="py-16 md:py-24 border-b border-(--outline)">
+        <Container>
+          <div className="max-w-[800px] animate-reveal">
+            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
+              Проекты
+            </h1>
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
+              Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
+            </p>
+          </div>
+        </Container>
+      </section>
 
-export const PROJECTS: Record<string, Project> = {
-  courtElegance: {
-    id: 4,
-    title: "The Court Elegance - Теннисный клуб",
-    image: "/images/projects/court.png",
-    category: "Проекты",
-    href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
-    description: "Полный редизайн аналитического ядра для корпоративных клиентов. Внедрение realtime обработки данных и сложной визуализации.",
-    client: "The Court Elegance",
-    platform: "Web App",
-    period: "2024",
-    techStack: ["React", "TypeScript", "Node.js", "PostgreSQL"],
-    metrics: [
-      { label: "КОНВЕРСИЯ", value: "+45%", description: "Рост регистраций" },
-      { label: "ОТТОК", value: "-20%", description: "Снижение отказов" },
-      { label: "ОЦЕНКА В APP STORE", value: "4.9", description: "Рейтинг" },
-    ],
-  },
-  alx: {
-    id: 3,
-    title: "Чужой | ALX-9 - ИИ выставка",
-    image: "/images/projects/alx.png",
-    category: "Проекты",
-    href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
-    description: "Разработка масштабируемого мобильного приложения с интеграцией AR-примерочной и бесшовным чекаутом.",
-    client: "ALX-9",
-    platform: "Mobile App",
-    period: "2023",
-    techStack: ["React Native", "TypeScript", "GraphQL", "Figma"],
-    metrics: [
-      { label: "КОНВЕРСИЯ", value: "+60%", description: "Рост установок" },
-      { label: "ОТТОК", value: "-15%", description: "Снижение отказов" },
-      { label: "ОЦЕНКА В APP STORE", value: "4.8", description: "Рейтинг" },
-    ],
-  },
-  sadovod: {
-    id: 2,
-    title: "Sadovod - Интернет магазин",
-    image: "/images/projects/sadovod.png",
-    category: "Проекты",
-    href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
-    description: "Миграция монолитной архитектуры на микросервисы. Повышение отказоустойчивости до 99.99%.",
-    client: "Sadovod",
-    platform: "Web App",
-    period: "2023 - 2024",
-    techStack: ["Next.js", "Node.js", "MongoDB", "Docker"],
-    metrics: [
-      { label: "СКОРОСТЬ", value: "x3", description: "Ускорение загрузки" },
-      { label: "ДОСТУПНОСТЬ", value: "99.99%", description: "Uptime" },
-      { label: "ОЦЕНКА", value: "4.7", description: "Рейтинг" },
-    ],
-  },
-  vanguard: {
-    id: 1,
-    title: "Vanguard: интернет-магазин электроники",
-    image: "/images/projects/vanguard.png",
-    category: "Проекты",
-    href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
-    description: "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда. Архитектура, ориентированная на прозрачность данных и экстремальную производительность.",
-    client: "Vanguard FinTech",
-    platform: "iOS & Android App",
-    period: "2023 - 2024",
-    techStack: ["React Native", "TypeScript", "GraphQL", "Node.js", "WebGL"],
-    metrics: [
-      { label: "КОНВЕРСИЯ", value: "+45%", description: "Рост регистраций" },
-      { label: "ОТТОК", value: "-20%", description: "Снижение отказов" },
-      { label: "ОЦЕНКА В APP STORE", value: "4.9", description: "Рейтинг" },
-    ],
-  },
-};
+      {/* Projects Grid */}
+      <section className="py-16 md:py-24">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {projectsList.map((project, idx) => (
+              <ProjectCard key={project.id} project={project} index={idx} />
+            ))}
+          </div>
+        </Container>
+      </section>
+    </main>
+  );
+}
