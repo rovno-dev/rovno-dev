@@ -19,6 +19,7 @@ import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code
 import { cn } from "@/lib/utils";
 import { ProjectCard } from "../[slug]/(Expert)/expert-page";
 import { PROJECTS } from "../[slug]/(Project)/data";
+import SocialsSection from "./socials-section";
 
 /* ---------- Hero Section ---------- */
 function HeroSection() {
@@ -224,9 +225,9 @@ function ServicesSection() {
                 <div className="flex size-14 items-center justify-center rounded-xl bg-(--primary) text-(--primary)">
                   {service.icon}
                 </div>
-                <span className="text-display-4 font-heading text-(--on-bg-low) opacity-40">
+                {/* <span className="text-display-4 font-heading text-(--on-bg-low) opacity-40">
                   {service.number}
-                </span>
+                </span> */}
               </div>
               <h3 className="text-display-4 text-(--on-bg-high) mb-1">{service.title}</h3>
               <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
@@ -277,6 +278,7 @@ export default function Home() {
       <HeroSection />
       <SelectedWorksSection />
       <ServicesSection />
+      <SocialsSection />
       {/* <CTASection /> */}
     </>
   );

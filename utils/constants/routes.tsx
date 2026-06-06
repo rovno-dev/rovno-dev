@@ -25,7 +25,7 @@ export const ROUTES = {
   about: {
     id: 'about',
     href: "/about",
-    title: 'Агентство',
+    title: 'О нас',
   },
   journal: {
     id: 'journal',
