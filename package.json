@@ -1,9 +1,9 @@
 {
   "name": "rovno-dev-frontend",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "private": false,
-  "author": "Niyaz Gimadiev niyazgim@gmail.com (https://rovno.dev/u/niyazgim)",
-  "license": "MIT",
+  "author": "Niyaz Gimadiev niyaztutor@gmail.com (https://rovno.dev/niyazgim)",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rovno-dev/rovno-dev-frontend"

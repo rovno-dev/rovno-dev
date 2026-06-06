@@ -1,44 +1,152 @@
-// "use client";
+"use client";
 
-// import React from "react";
-// import { PROJECTS } from "./data";
-// import { Container } from "@/components/ui/container";
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code-icon";
+import { Project } from "./data";
 
-// export default function ProjectsPage() {
-//   return (
-//     <main className="bg-[#0A0A0A] min-h-screen pt-20 pb-20">
-//       <Container variant="full-width" className="max-w-[1440px] mx-auto px-4">
+interface ProjectPageProps {
+  project: Project;
+}
 
-//         <div className="grid grid-cols-1 md:grid-cols-6 overflow-hidden rounded-[2.5rem] border border-white/5 mt-[30px]">
-//           {Object.keys(PROJECTS).map((project) => (
-//             <div
-//               key={project.id}
-//               className={`
-//                 flex flex-col group border-[0.5px] border-white/5
-//               `}
-//             >
+export default function ProjectPage({ project }: ProjectPageProps) {
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-20 pb-16 md:pb-24">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+            {/* Left column – text */}
+            <div className="animate-reveal">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Badge variant="glass-static" size="chip-small">
+                  ФИНАНСОВЫЕ ТЕХНОЛОГИИ
+                </Badge>
+                <Badge variant="glass-static" size="chip-small">
+                  КЕЙС-СТАДИ
+                </Badge>
+              </div>
 
-//               <div className="relative aspect-[16/10] overflow-hidden bg-[#141414]">
-//                 <img
-//                   src={project.image}
-//                   alt={project.title}
-//                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-//                 />
-//               </div>
+              <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-tight">
+                {project.title}
+              </h1>
 
-//               <div
-//                 className="py-5 px-6"
-//                 style={{ backgroundColor: '#25262B' }}
-//               >
-//                 <h3 className="text-white text-[18px] font-bold leading-tight">
-//                   {project.title}
-//                 </h3>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
+              <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) mb-8 max-w-[576px]">
+                {project.description}
+              </p>
 
-//       </Container>
-//     </main>
-//   );
-// }
+              {/* Client / Platform / Period info */}
+              <div className="flex flex-wrap gap-6 md:gap-10 mb-8">
+                <div>
+                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">КЛИЕНТ</p>
+                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.client}</p>
+                </div>
+                <div>
+                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЛАТФОРМА</p>
+                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.platform}</p>
+                </div>
+                <div>
+                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЕРИОД</p>
+                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.period}</p>
+                </div>
+              </div>
+
+              {/* Tech Stack */}
+              {project.techStack && project.techStack.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {project.techStack.map((tech, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="tonal-card-static"
+                      size="chip-medium"
+                      className="animate-reveal fill-mode-both"
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right column – image */}
+            <div className="relative aspect-[596/447] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) animate-reveal delay-200 fill-mode-both">
+              <Image
+                src={project.image}
+                alt={project.title}
+                fill
+                className="object-cover"
+                priority
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Results Section */}
+      {project.metrics && project.metrics.length > 0 && (
+        <section className="py-16 md:py-24 bg-(--bg)">
+          <Container>
+            <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
+              Результаты внедрения
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {project.metrics.map((metric, idx) => (
+                <Card
+                  key={idx}
+                  className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">
+                    {metric.label}
+                  </p>
+                  <p className="text-display-1 text-(--on-bg-high) mb-2">
+                    {metric.value}
+                  </p>
+                  <p className="text-body-3 text-(--on-bg-medium)">
+                    {metric.description}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="py-16 md:py-24">
+        <Container>
+          <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
+            <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
+
+            <div className="relative z-10 mx-auto max-w-[672px] text-center">
+              <h3 className="text-display-3 text-(--on-bg-high) mb-4">
+                Интерактивный прототип
+              </h3>
+              <p className="text-body-2 text-(--on-bg-medium) mb-8">
+                Оцените плавность анимаций, логику навигации и внимание к деталям в интерактивном прототипе.
+              </p>
+
+              <Button size="large" shape="round" asChild>
+                <Link href={project.href || "#"} target="_blank" rel="noopener noreferrer">
+                  Запустить демо
+                  <KeyboardArrowRightIcon className="size-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </main>
+  );
+}

@@ -1,7 +1,7 @@
 /* LLM context: Updating the Dispatcher to pass data from EXPERTS_DATA to the ExpertPage component. */
 
 import ExpertPage from "./(Expert)/expert-page";
-// import ProjectsPage from "./(Project)/project-page";
+import ProjectPage from "./(Project)/project-page";
 import { PROJECTS } from "./(Project)/data";
 import { EXPERTS_DATA } from "./(Expert)/_data";
 import { notFound } from "next/navigation";
@@ -14,10 +14,12 @@ export default async function DispatcherPage({ params }: PageProps) {
   const { slug } = await params;
 
   // Check if it's a project
-  // const isProject = projects.some((p) => p.id.toString() === slug);
-  // if (isProject) {
-  // return <ProjectsPage />;
-  // }
+  const projectKeys = Object.keys(PROJECTS);
+  const projectKey = projectKeys.find((key) => key === slug);
+  if (projectKey) {
+    const project = PROJECTS[projectKey];
+    return <ProjectPage project={project} />;
+  }
 
   // Check if it's an expert
   const expert = EXPERTS_DATA[slug];

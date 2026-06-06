@@ -211,7 +211,7 @@
 
 
 .dark {
-  --primary: var(--brand-7);
+  --primary: var(--brand-9);
   --on-primary: var(--white);
   --primary-card: var(--brand-3);
   --on-primary-card: var(--dark-9);
