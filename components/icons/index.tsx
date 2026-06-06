@@ -23,6 +23,7 @@ export * from "./unideka-icons/stylus-note-icon"
 export * from "./unideka-icons/sun-icon"
 export * from "./unideka-icons/night-icon"
 export * from "./unideka-icons/system-theme-icon"
+export * from "./unideka-icons/article-icon"
 
 export * from "./logotypes/chrome-logotype-icon"
 export * from "./logotypes/telegram-logotype-icon"

@@ -8,12 +8,19 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
+import { ProjectCard } from "../(Expert)/expert-page";
 
 /* ---------- Project type ---------- */
+export type ProjectTagType = {
+  title: string,
+  href?: string,
+}
+
 export interface Project {
   id: string;
   title: string;
-  description: string;
+  description?: string;
+  tags?: ProjectTagType[];
   image: string;
   href?: string;
   category?: string;
@@ -100,9 +107,9 @@ export const PROJECTS: Record<string, Project> = {
     id: "courtElegance",
     title: "Court Elegance",
     description:
-      "Разработка премиального веб-сайта для бутика мужской одежды.",
+      "Разработка сайта премиального теннисного клуба, расположенного в городе Остин, США, штат Техас",
     image: "/images/projects/court.png",
-    href: "#",
+    href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
     category: "E-commerce",
     client: "Court Elegance",
     platform: "Веб-сайт",
@@ -115,50 +122,50 @@ export const PROJECTS: Record<string, Project> = {
 /* ---------- Page component ---------- */
 const projectsList = Object.values(PROJECTS);
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  return (
-    <a
-      href={project.href || "#"}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${index * 100}ms` }}
-    >
-      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
-        <Image
-          fill
-          src={project.image}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
-          {project.category && (
-            <Badge
-              variant="glass-static"
-              size="chip-small"
-              className="text-white border-white/20 mb-2 w-fit"
-            >
-              {project.category}
-            </Badge>
-          )}
-          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-        </div>
-        {/* Arrow button */}
-        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <Button
-            size="icon-small"
-            shape="round"
-            className="bg-white text-black hover:bg-white"
-          >
-            <KeyboardArrowRightIcon className="size-5!" />
-          </Button>
-        </div>
-      </Card>
-    </a>
-  );
-}
+// function ProjectCard({ project, index }: { project: Project; index: number }) {
+//   return (
+//     <a
+//       href={project.href || "#"}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="group block animate-reveal fill-mode-both"
+//       style={{ animationDelay: `${index * 100}ms` }}
+//     >
+//       <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+//         <Image
+//           fill
+//           src={project.image}
+//           alt={project.title}
+//           className="object-cover transition-transform duration-700 group-hover:scale-105"
+//         />
+//         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+//           {project.category && (
+//             <Badge
+//               variant="glass-static"
+//               size="chip-small"
+//               className="text-white border-white/20 mb-2 w-fit"
+//             >
+//               {project.category}
+//             </Badge>
+//           )}
+//           <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+//             {project.title}
+//           </h3>
+//         </div>
+//         {/* Arrow button */}
+//         <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+//           <Button
+//             size="icon-small"
+//             shape="round"
+//             className="bg-white text-black hover:bg-white"
+//           >
+//             <KeyboardArrowRightIcon className="size-5!" />
+//           </Button>
+//         </div>
+//       </Card>
+//     </a>
+//   );
+// }
 
 export default function ProjectsPage() {
   return (

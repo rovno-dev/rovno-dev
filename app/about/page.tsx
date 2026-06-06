@@ -96,14 +96,14 @@ function ExpertsSection() {
   return (
     <section className="py-20 md:py-32">
       <Container>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16 animate-reveal">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16 animate-reveal">
           <div className="max-w-[600px]">
             <h2 className="text-display-3 md:text-display-2 mb-4">Наши эксперты</h2>
             <p className="text-body-2 text-(--on-bg-medium)">
               Команда специалистов, объединивших свои усилия для создания исключительных решений.
             </p>
           </div>
-          <Button variant="outlined" size="large" shape="round" asChild className="animate-in fade-in slide-in-from-right-4 duration-700">
+          <Button variant="glass" size="large" shape="round" asChild className="animate-in fade-in slide-in-from-right-4 duration-700">
             <Link href="https://forms.yandex.com/u/69975d0849af47b15b4c80df">Присоединиться к нам</Link>
           </Button>
         </div>

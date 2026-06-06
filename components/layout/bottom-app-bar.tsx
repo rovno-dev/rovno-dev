@@ -1,6 +1,5 @@
 "use client"
 
-import RovnoLogotypeIcon from "./rovno-dev-logotype/rovno-dev-logotype-icon";
 import { ROUTES } from "@/utils/constants/routes";
 import { Container } from "../ui/container";
 import { useState } from "react";
@@ -11,6 +10,7 @@ import { DeployedCodeIcon } from "../icons/unideka-icons/deployed-code-icon";
 import { ArticleIcon } from "../icons/unideka-icons/article-icon";
 import { WorkIcon } from "../icons/unideka-icons/work-icon";
 import Link from "next/link";
+import RovnoLogotypeIconEmpty from "./rovno-dev-logotype/rovno-dev-logotype-icon-empty";
 
 export default function BottomAppBar() {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,7 @@ export default function BottomAppBar() {
   const links = [
     // Pass the COMPONENT, not <Component />
     { ...ROUTES.projects, icon: DeployedCodeIcon },
-    { ...ROUTES.about, icon: RovnoLogotypeIcon },
+    { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
     { ...ROUTES.journal, icon: ArticleIcon },
     { ...ROUTES.job, icon: WorkIcon },
   ]

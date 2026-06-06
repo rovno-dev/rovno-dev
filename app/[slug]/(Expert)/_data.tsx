@@ -7,7 +7,7 @@ import {
   DiamondIcon
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
-import { Project, PROJECTS } from "../(Project)/data";
+import { Project, PROJECTS } from "@/app/[slug]/(Project)/data"
 // Note: PROJECTS is now defined in the same directory's data.tsx
 
 export interface ExpertTag {
@@ -48,12 +48,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       },
       { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
     ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-    ]
+    projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance]
   },
   RovnoMikhail: {
     id: "RovnoMikhail",
@@ -76,7 +71,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
   RovnoDanil: {
     id: "RovnoDanil",
     name: "Данил Киткин",
-    avatar: "/images/experts/RovnoDanil.jpg", // Replace with actual
+    avatar: "/images/experts/RovnoDanil.jpg",
     telegramChannel: "rovno_dev",
     tags: [
       { label: "Со-основатель и Арт-директор", icon: <RovnoLogotypeIcon /> },
