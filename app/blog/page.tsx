@@ -12,10 +12,8 @@ import { ARTICLES, Article } from "./data";
 
 function ArticleCard({ article, index }: { article: Article; index: number }) {
   return (
-    <a
-      href={article.href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/blog/${article.slug}`}
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${index * 100}ms` }}
     >
@@ -63,7 +61,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
           </Button>
         </div>
       </Card>
-    </a>
+    </Link>
   );
 }
 
