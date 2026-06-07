@@ -32,6 +32,11 @@ export const ROUTES = {
     href: "https://t.me/rovno_dev",
     title: "Журнал Ровня",
   },
+  blog: {
+    id: 'blog',
+    href: "/blog",
+    title: 'Блог',
+  },
   job: {
     id: 'job',
     href: "/job",

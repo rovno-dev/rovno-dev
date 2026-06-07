@@ -27,6 +27,7 @@ export default function Header() {
             <NavLink href={ROUTES.about.href}>О нас</NavLink>
             {/* <NavLink href={ROUTES.job}>Вакансии</NavLink> */}
             <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
+            <NavLink href={ROUTES.blog.href}>Блог</NavLink>
           </nav>
         </div>
 
