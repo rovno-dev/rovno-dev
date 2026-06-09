@@ -28,13 +28,13 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen bg-(--bg)">
       {/* Hero */}
-      <section className="py-16 md:py-24 border-b border-(--outline)">
+      <section className="py-24 md:py-32">
         <Container>
           <div className="max-w-[800px] animate-reveal">
-            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
+            <h1 className="text-display-1 md:text-display-0 text-(--on-bg-high) mb-6 leading-tight">
               Проекты
             </h1>
-            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
+            <p className="text-body-1 md:text-body-0 text-(--on-bg-medium) leading-relaxed max-w-[600px]">
               Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
             </p>
           </div>
@@ -42,7 +42,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* Filter Bar */}
-      <section className="py-6 md:py-8">
+      <section className="pb-8">
         <Container>
           <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
             <Button
@@ -69,14 +69,14 @@ export default function ProjectsPage() {
       </section>
 
       {/* Projects Grid */}
-      <section className="py-8 md:py-16">
+      <section className="pb-24 md:pb-32">
         <Container>
           {filteredProjects.length === 0 ? (
             <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
               Нет проектов в этой категории
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {filteredProjects.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))}
