@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
@@ -66,6 +66,22 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
 }
 
 export default function BlogPage() {
+  // Extract unique tags from all articles
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    ARTICLES.forEach((article) => {
+      article.tags.forEach((tag) => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, []);
+
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  const filteredArticles = useMemo(() => {
+    if (!activeTag) return ARTICLES;
+    return ARTICLES.filter((article) => article.tags.includes(activeTag));
+  }, [activeTag]);
+
   return (
     <main className="min-h-screen bg-(--bg)">
       {/* Hero */}
@@ -82,14 +98,47 @@ export default function BlogPage() {
         </Container>
       </section>
 
+      {/* Filter Bar */}
+      <section className="pb-8">
+        <Container>
+          <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
+            <Button
+              variant={activeTag === null ? "filled" : "tonal-card"}
+              size="chip-medium"
+              shape="round"
+              onClick={() => setActiveTag(null)}
+            >
+              Все
+            </Button>
+            {allTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={activeTag === tag ? "filled" : "tonal-card"}
+                size="chip-medium"
+                shape="round"
+                onClick={() => setActiveTag(tag)}
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       {/* Articles Grid */}
       <section className="py-16 md:py-24">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {ARTICLES.map((article, idx) => (
-              <ArticleCard key={article.id} article={article} index={idx} />
-            ))}
-          </div>
+          {filteredArticles.length === 0 ? (
+            <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+              Нет статей с таким тегом
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredArticles.map((article, idx) => (
+                <ArticleCard key={article.id} article={article} index={idx} />
+              ))}
+            </div>
+          )}
         </Container>
       </section>
     </main>
