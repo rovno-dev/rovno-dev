@@ -34,7 +34,7 @@ export default function RootLayout({
       className={cn(NotoSans.className, "font-sans")}
       suppressHydrationWarning
     >
-      <body>
+      <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -52,6 +52,8 @@ export default function RootLayout({
             `,
           }}
         />
+      </head>
+      <body>
         <ThemeProvider>
           <TooltipProvider>
             <Header />

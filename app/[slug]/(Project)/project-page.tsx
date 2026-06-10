@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { KeyboardArrowRightIcon } from "@/components/icons";
+import { DprofileLogotypeMonoIcon, KeyboardArrowRightIcon } from "@/components/icons";
 import { Project } from "./data";
 
 interface ProjectPageProps {
@@ -16,9 +16,9 @@ interface ProjectPageProps {
 
 export default function ProjectPage({ project }: ProjectPageProps) {
   return (
-    <main className="min-h-screen bg-(--bg)">
+    <>
       {/* Hero Section – large image + title */}
-      <section className="relative overflow-hidden pt-20 pb-16 md:pb-24">
+      <section className="relative overflow-hidden pt-16 pb-10 md:pb-10">
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
             {/* Left column – text */}
@@ -39,7 +39,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
               </p>
 
               {/* Client / Platform / Period info */}
-              <div className="flex flex-wrap gap-6 md:gap-10 mb-8">
+              <div className="flex flex-wrap gap-6 md:gap-10 mb-6">
                 {project.client && (
                   <div>
                     <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">КЛИЕНТ</p>
@@ -62,7 +62,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
               {/* Tech Stack */}
               {project.techStack && project.techStack.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1">
                   {project.techStack.map((tech, idx) => (
                     <Badge
                       key={idx}
@@ -76,6 +76,12 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                   ))}
                 </div>
               )}
+              <Button size="large" shape="round" asChild className="mt-10 w-full max-w-[300px]">
+                <Link href={project.href || "#"} target="_blank" rel="noopener noreferrer">
+                  Посмотреть проект
+                  <DprofileLogotypeMonoIcon className="size-7!" />
+                </Link>
+              </Button>
             </div>
 
             {/* Right column – large image */}
@@ -95,7 +101,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
       {/* Impact & Results Section */}
       {project.metrics && project.metrics.length > 0 && (
-        <section className="py-16 md:py-24 bg-(--bg)">
+        <section className="py-10 md:py-18 bg-(--bg)">
           <Container>
             <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
               Результаты внедрения
@@ -125,7 +131,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
       )}
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
+      {/* <section className="py-16 md:py-24">
         <Container>
           <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
             <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
@@ -138,16 +144,11 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                 Оцените плавность анимаций, логику навигации и внимание к деталям в интерактивном прототипе.
               </p>
 
-              <Button size="large" shape="round" asChild>
-                <Link href={project.href || "#"} target="_blank" rel="noopener noreferrer">
-                  Запустить демо
-                  <KeyboardArrowRightIcon className="size-5" />
-                </Link>
-              </Button>
+
             </div>
           </div>
         </Container>
-      </section>
-    </main>
+      </section> */}
+    </>
   );
 }

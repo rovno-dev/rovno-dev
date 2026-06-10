@@ -55,10 +55,14 @@ app/[slug]/(Project)/data.tsx
 app/[slug]/(Project)/project-page.tsx
 app/[slug]/page.tsx
 app/about/page.tsx
-app/contacts/page.tsx
+app/blog/[slug]/page.tsx
+app/blog/data.tsx
+app/blog/page.tsx
+app/contacts/_page.tsx
 app/favicon.ico
 app/globals.css
 app/layout.tsx
+app/projects/page.tsx
 app/unideka-base.css
 components.json
 components/icons/icon.tsx
@@ -104,6 +108,7 @@ components/layout/make-order-modal/make-order-form.tsx
 components/layout/make-order-modal/make-order-modal-video.tsx
 components/layout/make-order-modal/make-order-modal.tsx
 components/layout/nav-link.tsx
+components/layout/rovno-dev-logotype/rovno-dev-logotype-icon-empty.tsx
 components/layout/rovno-dev-logotype/rovno-dev-logotype-icon.tsx
 components/layout/rovno-dev-logotype/rovno-dev-logotype-wordmark.tsx
 components/layout/rovno-dev-logotype/rovno-dev-logotype.tsx
@@ -166,11 +171,13 @@ components/ui/toggle-group.tsx
 components/ui/toggle.tsx
 components/ui/tooltip.tsx
 Dockerfile
+e2e/pages.spec.ts
 eslint.config.mjs
 figma_state.txt
 hooks/use-mobile.ts
 lib/utils.ts
 LICENSE
+lol.txt
 next.config.ts
 package.json
 postcss.config.mjs
@@ -189,6 +196,7 @@ public/images/projects/hlebnaya-strana.png
 public/images/projects/sadovod.png
 public/images/projects/vanguard.png
 public/sus-cat.png
+pypypy.html
 README.md
 tailwind.config.js
 tsconfig.json
@@ -353,7 +361,103 @@ export default function Home() {
 }
 </file>
 
-<file path="app/contacts/page.tsx">
+<file path="app/blog/[slug]/page.tsx">
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { ARTICLES } from "../data";
+
+interface ArticlePageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function ArticlePage({ params }: ArticlePageProps) {
+  const { slug } = await params;
+  const article = ARTICLES.find((a) => a.slug === slug);
+
+  if (!article) {
+    notFound();
+  }
+
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-20 pb-16 md:pb-24">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+            {/* Left column – text */}
+            <div className="animate-reveal">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {article.tags.map((tag) => (
+                  <Badge key={tag} variant="glass-static" size="chip-small">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-tight">
+                {article.title}
+              </h1>
+
+              <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) mb-8 max-w-[576px]">
+                {article.description}
+              </p>
+
+              <p className="text-body-5 text-(--on-bg-low) mb-8">
+                {new Date(article.date).toLocaleDateString("ru-RU", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+
+              <Button size="large" shape="round" asChild>
+                <Link href={article.href} target="_blank" rel="noopener noreferrer">
+                  Читать в Telegram
+                  <KeyboardArrowRightIcon className="size-5" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Right column – image */}
+            <div className="relative aspect-[596/447] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) animate-reveal delay-200 fill-mode-both">
+              <Image
+                src={article.image}
+                alt={article.title}
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Back link */}
+      <section className="pb-16">
+        <Container>
+          <Button variant="text" size="medium" asChild>
+            <Link href="/blog">
+              ← Назад к списку статей
+            </Link>
+          </Button>
+        </Container>
+      </section>
+    </main>
+  );
+}
+</file>
+
+<file path="app/contacts/_page.tsx">
 "use client";
 
 import React from "react";
@@ -907,6 +1011,19 @@ export function NavLink({
       {...props}
     />
   )
+}
+</file>
+
+<file path="components/layout/rovno-dev-logotype/rovno-dev-logotype-icon-empty.tsx">
+import { IconProps } from "@/utils/interfaces";
+
+
+export default function RovnoLogotypeIconEmpty({ width = 26, height = 26, style, className }: IconProps) {
+  return (
+    <svg className={className} style={style} width={width} height={height} viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M26 26H0V0H26V26ZM8.97363 20.8584H10.6504V20.2949H9.55566V6.33398H10.6504V5.76172H8.97363V20.8584ZM15.1641 6.33398H16.2598V20.2949H15.1641V20.8584H16.8418V5.76172H15.1641V6.33398Z" fill="var(--on-bg-high)" />
+    </svg>
+  );
 }
 </file>
 
@@ -3420,6 +3537,272 @@ function TooltipContent({
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }
 </file>
 
+<file path="e2e/pages.spec.ts">
+import { test, expect } from '@playwright/test';
+
+test.describe('Rovno.dev Pages', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
+  test('home page loads and displays hero section', async ({ page }) => {
+    // Check that the page title is correct
+    await expect(page).toHaveTitle(/Rovno.dev/);
+
+    // Check that the hero heading is visible
+    const heroHeading = page.locator('h1');
+    await expect(heroHeading).toBeVisible();
+    await expect(heroHeading).toContainText('РАЗРАБОТКА');
+
+    // Check that the header is present
+    const header = page.locator('header');
+    await expect(header).toBeVisible();
+
+    // Check that the footer is present
+    const footer = page.locator('footer');
+    await expect(footer).toBeVisible();
+  });
+
+  test('home page has working navigation links', async ({ page }) => {
+    // Click on "Проекты" link in the header
+    const projectsLink = page.locator('nav a', { hasText: 'Проекты' });
+    await expect(projectsLink).toBeVisible();
+    await projectsLink.click();
+
+    // Should navigate to the projects page (external link to dprofile)
+    await expect(page).toHaveURL(/dprofile/);
+  });
+
+  test('home page displays selected works section', async ({ page }) => {
+    // Scroll to the selected works section
+    const selectedWorksHeading = page.locator('h2', { hasText: 'ИЗБРАННЫЕ ПРОЕКТЫ' });
+    await expect(selectedWorksHeading).toBeVisible();
+
+    // Check that project cards are rendered
+    const projectCards = page.locator('[data-slot="card"]');
+    await expect(projectCards.first()).toBeVisible();
+  });
+
+  test('home page displays services section', async ({ page }) => {
+    // Scroll to the services section
+    const servicesHeading = page.locator('h2', { hasText: 'НАШИ УСЛУГИ' });
+    await expect(servicesHeading).toBeVisible();
+
+    // Check that service cards are rendered
+    const serviceCards = page.locator('[data-slot="card"]');
+    await expect(serviceCards).toHaveCount(4);
+  });
+
+  test('home page has working CTA buttons', async ({ page }) => {
+    // Check the "Бесплатный аудит проекта" button
+    const auditButton = page.locator('a', { hasText: 'Бесплатный аудит проекта' });
+    await expect(auditButton).toBeVisible();
+    await expect(auditButton).toHaveAttribute('href', /forms\.yandex/);
+
+    // Check the "Наши проекты" button
+    const projectsButton = page.locator('a', { hasText: 'Наши проекты' });
+    await expect(projectsButton).toBeVisible();
+    await expect(projectsButton).toHaveAttribute('href', /dprofile/);
+  });
+
+  test('about page loads correctly', async ({ page }) => {
+    await page.goto('/about');
+
+    // Check that the page title is correct
+    await expect(page).toHaveTitle(/Rovno.dev/);
+
+    // Check that the hero section is visible
+    const heroHeading = page.locator('h1');
+    await expect(heroHeading).toBeVisible();
+    await expect(heroHeading).toContainText('Создаем цифровые продукты');
+
+    // Check that expert cards are rendered
+    const expertCards = page.locator('[data-slot="card"]');
+    await expect(expertCards).toHaveCount(3);
+  });
+
+  test('about page expert cards have correct links', async ({ page }) => {
+    await page.goto('/about');
+
+    // Click on the first expert card
+    const firstExpertCard = page.locator('a[href^="/"]').first();
+    await expect(firstExpertCard).toBeVisible();
+    await firstExpertCard.click();
+
+    // Should navigate to the expert page
+    await expect(page).toHaveURL(/\/niyazgim/);
+  });
+
+  test('expert page loads correctly', async ({ page }) => {
+    await page.goto('/niyazgim');
+
+    // Check that the expert name is visible
+    const expertName = page.locator('h1');
+    await expect(expertName).toBeVisible();
+    await expect(expertName).toContainText('Нияз Гимадиев');
+
+    // Check that the tags are visible
+    const tags = page.locator('[data-slot="badge"]');
+    await expect(tags.first()).toBeVisible();
+
+    // Check that the tabs are visible
+    const tabs = page.locator('[data-slot="tabs-trigger"]');
+    await expect(tabs).toHaveCount(1);
+    await expect(tabs).toContainText('Проекты');
+  });
+
+  test('expert page displays projects', async ({ page }) => {
+    await page.goto('/niyazgim');
+
+    // Check that project cards are rendered
+    const projectCards = page.locator('[data-slot="card"]');
+    await expect(projectCards.first()).toBeVisible();
+  });
+
+  test('project page loads correctly', async ({ page }) => {
+    await page.goto('/vanguard');
+
+    // Check that the project title is visible
+    const projectTitle = page.locator('h1');
+    await expect(projectTitle).toBeVisible();
+    await expect(projectTitle).toContainText('Vanguard');
+
+    // Check that the description is visible
+    const description = page.locator('p');
+    await expect(description.first()).toBeVisible();
+
+    // Check that the tech stack badges are visible
+    const techBadges = page.locator('[data-slot="badge"]');
+    await expect(techBadges.first()).toBeVisible();
+  });
+
+  test('project page displays metrics', async ({ page }) => {
+    await page.goto('/vanguard');
+
+    // Check that the metrics section is visible
+    const metricsHeading = page.locator('h2', { hasText: 'Результаты внедрения' });
+    await expect(metricsHeading).toBeVisible();
+
+    // Check that metric cards are rendered
+    const metricCards = page.locator('[data-slot="card"]');
+    await expect(metricCards).toHaveCount(3);
+  });
+
+  test('project page has working demo button', async ({ page }) => {
+    await page.goto('/vanguard');
+
+    // Check the "Запустить демо" button
+    const demoButton = page.locator('a', { hasText: 'Запустить демо' });
+    await expect(demoButton).toBeVisible();
+    await expect(demoButton).toHaveAttribute('href', /dprofile/);
+  });
+
+  test('contacts page loads correctly', async ({ page }) => {
+    await page.goto('/contacts');
+
+    // Check that the page title is correct
+    await expect(page).toHaveTitle(/Rovno.dev/);
+
+    // Check that the hero section is visible
+    const heroHeading = page.locator('h1');
+    await expect(heroHeading).toBeVisible();
+    await expect(heroHeading).toContainText('ЮРИДИЧЕСКАЯ ИНФОРМАЦИЯ');
+
+    // Check that the company details card is visible
+    const companyDetailsCard = page.locator('h2', { hasText: 'Реквизиты компании' });
+    await expect(companyDetailsCard).toBeVisible();
+
+    // Check that the documents card is visible
+    const documentsCard = page.locator('h2', { hasText: 'Документы' });
+    await expect(documentsCard).toBeVisible();
+  });
+
+  test('contacts page displays certificates', async ({ page }) => {
+    await page.goto('/contacts');
+
+    // Check that the certificates section is visible
+    const certificatesHeading = page.locator('h2', { hasText: 'Сертификаты и лицензии' });
+    await expect(certificatesHeading).toBeVisible();
+
+    // Check that certificate cards are rendered
+    const certificateCards = page.locator('[data-slot="card"]');
+    await expect(certificateCards).toHaveCount(6); // 2 from details + 4 certificates
+  });
+
+  test('404 page for non-existent routes', async ({ page }) => {
+    await page.goto('/non-existent-page');
+
+    // Check that the page shows a 404 error
+    await expect(page.locator('body')).toBeVisible();
+    // The app should show a not found message
+    await expect(page.locator('h1, h2')).toContainText(/404|not found/i);
+  });
+
+  test('theme switcher works', async ({ page }) => {
+    // Check that the theme switcher button is visible
+    const themeSwitcher = page.locator('button[aria-label="Поменять тему"]');
+    await expect(themeSwitcher).toBeVisible();
+
+    // Click the theme switcher
+    await themeSwitcher.click();
+
+    // Check that the dropdown menu appears
+    const dropdownMenu = page.locator('[data-slot="dropdown-menu-content"]');
+    await expect(dropdownMenu).toBeVisible();
+
+    // Click on "Тёмная" option
+    const darkOption = dropdownMenu.locator('span', { hasText: 'Тёмная' });
+    await expect(darkOption).toBeVisible();
+    await darkOption.click();
+
+    // Check that the dark class is added to the html element
+    await expect(page.locator('html')).toHaveClass(/dark/);
+  });
+
+  test('mobile bottom app bar is visible on small screens', async ({ page }) => {
+    // Set viewport to mobile size
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    // Check that the bottom app bar is visible
+    const bottomAppBar = page.locator('nav[aria-label="Bottom app bar"]');
+    await expect(bottomAppBar).toBeVisible();
+
+    // Check that the navigation links are present
+    const navLinks = bottomAppBar.locator('a');
+    await expect(navLinks).toHaveCount(4);
+  });
+
+  test('header navigation links work correctly', async ({ page }) => {
+    // Check that the header has the correct number of navigation links
+    const headerNav = page.locator('header nav');
+    const navLinks = headerNav.locator('a');
+    await expect(navLinks).toHaveCount(3);
+
+    // Check that the "О нас" link navigates to the about page
+    const aboutLink = navLinks.filter({ hasText: 'О нас' });
+    await expect(aboutLink).toBeVisible();
+    await aboutLink.click();
+    await expect(page).toHaveURL('/about');
+  });
+
+  test('footer contains social media links', async ({ page }) => {
+    // Scroll to the footer
+    const footer = page.locator('footer');
+    await footer.scrollIntoViewIfNeeded();
+
+    // Check that social media icons are present
+    const socialLinks = footer.locator('a[target="_blank"]');
+    await expect(socialLinks.first()).toBeVisible();
+  });
+
+  test('page has correct meta tags', async ({ page }) => {
+    // Check that the page has a description meta tag
+    const metaDescription = page.locator('meta[name="description"]');
+    await expect(metaDescription).toHaveAttribute('content', /Rovno.dev/);
+  });
+});
+</file>
+
 <file path="eslint.config.mjs">
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
@@ -3476,6 +3859,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 </file>
 
+<file path="lol.txt">
+lol
+</file>
+
 <file path="postcss.config.mjs">
 const config = {
   plugins: {
@@ -3520,6 +3907,10 @@ location: Казань
 ---
 
 Текст про эксперта
+</file>
+
+<file path="pypypy.html">
+pypypy
 </file>
 
 <file path="utils/styles/effects.tsx">
@@ -3577,103 +3968,6 @@ next-env.d.ts
 .aider*
 </file>
 
-<file path="app/[slug]/(Expert)/_data.tsx">
-/* LLM context: Creating a centralized data structure for experts and updating the dispatcher/expert page to be fully dynamic based on the slug. */
-
-import React, { ReactNode } from "react";
-import {
-  VKLogotypeMonoIcon,
-  TelegramLogotypeMonoIcon,
-  DiamondIcon
-} from "@/components/icons";
-import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
-import { Project, PROJECTS } from "../(Project)/data";
-// Note: PROJECTS is now defined in the same directory's data.tsx
-
-export interface ExpertTag {
-  label: string;
-  icon: ReactNode;
-}
-
-export interface ExpertSocial {
-  icon: ReactNode;
-  href: string;
-}
-
-export interface ExpertData {
-  id: string;
-  name: string;
-  avatar: string;
-  telegramChannel?: string;
-  tags: ExpertTag[];
-  socials: ExpertSocial[];
-  projects: Project[];
-}
-
-export const EXPERTS_DATA: Record<string, ExpertData> = {
-  niyazgim: {
-    id: "niyazgim",
-    name: "Нияз Гимадиев",
-    avatar: "/images/experts/niyazgim.png",
-    telegramChannel: "niyazgim",
-    tags: [
-      { label: "Со-основатель и Техдир", icon: <RovnoLogotypeIcon /> },
-      { label: "Автор тех самых стихов", icon: null },
-      { label: "Создатель Unideka UI", icon: null },
-      { label: "Основатель Вершин", icon: null },
-    ],
-    socials: [
-      {
-        icon: <VKLogotypeMonoIcon />, href: "https://vk.com/niyazgim"
-      },
-      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
-    ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-    ]
-  },
-  RovnoMikhail: {
-    id: "RovnoMikhail",
-    name: "Михаил Лапаев",
-    avatar: "/images/experts/RovnoMikhail.jpg", // Replace with actual
-    telegramChannel: "rovno_dev",
-    tags: [
-      { label: "Со-основатель и Директор по работе с клиентами и продукту", icon: <RovnoLogotypeIcon /> },
-    ],
-    socials: [
-      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/RovnoMikhail" },
-    ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-    ]
-  },
-  RovnoDanil: {
-    id: "RovnoDanil",
-    name: "Данил Киткин",
-    avatar: "/images/experts/RovnoDanil.jpg", // Replace with actual
-    telegramChannel: "rovno_dev",
-    tags: [
-      { label: "Со-основатель и Арт-директор", icon: <RovnoLogotypeIcon /> },
-    ],
-    socials: [
-      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/RovnoDanil" },
-    ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-    ]
-  }
-};
-</file>
-
 <file path="app/[slug]/(Project)/_page.tsx">
 // "use client";
 
@@ -3724,143 +4018,70 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
 // }
 </file>
 
-<file path="app/about/page.tsx">
-/* LLM context: Implementing Apple-grade staggered entry animations for the About page experts grid */
+<file path="app/blog/data.tsx">
+export interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  date: string;
+  tags: string[];
+}
 
-"use client";
-
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Container } from "@/components/ui/container";
-import { Card } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon } from "@/components/icons";
-
-const experts = [
+export const ARTICLES: Article[] = [
   {
-    name: "Нияз Гимадиев",
-    role: "Со-основатель и Технический директор",
-    description: "Архитектор сложных систем, поэт кода и создатель Unideka UI. Отвечает за технологический стек и инновации.",
-    image: "/images/experts/niyazgim.png",
-    slug: "niyazgim"
+    id: "1",
+    slug: "kak-my-delali-dizajn-dlya-finteh-startapa",
+    title: "Как мы делали дизайн для финтех-стартапа",
+    description: "Рассказываем о процессе создания интерфейса для инвестиционного приложения: от исследований до финальных пикселей.",
+    image: "/images/projects/vanguard.png",
+    href: "https://t.me/rovno_dev/1",
+    date: "2025-03-15",
+    tags: ["Дизайн", "Fintech"],
   },
   {
-    name: "Михаил Лапаев",
-    role: "Со-основатель и Директор по работе с клиентами и продукту",
-    description: "Мастер визуальных интерфейсов и продуктовой логики. Превращает хаос в эстетику и удобство пользователя.",
-    image: "/images/experts/RovnoMikhail.jpg",
-    slug: "RovnoMikhail"
+    id: "2",
+    slug: "pochemu-my-vybrali-next-js-dlya-novogo-proekta",
+    title: "Почему мы выбрали Next.js для нового проекта",
+    description: "Сравнение фреймворков и причины, по которым Next.js стал нашим основным инструментом для веб-разработки.",
+    image: "/images/projects/alx.png",
+    href: "https://t.me/rovno_dev/2",
+    date: "2025-02-20",
+    tags: ["Разработка", "Next.js"],
   },
   {
-    name: "Данил Киткин",
-    role: "Со-основатель и Арт-директор",
-    description: "Вдыхает жизнь в статичные объекты. Специализируется на высокотехнологичном моушн-дизайне, CGI и 3D",
-    image: "/images/experts/RovnoDanil.jpg",
-    slug: "RovnoDanil"
-  }
+    id: "3",
+    slug: "motion-dizajn-kak-animaciya-uluchshaet-ux",
+    title: "Motion-дизайн: как анимация улучшает UX",
+    description: "Разбираем примеры из наших проектов и объясняем, почему микроанимации важны для пользовательского опыта.",
+    image: "/images/projects/court.png",
+    href: "https://t.me/rovno_dev/3",
+    date: "2025-01-10",
+    tags: ["Motion", "UX"],
+  },
+  {
+    id: "4",
+    slug: "kak-my-sozdavali-identiku-dlya-alx",
+    title: "Как мы создавали айдентику для ALX",
+    description: "Закулисье разработки фирменного стиля для технологической компании: от брифа до финального брендбука.",
+    image: "/images/projects/alx.png",
+    href: "https://t.me/rovno_dev/4",
+    date: "2024-12-05",
+    tags: ["Айдентика", "Брендинг"],
+  },
+  {
+    id: "5",
+    slug: "unideka-ui-nasha-dizajn-sistema-s-otkrytym-ishodnym-kodom",
+    title: "Unideka UI: наша дизайн-система с открытым исходным кодом",
+    description: "Почему мы решили поделиться своей библиотекой компонентов и как она помогает ускорять разработку.",
+    image: "/images/projects/sadovod.png",
+    href: "https://t.me/rovno_dev/5",
+    date: "2024-11-18",
+    tags: ["UI", "Open Source"],
+  },
 ];
-
-function AboutHero() {
-  return (
-    <section className="py-16 md:py-24 border-b border-(--outline) overflow-hidden">
-      <Container>
-        <div className="max-w-[800px] animate-reveal">
-          <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-8">
-            Создаем цифровые продукты, <br />
-            <span className="text-(--primary)">которые меняют правила.</span>
-          </h1>
-          <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed animate-reveal delay-100 fill-mode-both">
-            Rovno.dev — это агентство полного цикла, где дизайн встречается с передовыми технологиями.
-            Мы не просто рисуем интерфейсы, мы проектируем опыт, который помогает брендам расти
-            в мире больших языковых моделей и цифровой трансформации.
-          </p>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-function ExpertCard({ expert, index }: { expert: typeof experts[0], index: number }) {
-  return (
-    <Link
-      href={`/${expert.slug}`}
-      className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${200 + index * 100}ms` }}
-    >
-      <Card className="border-none bg-transparent shadow-none ring-0 p-0 overflow-visible">
-        <div className="relative mb-6 overflow-hidden rounded-5xl border border-(--outline) bg-(--card) transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-(--primary)/10 group-hover:-translate-y-1">
-          <AspectRatio ratio={4 / 5}>
-            <Image
-              src={expert.image}
-              alt={expert.name}
-              fill
-              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
-            />
-          </AspectRatio>
-
-          <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <Button size="icon-small" shape="round" className="bg-white text-black hover:bg-white">
-              <KeyboardArrowRightIcon className="size-5!" />
-            </Button>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-display-2 text-(--on-bg-high) mb-1">{expert.name}</h3>
-          <p className="text-heading-3 font-medium text-(--primary) mb-3 uppercase tracking-wider">{expert.role}</p>
-          <p className="text-body-3 text-(--on-bg-medium) leading-snug line-clamp-2 md:line-clamp-none">
-            {expert.description}
-          </p>
-        </div>
-      </Card>
-    </Link>
-  );
-}
-
-function ExpertsSection() {
-  return (
-    <section className="py-20 md:py-32">
-      <Container>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16 animate-reveal">
-          <div className="max-w-[600px]">
-            <h2 className="text-display-3 md:text-display-2 mb-4">Наши эксперты</h2>
-            <p className="text-body-2 text-(--on-bg-medium)">
-              Команда специалистов, объединивших свои усилия для создания исключительных решений.
-            </p>
-          </div>
-          <Button variant="outlined" size="large" shape="round" asChild className="animate-in fade-in slide-in-from-right-4 duration-700">
-            <Link href="https://forms.yandex.com/u/69975d0849af47b15b4c80df">Присоединиться к нам</Link>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-          {experts.map((expert, idx) => (
-            <ExpertCard key={idx} expert={expert} index={idx} />
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-export default function AboutPage() {
-  return (
-    <main className="min-h-screen bg-(--bg)">
-      <AboutHero />
-      <ExpertsSection />
-
-      <section className="py-20 overflow-hidden opacity-30 pointer-events-none">
-        <Container>
-          <div className="text-[12vw] font-heading font-bold whitespace-nowrap text-(--outline) select-none animate-in slide-in-from-left duration-[10000ms] infinite alternate linear">
-            DESIGN • CODE • INNOVATE • 3D • DESIGN • CODE
-          </div>
-        </Container>
-      </section>
-    </main>
-  );
-}
 </file>
 
 <file path="components/icons/icon.tsx">
@@ -9119,296 +9340,6 @@ export interface IconProps {
 
 </file>
 
-<file path="app/(HomePage)/page.tsx">
-/* LLM context: Implementing the main page (/) based on Figma "Главная страница - Desktop (Noir Evolution)".
-   Uses existing components: Container, Button, Badge, Card, AspectRatio, Input, Textarea, KeyboardArrowRightIcon, etc.
-   Follows the same code style and comments pattern as other files. */
-
-"use client";
-
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { KeyboardArrowRightIcon, DesignServicesIcon, DiamondIcon, PublicIcon, StylusNoteIcon } from "@/components/icons";
-import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code-icon";
-import { cn } from "@/lib/utils";
-
-/* ---------- Hero Section ---------- */
-function HeroSection() {
-  return (
-    <section className="relative overflow-hidden bg-(--bg) pt-20 pb-16 md:pb-24">
-      {/* Ambient background blurs (matching Figma) */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 h-[700px] w-[700px] rounded-full bg-(--primary)/5 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[600px] w-[600px] rounded-full bg-(--primary)/5 blur-3xl" />
-      </div>
-
-      <Container>
-        <div className="relative z-10 mx-auto max-w-[672px] text-center">
-          {/* DIGITAL EXCELLENCE badge */}
-          <div className="mb-6 inline-flex items-center rounded-full border border-(--outline) bg-(--card-glass) px-6 py-2 text-sm font-medium text-(--on-bg-medium) backdrop-blur-glass">
-            DIGITAL EXCELLENCE
-          </div>
-
-          <h1 className="text-display-1 md:text-[4rem] font-heading font-bold leading-[1.1] text-(--on-bg-high) mb-6">
-            ИНЖИНИРИНГ <br /> БУДУЩЕГО
-          </h1>
-
-          <p className="mx-auto max-w-[606px] text-body-1 text-(--on-bg-medium) mb-10">
-            Проектируем и разрабатываем высоконагруженные цифровые продукты.
-            От айдентики до сложных сервисов — полный цикл создания.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="large" shape="round" asChild>
-              <Link href="https://forms.yandex.com/cloud/6936a4b1d0468820623c548e">
-                Обсудить проект
-                <KeyboardArrowRightIcon className="size-5" />
-              </Link>
-            </Button>
-            <Button variant="outlined" size="large" shape="round" asChild>
-              <Link href="https://dprofile.ru/rovno_dev">
-                Смотреть работы
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Decorative illustration cards (simplified) */}
-        <div className="relative mt-16 flex justify-center gap-4 opacity-30 pointer-events-none select-none">
-          <div className="size-24 rounded-2xl bg-(--primary-card) border border-(--outline)" />
-          <div className="size-24 rounded-2xl bg-(--primary-card) border border-(--outline) translate-y-8" />
-          <div className="size-24 rounded-2xl bg-(--primary-card) border border-(--outline)" />
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- Selected Works Section ---------- */
-const featuredProjects = [
-  {
-    title: "Vanguard",
-    tags: ["Fintech", "Платформа"],
-    image: "/images/projects/vanguard.png",
-    href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
-  },
-  {
-    title: "Aurora Flux",
-    tags: ["Айдентика"],
-    image: "/images/projects/alx.png",
-    href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
-  },
-  {
-    title: "E-commerce Aura",
-    tags: ["E-commerce"],
-    image: "/images/projects/sadovod.png",
-    href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
-  },
-];
-
-function SelectedWorksSection() {
-  return (
-    <section className="py-20 md:py-28">
-      <Container>
-        <div className="mb-12 flex items-center justify-between">
-          <h2 className="text-display-2 text-(--on-bg-high)">ИЗБРАННЫЕ РАБОТЫ</h2>
-          <Button variant="text" size="medium" asChild>
-            <Link href="https://dprofile.ru/rovno_dev">
-              Все проекты
-              <KeyboardArrowRightIcon className="size-4" />
-            </Link>
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* First project – large */}
-          <div className="md:col-span-2">
-            <ProjectCard project={featuredProjects[0]} large />
-          </div>
-          {featuredProjects.slice(1).map((project, idx) => (
-            <ProjectCard key={idx} project={project} />
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-function ProjectCard({
-  project,
-  large = false,
-}: {
-  project: (typeof featuredProjects)[0];
-  large?: boolean;
-}) {
-  return (
-    <a
-      href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block"
-    >
-      <Card
-        className={cn(
-          "relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99]",
-          large ? "aspect-[1232/528]" : "aspect-[600/450]"
-        )}
-      >
-        <Image
-          fill
-          src={project.image}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
-          <div className="flex flex-wrap gap-2 mb-3">
-            {project.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="glass-static"
-                size="chip-small"
-                className="text-white border-white/20"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-        </div>
-        {/* Arrow button */}
-        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <Button
-            size="icon-small"
-            shape="round"
-            className="bg-white text-black hover:bg-white"
-          >
-            <KeyboardArrowRightIcon className="size-5!" />
-          </Button>
-        </div>
-      </Card>
-    </a>
-  );
-}
-
-/* ---------- Services Section ---------- */
-const services = [
-  {
-    number: "01",
-    title: "АЙДЕНТИКА",
-    description:
-      "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
-    icon: <StylusNoteIcon className="size-10 text-(--on-bg-low)" />,
-  },
-  {
-    number: "02",
-    title: "ВЕБ-ДИЗАЙН",
-    description:
-      "Сайты и интерфейсы — точные, быстрые, продуманные до мелочей для решения задач бизнеса.",
-    icon: <PublicIcon className="size-10 text-(--on-bg-low)" />,
-  },
-  {
-    number: "03",
-    title: "UX/UI ДИЗАЙН",
-    description:
-      "Продуманные интерфейсы и сценарии, которые выдерживают тесты с пользователями и повышают конверсию.",
-    icon: <DiamondIcon className="size-10 text-(--on-bg-low)" />,
-  },
-  {
-    number: "04",
-    title: "РАЗРАБОТКА",
-    description:
-      "От лендингов до сложных высоконагруженных систем — пишем чистый код, который масштабируется.",
-    icon: <DeployedCodeIcon className="size-10 text-(--on-bg-low)" />,
-  },
-];
-
-function ServicesSection() {
-  return (
-    <section className="py-20 md:py-28 bg-(--bg)">
-      <Container>
-        <h2 className="text-display-2 text-(--on-bg-high) mb-12">ЧТО МЫ ДЕЛАЕМ</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {services.map((service) => (
-            <Card
-              key={service.number}
-              className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 transition-all hover:shadow-lg hover:shadow-(--primary)/5"
-            >
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-14 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary)">
-                    {service.icon}
-                  </div>
-                  <span className="text-display-4 font-heading text-(--on-bg-low) opacity-40">
-                    {service.number}
-                  </span>
-                </div>
-              </div>
-              <h3 className="text-display-4 text-(--on-bg-high) mb-3">{service.title}</h3>
-              <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
-                {service.description}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- CTA Section ---------- */
-function CTASection() {
-  return (
-    <section className="py-20 md:py-28">
-      <Container>
-        <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
-          {/* Decorative glow */}
-          <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
-
-          <div className="relative z-10 mx-auto max-w-[672px] text-center">
-            <h2 className="text-display-2 text-(--on-bg-high) mb-4">НАЧАТЬ ПРОЕКТ</h2>
-            <p className="text-body-2 text-(--on-bg-medium) mb-10">
-              Оставьте заявку, и мы свяжемся с вами для обсуждения деталей, сроков и стоимости вашего будущего продукта.
-            </p>
-
-            <form className="flex flex-col gap-5 text-left">
-              <Input placeholder="E-mail или Telegram" />
-              <Input placeholder="Ваше имя" />
-              <Textarea placeholder="Краткое описание задачи" rows={4} />
-              <Button size="large" className="w-full">
-                ОТПРАВИТЬ ЗАЯВКУ
-              </Button>
-            </form>
-          </div>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- Main Page ---------- */
-export default function Home() {
-  return (
-    <main className="min-h-screen bg-(--bg)">
-      <HeroSection />
-      <SelectedWorksSection />
-      <ServicesSection />
-      <CTASection />
-    </main>
-  );
-}
-</file>
-
 <file path="app/(HomePage)/services-section.tsx">
 /* LLM context: Applying staggered reveal animations to services section grid and typography */
 
@@ -9513,365 +9444,96 @@ export default function ServicesSection() {
 }
 </file>
 
-<file path="app/(HomePage)/socials-section.tsx">
-/* LLM context: Adding staggering and subtle reveal effects to socials section */
+<file path="app/[slug]/(Expert)/_data.tsx">
+/* LLM context: Creating a centralized data structure for experts and updating the dispatcher/expert page to be fully dynamic based on the slug. */
 
-import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
-import { servicesIconsStyles, ShowcaseCard } from "@/components/layout/showcase-card";
-import { Container } from "@/components/ui/container";
+import React, { ReactNode } from "react";
+import {
+  VKLogotypeMonoIcon,
+  TelegramLogotypeMonoIcon,
+  DiamondIcon
+} from "@/components/icons";
+import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
+import { Project, PROJECTS } from "@/app/[slug]/(Project)/data"
+// Note: PROJECTS is now defined in the same directory's data.tsx
 
-export default function SocialsSection() {
-  const socials = [
-    {
-      name: "Канал в Телеге",
-      icon: <TelegramLogotypeMonoIcon className={servicesIconsStyles} />,
-      href: "https://t.me/rovno_dev",
-      delay: "delay-100"
-    },
-    {
-      name: "Паблик в ВК",
-      icon: <VKLogotypeMonoIcon className={servicesIconsStyles} />,
-      href: "https://vk.com/rovno_dev",
-      delay: "delay-150"
-    },
-    {
-      name: "Дипрофайл",
-      icon: <DprofileLogotypeMonoIcon className={servicesIconsStyles} />,
-      href: "https://dprofile.ru/rovno_dev",
-      delay: "delay-200"
-    },
-    {
-      name: "Пинтерест",
-      icon: <PinterestLogotypeMonoIcon className={servicesIconsStyles} />,
-      href: "https://pinterest.com/rovno_dev",
-      delay: "delay-250"
-    },
-  ];
-
-  return (
-    <Container className="py-[30px] sm:pt-[75px] lg:pt-[30px] lg:h-[350px] flex flex-col-reverse lg:grid lg:grid-cols-[1fr_300px] gap-[20px] sm:gap-[30px] items-center">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 md:gap-2 w-full sm:h-full">
-        {socials.map((social, key) => (
-          <div key={key} className={`animate-reveal ${social.delay} fill-mode-both`}>
-            <ShowcaseCard href={social.href}>
-              {social.icon}
-              <p className="text-(--on-bg-high) text-heading-5 sm:text-heading-3 whitespace-normal">
-                {social.name}
-              </p>
-            </ShowcaseCard>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-full animate-reveal delay-300 fill-mode-both">
-        <h2 className="text-display-3"> Скоро здесь добавится <br /> много интересного,</h2>
-        <p className="mt-4">
-          <span className="hidden lg:inline">👈</span>
-          <span className="inline lg:hidden">👇</span>
-          <span> а наши работы можно посмотреть по ссылкам
-            <span className="hidden lg:inline"> слева</span>
-            <span className="inline lg:hidden"> ниже</span>
-          </span>
-        </p>
-      </div>
-    </Container>
-  );
-}
-</file>
-
-<file path="app/[slug]/(Expert)/expert-page.tsx">
-/* LLM context: Updating expert page with immersive transitions and dynamic project card entry */
-
-"use client";
-
-import React, { useState } from "react";
-import Image from "next/image";
-import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
-import { ExpertData } from "./_data";
-import { Project } from "../(Project)/data";
-import Link from "next/link";
-
-function ProjectCard({ project, index }: { project: Project, index: number }) {
-  return (
-    <a
-      href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${index * 100}ms` }}
-    >
-      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) aspect-[594/395] bg-card ring-0 transition-all active:scale-[0.99]">
-        <Image
-          fill
-          src={project.image}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
-          <h3 className="text-display-4 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-        </div>
-      </Card>
-    </a>
-  );
+export interface ExpertTag {
+  label: string;
+  icon: ReactNode;
 }
 
-function ExpertHeroSection({ expert }: { expert: ExpertData }) {
-  return (
-    <Container variant="full-width" className="pt-4 md:pt-10">
-      <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group animate-in fade-in zoom-in-95 duration-1000">
-        <Image
-          src={expert.avatar}
-          fill
-          className="object-cover object-center transition-transform duration-[2000ms]"
-          alt={expert.name}
-          priority
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-(--bg) via-transparent to-transparent z-10" />
-
-        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-1">
-          {expert.socials.map((social, key) => (
-            <Button variant={'text'} key={key} size={'icon-large'} asChild className="animate-reveal" style={{ animationDelay: `${400 + key * 100}ms` }}>
-              <Link href={social.href} target="_blank" rel="noopener noreferrer">
-                {social.icon}
-              </Link>
-            </Button>
-          ))}
-        </div>
-
-        <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-6 md:p-10">
-          <div className="flex items-center gap-3 mb-4 md:mb-6 animate-reveal delay-200 fill-mode-both">
-            <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
-            <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full duration-[2000ms]" />
-          </div>
-
-          <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
-            <div className="flex flex-nowrap gap-2 md:flex-wrap md:justify-center pb-1">
-              {expert.tags.map((tag, index) => (
-                <Badge
-                  key={index}
-                  variant="tonal-card-static"
-                  size="chip-large"
-                  className="bg-(--card)/50 backdrop-blur-md border-(--outline)/50 text-(--on-bg-high) whitespace-nowrap px-4 py-5 md:py-1 animate-reveal fill-mode-both"
-                  style={{ animationDelay: `${300 + index * 50}ms` }}
-                >
-                  {tag.icon && React.cloneElement(tag.icon as React.ReactElement<{ className?: string }>, { className: "size-4 fill-current" })}
-                  {tag.label}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </Container>
-  );
+export interface ExpertSocial {
+  icon: ReactNode;
+  href: string;
 }
 
-export default function ExpertPage({ expert }: { expert: ExpertData }) {
-  const [activeTab, setActiveTab] = useState("Проекты");
-  const tabs = [
-    "Проекты",
-    // "Будни",
-    // "Речи", 
-    // "События", 
-    // "Награды", 
-    // "Мысли вслух"
-  ];
-
-  return (
-    <div className="pb-20">
-      <ExpertHeroSection expert={expert} />
-
-      <Container variant="full-width" className="py-4 md:py-12">
-        <div className="max-w-[1200px] mx-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10 animate-reveal delay-500 fill-mode-both">
-            <TabsList variant="line" className="w-full justify-start md:justify-center overflow-x-auto overflow-y-hidden no-scrollbar border-b border-(--outline) rounded-none gap-2 md:gap-8 bg-transparent!">
-              {tabs.map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="px-4 md:px-0 data-[state=active]:text-(--primary)"
-                >
-                  {tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          {activeTab === "Проекты" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              {expert.projects.map((project, idx) => (
-                <ProjectCard key={idx} project={project} index={idx} />
-              ))}
-            </div>
-          )}
-        </div>
-      </Container>
-    </div>
-  );
-}
-</file>
-
-<file path="app/[slug]/(Project)/project-page.tsx">
-"use client";
-
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { KeyboardArrowRightIcon } from "@/components/icons";
-import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code-icon";
-import { Project } from "./data";
-
-interface ProjectPageProps {
-  project: Project;
+export interface ExpertData {
+  id: string;
+  name: string;
+  avatar: string;
+  telegramChannel?: string;
+  tags: ExpertTag[];
+  socials: ExpertSocial[];
+  projects: Project[];
 }
 
-export default function ProjectPage({ project }: ProjectPageProps) {
-  return (
-    <main className="min-h-screen bg-(--bg)">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-16 md:pb-24">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
-            {/* Left column – text */}
-            <div className="animate-reveal">
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge variant="glass-static" size="chip-small">
-                  ФИНАНСОВЫЕ ТЕХНОЛОГИИ
-                </Badge>
-                <Badge variant="glass-static" size="chip-small">
-                  КЕЙС-СТАДИ
-                </Badge>
-              </div>
-
-              <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-tight">
-                {project.title}
-              </h1>
-
-              <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) mb-8 max-w-[576px]">
-                {project.description}
-              </p>
-
-              {/* Client / Platform / Period info */}
-              <div className="flex flex-wrap gap-6 md:gap-10 mb-8">
-                <div>
-                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">КЛИЕНТ</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.client}</p>
-                </div>
-                <div>
-                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЛАТФОРМА</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.platform}</p>
-                </div>
-                <div>
-                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЕРИОД</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{project.period}</p>
-                </div>
-              </div>
-
-              {/* Tech Stack */}
-              {project.techStack && project.techStack.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {project.techStack.map((tech, idx) => (
-                    <Badge
-                      key={idx}
-                      variant="tonal-card-static"
-                      size="chip-medium"
-                      className="animate-reveal fill-mode-both"
-                      style={{ animationDelay: `${idx * 50}ms` }}
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Right column – image */}
-            <div className="relative aspect-[596/447] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) animate-reveal delay-200 fill-mode-both">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                className="object-cover"
-                priority
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Results Section */}
-      {project.metrics && project.metrics.length > 0 && (
-        <section className="py-16 md:py-24 bg-(--bg)">
-          <Container>
-            <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
-              Результаты внедрения
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {project.metrics.map((metric, idx) => (
-                <Card
-                  key={idx}
-                  className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both"
-                  style={{ animationDelay: `${idx * 100}ms` }}
-                >
-                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">
-                    {metric.label}
-                  </p>
-                  <p className="text-display-1 text-(--on-bg-high) mb-2">
-                    {metric.value}
-                  </p>
-                  <p className="text-body-3 text-(--on-bg-medium)">
-                    {metric.description}
-                  </p>
-                </Card>
-              ))}
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {/* CTA Section */}
-      <section className="py-16 md:py-24">
-        <Container>
-          <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
-            <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
-
-            <div className="relative z-10 mx-auto max-w-[672px] text-center">
-              <h3 className="text-display-3 text-(--on-bg-high) mb-4">
-                Интерактивный прототип
-              </h3>
-              <p className="text-body-2 text-(--on-bg-medium) mb-8">
-                Оцените плавность анимаций, логику навигации и внимание к деталям в интерактивном прототипе.
-              </p>
-
-              <Button size="large" shape="round" asChild>
-                <Link href={project.href || "#"} target="_blank" rel="noopener noreferrer">
-                  Запустить демо
-                  <KeyboardArrowRightIcon className="size-5" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </section>
-    </main>
-  );
-}
+export const EXPERTS_DATA: Record<string, ExpertData> = {
+  niyazgim: {
+    id: "niyazgim",
+    name: "Нияз Гимадиев",
+    avatar: "/images/experts/niyazgim.png",
+    telegramChannel: "niyazgim",
+    tags: [
+      { label: "Со-основатель и Техдир", icon: <RovnoLogotypeIcon /> },
+      { label: "Автор тех самых стихов", icon: null },
+      { label: "Создатель Unideka UI", icon: null },
+      { label: "Основатель Вершин", icon: null },
+    ],
+    socials: [
+      {
+        icon: <VKLogotypeMonoIcon />, href: "https://vk.com/niyazgim"
+      },
+      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
+    ],
+    projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance]
+  },
+  RovnoMikhail: {
+    id: "RovnoMikhail",
+    name: "Михаил Лапаев",
+    avatar: "/images/experts/RovnoMikhail.jpg", // Replace with actual
+    telegramChannel: "rovno_dev",
+    tags: [
+      { label: "Со-основатель и Директор по работе с клиентами и продукту", icon: <RovnoLogotypeIcon /> },
+    ],
+    socials: [
+      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/RovnoMikhail" },
+    ],
+    projects: [
+      PROJECTS.alx,
+      PROJECTS.sadovod,
+      PROJECTS.vanguard,
+      PROJECTS.courtElegance,
+    ]
+  },
+  RovnoDanil: {
+    id: "RovnoDanil",
+    name: "Данил Киткин",
+    avatar: "/images/experts/RovnoDanil.jpg",
+    telegramChannel: "rovno_dev",
+    tags: [
+      { label: "Со-основатель и Арт-директор", icon: <RovnoLogotypeIcon /> },
+    ],
+    socials: [
+      { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/RovnoDanil" },
+    ],
+    projects: [
+      PROJECTS.alx,
+      PROJECTS.sadovod,
+      PROJECTS.vanguard,
+      PROJECTS.courtElegance,
+    ]
+  }
+};
 </file>
 
 <file path="app/[slug]/page.tsx">
@@ -9908,83 +9570,382 @@ export default async function DispatcherPage({ params }: PageProps) {
 }
 </file>
 
-<file path="components/icons/index.tsx">
-export * from "./icon"
-export * from "./unideka-icons/keyboard-arrow-down-icon"
-export * from "./unideka-icons/keyboard-arrow-up-icon"
-export * from "./unideka-icons/keyboard-arrow-left-icon"
-export * from "./unideka-icons/keyboard-arrow-right-icon"
-export * from "./unideka-icons/more-horizontal-icon"
-export * from "./unideka-icons/close-small-icon"
-export * from "./unideka-icons/check-small-icon"
-export * from "./unideka-icons/search-icon"
-export * from "./unideka-icons/check-indeterminate-small-icon"
-export * from "./unideka-icons/dock-to-bottom-icon"
-export * from "./unideka-icons/dock-to-left-icon"
-export * from "./unideka-icons/dock-to-right-icon"
-export * from "./unideka-icons/check-circle-icon"
-export * from "./unideka-icons/design-services-icon"
-export * from "./unideka-icons/info-icon"
-export * from "./unideka-icons/octagon-icon"
-export * from "./unideka-icons/progress-activity-icon"
-export * from "./unideka-icons/warning-icon"
-export * from "./unideka-icons/public-icon"
-export * from "./unideka-icons/diamond-icon"
-export * from "./unideka-icons/stylus-note-icon"
-export * from "./unideka-icons/sun-icon"
-export * from "./unideka-icons/night-icon"
-export * from "./unideka-icons/system-theme-icon"
-export * from "./unideka-icons/article-icon"
+<file path="app/about/page.tsx">
+/* LLM context: Implementing Apple-grade staggered entry animations for the About page experts grid */
 
-export * from "./logotypes/chrome-logotype-icon"
-export * from "./logotypes/telegram-logotype-icon"
-export * from "./logotypes/telegram-logotype-mono-icon"
-export * from "./logotypes/pinterest-logotype-mono-icon"
-export * from "./logotypes/dprofile-logotype-mono-icon"
-export * from "./logotypes/vk-logotype-mono-icon"
-</file>
+"use client";
 
-<file path="components/layout/header.tsx">
-import { Container } from "@/components/ui/container";
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
-import { Button } from "../ui/button";
-import { NavLink } from "./nav-link";
-import { DesignServicesIcon } from "../icons";
-import { ROUTES } from "@/utils/constants/routes";
+import { Container } from "@/components/ui/container";
+import { Card } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import { KeyboardArrowRightIcon } from "@/components/icons";
 
-export default function Header() {
+const experts = [
+  {
+    name: "Нияз Гимадиев",
+    role: "Со-основатель и Технический директор",
+    description: "Архитектор сложных систем, поэт кода и создатель Unideka UI. Отвечает за технологический стек и инновации.",
+    image: "/images/experts/niyazgim.png",
+    slug: "niyazgim"
+  },
+  {
+    name: "Михаил Лапаев",
+    role: "Со-основатель и Директор по работе с клиентами и продукту",
+    description: "Мастер визуальных интерфейсов и продуктовой логики. Превращает хаос в эстетику и удобство пользователя.",
+    image: "/images/experts/RovnoMikhail.jpg",
+    slug: "RovnoMikhail"
+  },
+  {
+    name: "Данил Киткин",
+    role: "Со-основатель и Арт-директор",
+    description: "Вдыхает жизнь в статичные объекты. Специализируется на высокотехнологичном моушн-дизайне, CGI и 3D",
+    image: "/images/experts/RovnoDanil.jpg",
+    slug: "RovnoDanil"
+  }
+];
+
+function AboutHero() {
   return (
-    <header
-      className="h-[46px] md:h-[70px] 
-      fixed top-0 left-0 right-0 w-full z-50 
-      flex items-center
-      bg-(--card-glass) backdrop-blur-glass border-b border-b-(--card-glass)"
-    >
-      <Container
-        className="flex justify-center sm:justify-between"
-      >
-        <div className="flex items-center gap-8">
-          <Link href={'/'}>
-            <RovnoLogotype className="!h-[30px] sm:h-[40px]" />
-          </Link>
+    <section className="py-16 md:py-24 border-b border-(--outline) overflow-hidden">
+      <Container>
+        <div className="max-w-[800px] animate-reveal">
+          <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-8">
+            Создаем цифровые продукты, <br />
+            <span className="text-(--primary)">которые меняют правила.</span>
+          </h1>
+          <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed animate-reveal delay-100 fill-mode-both">
+            Rovno.dev — это агентство полного цикла, где дизайн встречается с передовыми технологиями.
+            Мы не просто рисуем интерфейсы, мы проектируем опыт, который помогает брендам расти
+            в мире больших языковых моделей и цифровой трансформации.
+          </p>
+        </div>
+      </Container>
+    </section>
+  );
+}
 
-          <nav className="hidden md:flex gap-4 text-sm">
-            <NavLink href={ROUTES.projects.href}>Проекты</NavLink>
-            <NavLink href={ROUTES.about.href}>О нас</NavLink>
-            {/* <NavLink href={ROUTES.job}>Вакансии</NavLink> */}
-            <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
-          </nav>
+function ExpertCard({ expert, index }: { expert: typeof experts[0], index: number }) {
+  return (
+    <Link
+      href={`/${expert.slug}`}
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${200 + index * 100}ms` }}
+    >
+      <Card className="border-none bg-transparent shadow-none ring-0 p-0 overflow-visible">
+        <div className="relative mb-6 overflow-hidden rounded-5xl border border-(--outline) bg-(--card) transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-(--primary)/10 group-hover:-translate-y-1">
+          <AspectRatio ratio={4 / 5}>
+            <Image
+              src={expert.image}
+              alt={expert.name}
+              fill
+              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+            />
+          </AspectRatio>
+
+          <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            <Button size="icon-small" shape="round" className="bg-white text-black hover:bg-white">
+              <KeyboardArrowRightIcon className="size-5!" />
+            </Button>
+          </div>
         </div>
 
-        <Button className="hidden sm:flex" asChild>
-          <Link href={"https://forms.yandex.com/cloud/6936a4b1d0468820623c548e"}>
-            <DesignServicesIcon />
-            Оформить заказ
-          </Link>
-        </Button>
+        <div>
+          <h3 className="text-display-2 text-(--on-bg-high) mb-1">{expert.name}</h3>
+          <p className="text-heading-3 font-medium text-(--primary) mb-3 uppercase tracking-wider">{expert.role}</p>
+          <p className="text-body-3 text-(--on-bg-medium) leading-snug line-clamp-2 md:line-clamp-none">
+            {expert.description}
+          </p>
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
+function ExpertsSection() {
+  return (
+    <section className="py-20 md:py-32">
+      <Container>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16 animate-reveal">
+          <div className="max-w-[600px]">
+            <h2 className="text-display-3 md:text-display-2 mb-4">Наши эксперты</h2>
+            <p className="text-body-2 text-(--on-bg-medium)">
+              Команда специалистов, объединивших свои усилия для создания исключительных решений.
+            </p>
+          </div>
+          <Button variant="glass" size="large" shape="round" asChild className="animate-in fade-in slide-in-from-right-4 duration-700">
+            <Link href="https://forms.yandex.com/u/69975d0849af47b15b4c80df">Присоединиться к нам</Link>
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+          {experts.map((expert, idx) => (
+            <ExpertCard key={idx} expert={expert} index={idx} />
+          ))}
+        </div>
       </Container>
-    </header >
+    </section>
+  );
+}
+
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      <AboutHero />
+      <ExpertsSection />
+
+      <section className="py-20 overflow-hidden opacity-30 pointer-events-none">
+        <Container>
+          <div className="text-[12vw] font-heading font-bold whitespace-nowrap text-(--outline) select-none animate-in slide-in-from-left duration-[10000ms] infinite alternate linear">
+            DESIGN • CODE • INNOVATE • 3D • DESIGN • CODE
+          </div>
+        </Container>
+      </section>
+    </main>
+  );
+}
+</file>
+
+<file path="app/blog/page.tsx">
+"use client";
+
+import React, { useState, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { ARTICLES, Article } from "./data";
+
+function ArticleCard({ article, index }: { article: Article; index: number }) {
+  return (
+    <Link
+      href={`/blog/${article.slug}`}
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+        <Image
+          fill
+          src={article.image}
+          alt={article.title}
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {article.tags.map((tag) => (
+              <Badge
+                key={tag}
+                variant="glass-static"
+                size="chip-small"
+                className="text-white border-white/20"
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+            {article.title}
+          </h3>
+          <p className="mt-2 text-body-3 text-white/80 line-clamp-2">
+            {article.description}
+          </p>
+          <p className="mt-2 text-body-5 text-white/60">
+            {new Date(article.date).toLocaleDateString("ru-RU", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
+        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <Button
+            size="icon-small"
+            shape="round"
+            className="bg-white text-black hover:bg-white"
+          >
+            <KeyboardArrowRightIcon className="size-5!" />
+          </Button>
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
+export default function BlogPage() {
+  // Extract unique tags from all articles
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    ARTICLES.forEach((article) => {
+      article.tags.forEach((tag) => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, []);
+
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  const filteredArticles = useMemo(() => {
+    if (!activeTag) return ARTICLES;
+    return ARTICLES.filter((article) => article.tags.includes(activeTag));
+  }, [activeTag]);
+
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero */}
+      <section className="py-16 md:py-24 border-b border-(--outline)">
+        <Container>
+          <div className="max-w-[800px] animate-reveal">
+            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
+              Блог
+            </h1>
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
+              Статьи о дизайне, разработке, кейсах и инсайтах нашей команды.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* Filter Bar */}
+      <section className="pb-8">
+        <Container>
+          <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
+            <Button
+              variant={activeTag === null ? "filled" : "tonal-card"}
+              size="chip-medium"
+              shape="round"
+              onClick={() => setActiveTag(null)}
+            >
+              Все
+            </Button>
+            {allTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={activeTag === tag ? "filled" : "tonal-card"}
+                size="chip-medium"
+                shape="round"
+                onClick={() => setActiveTag(tag)}
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Articles Grid */}
+      <section className="py-16 md:py-24">
+        <Container>
+          {filteredArticles.length === 0 ? (
+            <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+              Нет статей с таким тегом
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredArticles.map((article, idx) => (
+                <ArticleCard key={article.id} article={article} index={idx} />
+              ))}
+            </div>
+          )}
+        </Container>
+      </section>
+    </main>
+  );
+}
+</file>
+
+<file path="app/projects/page.tsx">
+"use client";
+
+import React, { useState, useMemo } from "react";
+import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
+import { PROJECTS } from "@/app/[slug]/(Project)/data";
+import { ProjectCard } from "@/app/[slug]/(Expert)/expert-page";
+
+export default function ProjectsPage() {
+  const projectsList = useMemo(() => Object.values(PROJECTS), []);
+
+  // Extract unique categories from projects
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    projectsList.forEach((p) => {
+      if (p.category) cats.add(p.category);
+    });
+    return Array.from(cats).sort();
+  }, [projectsList]);
+
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const filteredProjects = useMemo(() => {
+    if (!activeCategory) return projectsList;
+    return projectsList.filter((p) => p.category === activeCategory);
+  }, [activeCategory, projectsList]);
+
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero */}
+      <section className="py-24 md:py-32">
+        <Container>
+          <div className="max-w-[800px] animate-reveal">
+            <h1 className="text-display-1 md:text-display-0 text-(--on-bg-high) mb-6 leading-tight">
+              Проекты
+            </h1>
+            <p className="text-body-1 md:text-body-0 text-(--on-bg-medium) leading-relaxed max-w-[600px]">
+              Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* Filter Bar */}
+      <section className="pb-8">
+        <Container>
+          <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
+            <Button
+              variant={activeCategory === null ? "filled" : "tonal-card"}
+              size="chip-medium"
+              shape="round"
+              onClick={() => setActiveCategory(null)}
+            >
+              Все
+            </Button>
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                variant={activeCategory === cat ? "filled" : "tonal-card"}
+                size="chip-medium"
+                shape="round"
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Projects Grid */}
+      <section className="pb-24 md:pb-32">
+        <Container>
+          {filteredProjects.length === 0 ? (
+            <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+              Нет проектов в этой категории
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              {filteredProjects.map((project, idx) => (
+                <ProjectCard key={project.id} project={project} index={idx} />
+              ))}
+            </div>
+          )}
+        </Container>
+      </section>
+    </main>
   );
 }
 </file>
@@ -10027,7 +9988,7 @@ export const badgeUnidekaVariants = {
   "tonal-card-static": "bg-card text-card-foreground border border-border/50",
   "tonal-primary-static": "bg-[var(--primary-card)] text-primary",
   "text-static": "bg-transparent text-foreground",
-  "glass-static": "bg-[var(--primary-glass)] backdrop-blur-custom border border-[var(--primary-glass)] text-primary [&_svg]:fill-primary",
+  "glass-static": "bg-[var(--primary-glass)] backdrop-blur-glass border border-[var(--primary-glass)] text-primary [&_svg]:fill-primary",
   "selected-static": "bg-[var(--primary-card)] text-primary border border-primary",
 };
 
@@ -10357,197 +10318,68 @@ Built with ❤️ by [Niyaz Gimadiev](https://rovno.dev/u/niyazgim)
 }
 </file>
 
-<file path="app/[slug]/(Project)/data.tsx">
-"use client";
+<file path="app/(HomePage)/socials-section.tsx">
+/* LLM context: Adding staggering and subtle reveal effects to socials section */
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
+import { servicesIconsStyles, ShowcaseCard } from "@/components/layout/showcase-card";
 import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon } from "@/components/icons";
 
-/* ---------- Project type ---------- */
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  href?: string;
-  category?: string;
-  client?: string;
-  platform?: string;
-  period?: string;
-  techStack?: string[];
-  metrics?: { label: string; value: string; description: string }[];
-}
+export default function SocialsSection() {
+  const socials = [
+    {
+      name: "Канал в Телеге",
+      icon: <TelegramLogotypeMonoIcon className={servicesIconsStyles} />,
+      href: "https://t.me/rovno_dev",
+      delay: "delay-100"
+    },
+    {
+      name: "Наш ВК",
+      icon: <VKLogotypeMonoIcon className={servicesIconsStyles} />,
+      href: "https://vk.com/rovno_dev",
+      delay: "delay-150"
+    },
+    {
+      name: "Дипрофайл",
+      icon: <DprofileLogotypeMonoIcon className={servicesIconsStyles} />,
+      href: "https://dprofile.ru/rovno_dev",
+      delay: "delay-200"
+    },
+    {
+      name: "Пинтерест",
+      icon: <PinterestLogotypeMonoIcon className={servicesIconsStyles} />,
+      href: "https://pinterest.com/rovno_dev",
+      delay: "delay-250"
+    },
+  ];
 
-/* ---------- Project data ---------- */
-export const PROJECTS: Record<string, Project> = {
-  alx: {
-    id: "alx",
-    title: "ALX",
-    description:
-      "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
-    image: "/images/projects/alx.png",
-    href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
-    category: "Айдентика",
-    client: "ALX",
-    platform: "Веб-сайт",
-    period: "2024",
-    techStack: ["Figma", "After Effects"],
-    metrics: [
-      {
-        label: "Узнаваемость",
-        value: "+60%",
-        description: "Рост узнаваемости бренда после ребрендинга",
-      },
-    ],
-  },
-  sadovod: {
-    id: "sadovod",
-    title: "Садовод",
-    description:
-      "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
-    image: "/images/projects/sadovod.png",
-    href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
-    category: "E-commerce",
-    client: "Садовод",
-    platform: "Веб-сайт",
-    period: "2024",
-    techStack: ["Next.js", "TypeScript", "Tailwind CSS"],
-    metrics: [
-      {
-        label: "Конверсия",
-        value: "+35%",
-        description: "Увеличение конверсии после редизайна",
-      },
-    ],
-  },
-  vanguard: {
-    id: "vanguard",
-    title: "Vanguard",
-    description:
-      "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда.",
-    image: "/images/projects/vanguard.png",
-    href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
-    category: "Fintech",
-    client: "Vanguard FinTech",
-    platform: "iOS & Android App",
-    period: "2023 - 2024",
-    techStack: ["React Native", "TypeScript", "GraphQL", "Node.js", "WebGL"],
-    metrics: [
-      {
-        label: "Конверсия",
-        value: "+45%",
-        description: "Рост регистраций",
-      },
-      {
-        label: "Отток",
-        value: "-20%",
-        description: "Снижение отказов",
-      },
-      {
-        label: "Оценка в App Store",
-        value: "4.9",
-        description: "Средняя оценка пользователей",
-      },
-    ],
-  },
-  courtElegance: {
-    id: "courtElegance",
-    title: "Court Elegance",
-    description:
-      "Разработка премиального веб-сайта для бутика мужской одежды.",
-    image: "/images/projects/court.png",
-    href: "#",
-    category: "E-commerce",
-    client: "Court Elegance",
-    platform: "Веб-сайт",
-    period: "2024",
-    techStack: ["Next.js", "TypeScript", "Framer Motion"],
-    metrics: [],
-  },
-};
-
-/* ---------- Page component ---------- */
-const projectsList = Object.values(PROJECTS);
-
-function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <a
-      href={project.href || "#"}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${index * 100}ms` }}
-    >
-      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
-        <Image
-          fill
-          src={project.image}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
-          {project.category && (
-            <Badge
-              variant="glass-static"
-              size="chip-small"
-              className="text-white border-white/20 mb-2 w-fit"
-            >
-              {project.category}
-            </Badge>
-          )}
-          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-        </div>
-        {/* Arrow button */}
-        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <Button
-            size="icon-small"
-            shape="round"
-            className="bg-white text-black hover:bg-white"
-          >
-            <KeyboardArrowRightIcon className="size-5!" />
-          </Button>
-        </div>
-      </Card>
-    </a>
-  );
-}
-
-export default function ProjectsPage() {
-  return (
-    <main className="min-h-screen bg-(--bg)">
-      {/* Hero */}
-      <section className="py-16 md:py-24 border-b border-(--outline)">
-        <Container>
-          <div className="max-w-[800px] animate-reveal">
-            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
-              Проекты
-            </h1>
-            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
-              Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
-            </p>
+    <Container className="py-[30px] sm:pt-[75px] lg:pt-[30px] lg:h-[350px] flex flex-col-reverse lg:grid lg:grid-cols-[1fr_300px] gap-[20px] sm:gap-[30px] items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-2 gap-1 md:gap-2 w-full sm:h-full">
+        {socials.map((social, key) => (
+          <div key={key} className={`animate-reveal ${social.delay} fill-mode-both`}>
+            <ShowcaseCard href={social.href}>
+              {social.icon}
+              <p className="text-center text-(--on-bg-high) text-heading-5 sm:text-heading-3 whitespace-normal">
+                {social.name}
+              </p>
+            </ShowcaseCard>
           </div>
-        </Container>
-      </section>
+        ))}
+      </div>
 
-      {/* Projects Grid */}
-      <section className="py-16 md:py-24">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {projectsList.map((project, idx) => (
-              <ProjectCard key={project.id} project={project} index={idx} />
-            ))}
-          </div>
-        </Container>
-      </section>
-    </main>
+      <div className="w-full animate-reveal delay-300 fill-mode-both">
+        <h2 className="text-display-3 md:text-display-2"> Скоро здесь добавится <br /> много интересного...</h2>
+        <p className="mt-4">
+          <span className="text-body-2 hidden lg:inline">👈</span>
+          <span className="text-body-2 inline lg:hidden">👇</span>
+          <span> а наши работы также можно посмотреть по ссылкам
+            <span className="text-body-2 hidden lg:inline"> слева</span>
+            <span className="text-body-2 inline lg:hidden"> ниже</span>
+          </span>
+        </p>
+      </div>
+    </Container>
   );
 }
 </file>
@@ -10744,6 +10576,89 @@ export default function ProjectsPage() {
 }
 </file>
 
+<file path="components/icons/index.tsx">
+export * from "./icon"
+export * from "./unideka-icons/keyboard-arrow-down-icon"
+export * from "./unideka-icons/keyboard-arrow-up-icon"
+export * from "./unideka-icons/keyboard-arrow-left-icon"
+export * from "./unideka-icons/keyboard-arrow-right-icon"
+export * from "./unideka-icons/more-horizontal-icon"
+export * from "./unideka-icons/close-small-icon"
+export * from "./unideka-icons/check-small-icon"
+export * from "./unideka-icons/search-icon"
+export * from "./unideka-icons/check-indeterminate-small-icon"
+export * from "./unideka-icons/dock-to-bottom-icon"
+export * from "./unideka-icons/dock-to-left-icon"
+export * from "./unideka-icons/dock-to-right-icon"
+export * from "./unideka-icons/check-circle-icon"
+export * from "./unideka-icons/design-services-icon"
+export * from "./unideka-icons/info-icon"
+export * from "./unideka-icons/octagon-icon"
+export * from "./unideka-icons/progress-activity-icon"
+export * from "./unideka-icons/warning-icon"
+export * from "./unideka-icons/public-icon"
+export * from "./unideka-icons/diamond-icon"
+export * from "./unideka-icons/stylus-note-icon"
+export * from "./unideka-icons/sun-icon"
+export * from "./unideka-icons/night-icon"
+export * from "./unideka-icons/system-theme-icon"
+export * from "./unideka-icons/article-icon"
+export * from "./unideka-icons/deployed-code-icon"
+
+export * from "./logotypes/chrome-logotype-icon"
+export * from "./logotypes/telegram-logotype-icon"
+export * from "./logotypes/telegram-logotype-mono-icon"
+export * from "./logotypes/pinterest-logotype-mono-icon"
+export * from "./logotypes/dprofile-logotype-mono-icon"
+export * from "./logotypes/vk-logotype-mono-icon"
+</file>
+
+<file path="components/layout/header.tsx">
+import { Container } from "@/components/ui/container";
+import Link from "next/link";
+import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
+import { Button } from "../ui/button";
+import { NavLink } from "./nav-link";
+import { DesignServicesIcon } from "../icons";
+import { ROUTES } from "@/utils/constants/routes";
+
+export default function Header() {
+  return (
+    <header
+      className="h-[55px] md:h-[70px] 
+      fixed top-0 left-0 right-0 w-full z-50 
+      flex items-center
+      bg-(--card-glass) backdrop-blur-glass border-b border-b-(--card-glass)"
+    >
+      <Container
+        className="flex justify-center sm:justify-between"
+      >
+        <div className="flex items-center gap-8">
+          <Link href={'/'}>
+            <RovnoLogotype className="!h-[30px] sm:h-[40px]" />
+          </Link>
+
+          <nav className="hidden md:flex gap-4 text-sm">
+            <NavLink href={ROUTES.projects.href}>Проекты</NavLink>
+            <NavLink href={ROUTES.about.href}>О нас</NavLink>
+            {/* <NavLink href={ROUTES.job}>Вакансии</NavLink> */}
+            <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
+            <NavLink href={ROUTES.blog.href}>Блог</NavLink>
+          </nav>
+        </div>
+
+        <Button className="hidden sm:flex" asChild>
+          <Link href={"https://forms.yandex.com/cloud/6936a4b1d0468820623c548e"}>
+            <DesignServicesIcon />
+            Оформить заказ
+          </Link>
+        </Button>
+      </Container>
+    </header >
+  );
+}
+</file>
+
 <file path="next.config.ts">
 import type { NextConfig } from "next";
 
@@ -10782,72 +10697,743 @@ jobs:
             make rebuild ENV=prod SERVICES=rovno_dev_next_js_frontend
 </file>
 
-<file path="components/layout/bottom-app-bar.tsx">
-"use client"
+<file path="app/(HomePage)/page.tsx">
+/* LLM context: Refactoring HeroSection for pixel-perfect mobile alignment inspired by nextjs.org grid precision. 
+   Optimizing typography scaling and IllustrationCard positioning for small viewports to match the provided mockup. */
 
-import RovnoLogotypeIcon from "./rovno-dev-logotype/rovno-dev-logotype-icon";
-import { ROUTES } from "@/utils/constants/routes";
-import { Container } from "../ui/container";
-import { useState } from "react";
-// import MakeOrderModal from "./make-order-modal/make-order-modal";
-import { Button } from "../ui/button";
-import { DesignServicesIcon } from "../icons";
-import { DeployedCodeIcon } from "../icons/unideka-icons/deployed-code-icon";
-import { ArticleIcon } from "../icons/unideka-icons/article-icon";
-import { WorkIcon } from "../icons/unideka-icons/work-icon";
+"use client";
+
+import React from "react";
 import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  KeyboardArrowRightIcon,
+  DprofileLogotypeMonoIcon,
+  DeployedCodeIcon,
+  DiamondIcon,
+  SunIcon,
+  PublicIcon,
+  OctagonIcon,
+  StylusNoteIcon
+} from "@/components/icons";
+import { ProjectCard } from "../[slug]/(Expert)/expert-page";
+import { PROJECTS } from "../[slug]/(Project)/data";
+import SocialsSection from "./socials-section";
+import { ROUTES } from "@/utils/constants/routes";
 
-export default function BottomAppBar() {
-  const [open, setOpen] = useState(false);
-
-  const links = [
-    // Pass the COMPONENT, not <Component />
-    { ...ROUTES.projects, icon: DeployedCodeIcon },
-    { ...ROUTES.about, icon: RovnoLogotypeIcon },
-    { ...ROUTES.journal, icon: ArticleIcon },
-    { ...ROUTES.job, icon: WorkIcon },
-  ]
-
+function IllustrationCard({ icon, className, style }: { icon: React.ReactNode, className?: string, style?: React.CSSProperties }) {
   return (
-    <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
-      <Container aria-label="Bottom app bar">
-        <div className="p-2 grid grid-cols-[1fr_125px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
-          <div className="w-full h-full grid grid-cols-4 items-center">
-            {links.map((link, key) => {
-              const Icon = link.icon;
-              return (
-                <Button
-                  asChild
-                  className="w-full h-[60px]! p-0"
-                  variant={'text'}
-                  shape={'round'}
-                  size="icon-medium"
-                  key={key}
-                >
-                  <Link href={link.href} className="flex items-center justify-center w-full h-full">
-                    <Icon className="size-6" />
-                  </Link>
-                </Button>
-              );
-            })}
+    <div
+      className={`absolute flex items-center justify-center size-20 md:size-32 rounded-2xl md:rounded-3xl bg-(--card) border border-(--outline) shadow-2xl transition-transform duration-1000 ease-out select-none pointer-events-none ${className}`}
+      style={style}
+    >
+      <div className="text-(--on-bg-low) [&_svg]:size-10 md:[&_svg]:size-16">
+        {icon}
+      </div>
+    </div>
+  );
+}
+
+function HeroBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--outline)_1px,transparent_1px),linear-gradient(to_bottom,var(--outline)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-[0.15]" />
+
+      <svg className="absolute inset-0 w-full h-full opacity-10 dark:opacity-30" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M-100 400C100 350 400 350 720 400C1040 450 1340 450 1540 400" stroke="var(--on-bg-low)" strokeWidth="1" strokeDasharray="4 8" />
+        <path d="M200 -100C250 100 250 400 200 720C150 1040 150 1340 200 1540" stroke="var(--on-bg-low)" strokeWidth="1" strokeDasharray="4 8" />
+      </svg>
+
+      <div className="absolute inset-0 bg-radial-[at_50%_40%] from-transparent via-transparent to-(--bg) z-10" />
+
+      <IllustrationCard
+        icon={<SunIcon />}
+        className="top-[5%] left-[5%] md:top-[10%] md:left-[10%] -rotate-12 animate-reveal"
+        style={{ transitionDelay: '100ms' }}
+      />
+      <IllustrationCard
+        icon={<OctagonIcon />}
+        className="top-[50%] -left-10 md:left-4 rotate-6 animate-reveal"
+        style={{ transitionDelay: '300ms' }}
+      />
+      <IllustrationCard
+        icon={<DeployedCodeIcon />}
+        className="bottom-[5%] left-[10%] md:bottom-[10%] md:left-[15%] -rotate-3 animate-reveal"
+        style={{ transitionDelay: '500ms' }}
+      />
+
+      <IllustrationCard
+        icon={<OctagonIcon />}
+        className="top-[8%] right-[5%] md:top-[5%] md:right-[20%] rotate-12 animate-reveal"
+        style={{ transitionDelay: '200ms' }}
+      />
+      <IllustrationCard
+        icon={<DiamondIcon />}
+        className="top-[40%] -right-10 md:right-10 -rotate-12 animate-reveal"
+        style={{ transitionDelay: '400ms' }}
+      />
+      <IllustrationCard
+        icon={<PublicIcon />}
+        className="bottom-[12%] right-[5%] md:bottom-[15%] md:right-[10%] rotate-3 animate-reveal"
+        style={{ transitionDelay: '600ms' }}
+      />
+    </div>
+  );
+}
+
+function HeroSection() {
+  const badges = [
+    'Разработка',
+    'Дизайн',
+    '3D',
+    'ИИ-автоматизация'
+  ];
+  return (
+    <section className="relative min-h-[100svh] md:min-h-[800px] flex items-center justify-center overflow-hidden bg-(--bg) -top-[46px] md:-top-[70px] mb-[-46px] md:mb-[-70px]">
+      <HeroBackground />
+
+      <Container className="relative z-20 pt-10 md:pt-0">
+        <div className="mx-auto max-w-[800px] text-center flex flex-col items-center px-4 md:px-0">
+          <div className="mb-4 md:mb-8 justify-center animate-reveal [animation-delay:200ms] flex gap-2 flex-wrap">
+            {badges.map((el, key) =>
+              <Badge
+                key={key}
+                size="chip-xlarge"
+                variant="glass-static"
+              >
+                {el}
+              </Badge>
+            )}
           </div>
 
-          <Button
-            asChild
-            shape={'round'}
-            className="w-full h-[60px] gap-2"
-            size="medium"
-            onClick={() => setOpen(true)}
-          >
-            <Link href={'https://forms.yandex.com/cloud/6936a4b1d0468820623c548e'}>
-              <DesignServicesIcon className="size-[26px]!" />
-              <span className="text-display-4">Заказ</span>
-            </Link>
-          </Button>
+          <div className="flex flex-col gap-2 mb-6 md:mb-8">
+            <h1 className="text-display-1 text-5xl sm:text-7xl leading-none md:text-8xl lg:text-[6.5rem] tracking-tighter text-(--on-bg-high) animate-reveal [animation-delay:400ms] fill-mode-both uppercase flex flex-col">Инжиниринг</h1>
+            <h1 className="text-display-1 text-5xl sm:text-7xl leading-none md:text-8xl lg:text-[6.5rem] tracking-tighter text-(--on-bg-high) animate-reveal [animation-delay:350ms] fill-mode-both uppercase flex flex-col">Будущего</h1>
+          </div>
 
+          <p className="mx-auto text-body-3 md:text-body-1 text-(--on-bg-medium) mb-10 md:mb-12 animate-reveal [animation-delay:600ms] fill-mode-both leading-relaxed font-medium">
+            Проектируем и разрабатываем высоконагруженные цифровые продукты, делаем продающий дизайн, залипательные 3D и видео
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto animate-reveal [animation-delay:800ms] fill-mode-both">
+            <Button className="w-full sm:w-fit h-14 md:h-16! px-8 md:px-10! rounded-2xl! shadow-[0_0_20px_rgba(var(--brand-9-rgb),0.3)]" size="large" shape="square" asChild>
+              <Link href="https://forms.yandex.ru/cloud/6a23793395add518b6d0f197">
+                Обсудить проект
+                <KeyboardArrowRightIcon className="size-5 md:size-6!" />
+              </Link>
+            </Button>
+            <Button className="w-full sm:w-fit h-14 md:h-16! px-8 md:px-10! rounded-2xl!" variant="outlined" size="large" shape="square" asChild>
+              <Link href={ROUTES.projects.href}>
+                Смотреть работы
+              </Link>
+            </Button>
+          </div>
         </div>
       </Container>
-    </nav>
+    </section>
+  );
+}
+
+function SelectedWorksSection() {
+  return (
+    <section className="py-8 md:py-10">
+      <Container>
+        <h2 className="mb-8 text-display-2 md:text-display-2 text-(--on-bg-high) tracking-tight">ИЗБРАННЫЕ ПРОЕКТЫ</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+          {[PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance].map((project, idx) => (
+            <ProjectCard key={idx} project={project} index={idx} />
+          ))}
+        </div>
+        <Button className="w-full md:w-fit mt-8" variant="glass" size="large" asChild>
+          <Link href="https://dprofile.ru/rovno_dev">
+            Все проекты
+            <KeyboardArrowRightIcon className="size-4" />
+          </Link>
+        </Button>
+      </Container>
+    </section>
+  );
+}
+
+const services = [
+  {
+    number: "01",
+    title: "РАЗРАБОТКА",
+    description:
+      "От лендингов до сложных высоконагруженных систем — пишем чистый код, который масштабируется.",
+    icon: <DeployedCodeIcon className="size-10 text-(--on-bg-low)" />,
+  },
+  {
+    number: "02",
+    title: "UX/UI ДИЗАЙН",
+    description:
+      "Продуманные интерфейсы и сценарии, которые выдерживают тесты с пользователями и повышают конверсию.",
+    icon: <DiamondIcon className="size-10 text-(--on-bg-low)" />,
+  },
+  {
+    number: "03",
+    title: "АЙДЕНТИКА",
+    description:
+      "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
+    icon: <StylusNoteIcon className="size-10 text-(--on-bg-low)" />,
+  },
+  {
+    number: "04",
+    title: "3D-ГРАФИКА И MOTION",
+    description:
+      "3D и залипательные видео для вашего бренда или продукта для рекламы, на сайт, в приложение или для соц. сетей",
+    icon: <SunIcon className="size-10 text-(--on-bg-low)" />,
+  },
+];
+
+function ServicesSection() {
+  return (
+    <section className="py-12 md:py-20 bg-(--bg)">
+      <Container>
+        <h2 className="mb-8 text-left text-display-2 md:text-display-2 text-(--on-bg-high) tracking-tight uppercase">Наши услуги</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+          {services.map((service) => (
+            <div
+              key={service.number}
+              className="group rounded-3xl border border-(--outline) bg-(--card) p-6 md:p-10 ring-0 transition-all hover:bg-(--state-hover) hover:border-(--primary)/30"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex size-14 items-center justify-center rounded-2xl bg-(--primary-glass) text-(--primary) border border-(--primary-glass)">
+                  {service.icon}
+                </div>
+                <span className="text-display-3 font-heading text-(--on-bg-low) opacity-10 select-none">
+                  {service.number}
+                </span>
+              </div>
+              <h3 className="text-display-4 md:text-display-3 text-(--on-bg-high) mb-3 uppercase tracking-tight">{service.title}</h3>
+              <p className="text-body-3 md:text-body-2 text-(--on-bg-medium) leading-relaxed">
+                {service.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+export default function Home() {
+  return (
+    <>
+      <HeroSection />
+      <SelectedWorksSection />
+      <ServicesSection />
+      <SocialsSection />
+    </>
+  );
+}
+</file>
+
+<file path="app/[slug]/(Expert)/expert-page.tsx">
+/* LLM context: Updating expert page with immersive transitions and dynamic project card entry */
+
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
+import { ExpertData } from "./_data";
+import { Project, PROJECTS } from "../(Project)/data";
+import Link from "next/link";
+
+export function ProjectCard({ project, index }: { project: Project, index?: number }) {
+  return (
+    <a
+      href={project.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${index ? index : 1 * 100}ms` }}
+    >
+      <Card className="relative overflow-hidden rounded-2xl border border-(--outline) aspect-4/3! bg-card ring-0 transition-all active:scale-[0.99]">
+        <Image
+          fill
+          src={project.image}
+          alt={project.title}
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-transparent to-transparent flex flex-col justify-end p-3 md:p-5">
+          <h3 className="text-display-4 md:text-display-2 text-[var(--on-bg-high)] leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+            {project.title}
+          </h3>
+          {project.description && (
+            <p className="mt-4 text-body-3 md:text-body-2 text-(--on-bg-high) leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+              {project.description}
+            </p>
+          )}
+        </div>
+      </Card>
+    </a>
+  );
+}
+
+function ExpertHeroSection({ expert }: { expert: ExpertData }) {
+  console.log(expert);
+  return (
+    <Container variant="full-width" className="pt-4 md:pt-10">
+      <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group animate-in fade-in zoom-in-95 duration-1000">
+        <Image
+          src={expert.avatar}
+          fill
+          className="object-cover object-center transition-transform duration-[2000ms]"
+          alt={expert.name}
+          priority
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-(--bg) via-transparent to-transparent z-10" />
+
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-1">
+          {expert.socials.map((social, key) => (
+            <Button variant={'text'} key={key} size={'icon-large'} asChild className="animate-reveal" style={{ animationDelay: `${400 + key * 100}ms` }}>
+              <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                {social.icon}
+              </Link>
+            </Button>
+          ))}
+        </div>
+
+        <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-6 md:p-10">
+          <div className="flex items-center gap-3 mb-4 md:mb-6 animate-reveal delay-200 fill-mode-both">
+            <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
+            <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full duration-[2000ms]" />
+          </div>
+
+          <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
+            <div className="flex flex-nowrap gap-2 md:flex-wrap md:justify-center pb-1">
+              {expert.tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="tonal-card-static"
+                  size="chip-large"
+                  className="bg-(--card)/50 backdrop-blur-md border-(--outline)/50 text-(--on-bg-high) whitespace-nowrap px-4 py-5 md:py-1 animate-reveal fill-mode-both"
+                  style={{ animationDelay: `${300 + index * 50}ms` }}
+                >
+                  {tag.icon && React.cloneElement(tag.icon as React.ReactElement<{ className?: string }>, { className: "size-4 fill-current" })}
+                  {tag.label}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  );
+}
+
+export default function ExpertPage({ expert }: { expert: ExpertData }) {
+  const [activeTab, setActiveTab] = useState("Проекты");
+  const tabs = [
+    "Проекты",
+    // "Будни",
+    // "Речи", 
+    // "События", 
+    // "Награды", 
+    // "Мысли вслух"
+  ];
+
+  return (
+    <div className="pb-20">
+      <ExpertHeroSection expert={expert} />
+
+      <Container variant="full-width" className="py-4 md:py-12">
+        <div className="max-w-[1200px] mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10 animate-reveal delay-500 fill-mode-both">
+            <TabsList variant="line" className="w-full justify-start md:justify-center overflow-x-auto overflow-y-hidden no-scrollbar border-b border-(--outline) rounded-none gap-2 md:gap-8 bg-transparent!">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className="px-4 md:px-0 data-[state=active]:text-(--primary)"
+                >
+                  {tab}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
+          {activeTab === "Проекты" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              {/* {expert.projects.map((project, idx) => ( */}
+              {[PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance].map((project, idx) => (
+                <ProjectCard key={idx} project={project} index={idx} />
+              ))}
+            </div>
+          )}
+        </div>
+      </Container>
+    </div>
+  );
+}
+</file>
+
+<file path="app/[slug]/(Project)/data.tsx">
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { ProjectCard } from "../(Expert)/expert-page";
+
+/* ---------- Project type ---------- */
+export type ProjectTagType = {
+  title: string,
+  href?: string,
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description?: string;
+  tags?: ProjectTagType[];
+  image: string;
+  href?: string;
+  category?: string;
+  client?: string;
+  platform?: string;
+  period?: string;
+  techStack?: string[];
+  metrics?: { label: string; value: string; description: string }[];
+}
+
+/* ---------- Project data ---------- */
+export const PROJECTS: Record<string, Project> = {
+  alx: {
+    id: "alx",
+    title: "ALX",
+    description:
+      "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
+    image: "/images/projects/alx.png",
+    href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
+    category: "Айдентика",
+    client: "ALX",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Figma", "After Effects"],
+    metrics: [
+      {
+        label: "Узнаваемость",
+        value: "+60%",
+        description: "Рост узнаваемости бренда после ребрендинга",
+      },
+    ],
+  },
+  sadovod: {
+    id: "sadovod",
+    title: "Садовод",
+    description:
+      "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
+    image: "/images/projects/sadovod.png",
+    href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
+    category: "E-commerce",
+    client: "Садовод",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS"],
+    metrics: [
+      {
+        label: "Конверсия",
+        value: "+35%",
+        description: "Увеличение конверсии после редизайна",
+      },
+    ],
+  },
+  vanguard: {
+    id: "vanguard",
+    title: "Vanguard",
+    description:
+      "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда.",
+    image: "/images/projects/vanguard.png",
+    href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
+    category: "Fintech",
+    client: "Vanguard FinTech",
+    platform: "iOS & Android App",
+    period: "2023 - 2024",
+    techStack: ["React Native", "TypeScript", "GraphQL", "Node.js", "WebGL"],
+    metrics: [
+      {
+        label: "Конверсия",
+        value: "+45%",
+        description: "Рост регистраций",
+      },
+      {
+        label: "Отток",
+        value: "-20%",
+        description: "Снижение отказов",
+      },
+      {
+        label: "Оценка в App Store",
+        value: "4.9",
+        description: "Средняя оценка пользователей",
+      },
+    ],
+  },
+  courtElegance: {
+    id: "courtElegance",
+    title: "Court Elegance",
+    description:
+      "Разработка сайта премиального теннисного клуба, расположенного в городе Остин, США, штат Техас",
+    image: "/images/projects/court.png",
+    href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
+    category: "E-commerce",
+    client: "Court Elegance",
+    platform: "Веб-сайт",
+    period: "2024",
+    techStack: ["Next.js", "TypeScript", "Framer Motion"],
+    metrics: [],
+  },
+};
+
+/* ---------- Page component ---------- */
+const projectsList = Object.values(PROJECTS);
+
+// function ProjectCard({ project, index }: { project: Project; index: number }) {
+//   return (
+//     <a
+//       href={project.href || "#"}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="group block animate-reveal fill-mode-both"
+//       style={{ animationDelay: `${index * 100}ms` }}
+//     >
+//       <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+//         <Image
+//           fill
+//           src={project.image}
+//           alt={project.title}
+//           className="object-cover transition-transform duration-700 group-hover:scale-105"
+//         />
+//         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+//           {project.category && (
+//             <Badge
+//               variant="glass-static"
+//               size="chip-small"
+//               className="text-white border-white/20 mb-2 w-fit"
+//             >
+//               {project.category}
+//             </Badge>
+//           )}
+//           <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+//             {project.title}
+//           </h3>
+//         </div>
+//         {/* Arrow button */}
+//         <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+//           <Button
+//             size="icon-small"
+//             shape="round"
+//             className="bg-white text-black hover:bg-white"
+//           >
+//             <KeyboardArrowRightIcon className="size-5!" />
+//           </Button>
+//         </div>
+//       </Card>
+//     </a>
+//   );
+// }
+
+export default function ProjectsPage() {
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero */}
+      <section className="py-16 md:py-24 border-b border-(--outline)">
+        <Container>
+          <div className="max-w-[800px] animate-reveal">
+            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
+              Проекты
+            </h1>
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
+              Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* Projects Grid */}
+      <section className="py-16 md:py-24">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {projectsList.map((project, idx) => (
+              <ProjectCard key={project.id} project={project} index={idx} />
+            ))}
+          </div>
+        </Container>
+      </section>
+    </main>
+  );
+}
+</file>
+
+<file path="app/[slug]/(Project)/project-page.tsx">
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { KeyboardArrowRightIcon } from "@/components/icons";
+import { Project } from "./data";
+
+interface ProjectPageProps {
+  project: Project;
+}
+
+export default function ProjectPage({ project }: ProjectPageProps) {
+  return (
+    <main className="min-h-screen bg-(--bg)">
+      {/* Hero Section – large image + title */}
+      <section className="relative overflow-hidden pt-20 pb-16 md:pb-24">
+        <Container>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+            {/* Left column – text */}
+            <div className="animate-reveal">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Badge variant="glass-static" size="chip-small">
+                  {project.category || "Проект"}
+                </Badge>
+              </div>
+
+              <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-tight">
+                {project.title}
+              </h1>
+
+              <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) mb-8 max-w-[576px]">
+                {project.description}
+              </p>
+
+              {/* Client / Platform / Period info */}
+              <div className="flex flex-wrap gap-6 md:gap-10 mb-8">
+                {project.client && (
+                  <div>
+                    <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">КЛИЕНТ</p>
+                    <p className="text-body-3 text-(--on-bg-high) font-medium">{project.client}</p>
+                  </div>
+                )}
+                {project.platform && (
+                  <div>
+                    <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЛАТФОРМА</p>
+                    <p className="text-body-3 text-(--on-bg-high) font-medium">{project.platform}</p>
+                  </div>
+                )}
+                {project.period && (
+                  <div>
+                    <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">ПЕРИОД</p>
+                    <p className="text-body-3 text-(--on-bg-high) font-medium">{project.period}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Tech Stack */}
+              {project.techStack && project.techStack.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {project.techStack.map((tech, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="tonal-card-static"
+                      size="chip-medium"
+                      className="animate-reveal fill-mode-both"
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right column – large image */}
+            <div className="relative aspect-[596/447] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) animate-reveal delay-200 fill-mode-both">
+              <Image
+                src={project.image}
+                alt={project.title}
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Impact & Results Section */}
+      {project.metrics && project.metrics.length > 0 && (
+        <section className="py-16 md:py-24 bg-(--bg)">
+          <Container>
+            <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
+              Результаты внедрения
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {project.metrics.map((metric, idx) => (
+                <Card
+                  key={idx}
+                  className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">
+                    {metric.label}
+                  </p>
+                  <p className="text-display-1 text-(--on-bg-high) mb-2">
+                    {metric.value}
+                  </p>
+                  <p className="text-body-3 text-(--on-bg-medium)">
+                    {metric.description}
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="py-16 md:py-24">
+        <Container>
+          <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
+            <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
+
+            <div className="relative z-10 mx-auto max-w-[672px] text-center">
+              <h3 className="text-display-3 text-(--on-bg-high) mb-4">
+                Интерактивный прототип
+              </h3>
+              <p className="text-body-2 text-(--on-bg-medium) mb-8">
+                Оцените плавность анимаций, логику навигации и внимание к деталям в интерактивном прототипе.
+              </p>
+
+              <Button size="large" shape="round" asChild>
+                <Link href={project.href || "#"} target="_blank" rel="noopener noreferrer">
+                  Запустить демо
+                  <KeyboardArrowRightIcon className="size-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+    </main>
   );
 }
 </file>
@@ -10923,6 +11509,77 @@ export default function RootLayout({
 }
 </file>
 
+<file path="components/layout/bottom-app-bar.tsx">
+"use client"
+
+import { ROUTES } from "@/utils/constants/routes";
+import { Container } from "../ui/container";
+import { useState } from "react";
+// import MakeOrderModal from "./make-order-modal/make-order-modal";
+import { Button } from "../ui/button";
+import { DesignServicesIcon } from "../icons";
+import { DeployedCodeIcon } from "../icons/unideka-icons/deployed-code-icon";
+import { ArticleIcon } from "../icons/unideka-icons/article-icon";
+import { WorkIcon } from "../icons/unideka-icons/work-icon";
+import Link from "next/link";
+import RovnoLogotypeIconEmpty from "./rovno-dev-logotype/rovno-dev-logotype-icon-empty";
+
+export default function BottomAppBar() {
+  const [open, setOpen] = useState(false);
+
+  const links = [
+    // Pass the COMPONENT, not <Component />
+    { ...ROUTES.projects, icon: DeployedCodeIcon },
+    { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
+    { href: ROUTES.journal.href, title: "Журнал", icon: ArticleIcon },
+    // { ...ROUTES.job, icon: WorkIcon },
+  ]
+
+  return (
+    <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
+      <Container aria-label="Bottom app bar">
+        <div className="p-2 grid grid-cols-[1fr_125px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
+          <div className="w-full h-full grid grid-cols-3 items-center">
+            {links.map((link, key) => {
+              const Icon = link.icon;
+              return (
+                <Button
+                  asChild
+                  className="w-full h-[60px]! p-0"
+                  variant={'text'}
+                  shape={'round'}
+                  size="icon-medium"
+                  key={key}
+                >
+                  <Link href={link.href} className="flex items-center justify-center flex-col! gap-2 w-full h-full">
+                    <Icon className="size-6" />
+                    <p className="text-body-5">{link.title}</p>
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+
+          <Button
+            asChild
+            shape={'round'}
+            className="w-full h-[60px] gap-2"
+            size="medium"
+            onClick={() => setOpen(true)}
+          >
+            <Link href={'https://forms.yandex.com/cloud/6936a4b1d0468820623c548e'}>
+              <DesignServicesIcon className="size-[26px]!" />
+              <span className="text-display-4">Заказ</span>
+            </Link>
+          </Button>
+
+        </div>
+      </Container>
+    </nav>
+  );
+}
+</file>
+
 <file path="components/ui/button.tsx">
 /* LLM context: Forcing SVG internal paths to inherit current color in Button components to fix dark icons on primary buttons in light theme */
 
@@ -10943,9 +11600,10 @@ export const buttonUnidekaVariants = {
 };
 
 export const chipSizes = {
-  "chip-small": "h-[26px] px-2 [&_svg]:size-4",
-  "chip-medium": "h-[32px] px-3  [&_svg]:size-5",
-  "chip-large": "h-[38px] px-4 [&_svg]:size-6",
+  "chip-small": "h-[26px] px-2 [&_svg]:size-4 text-body-4!",
+  "chip-medium": "h-[32px] px-3  [&_svg]:size-5 text-body-3!",
+  "chip-large": "h-[38px] px-4 [&_svg]:size-6 text-body-2!",
+  "chip-xlarge": "h-[50px] px-6 [&_svg]:size-8 text-body-1!",
 }
 
 export const iconButtonSizes = {
@@ -11012,54 +11670,6 @@ function Button({
 }
 
 export { Button, buttonVariants }
-</file>
-
-<file path="utils/constants/routes.tsx">
-import { ReactNode } from "react";
-
-export interface RouteLinkProps {
-  id?: string,
-  href: string,
-  title?: string | ReactNode,
-}
-
-export const ROUTES = {
-  home: {
-    id: 'home',
-    href: "/",
-    title: 'Главная',
-  },
-  projects: {
-    id: 'projects',
-    href: "/projects",
-    title: 'Проекты'
-  },
-  dprofileProjects: {
-    id: 'dprofileProjects',
-    href: "https://dprofile.ru/rovno_dev",
-    title: 'Проекты на Dprofile'
-  },
-  about: {
-    id: 'about',
-    href: "/about",
-    title: 'Агентство',
-  },
-  journal: {
-    id: 'journal',
-    href: "https://t.me/rovno_dev",
-    title: "Журнал Ровня",
-  },
-  job: {
-    id: 'job',
-    href: "/job",
-    title: "Вакансии",
-  },
-  "fake-api": {
-    id: 'fake-api',
-    href: "fake-api.localhost:3000",
-    title: "Фейк АПИ",
-  },
-}
 </file>
 
 <file path="app/globals.css">
@@ -11276,7 +11886,7 @@ export const ROUTES = {
 
 
 .dark {
-  --primary: var(--brand-7);
+  --primary: var(--brand-9);
   --on-primary: var(--white);
   --primary-card: var(--brand-3);
   --on-primary-card: var(--dark-9);
@@ -11381,7 +11991,7 @@ export const ROUTES = {
 <file path="package.json">
 {
   "name": "rovno-dev-frontend",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "private": false,
   "author": "Niyaz Gimadiev niyaztutor@gmail.com (https://rovno.dev/niyazgim)",
   "license": "Apache-2.0",
@@ -11430,6 +12040,59 @@ export const ROUTES = {
     "tailwindcss": "^4",
     "typescript": "^5"
   }
+}
+</file>
+
+<file path="utils/constants/routes.tsx">
+import { ReactNode } from "react";
+
+export interface RouteLinkProps {
+  id?: string,
+  href: string,
+  title?: string | ReactNode,
+}
+
+export const ROUTES = {
+  home: {
+    id: 'home',
+    href: "/",
+    title: 'Главная',
+  },
+  projects: {
+    id: 'projects',
+    href: "/projects",
+    title: 'Проекты'
+  },
+  dprofileProjects: {
+    id: 'dprofileProjects',
+    href: "https://dprofile.ru/rovno_dev",
+    title: 'Проекты на Dprofile'
+  },
+  about: {
+    id: 'about',
+    href: "/about",
+    title: 'О нас',
+  },
+  journal: {
+    id: 'journal',
+    href: "https://t.me/rovno_dev",
+    title: "Журнал Ровня",
+  },
+  blog: {
+    id: 'blog',
+    href: "/blog",
+    title: 'Блог',
+  },
+  job: {
+    id: 'job',
+    href: "/job",
+    title: "Вакансии",
+  },
+  "fake-api": {
+    id: 'fake-api',
+    href: "fake-api.localhost:3000",
+    title: "Фейк АПИ",
+  },
 }
 </file>
 

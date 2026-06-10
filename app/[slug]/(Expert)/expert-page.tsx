@@ -13,40 +13,9 @@ import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
 import { ExpertData } from "./_data";
 import { Project, PROJECTS } from "../(Project)/data";
 import Link from "next/link";
-
-export function ProjectCard({ project, index }: { project: Project, index?: number }) {
-  return (
-    <a
-      href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${index ? index : 1 * 100}ms` }}
-    >
-      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) aspect-4/3! bg-card ring-0 transition-all active:scale-[0.99]">
-        <Image
-          fill
-          src={project.image}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-transparent to-transparent flex flex-col justify-end p-4 md:p-6">
-          <h3 className="text-display-4 md:text-display-2 text-[var(--on-bg-high)] leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-          {project.description && (
-            <p className="mt-4 text-body-3 md:text-body-2 text-(--on-bg-high) leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-              {project.description}
-            </p>
-          )}
-        </div>
-      </Card>
-    </a>
-  );
-}
+import ProjectCard from "@/components/layout/project-card/project-card";
 
 function ExpertHeroSection({ expert }: { expert: ExpertData }) {
-  console.log(expert);
   return (
     <Container variant="full-width" className="pt-4 md:pt-10">
       <div className="relative w-full max-w-[1200px] mx-auto h-[520px] md:h-[480px] rounded-6xl md:rounded-8xl overflow-hidden bg-card border border-(--outline) group animate-in fade-in zoom-in-95 duration-1000">
@@ -131,8 +100,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
 
           {activeTab === "Проекты" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-              {/* {expert.projects.map((project, idx) => ( */}
-              {[PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance].map((project, idx) => (
+              {expert.projects.map((project, idx) => (
                 <ProjectCard key={idx} project={project} index={idx} />
               ))}
             </div>

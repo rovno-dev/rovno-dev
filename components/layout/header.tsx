@@ -9,7 +9,7 @@ import { ROUTES } from "@/utils/constants/routes";
 export default function Header() {
   return (
     <header
-      className="h-[46px] md:h-[70px] 
+      className="h-[55px] md:h-[70px] 
       fixed top-0 left-0 right-0 w-full z-50 
       flex items-center
       bg-(--card-glass) backdrop-blur-glass border-b border-b-(--card-glass)"
@@ -27,7 +27,7 @@ export default function Header() {
             <NavLink href={ROUTES.about.href}>О нас</NavLink>
             {/* <NavLink href={ROUTES.job}>Вакансии</NavLink> */}
             <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
-            <NavLink href={ROUTES.blog.href}>Блог</NavLink>
+            {/* <NavLink href={ROUTES.blog.href}>Блог</NavLink> */}
           </nav>
         </div>
 

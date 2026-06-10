@@ -4,7 +4,8 @@ import React, { useState, useMemo } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { PROJECTS } from "@/app/[slug]/(Project)/data";
-import { ProjectCard } from "@/app/[slug]/(Expert)/expert-page";
+import ProjectCard from "@/components/layout/project-card/project-card";
+import PageHeadingSection from "@/components/layout/page/page-heading-section";
 
 export default function ProjectsPage() {
   const projectsList = useMemo(() => Object.values(PROJECTS), []);
@@ -27,27 +28,14 @@ export default function ProjectsPage() {
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Hero */}
-      <section className="py-24 md:py-32">
-        <Container>
-          <div className="max-w-[800px] animate-reveal">
-            <h1 className="text-display-1 md:text-display-0 text-(--on-bg-high) mb-6 leading-tight">
-              Проекты
-            </h1>
-            <p className="text-body-1 md:text-body-0 text-(--on-bg-medium) leading-relaxed max-w-[600px]">
-              Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках.
-            </p>
-          </div>
-        </Container>
-      </section>
-
+      <PageHeadingSection title={"Проекты"} description={"Высокопроизводительные цифровые решения. Фокус на архитектуре и метриках."} />
       {/* Filter Bar */}
       <section className="pb-8">
         <Container>
           <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
             <Button
               variant={activeCategory === null ? "filled" : "tonal-card"}
-              size="chip-medium"
+              size="chip-large"
               shape="round"
               onClick={() => setActiveCategory(null)}
             >
@@ -57,7 +45,7 @@ export default function ProjectsPage() {
               <Button
                 key={cat}
                 variant={activeCategory === cat ? "filled" : "tonal-card"}
-                size="chip-medium"
+                size="chip-large"
                 shape="round"
                 onClick={() => setActiveCategory(cat)}
               >
@@ -76,7 +64,7 @@ export default function ProjectsPage() {
               Нет проектов в этой категории
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
               {filteredProjects.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))}
