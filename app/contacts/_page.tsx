@@ -6,34 +6,26 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon, ArticleIcon, DiamondIcon, PublicIcon, StylusNoteIcon } from "@/components/icons";
+import {
+  KeyboardArrowRightIcon,
+  ArticleIcon,
+  DiamondIcon,
+  PublicIcon,
+  StylusNoteIcon,
+} from "@/components/icons";
 import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code-icon";
 import { cn } from "@/lib/utils";
+import PageHeadingSection from "@/components/layout/page/page-heading-section";
 
-/* ---------- Hero Section ---------- */
-function HeroSection() {
-  return (
-    <section className="py-16 md:py-24 border-b border-(--outline)">
-      <Container>
-        <div className="max-w-[800px] animate-reveal">
-          <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
-            ЮРИДИЧЕСКАЯ ИНФОРМАЦИЯ
-          </h1>
-          <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
-            Официальные реквизиты, правовые документы и контактные данные цифрового агентства.
-          </p>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
-/* ---------- Company Details Card ---------- */
+/* ---------- Company Details ---------- */
 const companyDetails = [
   { label: "Полное наименование", value: "ООО «Ровно.дев»" },
   { label: "ИНН / КПП", value: "7700000000 / 770001001" },
   { label: "ОГРН", value: "1234567890123" },
-  { label: "Юридический адрес", value: "123000, г. Москва, ул. Тестовая, д. 1, офис 1" },
+  {
+    label: "Юридический адрес",
+    value: "123000, г. Москва, ул. Тестовая, д. 1, офис 1",
+  },
 ];
 
 function CompanyDetailsCard() {
@@ -55,8 +47,12 @@ function CompanyDetailsCard() {
               idx < companyDetails.length - 1 && "border-b border-(--outline)"
             )}
           >
-            <span className="text-body-3 text-(--on-bg-medium) shrink-0">{item.label}</span>
-            <span className="text-body-3 text-(--on-bg-high) text-right max-w-[60%]">{item.value}</span>
+            <span className="text-body-3 text-(--on-bg-medium) shrink-0">
+              {item.label}
+            </span>
+            <span className="text-body-3 text-(--on-bg-high) text-right max-w-[60%]">
+              {item.value}
+            </span>
           </div>
         ))}
       </div>
@@ -64,7 +60,7 @@ function CompanyDetailsCard() {
   );
 }
 
-/* ---------- Documents Card ---------- */
+/* ---------- Documents ---------- */
 const documents = [
   { title: "Политика конфиденциальности", href: "#" },
   { title: "Пользовательское соглашение", href: "#" },
@@ -97,7 +93,7 @@ function DocumentsCard() {
   );
 }
 
-/* ---------- Certificates & Awards Section ---------- */
+/* ---------- Certificates & Awards ---------- */
 const certificates = [
   {
     title: "Аккредитованная IT-компания",
@@ -155,8 +151,13 @@ function CertificatesSection() {
 export default function ContactsPage() {
   return (
     <main className="min-h-screen bg-(--bg)">
-      <HeroSection />
+      {/* Hero Section using PageHeadingSection */}
+      <PageHeadingSection
+        title="ЮРИДИЧЕСКАЯ ИНФОРМАЦИЯ"
+        description="Официальные реквизиты, правовые документы и контактные данные цифрового агентства."
+      />
 
+      {/* Bento Grid Layout – Company Details + Documents */}
       <section className="py-16 md:py-24">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -166,6 +167,7 @@ export default function ContactsPage() {
         </Container>
       </section>
 
+      {/* Certificates & Awards */}
       <CertificatesSection />
     </main>
   );
