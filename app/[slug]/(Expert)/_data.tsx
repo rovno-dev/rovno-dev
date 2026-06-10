@@ -10,6 +10,7 @@ import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-
 import { Project, PROJECTS } from "@/app/[slug]/(Project)/data"
 import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
 import { Thought, THOUGHTS } from "./thoughts-data";
+import { DailyPost, DAILY_POSTS } from "./daily-data";
 // Note: PROJECTS is now defined in the same directory's data.tsx
 
 export interface ExpertTag {
@@ -31,6 +32,7 @@ export interface ExpertData {
   socials: ExpertSocial[];
   projects: Project[];
   thoughts: Thought[];
+  dailyPosts: DailyPost[];
 }
 
 export const EXPERTS_DATA: Record<string, ExpertData> = {
@@ -54,6 +56,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
     ],
     projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance],
     thoughts: THOUGHTS.niyazgim || [],
+    dailyPosts: DAILY_POSTS.niyazgim || [],
   },
   RovnoMikhail: {
     id: "RovnoMikhail",
@@ -73,6 +76,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.courtElegance,
     ],
     thoughts: THOUGHTS.RovnoMikhail || [],
+    dailyPosts: DAILY_POSTS.RovnoMikhail || [],
   },
   RovnoDanil: {
     id: "RovnoDanil",
@@ -92,5 +96,6 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.courtElegance,
     ],
     thoughts: THOUGHTS.RovnoDanil || [],
+    dailyPosts: DAILY_POSTS.RovnoDanil || [],
   }
 };

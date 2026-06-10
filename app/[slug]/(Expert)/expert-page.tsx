@@ -72,7 +72,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
   const tabs = [
     "Проекты",
     "Мысли вслух",
-    // "Будни",
+    "Будни",
     // "Речи", 
     // "События", 
     // "Награды", 
@@ -137,6 +137,48 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                       </div>
                       <span className="text-body-5 text-(--on-bg-low)">
                         {new Date(thought.date).toLocaleDateString("ru-RU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab === "Будни" && (
+            <div className="space-y-4">
+              {expert.dailyPosts.length === 0 ? (
+                <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+                  Пока нет записей
+                </p>
+              ) : (
+                expert.dailyPosts.map((post, idx) => (
+                  <Card
+                    key={post.id}
+                    className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 animate-reveal fill-mode-both"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
+                      {post.text}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        {post.tags?.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="tonal-card-static"
+                            size="chip-small"
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <span className="text-body-5 text-(--on-bg-low)">
+                        {new Date(post.date).toLocaleDateString("ru-RU", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
