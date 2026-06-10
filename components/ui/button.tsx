@@ -17,9 +17,10 @@ export const buttonUnidekaVariants = {
 };
 
 export const chipSizes = {
-  "chip-small": "h-[26px] px-2 [&_svg]:size-4",
-  "chip-medium": "h-[32px] px-3  [&_svg]:size-5",
-  "chip-large": "h-[38px] px-4 [&_svg]:size-6",
+  "chip-small": "h-[28px] px-3 [&_svg]:size-3.5 text-body-5!",
+  "chip-medium": "h-[36px] px-4 [&_svg]:size-4 text-body-4!",
+  "chip-large": "h-[46px] px-6 [&_svg]:size-5 text-body-3!",
+  "chip-xlarge": "h-[58px] px-8 [&_svg]:size-6 text-body-2!",
 }
 
 export const iconButtonSizes = {

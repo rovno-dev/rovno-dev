@@ -8,6 +8,7 @@ import {
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
 import { Project, PROJECTS } from "@/app/[slug]/(Project)/data"
+import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
 // Note: PROJECTS is now defined in the same directory's data.tsx
 
 export interface ExpertTag {
@@ -47,6 +48,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
         icon: <VKLogotypeMonoIcon />, href: "https://vk.com/niyazgim"
       },
       { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
+      { icon: <GithubLogotypeMonoIcon />, href: "https://github.com/niyazgim" },
     ],
     projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance]
   },

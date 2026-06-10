@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
-import { ProjectCard } from "../(Expert)/expert-page";
+import ProjectCard from "@/components/layout/project-card/project-card";
 
 /* ---------- Project type ---------- */
 export type ProjectTagType = {
@@ -34,7 +32,7 @@ export interface Project {
 /* ---------- Project data ---------- */
 export const PROJECTS: Record<string, Project> = {
   alx: {
-    id: "alx",
+    id: "1",
     title: "ALX",
     description:
       "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
@@ -54,7 +52,7 @@ export const PROJECTS: Record<string, Project> = {
     ],
   },
   sadovod: {
-    id: "sadovod",
+    id: "2",
     title: "Садовод",
     description:
       "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
@@ -74,7 +72,7 @@ export const PROJECTS: Record<string, Project> = {
     ],
   },
   vanguard: {
-    id: "vanguard",
+    id: '3',
     title: "Vanguard",
     description:
       "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда.",
@@ -104,7 +102,7 @@ export const PROJECTS: Record<string, Project> = {
     ],
   },
   courtElegance: {
-    id: "courtElegance",
+    id: "4",
     title: "Court Elegance",
     description:
       "Разработка сайта премиального теннисного клуба, расположенного в городе Остин, США, штат Техас",

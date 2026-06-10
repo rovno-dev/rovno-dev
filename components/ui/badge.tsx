@@ -12,7 +12,7 @@ export const badgeUnidekaVariants = {
   "tonal-card-static": "bg-card text-card-foreground border border-border/50",
   "tonal-primary-static": "bg-[var(--primary-card)] text-primary",
   "text-static": "bg-transparent text-foreground",
-  "glass-static": "bg-[var(--primary-glass)] backdrop-blur-custom border border-[var(--primary-glass)] text-primary [&_svg]:fill-primary",
+  "glass-static": "bg-[var(--primary-glass)] backdrop-blur-glass border border-[var(--primary-glass)] text-primary [&_svg]:fill-primary",
   "selected-static": "bg-[var(--primary-card)] text-primary border border-primary",
 };
 

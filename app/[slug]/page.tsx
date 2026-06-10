@@ -1,4 +1,4 @@
-/* LLM context: Updating the Dispatcher to pass data from EXPERTS_DATA to the ExpertPage component. */
+/* LLM context: Refactoring Dispatcher logic to resolve projects by their internal unique ID instead of record keys. */
 
 import ExpertPage from "./(Expert)/expert-page";
 import ProjectPage from "./(Project)/project-page";
@@ -13,15 +13,11 @@ interface PageProps {
 export default async function DispatcherPage({ params }: PageProps) {
   const { slug } = await params;
 
-  // Check if it's a project
-  const projectKeys = Object.keys(PROJECTS);
-  const projectKey = projectKeys.find((key) => key === slug);
-  if (projectKey) {
-    const project = PROJECTS[projectKey];
+  const project = Object.values(PROJECTS).find((p) => p.id === slug);
+  if (project) {
     return <ProjectPage project={project} />;
   }
 
-  // Check if it's an expert
   const expert = EXPERTS_DATA[slug];
   if (expert) {
     return <ExpertPage expert={expert} />;
