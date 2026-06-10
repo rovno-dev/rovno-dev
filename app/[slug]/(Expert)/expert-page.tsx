@@ -73,6 +73,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
     "Проекты",
     "Мысли вслух",
     "Будни",
+    "События",
     // "Речи", 
     // "События", 
     // "Награды", 
@@ -179,6 +180,51 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                       </div>
                       <span className="text-body-5 text-(--on-bg-low)">
                         {new Date(post.date).toLocaleDateString("ru-RU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab === "События" && (
+            <div className="space-y-4">
+              {expert.events.length === 0 ? (
+                <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+                  Пока нет событий
+                </p>
+              ) : (
+                expert.events.map((event, idx) => (
+                  <Card
+                    key={event.id}
+                    className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 animate-reveal fill-mode-both"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <h3 className="text-display-4 text-(--on-bg-high) mb-2">
+                      {event.title}
+                    </h3>
+                    <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
+                      {event.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        {event.tags?.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="tonal-card-static"
+                            size="chip-small"
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <span className="text-body-5 text-(--on-bg-low)">
+                        {new Date(event.date).toLocaleDateString("ru-RU", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
