@@ -9,6 +9,7 @@ import {
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
 import { Project, PROJECTS } from "@/app/[slug]/(Project)/data"
 import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
+import { Thought, THOUGHTS } from "./thoughts-data";
 // Note: PROJECTS is now defined in the same directory's data.tsx
 
 export interface ExpertTag {
@@ -29,6 +30,7 @@ export interface ExpertData {
   tags: ExpertTag[];
   socials: ExpertSocial[];
   projects: Project[];
+  thoughts: Thought[];
 }
 
 export const EXPERTS_DATA: Record<string, ExpertData> = {
@@ -50,7 +52,8 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
       { icon: <GithubLogotypeMonoIcon />, href: "https://github.com/niyazgim" },
     ],
-    projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance]
+    projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance],
+    thoughts: THOUGHTS.niyazgim || [],
   },
   RovnoMikhail: {
     id: "RovnoMikhail",
@@ -68,7 +71,8 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.sadovod,
       PROJECTS.vanguard,
       PROJECTS.courtElegance,
-    ]
+    ],
+    thoughts: THOUGHTS.RovnoMikhail || [],
   },
   RovnoDanil: {
     id: "RovnoDanil",
@@ -86,6 +90,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.sadovod,
       PROJECTS.vanguard,
       PROJECTS.courtElegance,
-    ]
+    ],
+    thoughts: THOUGHTS.RovnoDanil || [],
   }
 };

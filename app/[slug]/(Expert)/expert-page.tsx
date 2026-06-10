@@ -71,6 +71,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
   const [activeTab, setActiveTab] = useState("Проекты");
   const tabs = [
     "Проекты",
+    "Мысли вслух",
     // "Будни",
     // "Речи", 
     // "События", 
@@ -103,6 +104,48 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
               {expert.projects.map((project, idx) => (
                 <ProjectCard key={idx} project={project} index={idx} />
               ))}
+            </div>
+          )}
+
+          {activeTab === "Мысли вслух" && (
+            <div className="space-y-4">
+              {expert.thoughts.length === 0 ? (
+                <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+                  Пока нет мыслей вслух
+                </p>
+              ) : (
+                expert.thoughts.map((thought, idx) => (
+                  <Card
+                    key={thought.id}
+                    className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 animate-reveal fill-mode-both"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
+                      {thought.text}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        {thought.tags?.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="tonal-card-static"
+                            size="chip-small"
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <span className="text-body-5 text-(--on-bg-low)">
+                        {new Date(thought.date).toLocaleDateString("ru-RU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </Card>
+                ))
+              )}
             </div>
           )}
         </div>
