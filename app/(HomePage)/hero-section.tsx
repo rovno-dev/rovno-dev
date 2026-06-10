@@ -81,7 +81,7 @@ export default function HeroSection() {
           </div> */}
 
           <div className="flex flex-col gap-2 mb-6 md:mb-8">
-            <h1 className="text-display-1 text-5xl sm:text-7xl leading-none md:text-8xl lg:text-[6.5rem] tracking-tighter text-(--on-bg-high) animate-reveal [animation-delay:400ms] fill-mode-both uppercase flex flex-col">Инжиниринг</h1>
+            <h1 className="text-display-1 text-5xl sm:text-7xl leading-none md:text-8xl lg:text-[6.5rem] tracking-tighter text-(--on-bg-high) animate-reveal [animation-delay:400ms] fill-mode-both uppercase flex flex-col">Разработка</h1>
             <h1 className="text-display-1 text-5xl sm:text-7xl leading-none md:text-8xl lg:text-[6.5rem] tracking-tighter text-(--on-bg-high) animate-reveal [animation-delay:350ms] fill-mode-both uppercase flex flex-col">Будущего</h1>
           </div>
 
