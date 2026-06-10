@@ -74,8 +74,8 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
     "Мысли вслух",
     "Будни",
     "События",
+    "Награды",
     // "Речи", 
-    // "События", 
     // "Награды", 
     // "Мысли вслух"
   ];
@@ -225,6 +225,51 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                       </div>
                       <span className="text-body-5 text-(--on-bg-low)">
                         {new Date(event.date).toLocaleDateString("ru-RU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab === "Награды" && (
+            <div className="space-y-4">
+              {expert.awards.length === 0 ? (
+                <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
+                  Пока нет наград
+                </p>
+              ) : (
+                expert.awards.map((award, idx) => (
+                  <Card
+                    key={award.id}
+                    className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 animate-reveal fill-mode-both"
+                    style={{ animationDelay: `${idx * 100}ms` }}
+                  >
+                    <h3 className="text-display-4 text-(--on-bg-high) mb-2">
+                      {award.title}
+                    </h3>
+                    <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
+                      {award.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1">
+                        {award.tags?.map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="tonal-card-static"
+                            size="chip-small"
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <span className="text-body-5 text-(--on-bg-low)">
+                        {new Date(award.date).toLocaleDateString("ru-RU", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
