@@ -92,9 +92,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                 <TabsTrigger
                   key={tab}
                   value={tab}
-                  className="px-4 md:px-0 data-[state=active]:text-(--primary)"
-                // need to add selected state on activeTab
-                // {...activeTab === tab ? selected : ""}
+                  className={`px-4 md:px-0 ${activeTab === tab ? "text-(--primary) after:opacity-100" : ""}`}
                 >
                   {tab}
                 </TabsTrigger>
