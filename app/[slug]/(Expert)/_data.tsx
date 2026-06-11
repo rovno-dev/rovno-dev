@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { Project, PROJECTS } from "../(Project)/data";
-import { EVENTS, Event } from "./_data";
 import { THOUGHTS, Thought } from "./thoughts-data";
 import { DAILY_POSTS, DailyPost } from "./daily-data";
 import { AWARDS, Award } from "./awards-data";
@@ -9,6 +8,29 @@ import {
   GithubLogotypeMonoIcon,
   TelegramLogotypeMonoIcon,
 } from "@/components/icons";
+
+export interface Event {
+  id: string,
+  date?: string,
+  slug?: string,
+  title: string,
+  blog_href?: string,
+  image?: string,
+  tags?: string[],
+}
+
+export const EVENTS: Record<string, Event> = {
+  "web-summit-2026": {
+    id: '1',
+    title: 'Веб Саммит 2026',
+    slug: "web-summit-2026",
+  },
+  "web-summit-2025": {
+    id: '2',
+    title: 'Веб Саммит 2025',
+    slug: "web-summit-2025",
+  },
+}
 
 export interface ExpertData {
   name: string;
@@ -46,7 +68,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       },
     ],
     projects: [PROJECTS.vanguard, PROJECTS.alx],
-    events: EVENTS.niyazgim,
+    events: [EVENTS['web-summit-2026'], EVENTS['web-summit-2025']],
     thoughts: THOUGHTS.niyazgim,
     dailyPosts: DAILY_POSTS.niyazgim,
     awards: AWARDS.niyazgim,
@@ -70,7 +92,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       },
     ],
     projects: [PROJECTS.sadovod, PROJECTS.courtElegance],
-    events: EVENTS.RovnoMikhail,
+    events: [EVENTS['web-summit-2026'], EVENTS['web-summit-2025']],
     thoughts: THOUGHTS.RovnoMikhail,
     dailyPosts: DAILY_POSTS.RovnoMikhail,
     awards: AWARDS.RovnoMikhail,
@@ -94,7 +116,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       },
     ],
     projects: [PROJECTS.vanguard, PROJECTS.courtElegance],
-    events: EVENTS.RovnoDanil,
+    events: [EVENTS['web-summit-2026'], EVENTS['web-summit-2025']],
     thoughts: THOUGHTS.RovnoDanil,
     dailyPosts: DAILY_POSTS.RovnoDanil,
     awards: AWARDS.RovnoDanil,

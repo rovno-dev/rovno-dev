@@ -84,7 +84,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
     <div className="pb-20">
       <ExpertHeroSection expert={expert} />
 
-      <Container variant="full-width" className="py-4 md:py-12">
+      <Container variant="full-width" className="pt-6 pb-4 md:pt-8 md:pb-4">
         <div className="max-w-[1200px] mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10 animate-reveal delay-500 fill-mode-both">
             <TabsList variant="line" className="w-full justify-start md:justify-center overflow-x-auto overflow-y-hidden no-scrollbar border-b border-(--outline) rounded-none gap-2 md:gap-8 bg-transparent!">
@@ -93,6 +93,8 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                   key={tab}
                   value={tab}
                   className="px-4 md:px-0 data-[state=active]:text-(--primary)"
+                // need to add selected state on activeTab
+                // {...activeTab === tab ? selected : ""}
                 >
                   {tab}
                 </TabsTrigger>
@@ -208,28 +210,32 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                     <h3 className="text-display-4 text-(--on-bg-high) mb-2">
                       {event.title}
                     </h3>
-                    <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
+                    {/* <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
                       {event.description}
-                    </p>
+                    </p> */}
                     <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1">
-                        {event.tags?.map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="tonal-card-static"
-                            size="chip-small"
-                          >
-                            #{tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <span className="text-body-5 text-(--on-bg-low)">
-                        {new Date(event.date).toLocaleDateString("ru-RU", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
+                      {event.tags && (
+                        <div className="flex flex-wrap gap-1">
+                          {event.tags.map((tag: string) => (
+                            <Badge
+                              key={tag}
+                              variant="tonal-card-static"
+                              size="chip-small"
+                            >
+                              #{tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      {event.date && (
+                        <span className="text-body-5 text-(--on-bg-low)">
+                          {new Date(event.date).toLocaleDateString("ru-RU", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </span>
+                      )}
                     </div>
                   </Card>
                 ))
