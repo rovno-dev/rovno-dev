@@ -11,6 +11,7 @@ interface PageProps {
 }
 
 export default async function DispatcherPage({ params }: PageProps) {
+  // Get slug from url
   const { slug } = await params;
 
   const project = Object.values(PROJECTS).find((p) => p.id === slug);
