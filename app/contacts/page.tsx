@@ -119,7 +119,7 @@ const certificates = [
 
 function CertificatesSection() {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-8 md:py-12">
       <Container>
         <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
           Сертификаты и лицензии
@@ -151,14 +151,15 @@ function CertificatesSection() {
 export default function ContactsPage() {
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Hero Section using PageHeadingSection */}
+      {/* Hero Section using PageHeadingSection with reduced padding */}
       <PageHeadingSection
         title="ЮРИДИЧЕСКАЯ ИНФОРМАЦИЯ"
         description="Официальные реквизиты, правовые документы и контактные данные цифрового агентства."
+        className="py-6 md:py-10"
       />
 
       {/* Bento Grid Layout – Company Details + Documents */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <CompanyDetailsCard />
