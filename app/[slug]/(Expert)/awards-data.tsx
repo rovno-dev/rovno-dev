@@ -4,6 +4,7 @@ export interface Award {
   description: string;
   date: string;
   tags?: string[];
+  image?: string; // optional image URL
 }
 
 export const AWARDS: Record<string, Award[]> = {
@@ -14,6 +15,7 @@ export const AWARDS: Record<string, Award[]> = {
       description: "Первое место в треке «Искусственный интеллект» с проектом AI-ассистента для аналитики данных.",
       date: "2024-11-15",
       tags: ["hackathon", "ai"],
+      image: "/images/projects/vanguard.png",
     },
     {
       id: "a2",
@@ -21,6 +23,7 @@ export const AWARDS: Record<string, Award[]> = {
       description: "Награда за выступление «Создание дизайн-систем с открытым исходным кодом».",
       date: "2024-09-20",
       tags: ["conference", "speaking"],
+      image: "/images/projects/alx.png",
     },
     {
       id: "a3",
@@ -37,6 +40,7 @@ export const AWARDS: Record<string, Award[]> = {
       description: "Награда от сообщества дизайнеров за проект Vanguard.",
       date: "2024-12-01",
       tags: ["design", "award"],
+      image: "/images/projects/sadovod.png",
     },
     {
       id: "a5",
@@ -53,6 +57,7 @@ export const AWARDS: Record<string, Award[]> = {
       description: "Работа «Aurora Flux» получила золотую награду в категории «Brand Motion».",
       date: "2025-02-10",
       tags: ["motion", "award"],
+      image: "/images/projects/court.png",
     },
     {
       id: "a7",
