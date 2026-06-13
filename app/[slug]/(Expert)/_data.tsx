@@ -24,6 +24,7 @@ export const EVENTS: Record<string, Event> = {
     id: '1',
     title: 'Веб Саммит 2026',
     slug: "web-summit-2026",
+    image: "/images/projects/vanguard.png",
   },
   "web-summit-2025": {
     id: '2',
