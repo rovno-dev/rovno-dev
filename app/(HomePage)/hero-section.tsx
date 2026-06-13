@@ -22,33 +22,33 @@ export function HeroBackground() {
 
       <IllustrationCard
         icon={<SunIcon />}
-        className="hidden md:block top-[8%] left-[8%] md:top-[12%] md:left-[15%] -rotate-12 animate-reveal"
+        className="hidden md:block top-[8%] left-[8%] md:top-[12%] md:left-[15%] lg:top-[10%] lg:left-[12%] xl:top-[8%] xl:left-[10%] -rotate-12 animate-reveal"
         style={{ transitionDelay: '100ms' }}
       />
       <IllustrationCard
         icon={<CloudIcon />}
-        className="top-[45%] -left-10 md:left-8 -rotate-10 md:rotate-6 animate-reveal"
+        className="top-[45%] -left-10 md:left-8 lg:left-4 xl:left-2 -rotate-10 md:rotate-6 lg:rotate-3 animate-reveal"
         style={{ transitionDelay: '300ms' }}
       />
       <IllustrationCard
         icon={<DeployedCodeIcon />}
-        className="bottom-[8%]  bottom-[15%] right-[8%] md:left-[20%] rotate-17 md:-rotate-15 animate-reveal"
+        className="bottom-[8%] bottom-[15%] right-[8%] md:left-[20%] lg:left-[18%] xl:left-[16%] rotate-17 md:-rotate-15 lg:-rotate-10 animate-reveal"
         style={{ transitionDelay: '500ms' }}
       />
 
       <IllustrationCard
         icon={<DesignServicesIcon />}
-        className="top-[12%] right-[10%] md:top-[10%] md:right-[25%] rotate-12 animate-reveal"
+        className="top-[12%] right-[10%] md:top-[10%] md:right-[25%] lg:top-[8%] lg:right-[20%] xl:top-[6%] xl:right-[18%] rotate-12 animate-reveal"
         style={{ transitionDelay: '200ms' }}
       />
       <IllustrationCard
         icon={<DiamondIcon />}
-        className="hidden md:block top-[35%] -right-10 md:right-12 -rotate-12 animate-reveal"
+        className="hidden md:block top-[35%] -right-10 md:right-12 lg:right-8 xl:right-6 -rotate-12 animate-reveal"
         style={{ transitionDelay: '400ms' }}
       />
       <IllustrationCard
         icon={<PublicIcon />}
-        className="hidden md:block md:bottom-[20%] md:right-[16%] rotate-61 animate-reveal"
+        className="hidden md:block md:bottom-[20%] md:right-[16%] lg:bottom-[18%] lg:right-[12%] xl:bottom-[16%] xl:right-[10%] rotate-61 animate-reveal"
         style={{ transitionDelay: '600ms' }}
       />
     </div>
