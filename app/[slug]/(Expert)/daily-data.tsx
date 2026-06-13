@@ -3,6 +3,7 @@ export interface DailyPost {
   text: string;
   date: string;
   tags?: string[];
+  image?: string; // optional image URL
 }
 
 export const DAILY_POSTS: Record<string, DailyPost[]> = {
@@ -12,6 +13,7 @@ export const DAILY_POSTS: Record<string, DailyPost[]> = {
       text: "Сегодня весь день писал код для нового компонента Unideka UI. Получилось красиво, но спать хочется 😴",
       date: "2025-04-01",
       tags: ["code", "ui"],
+      image: "/images/projects/vanguard.png",
     },
     {
       id: "d2",
@@ -24,6 +26,7 @@ export const DAILY_POSTS: Record<string, DailyPost[]> = {
       text: "Обновил документацию по проекту. Теперь хотя бы сам понимаю, что написал месяц назад.",
       date: "2025-03-20",
       tags: ["docs", "productivity"],
+      image: "/images/projects/alx.png",
     },
   ],
   RovnoMikhail: [
@@ -32,6 +35,7 @@ export const DAILY_POSTS: Record<string, DailyPost[]> = {
       text: "Встреча с клиентом прошла отлично! Обсудили новый проект в сфере EdTech. Скоро расскажу подробности.",
       date: "2025-04-02",
       tags: ["client", "edtech"],
+      image: "/images/projects/sadovod.png",
     },
     {
       id: "d5",
@@ -46,6 +50,7 @@ export const DAILY_POSTS: Record<string, DailyPost[]> = {
       text: "Рендерил новую 3D-сцену для промо-ролика. 12 часов — и результат того стоит!",
       date: "2025-04-03",
       tags: ["3d", "motion"],
+      image: "/images/projects/court.png",
     },
     {
       id: "d7",

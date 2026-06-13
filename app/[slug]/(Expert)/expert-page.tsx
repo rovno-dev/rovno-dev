@@ -163,6 +163,17 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                     className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 animate-reveal fill-mode-both"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
+                    {/* Optional image */}
+                    {post.image && (
+                      <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-4 border border-(--outline)">
+                        <Image
+                          src={post.image}
+                          alt=""
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
                     <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
                       {post.text}
                     </p>
