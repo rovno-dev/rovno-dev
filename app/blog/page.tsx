@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
 import { ARTICLES, Article } from "./data";
+import PageHeadingSection from "@/components/layout/page/page-heading-section";
 
 function ArticleCard({ article, index }: { article: Article; index: number }) {
   return (
@@ -84,27 +85,19 @@ export default function BlogPage() {
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Hero */}
-      <section className="py-16 md:py-24 border-b border-(--outline)">
-        <Container>
-          <div className="max-w-[800px] animate-reveal">
-            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-4">
-              Блог
-            </h1>
-            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed">
-              Статьи о дизайне, разработке, кейсах и инсайтах нашей команды.
-            </p>
-          </div>
-        </Container>
-      </section>
+      {/* Hero Section using PageHeadingSection */}
+      <PageHeadingSection
+        title="Блог"
+        description="Статьи о дизайне, разработке, кейсах и инсайтах нашей команды."
+      />
 
-      {/* Filter Bar */}
+      {/* Filter Bar – larger chips with improved spacing */}
       <section className="pb-8">
         <Container>
-          <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
+          <div className="flex flex-wrap gap-3 animate-reveal delay-100 fill-mode-both">
             <Button
               variant={activeTag === null ? "filled" : "tonal-card"}
-              size="chip-medium"
+              size="chip-large"
               shape="round"
               onClick={() => setActiveTag(null)}
             >
@@ -114,7 +107,7 @@ export default function BlogPage() {
               <Button
                 key={tag}
                 variant={activeTag === tag ? "filled" : "tonal-card"}
-                size="chip-medium"
+                size="chip-large"
                 shape="round"
                 onClick={() => setActiveTag(tag)}
               >
