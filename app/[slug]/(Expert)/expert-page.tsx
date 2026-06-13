@@ -4,15 +4,17 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { KeyboardArrowRightIcon } from "@/components/icons";
 import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
 import { ExpertData } from "./_data";
 import { Project, PROJECTS } from "../(Project)/data";
-import Link from "next/link";
+import { ARTICLES, Article } from "../../blog/data";
 import ProjectCard from "@/components/layout/project-card/project-card";
 
 function ExpertHeroSection({ expert }: { expert: ExpertData }) {
@@ -67,6 +69,61 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
   );
 }
 
+function ArticleCard({ article, index }: { article: Article; index: number }) {
+  return (
+    <Link
+      href={`/blog/${article.slug}`}
+      className="group block animate-reveal fill-mode-both"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+        <Image
+          fill
+          src={article.image}
+          alt={article.title}
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {article.tags.map((tag) => (
+              <Badge
+                key={tag}
+                variant="glass-static"
+                size="chip-small"
+                className="text-white border-white/20"
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
+            {article.title}
+          </h3>
+          <p className="mt-2 text-body-3 text-white/80 line-clamp-2">
+            {article.description}
+          </p>
+          <p className="mt-2 text-body-5 text-white/60">
+            {new Date(article.date).toLocaleDateString("ru-RU", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </div>
+        <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <Button
+            size="icon-small"
+            shape="round"
+            className="bg-white text-black hover:bg-white"
+          >
+            <KeyboardArrowRightIcon className="size-5!" />
+          </Button>
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
 export default function ExpertPage({ expert }: { expert: ExpertData }) {
   const [activeTab, setActiveTab] = useState("Проекты");
   const tabs = [
@@ -75,9 +132,7 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
     "Будни",
     "События",
     "Награды",
-    // "Речи", 
-    // "Награды", 
-    // "Мысли вслух"
+    "Статьи",
   ];
 
   return (
@@ -230,9 +285,6 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                     <h3 className="text-display-4 text-(--on-bg-high) mb-2">
                       {event.title}
                     </h3>
-                    {/* <p className="text-body-2 text-(--on-bg-high) leading-relaxed mb-3">
-                      {event.description}
-                    </p> */}
                     <div className="flex items-center justify-between">
                       {event.tags && (
                         <div className="flex flex-wrap gap-1">
@@ -303,6 +355,20 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
                       </span>
                     </div>
                   </Card>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab === "Статьи" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {ARTICLES.length === 0 ? (
+                <p className="text-body-2 text-(--on-bg-medium) text-center py-20 col-span-full">
+                  Пока нет статей
+                </p>
+              ) : (
+                ARTICLES.map((article, idx) => (
+                  <ArticleCard key={article.id} article={article} index={idx} />
                 ))
               )}
             </div>
