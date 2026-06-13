@@ -155,7 +155,7 @@ export default function ContactsPage() {
       <PageHeadingSection
         title="ЮРИДИЧЕСКАЯ ИНФОРМАЦИЯ"
         description="Официальные реквизиты, правовые документы и контактные данные цифрового агентства."
-        className="py-6 md:py-10"
+        className="py-4 md:py-6"
       />
 
       {/* Bento Grid Layout – Company Details + Documents */}
