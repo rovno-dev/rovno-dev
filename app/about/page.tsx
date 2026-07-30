@@ -16,7 +16,7 @@ const experts = Object.values(EXPERTS_DATA);
 
 function AboutHero() {
   return (
-    <section className="py-16 md:py-24 border-b border-(--outline) overflow-hidden">
+    <section className="py-8 md:py-12 border-b border-(--outline) overflow-hidden">
       <Container>
         <div className="max-w-[800px] animate-reveal">
           <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-8">
@@ -73,7 +73,7 @@ function ExpertCard({ expert, index }: { expert: typeof experts[0], index: numbe
 
 function ExpertsSection() {
   return (
-    <section className="py-20 md:py-32">
+    <section className="py-8 md:py-16">
       <Container>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 md:mb-16 animate-reveal">
           <div className="max-w-[600px]">

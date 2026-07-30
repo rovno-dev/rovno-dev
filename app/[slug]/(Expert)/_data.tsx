@@ -55,7 +55,13 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/niyazgim" },
       { icon: <GithubLogotypeMonoIcon />, href: "https://github.com/niyazgim" },
     ],
-    projects: [PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance]
+    projects: [
+      PROJECTS.alx,
+      PROJECTS.sadovod,
+      PROJECTS.vanguard,
+      PROJECTS.courtElegance,
+      PROJECTS.concord,
+    ]
   },
   RovnoMikhail: {
     id: "RovnoMikhail",
@@ -75,6 +81,7 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.sadovod,
       PROJECTS.vanguard,
       PROJECTS.courtElegance,
+      PROJECTS.concord,
     ]
   },
   RovnoDanil: {
@@ -95,6 +102,8 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
       PROJECTS.sadovod,
       PROJECTS.vanguard,
       PROJECTS.courtElegance,
+      PROJECTS.concord,
+      PROJECTS.bread,
     ]
   }
 };

@@ -45,9 +45,8 @@ function CarouselIndicators() {
         <button
           key={idx}
           onClick={() => api.scrollTo(idx)}
-          className={`h-2 rounded-full transition-all ${
-            selectedIndex === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
-          }`}
+          className={`h-2 rounded-full transition-all ${selectedIndex === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
+            }`}
         />
       ))}
     </div>
@@ -96,19 +95,19 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-1">
+                <div className="flex flex-wrap gap-6 md:gap-10 pt-1">
                   {client && (
                     <div>
                       <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-0.5">КЛИЕНТ</p>
                       <p className="text-body-3 text-(--on-bg-high) font-medium">{client.name}</p>
                     </div>
                   )}
-                  {project.platform && (
+                  {/* {project.platform && (
                     <div>
                       <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-0.5">ПЛАТФОРМА</p>
                       <p className="text-body-3 text-(--on-bg-high) font-medium">{project.platform}</p>
                     </div>
-                  )}
+                  )} */}
                   {project.period && (
                     <div>
                       <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-0.5">ПЕРИОД</p>
@@ -254,7 +253,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
       {/* Impact & Results Section */}
       {project.metrics && project.metrics.length > 0 && (
-        <section className="py-10 md:py-18 bg-(--bg)">
+        <section className="py-8 md:py-12 bg-(--bg)">
           <Container>
             <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
               Результаты внедрения
@@ -285,12 +284,9 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
       {/* Media Carousel Section */}
       {project.media && project.media.length > 0 && (
-        <section className="py-10 md:py-18 bg-(--bg)">
+        <section className="py-8 md:py-12 bg-(--bg)">
           <Container>
-            <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
-              Медиа
-            </h2>
-            <div className="max-w-4xl mx-auto">
+            <div className="w-full mx-auto">
               <Carousel className="relative">
                 <CarouselContent>
                   {project.media.map((item, idx) => (
@@ -303,13 +299,13 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                                 src={item.src}
                                 alt={`${project.title} - media ${idx + 1}`}
                                 fill
-                                className="object-contain"
+                                className="object-cover"
                               />
                             </div>
                           </MediaLightbox>
                         ) : (
                           <iframe
-                            src={item.src}
+                            src={item.src + "?muted=1"}
                             className="w-full h-full"
                             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                             allowFullScreen
