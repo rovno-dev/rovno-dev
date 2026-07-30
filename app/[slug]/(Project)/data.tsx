@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
 import ProjectCard from "@/components/layout/project-card/project-card";
+import { CLIENTS, Client } from "@/app/clients/_data";
 
 /* ---------- Project type ---------- */
 export type ProjectTagType = {
@@ -22,7 +23,7 @@ export interface Project {
   image: string;
   href?: string;
   category?: string;
-  client?: string;
+  clientId: string;          // replaced client string with clientId
   platform?: string;
   period?: string;
   techStack?: string[];
@@ -39,7 +40,7 @@ export const PROJECTS: Record<string, Project> = {
     image: "/_static/projects/alx.png",
     href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
     category: "Айдентика",
-    client: "ALX",
+    clientId: "alx",
     platform: "Веб-сайт",
     period: "2024",
     techStack: ["Figma", "After Effects"],
@@ -59,7 +60,7 @@ export const PROJECTS: Record<string, Project> = {
     image: "/_static/projects/sadovod.png",
     href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
     category: "E-commerce",
-    client: "Садовод",
+    clientId: "sadovod",
     platform: "Веб-сайт",
     period: "2024",
     techStack: ["Next.js", "TypeScript", "Tailwind CSS"],
@@ -79,7 +80,7 @@ export const PROJECTS: Record<string, Project> = {
     image: "/_static/projects/vanguard.png",
     href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
     category: "Fintech",
-    client: "Vanguard FinTech",
+    clientId: "vanguard",
     platform: "iOS & Android App",
     period: "2023 - 2024",
     techStack: ["React Native", "TypeScript", "GraphQL", "Node.js", "WebGL"],
@@ -109,7 +110,7 @@ export const PROJECTS: Record<string, Project> = {
     image: "/_static/projects/court.png",
     href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
     category: "E-commerce",
-    client: "Court Elegance",
+    clientId: "courtElegance",
     platform: "Веб-сайт",
     period: "2024",
     techStack: ["Next.js", "TypeScript", "Framer Motion"],
@@ -119,51 +120,6 @@ export const PROJECTS: Record<string, Project> = {
 
 /* ---------- Page component ---------- */
 const projectsList = Object.values(PROJECTS);
-
-// function ProjectCard({ project, index }: { project: Project; index: number }) {
-//   return (
-//     <a
-//       href={project.href || "#"}
-//       target="_blank"
-//       rel="noopener noreferrer"
-//       className="group block animate-reveal fill-mode-both"
-//       style={{ animationDelay: `${index * 100}ms` }}
-//     >
-//       <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
-//         <Image
-//           fill
-//           src={project.image}
-//           alt={project.title}
-//           className="object-cover transition-transform duration-700 group-hover:scale-105"
-//         />
-//         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 md:p-8">
-//           {project.category && (
-//             <Badge
-//               variant="glass-static"
-//               size="chip-small"
-//               className="text-white border-white/20 mb-2 w-fit"
-//             >
-//               {project.category}
-//             </Badge>
-//           )}
-//           <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] transition-transform group-hover:-translate-y-1">
-//             {project.title}
-//           </h3>
-//         </div>
-//         {/* Arrow button */}
-//         <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-//           <Button
-//             size="icon-small"
-//             shape="round"
-//             className="bg-white text-black hover:bg-white"
-//           >
-//             <KeyboardArrowRightIcon className="size-5!" />
-//           </Button>
-//         </div>
-//       </Card>
-//     </a>
-//   );
-// }
 
 export default function ProjectsPage() {
   return (

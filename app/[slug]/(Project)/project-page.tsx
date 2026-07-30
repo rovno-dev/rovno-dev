@@ -9,12 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DprofileLogotypeMonoIcon, KeyboardArrowRightIcon } from "@/components/icons";
 import { Project } from "./data";
+import { CLIENTS } from "@/app/clients/_data";
 
 interface ProjectPageProps {
   project: Project;
 }
 
 export default function ProjectPage({ project }: ProjectPageProps) {
+  const client = CLIENTS[project.clientId];
+
   return (
     <>
       {/* Hero Section – large image + title */}
@@ -40,10 +43,10 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
               {/* Client / Platform / Period info */}
               <div className="flex flex-wrap gap-6 md:gap-10 mb-6">
-                {project.client && (
+                {client && (
                   <div>
                     <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-1">КЛИЕНТ</p>
-                    <p className="text-body-3 text-(--on-bg-high) font-medium">{project.client}</p>
+                    <p className="text-body-3 text-(--on-bg-high) font-medium">{client.name}</p>
                   </div>
                 )}
                 {project.platform && (
@@ -129,26 +132,6 @@ export default function ProjectPage({ project }: ProjectPageProps) {
           </Container>
         </section>
       )}
-
-      {/* CTA Section */}
-      {/* <section className="py-16 md:py-24">
-        <Container>
-          <div className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-(--primary-card) to-(--card) border border-(--outline) p-8 md:p-16">
-            <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-(--primary)/10 blur-3xl" />
-
-            <div className="relative z-10 mx-auto max-w-[672px] text-center">
-              <h3 className="text-display-3 text-(--on-bg-high) mb-4">
-                Интерактивный прототип
-              </h3>
-              <p className="text-body-2 text-(--on-bg-medium) mb-8">
-                Оцените плавность анимаций, логику навигации и внимание к деталям в интерактивном прототипе.
-              </p>
-
-
-            </div>
-          </div>
-        </Container>
-      </section> */}
     </>
   );
 }
