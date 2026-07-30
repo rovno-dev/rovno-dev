@@ -1,4 +1,4 @@
-import { Project } from "@/app/[slug]/(Project)/data";
+import { Project } from "@/app/[slug]/(Project)/_data";
 import { Card } from "@/components/ui/card";
 import Image from "next/image"
 
@@ -22,12 +22,12 @@ export default function ProjectCard({ project, index }: { project: Project, inde
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
         <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6">
-          <h3 className="text-display-3 md:text-display-2 text-white leading-tight max-w-[90%] drop-shadow-lg transition-transform group-hover:-translate-y-1">
+          <h3 className="text-display-4 md:text-display-3 text-white leading-tight max-w-[90%] drop-shadow-lg transition-transform group-hover:-translate-y-1">
             {project.title}
           </h3>
-          {project.description && (
+          {project.shortDescription && (
             <p className="mt-2 text-body-2 md:text-body-1 text-white/80 leading-relaxed max-w-[90%] drop-shadow-md line-clamp-3 transition-transform group-hover:-translate-y-1">
-              {project.description}
+              {project.shortDescription}
             </p>
           )}
         </div>

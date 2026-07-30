@@ -2,7 +2,7 @@
 
 import ExpertPage from "./(Expert)/expert-page";
 import ProjectPage from "./(Project)/project-page";
-import { PROJECTS } from "./(Project)/data";
+import { PROJECTS } from "./(Project)/_data";
 import { EXPERTS_DATA } from "./(Expert)/_data";
 import { notFound } from "next/navigation";
 

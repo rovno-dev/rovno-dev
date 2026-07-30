@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import TatarstanIcon from "@/components/layout/experts-icons/Tatarstan-icon";
 import { ExpertData } from "./_data";
-import { Project, PROJECTS } from "../(Project)/data";
+import { Project, PROJECTS } from "../(Project)/_data";
 import Link from "next/link";
 import ProjectCard from "@/components/layout/project-card/project-card";
 

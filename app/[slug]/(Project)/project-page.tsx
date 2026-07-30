@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DprofileLogotypeMonoIcon, KeyboardArrowRightIcon } from "@/components/icons";
-import { Project } from "./data";
+import { Project } from "./_data";
 import { CLIENTS } from "@/app/clients/_data";
 
 interface ProjectPageProps {
