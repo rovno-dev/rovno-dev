@@ -13,7 +13,7 @@ export default function ProjectCard({ project, index }: { project: Project, inde
       <Card className="relative overflow-hidden rounded-3xl bg-card aspect-4/3! transition-all active:scale-[0.98]">
         <Image
           fill
-          src={project.image}
+          src={project.cover}
           alt={project.title}
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />

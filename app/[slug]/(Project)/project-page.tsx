@@ -7,6 +7,13 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DprofileLogotypeMonoIcon } from "@/components/icons";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Project } from "./_data";
 import { CLIENTS } from "@/app/clients/_data";
 
@@ -29,7 +36,6 @@ export default function ProjectPage({ project }: ProjectPageProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Parallax offset for desktop image (subtle)
   const desktopParallax = Math.min(Math.max((scrollY * 0.05), -20), 20);
 
   return (
@@ -57,7 +63,6 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                   </p>
                 </div>
 
-                {/* Client / Platform / Period */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-1">
                   {client && (
                     <div>
@@ -79,7 +84,6 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                   )}
                 </div>
 
-                {/* Tech Stack */}
                 {project.techStack && project.techStack.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {project.techStack.map((tech, idx) => (
@@ -114,7 +118,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                   }}
                 >
                   <Image
-                    src={project.image}
+                    src={project.cover}
                     alt={project.title}
                     fill
                     className="object-cover"
@@ -139,7 +143,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
               }}
             >
               <Image
-                src={project.image}
+                src={project.cover}
                 alt={project.title}
                 fill
                 className="object-cover"
@@ -215,9 +219,9 @@ export default function ProjectPage({ project }: ProjectPageProps) {
         </div>
       </section>
 
-      {/* Impact & Results Section (common for both) */}
+      {/* Impact & Results Section */}
       {project.metrics && project.metrics.length > 0 && (
-        <section className="py-10 md:py-18 bg-(--bg)">
+        <section className="py-6 md:py-10 bg-(--bg)">
           <Container>
             <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
               Результаты внедрения
@@ -242,6 +246,42 @@ export default function ProjectPage({ project }: ProjectPageProps) {
                 </div>
               ))}
             </div>
+          </Container>
+        </section>
+      )}
+
+      {/* Media Carousel Section */}
+      {project.media && project.media.length > 0 && (
+        <section className="py-6 md:py-10 bg-(--bg)">
+          <Container>
+            <Carousel className="mx-auto max-w-4xl">
+              <CarouselContent>
+                {project.media.map((item, idx) => (
+                  <CarouselItem key={idx}>
+                    <div className="relative aspect-video rounded-3xl overflow-hidden border border-(--outline) bg-(--card)">
+                      {item.type === 'image' ? (
+                        <Image
+                          src={item.src}
+                          alt={`${project.title} - media ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <iframe
+                          src={item.src}
+                          className="w-full h-full"
+                          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                          allowFullScreen
+                          title={`${project.title} - video ${idx + 1}`}
+                        />
+                      )}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-4" />
+              <CarouselNext className="right-4" />
+            </Carousel>
           </Container>
         </section>
       )}

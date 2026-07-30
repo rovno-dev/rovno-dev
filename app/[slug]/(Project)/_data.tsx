@@ -19,9 +19,9 @@ export interface Project {
   id: string;
   title: string;
   description?: string;
-  shortDescription?: string;  // added for card display
+  shortDescription?: string;
   tags?: ProjectTagType[];
-  image: string;
+  cover: string;            // renamed from image
   href?: string;
   category?: string;
   clientId: string;
@@ -29,6 +29,7 @@ export interface Project {
   period?: string;
   techStack?: string[];
   metrics?: { label: string; value: string; description: string }[];
+  media?: { type: 'image' | 'video'; src: string }[];
 }
 
 /* ---------- Project data ---------- */
@@ -38,7 +39,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Vanguard: интернет-магазин электроники",
     description: "Полное переосмысление всего дизайна для интернет-магазина электроники и посты к 8 марта",
     shortDescription: "Редизайн интернет-магазина электроники с ростом конверсии +45%.",
-    image: "/_static/projects/vanguard/vanguard-cover.jpg",
+    cover: "/_static/projects/vanguard/vanguard-cover.jpg",
     href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
     category: "E-commerce",
     clientId: "1",
@@ -62,7 +63,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Чужой | ALX-9 - ИИ выставка",
     description: "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
     shortDescription: "Разработка айдентики и веб-сайта для технологической компании ALX.",
-    image: "/_static/projects/alx/alx-cover.png",
+    cover: "/_static/projects/alx/alx-cover.png",
     href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
     category: "Айдентика",
     clientId: "2",
@@ -76,13 +77,19 @@ export const PROJECTS: Record<string, Project> = {
         description: "Ребрендинг помог бренду сильно продвинуться в медиа благодаря качественной анимации от наших 3D-художников",
       },
     ],
+    media: [
+      {
+        type: 'video',
+        src: 'https://kinescope.io/wJ6WmWZCkVYZr6yEDvYmLo'
+      }
+    ]
   },
   sadovod: {
     id: "3",
     title: "Sadovod - Интернет магазин",
     description: "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
     shortDescription: "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом.",
-    image: "/_static/projects/sadovod/sadovod-cover.jpg",
+    cover: "/_static/projects/sadovod/sadovod-cover.jpg",
     href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
     category: "E-commerce",
     clientId: "3",
@@ -101,7 +108,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "The Court Elegance - Теннисный клуб",
     description: "Разработка сайта премиального теннисного клуба, расположенного в городе Остин, США, штат Техас.",
     shortDescription: "Сайт премиального теннисного клуба в Техасе, США.",
-    image: "/_static/projects/tennis-cover.jpg",
+    cover: "/_static/projects/tennis-cover.jpg",
     href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
     category: "E-commerce",
     clientId: "4",
@@ -114,7 +121,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Хлебная Страна - Промо-ролик",
     description: "Разработка айдентики для продуктов серии Хлебная Страна от БКК",
     shortDescription: "Айдентика и промо-ролик для продуктовой серии «Хлебная Страна».",
-    image: "/_static/projects/bread/bread-cover.jpg",
+    cover: "/_static/projects/bread/bread-cover.jpg",
     href: "https://dprofile.ru/case/168046/xlebnaia-strana-promo-rolik",
     category: "Айдентика",
     clientId: "5",
@@ -127,7 +134,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Concord Construction - Строительная компания",
     description: "Разработка дизайна сайта и айдентики для строительной компании",
     shortDescription: "Дизайн сайта и айдентика для строительной компании Concord Construction.",
-    image: "/_static/projects/concord/concord-cover.jpg",
+    cover: "/_static/projects/concord/concord-cover.jpg",
     href: "https://dprofile.ru/case/185165/concord-construction-stroitelnaia-kompaniia",
     category: "Корпоративные сайты",
     clientId: "6",
