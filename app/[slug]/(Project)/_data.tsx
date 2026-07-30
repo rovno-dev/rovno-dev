@@ -21,7 +21,7 @@ export interface Project {
   description?: string;
   shortDescription?: string;
   tags?: ProjectTagType[];
-  cover: string;            // renamed from image
+  cover: string;
   href?: string;
   category?: string;
   clientId: string;
@@ -81,6 +81,18 @@ export const PROJECTS: Record<string, Project> = {
       {
         type: 'video',
         src: 'https://kinescope.io/wJ6WmWZCkVYZr6yEDvYmLo'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/alx/alx-1.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/alx/alx-2.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/alx/alx-3.jpg'
       }
     ]
   },

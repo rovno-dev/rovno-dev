@@ -13,12 +13,45 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  useCarousel,
 } from "@/components/ui/carousel";
+import { MediaLightbox } from "@/components/ui/media-lightbox";
 import { Project } from "./_data";
 import { CLIENTS } from "@/app/clients/_data";
 
 interface ProjectPageProps {
   project: Project;
+}
+
+function CarouselIndicators() {
+  const { api } = useCarousel();
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
+
+  React.useEffect(() => {
+    if (!api) return;
+    setScrollSnaps(api.scrollSnapList());
+    setSelectedIndex(api.selectedScrollSnap());
+    api.on("select", () => {
+      setSelectedIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  if (!api || scrollSnaps.length <= 1) return null;
+
+  return (
+    <div className="flex justify-center gap-2 mt-4">
+      {scrollSnaps.map((_, idx) => (
+        <button
+          key={idx}
+          onClick={() => api.scrollTo(idx)}
+          className={`h-2 rounded-full transition-all ${
+            selectedIndex === idx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
+          }`}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function ProjectPage({ project }: ProjectPageProps) {
@@ -221,7 +254,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
       {/* Impact & Results Section */}
       {project.metrics && project.metrics.length > 0 && (
-        <section className="py-6 md:py-10 bg-(--bg)">
+        <section className="py-10 md:py-18 bg-(--bg)">
           <Container>
             <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
               Результаты внедрения
@@ -252,36 +285,50 @@ export default function ProjectPage({ project }: ProjectPageProps) {
 
       {/* Media Carousel Section */}
       {project.media && project.media.length > 0 && (
-        <section className="py-6 md:py-10 bg-(--bg)">
+        <section className="py-10 md:py-18 bg-(--bg)">
           <Container>
-            <Carousel className="mx-auto max-w-4xl">
-              <CarouselContent>
-                {project.media.map((item, idx) => (
-                  <CarouselItem key={idx}>
-                    <div className="relative aspect-video rounded-3xl overflow-hidden border border-(--outline) bg-(--card)">
-                      {item.type === 'image' ? (
-                        <Image
-                          src={item.src}
-                          alt={`${project.title} - media ${idx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <iframe
-                          src={item.src}
-                          className="w-full h-full"
-                          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-                          allowFullScreen
-                          title={`${project.title} - video ${idx + 1}`}
-                        />
-                      )}
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-4" />
-              <CarouselNext className="right-4" />
-            </Carousel>
+            <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
+              Медиа
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <Carousel className="relative">
+                <CarouselContent>
+                  {project.media.map((item, idx) => (
+                    <CarouselItem key={idx}>
+                      <div className="relative aspect-video rounded-3xl overflow-hidden border border-(--outline) bg-(--card) flex items-center justify-center">
+                        {item.type === 'image' ? (
+                          <MediaLightbox src={item.src} alt={`${project.title} - media ${idx + 1}`}>
+                            <div className="cursor-pointer w-full h-full flex items-center justify-center">
+                              <Image
+                                src={item.src}
+                                alt={`${project.title} - media ${idx + 1}`}
+                                fill
+                                className="object-contain"
+                              />
+                            </div>
+                          </MediaLightbox>
+                        ) : (
+                          <iframe
+                            src={item.src}
+                            className="w-full h-full"
+                            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                            allowFullScreen
+                            title={`${project.title} - video ${idx + 1}`}
+                          />
+                        )}
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {project.media.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-4 z-10" />
+                    <CarouselNext className="right-4 z-10" />
+                  </>
+                )}
+                <CarouselIndicators />
+              </Carousel>
+            </div>
           </Container>
         </section>
       )}
