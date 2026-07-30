@@ -57,6 +57,20 @@ export const PROJECTS: Record<string, Project> = {
         description: "снижение отказов",
       },
     ],
+    media: [
+      {
+        type: 'image',
+        src: '/_static/projects/vanguard/vanguard-1.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/vanguard/vanguard-2.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/vanguard/vanguard-3.jpg'
+      },
+    ],
   },
   alx: {
     id: "2",
@@ -94,7 +108,7 @@ export const PROJECTS: Record<string, Project> = {
         type: 'image',
         src: '/_static/projects/alx/alx-3.jpg'
       }
-    ]
+    ],
   },
   sadovod: {
     id: "3",
@@ -114,6 +128,16 @@ export const PROJECTS: Record<string, Project> = {
         description: "Увеличение конверсии после редизайна",
       },
     ],
+    media: [
+      {
+        type: 'image',
+        src: '/_static/projects/sadovod/sadovod-1.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/sadovod/sadovod-2.jpg'
+      },
+    ],
   },
   courtElegance: {
     id: "4",
@@ -126,7 +150,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "4",
     period: "2025",
     techStack: ["Figma", "Wix"],
-    metrics: [],
   },
   bread: {
     id: "5",
@@ -139,7 +162,24 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "5",
     period: "2026",
     techStack: ["Figma", "Blender", "Adobe After Effects", "Adobe Premier Pro", "Crita"],
-    metrics: [],
+    media: [
+      {
+        type: 'video',
+        src: 'https://kinescope.io/aeKrj7KerGCQnPo7rPo22t'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/bread/bread-1.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/bread/bread-2.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/bread/bread-3.jpg'
+      },
+    ],
   },
   concord: {
     id: "6",
@@ -167,6 +207,24 @@ export const PROJECTS: Record<string, Project> = {
         label: "Экономия на мерче",
         value: "75%",
         description: "Простой дизайн позволяет выпускать простые и очень яркие элементы фирменной экипировки что критично в больших масштабах строительной области",
+      },
+    ],
+    media: [
+      {
+        type: 'video',
+        src: 'https://kinescope.io/jpn627TNuBgbK3gJ7dsMqP'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/concord/concord-1.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/concord/concord-2.jpg'
+      },
+      {
+        type: 'image',
+        src: '/_static/projects/concord/concord-3.jpg'
       },
     ],
   },
