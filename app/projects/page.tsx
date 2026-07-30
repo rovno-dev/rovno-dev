@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { PROJECTS } from "@/app/[slug]/(Project)/data";
+import { PROJECTS } from "@/app/[slug]/(Project)/_data";
 import ProjectCard from "@/components/layout/project-card/project-card";
 import PageHeadingSection from "@/components/layout/page/page-heading-section";
 
@@ -64,7 +64,7 @@ export default function ProjectsPage() {
               Нет проектов в этой категории
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 xl:grid-cols-3">
               {filteredProjects.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))}
