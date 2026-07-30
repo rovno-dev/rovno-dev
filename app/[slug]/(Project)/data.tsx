@@ -36,7 +36,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "ALX",
     description:
       "Разработка фирменного стиля и веб-сайта для технологической компании ALX.",
-    image: "/images/projects/alx.png",
+    image: "/_static/projects/alx.png",
     href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
     category: "Айдентика",
     client: "ALX",
@@ -56,7 +56,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Садовод",
     description:
       "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом и корзиной.",
-    image: "/images/projects/sadovod.png",
+    image: "/_static/projects/sadovod.png",
     href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
     category: "E-commerce",
     client: "Садовод",
@@ -76,7 +76,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Vanguard",
     description:
       "Полное переосмысление цифровой экосистемы для ведущего инвестиционного фонда.",
-    image: "/images/projects/vanguard.png",
+    image: "/_static/projects/vanguard.png",
     href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
     category: "Fintech",
     client: "Vanguard FinTech",
@@ -106,7 +106,7 @@ export const PROJECTS: Record<string, Project> = {
     title: "Court Elegance",
     description:
       "Разработка сайта премиального теннисного клуба, расположенного в городе Остин, США, штат Техас",
-    image: "/images/projects/court.png",
+    image: "/_static/projects/court.png",
     href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
     category: "E-commerce",
     client: "Court Elegance",

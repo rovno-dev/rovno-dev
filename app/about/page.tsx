@@ -10,30 +10,9 @@ import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
+import { EXPERTS_DATA } from "@/app/[slug]/(Expert)/_data";
 
-const experts = [
-  {
-    name: "Нияз Гимадиев",
-    role: "Со-основатель и Технический директор",
-    description: "Архитектор сложных систем, поэт кода и создатель Unideka UI. Отвечает за технологический стек и инновации.",
-    image: "/images/experts/niyazgim.png",
-    slug: "niyazgim"
-  },
-  {
-    name: "Михаил Лапаев",
-    role: "Со-основатель и Директор по работе с клиентами и продукту",
-    description: "Мастер визуальных интерфейсов и продуктовой логики. Превращает хаос в эстетику и удобство пользователя.",
-    image: "/images/experts/RovnoMikhail.jpg",
-    slug: "RovnoMikhail"
-  },
-  {
-    name: "Данил Киткин",
-    role: "Со-основатель и Арт-директор",
-    description: "Вдыхает жизнь в статичные объекты. Специализируется на высокотехнологичном моушн-дизайне, CGI и 3D",
-    image: "/images/experts/RovnoDanil.jpg",
-    slug: "RovnoDanil"
-  }
-];
+const experts = Object.values(EXPERTS_DATA);
 
 function AboutHero() {
   return (
@@ -58,7 +37,7 @@ function AboutHero() {
 function ExpertCard({ expert, index }: { expert: typeof experts[0], index: number }) {
   return (
     <Link
-      href={`/${expert.slug}`}
+      href={`/${expert.id}`}
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${200 + index * 100}ms` }}
     >
@@ -66,7 +45,7 @@ function ExpertCard({ expert, index }: { expert: typeof experts[0], index: numbe
         <div className="relative mb-6 overflow-hidden rounded-5xl border border-(--outline) bg-(--card) transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-(--primary)/10 group-hover:-translate-y-1">
           <AspectRatio ratio={4 / 5}>
             <Image
-              src={expert.image}
+              src={expert.avatar}
               alt={expert.name}
               fill
               className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"

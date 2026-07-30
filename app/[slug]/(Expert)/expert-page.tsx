@@ -39,7 +39,7 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
           ))}
         </div>
 
-        <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-6 md:p-10">
+        <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-4 md:p-6">
           <div className="flex items-center gap-3 mb-4 md:mb-6 animate-reveal delay-200 fill-mode-both">
             <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
             <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full duration-[2000ms]" />

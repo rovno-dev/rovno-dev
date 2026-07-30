@@ -25,6 +25,8 @@ export interface ExpertData {
   id: string;
   name: string;
   avatar: string;
+  role: string;
+  description: string;
   telegramChannel?: string;
   tags: ExpertTag[];
   socials: ExpertSocial[];
@@ -35,13 +37,16 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
   niyazgim: {
     id: "niyazgim",
     name: "Нияз Гимадиев",
-    avatar: "/images/experts/niyazgim.png",
+    avatar: "/_static/experts/niyazgim.png",
+    role: "Со-основатель и Технический директор",
+    description: "Архитектор сложных систем, поэт (не только кода), создатель Unidoka и Unidoka UI. Отвечает за технологический стек и инновации.",
     telegramChannel: "niyazgim",
     tags: [
       { label: "Со-основатель и Техдир", icon: <RovnoLogotypeIcon /> },
       { label: "Автор тех самых стихов", icon: null },
-      { label: "Создатель Unideka UI", icon: null },
+      { label: "Создатель Unidoka UI", icon: null },
       { label: "Основатель Вершин", icon: null },
+      { label: "Основатель Unidoka", icon: null },
     ],
     socials: [
       {
@@ -55,7 +60,9 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
   RovnoMikhail: {
     id: "RovnoMikhail",
     name: "Михаил Лапаев",
-    avatar: "/images/experts/RovnoMikhail.jpg", // Replace with actual
+    avatar: "/_static/experts/RovnoMikhail.jpg",
+    role: "Со-основатель и Директор по работе с клиентами и продукту",
+    description: "Мастер визуальных интерфейсов и продуктовой логики. Превращает хаос в эстетику и удобство пользователя.",
     telegramChannel: "rovno_dev",
     tags: [
       { label: "Со-основатель и Директор по работе с клиентами и продукту", icon: <RovnoLogotypeIcon /> },
@@ -73,7 +80,9 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
   RovnoDanil: {
     id: "RovnoDanil",
     name: "Данил Киткин",
-    avatar: "/images/experts/RovnoDanil.jpg",
+    avatar: "/_static/experts/RovnoDanil.jpg",
+    role: "Со-основатель и Арт-директор",
+    description: "Вдыхает жизнь в статичные объекты. Специализируется на высокотехнологичном моушн-дизайне, CGI и 3D",
     telegramChannel: "rovno_dev",
     tags: [
       { label: "Со-основатель и Арт-директор", icon: <RovnoLogotypeIcon /> },
