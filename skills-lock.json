@@ -61,6 +61,12 @@
       "skillPath": "skills/brutalist-skill/SKILL.md",
       "computedHash": "8fc355c4aadb7d29c53ca28bc41be3cd6eea765d121e3737c4dc2d0f90a8effa"
     },
+    "lazy-accurate": {
+      "source": "niyazgim/uniskilla",
+      "sourceType": "github",
+      "skillPath": ".agents/lazy-accurate/SKILL.md",
+      "computedHash": "3c1caab96cde70eab7dd69714bb35855fa3248b153a25af49384d9940159693d"
+    },
     "minimalist-ui": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",

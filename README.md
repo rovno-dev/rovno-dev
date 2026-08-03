@@ -1,64 +1,87 @@
-# Rovno.dev - Agency web app
+# Rovno.dev
 
-Official source code of the [Rovno.dev](https://rovno.dev) agency web app. 
-The reference of combining shadcn + Unideka UI + Next.js
+This repository contains the source code for the Rovno.dev agency web application and its associated infrastructure. The project follows a self-contained architecture where deployment logic, proxy configuration, and application code coexist in a single repository.
 
-[English](#-english) | [Русский](#-russian)
+## Project Structure
 
-## 🇺🇸 English
+- **webapp**: The Next.js application built with Tailwind CSS v4 and Unideka UI.
+- **backend**: Docker configuration for the Fake API service and its database.
+- **docker-compose.yml**: The root orchestration file that coordinates Traefik and the sub-services.
+- **Makefile**: The primary entry point for managing the local and production environments.
 
-### How to start (local dev)
+## Local Development
 
-#### 1. Add subdomains to your hosts file
+### Prerequisites
 
-```
+- Docker and Docker Compose
+- Node.js (for local webapp development)
+- Access to modify your system hosts file
+
+### 1. Configure Hosts
+
+Add the following entries to your `/etc/hosts` (Linux/macOS) or `C:\Windows\System32\drivers\etc\hosts` (Windows) file to route local traffic through Traefik:
+
+```text
+127.0.0.1  localhost
 127.0.0.1  fake-api.localhost
+127.0.0.1  i.localhost
 ```
 
-#### 2. Install deps
+### 2. Environment Setup
+
+Copy the example environment file and adjust it for development:
 
 ```bash
-npm i
+cp .env.example .env
 ```
 
-#### 3. Run
+By default, the `.env` is configured for development:
+- `DOMAIN=localhost`
+- `ENTRYPOINT=web` (Port 80)
+- `TLS_ENABLED=false`
+
+### 3. Launch Services
+
+Use the Makefile to start the infrastructure:
 
 ```bash
-npm run dev
+make up
 ```
 
-### Tech Stack
-- **Framework:** [Next.js 16 Turbopack](https://nextjs.org/)
-- **Engine:** [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui v2](https://ui.shadcn.com/)
-- **UI System:** [Unideka UI v1.2](https://www.figma.com/community/file/1622312904371459207)
-- **Fonts:** Noto Sans & Oswald
-- **Icons:** Unideka Icons (Material Symbols based)
+The web application will be accessible at http://localhost.
 
-### Fair Use & Licensing
-The code is available under the **MIT License**. 
-- You are free to use the logic, configuration, and components.
-- **Brand Identity:** The "Rovno.dev" name, logo, and case studies are NOT open-source. Please don't clone the design 1:1 for commercial use—be creative!
+## Management Commands
 
-## 🇷🇺 Russian
+The Makefile provides a standardized interface for common tasks:
 
-### Особенности реализации
-- **Tailwind v4:** Полностью на CSS-переменных для максимальной скорости сборки.
-- **Performance:** 100/100 Lighthouse за счет кастомной оптимизации и отсутствия лишних зависимостей.
-- **Zero-Dependency Icons:** Иконки внедрены через оптимизированный SVG-код.
+- **make up**: Starts all containers in detached mode.
+- **make stop**: Stops all running containers.
+- **make restart**: Pulls latest changes, rebuilds images, and recreates containers.
+- **make logs**: Streams combined logs from all services.
+- **make clean**: Removes unused Docker resources.
 
-### Правила использования
-Код открыт под лицензией **MIT**. Вы можете использовать наши решения и компоненты в своих проектах.
-- **Бренд:** Название "Rovno.dev", логотип и тексты кейсов защищены авторским правом.
-- **Дизайн:** Мы делимся кодом для обучения и вдохновения. Пожалуйста, не копируйте визуальный стиль сайта точь-в-точь для коммерческих целей.
+## Infrastructure Details
 
-## Quick Start
+### Traefik Proxy
 
-```bash
-git clone https://github.com/rovno-dev/rovno-dev-frontend
+Traefik handles routing and SSL termination. In production, it automatically provisions certificates via Let's Encrypt using the TLS challenge. The configuration is logic-driven based on environment variables, eliminating the need to manually edit YAML files between deployments.
 
-npm install
+### Next.js (Webapp)
 
-npm run dev
-```
+The frontend is a Next.js application running in standalone mode for optimized Docker performance. It uses Tailwind CSS v4 for styling and follows high-performance standards.
 
-Built with ❤️ by [Niyaz Gimadiev](https://rovno.dev/u/niyazgim)
+## Deployment
+
+Automated deployment is handled via GitHub Actions. On every push to the main branch, the runner connects to the production server, pulls the latest code, and executes the restart sequence.
+
+### Production Environment Requirements
+
+The production server must have a `.env` file with the following overrides:
+- `ENTRYPOINT=websecure`
+- `TLS_ENABLED=true`
+- `CERT_RESOLVER=myresolver`
+- `DOMAIN`: Should include the full Host rule for all production subdomains.
+
+## Licensing
+
+The project logic and infrastructure components are available under the MIT License. Brand assets, including the Rovno.dev name, logo, and case studies, are proprietary and protected by copyright.
