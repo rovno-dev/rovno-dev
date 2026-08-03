@@ -1,0 +1,38 @@
+services:
+  fake_api:
+    container_name: main-service
+    build:
+      context: .
+      target: prod
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fake_api.rule=Host(`${FAKE_API_HOST}`)"
+      - "traefik.http.routers.fake_api.entrypoints=${TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.fake_api.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.fake_api.tls.certresolver=${CERT_RESOLVER}"
+    environment:
+      DB_DSN: ${FAKE_API_DB_DSN}
+    depends_on:
+      fake_api_db:
+        condition: service_healthy
+
+  fake_api_db:
+    image: postgres:16
+    container_name: main-service-db
+    environment:
+      POSTGRES_USER: ${FAKE_API_DB_USER}
+      POSTGRES_PASSWORD: ${FAKE_API_DB_PASSWORD}
+      POSTGRES_DB: ${FAKE_API_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FAKE_API_DB_USER} -d ${FAKE_API_DB_NAME}"]
+      interval: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+
+volumes:
+  db_data:
+
+networks:
+  main-network:
+    driver: bridge
