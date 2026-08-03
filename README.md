@@ -81,7 +81,3 @@ The production server must have a `.env` file with the following overrides:
 - `TLS_ENABLED=true`
 - `CERT_RESOLVER=myresolver`
 - `DOMAIN`: Should include the full Host rule for all production subdomains.
-
-## Licensing
-
-The project logic and infrastructure components are available under the MIT License. Brand assets, including the Rovno.dev name, logo, and case studies, are proprietary and protected by copyright.
