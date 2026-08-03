@@ -34,3 +34,5 @@ aider*
 repomix*
 
 openapi.json
+
+letsencrypt/*

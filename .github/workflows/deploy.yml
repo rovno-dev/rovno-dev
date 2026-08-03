@@ -19,7 +19,7 @@ jobs:
           command_timeout: 20m
           script: |
             cd ${{ secrets.PROJECT_PATH }}
+
             git fetch origin main && git reset --hard origin/main
 
-            cd ${{ secrets.INFRA_PATH }}
-            make rebuild ENV=prod SERVICES=rovno_dev_next_js_frontend
+            docker compose --profile prod up -d --build --force-recreate
