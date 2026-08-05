@@ -17,7 +17,7 @@ This repository contains the source code for the Rovno.dev agency web applicatio
 - Node.js (for local webapp development)
 - Access to modify your system hosts file
 
-### 1. Configure Hosts
+### 1. (optinoal) Configure Hosts
 
 Add the following entries to your `/etc/hosts` (Linux/macOS) or `C:\Windows\System32\drivers\etc\hosts` (Windows) file to route local traffic through Traefik:
 
@@ -45,20 +45,10 @@ By default, the `.env` is configured for development:
 Use the Makefile to start the infrastructure:
 
 ```bash
-make up
+docker compose up --build --force-recreate
 ```
 
 The web application will be accessible at http://localhost.
-
-## Management Commands
-
-The Makefile provides a standardized interface for common tasks:
-
-- **make up**: Starts all containers in detached mode.
-- **make stop**: Stops all running containers.
-- **make restart**: Pulls latest changes, rebuilds images, and recreates containers.
-- **make logs**: Streams combined logs from all services.
-- **make clean**: Removes unused Docker resources.
 
 ## Infrastructure Details
 

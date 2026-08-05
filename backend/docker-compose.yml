@@ -9,7 +9,7 @@ services:
       - MAIN_DB_HOST=main-db
     volumes:
       - ./services/main-service:/app
-      - ../storage:/app/storage
+      - ./services/main-service/storage:/app/storage
     depends_on:
       main-db:
         condition: service_healthy

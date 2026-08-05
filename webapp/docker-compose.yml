@@ -4,7 +4,6 @@ services:
     build:
       context: .
       target: prod
-    env_file: ../.env
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"

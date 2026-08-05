@@ -3,14 +3,13 @@ services:
     build:
       context: .
     container_name: tg-bot
-    env_file: ../.env
-    environment:
-      - MAIN_DB_HOST=main-db
+    env_file:
+      - ../.env
     depends_on:
       main-db:
         condition: service_healthy
     volumes:
-      - ../storage:/app/storage
+      - ../backend/services/main-service/storage:/app/storage
     networks:
       - main-network
     restart: unless-stopped

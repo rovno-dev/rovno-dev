@@ -1,90 +1,95 @@
 import os
+import sys
+import logging
 import asyncio
-import pandas as pd
-from datetime import datetime
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
-from sqlalchemy import create_all, create_engine, select, desc, extract
-from sqlalchemy.orm import sessionmaker
-from backend.services.main_service.app.models.order import Order # Path hack or re-define
-import sys
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.markdown import hbold, hcode
 
-# Simplified model re-definition for bot to avoid complex path imports
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, DateTime, Text, JSON
-from sqlalchemy.dialects.postgresql import UUID
-Base = declarative_base()
+# 1. Настройка логов
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-class Order(Base):
-    __tablename__ = "orders"
-    id = Column(UUID, primary_key=True)
-    services = Column(JSON)
-    company_name = Column(String)
-    description = Column(Text)
-    budget = Column(String)
-    user_name = Column(String)
-    user_contact = Column(String)
-    created_at = Column(DateTime)
-
+# 2. Загрузка переменных
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ADMIN_IDS = [int(i) for i in os.getenv("ADMIN_IDS", "").split(",") if i]
-DB_URL = f"postgresql://{os.getenv('MAIN_DB_USER')}:{os.getenv('MAIN_DB_PASSWORD')}@{os.getenv('MAIN_DB_HOST')}:{os.getenv('MAIN_DB_PORT')}/{os.getenv('MAIN_DB_NAME')}"
+ALLOWED_USERS_RAW = os.getenv("TELEGRAM_BOT_ALLOWED_USERS", "")
 
-bot = Bot(token=TOKEN)
+# Парсим список ID
+try:
+    ALLOWED_USERS = [int(uid.strip()) for uid in ALLOWED_USERS_RAW.split(",") if uid.strip()]
+except ValueError:
+    logger.error("TELEGRAM_BOT_ALLOWED_USERS содержит некорректные данные (не числа)!")
+    sys.exit(1)
+
+if not TOKEN or not ALLOWED_USERS:
+    logger.error("BOT_TOKEN или TELEGRAM_BOT_ALLOWED_USERS не установлены!")
+    sys.exit(1)
+
+bot = Bot(token=TOKEN, parse_mode="HTML")
 dp = Dispatcher()
-engine = create_engine(DB_URL)
-Session = sessionmaker(bind=engine)
 
-def is_admin(message: types.Message):
-    return message.from_user.id in ADMIN_IDS
+# 3. Middleware для ограничения доступа к командам
+@dp.message.outer_middleware()
+async def access_middleware(handler, event, data):
+    if event.from_user.id not in ALLOWED_USERS:
+        return # Игнорируем всех посторонних
+    return await handler(event, data)
 
-@dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    if not is_admin(message): return
-    await message.answer("🤖 Админ-панель Rovno.dev\n\n/last10 - Последние 10 заказов\n/monthly - Отчет за месяц (XLSX)\n/dump - Полный дамп")
+# 4. Клавиатура управления заказом
+def get_order_keyboard(order_id, contact_info):
+    # Если контакт начинается с @, делаем ссылку на ТГ, иначе на телефон
+    if contact_info.startswith('@'):
+        contact_url = f"https://t.me/{contact_info.replace('@', '')}"
+    else:
+        contact_url = f"tel:{contact_info}"
 
-@dp.message(Command("last10"))
-async def last_10(message: types.Message):
-    if not is_admin(message): return
-    with Session() as session:
-        orders = session.query(Order).order_by(desc(Order.created_at)).limit(10).all()
-        if not orders:
-            return await message.answer("Заказов нет")
-        
-        resp = "📅 *Последние 10 заказов:*\n\n"
-        for o in orders:
-            resp += f"🔹 {o.created_at.strftime('%d.%m')} | {o.user_name} | {o.budget}\n`{o.id}`\n\n"
-        await message.answer(resp, parse_mode="Markdown")
+    buttons = [
+        [InlineKeyboardButton(text="✅ Принять", callback_data=f"accept_{order_id}")],
+        [InlineKeyboardButton(text="📞 Связаться", url=contact_url)],
+        [InlineKeyboardButton(text="❌ В архив", callback_data=f"archive_{order_id}")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-@dp.message(Command("monthly"))
-async def monthly_report(message: types.Message):
-    if not is_admin(message): return
-    now = datetime.now()
-    with Session() as session:
-        orders = session.query(Order).filter(
-            extract('month', Order.created_at) == now.month,
-            extract('year', Order.created_at) == now.year
-        ).all()
-        
-        if not orders: return await message.answer("В этом месяце еще нет заказов")
-        
-        data = []
-        for o in orders:
-            data.append({
-                "Дата": o.created_at,
-                "Услуги": ", ".join(o.services) if isinstance(o.services, list) else o.services,
-                "Имя": o.user_name,
-                "Контакт": o.user_contact,
-                "Бюджет": o.budget,
-                "Описание": o.description
-            })
-        
-        df = pd.DataFrame(data)
-        path = f"report_{now.month}_{now.year}.xlsx"
-        df.to_excel(path, index=False)
-        
-        await message.answer_document(types.FSInputFile(path))
-        os.remove(path)
+# 5. Команды бота
+@dp.message(Command("start", "help"))
+async def send_welcome(message: types.Message):
+    await message.reply(
+        f"🤖 {hbold('Менеджер Заказов')}\n\n"
+        f"Вы в списке разрешенных пользователей ({len(ALLOWED_USERS)} чел.).\n"
+        "Уведомления о новых заказах будут приходить сюда."
+    )
+
+@dp.callback_query(F.data.startswith("accept_"))
+async def accept_order(callback: types.CallbackQuery):
+    await callback.answer("Заказ принят!")
+    # Обновляем сообщение у того, кто нажал, чтобы было видно, кто взял заказ
+    await callback.message.edit_caption(
+        caption=callback.message.caption + f"\n\n✅ {hbold('ПРИНЯЛ:')} {callback.from_user.first_name}",
+        parse_mode="HTML"
+    )
+
+# 6. ФУНКЦИЯ РАССЫЛКИ (Вызывается вашим бэкендом)
+async def broadcast_new_order(order_data: dict):
+    """Отправляет уведомление всем пользователям из списка ALLOWED_USERS"""
+    text = (
+        f"🚀 {hbold('Новый заказ!')}\n\n"
+        f"👤 {hbold('Имя:')} {order_data.get('user_name')}\n"
+        f"📞 {hbold('Контакт:')} {hcode(order_data.get('user_contact'))}\n"
+        f"🏢 {hbold('Компания:')} {order_data.get('company_name')}\n"
+        f"🛠 {hbold('Услуги:')} {order_data.get('services')}\n"
+        f"📝 {hbold('Описание:')} {order_data.get('description')}\n"
+        f"💰 {hbold('Бюджет:')} {order_data.get('budget') or '—'}\n\n"
+        f"ID: {hcode(order_data.get('id'))}"
+    )
+    
+    keyboard = get_order_keyboard(order_data.get('id'), order_data.get('user_contact'))
+
+    for user_id in ALLOWED_USERS:
+        try:
+            await bot.send_message(user_id, text, reply_markup=keyboard)
+        except Exception as e:
+            logger.error(f"Не удалось отправить сообщение пользователю {user_id}: {e}")
 
 async def main():
     await dp.start_polling(bot)
