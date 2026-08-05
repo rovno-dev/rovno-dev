@@ -1,37 +1,71 @@
 services:
-  fake_api:
-    container_name: main-service
+  main-service:
     build:
-      context: .
-      target: prod
+      context: ./services/main-service
+      dockerfile: Dockerfile
+    container_name: main-service
+    env_file:
+      - .env
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - MAIN_DB_NAME=${MAIN_DB_NAME}
+    ports:
+      - "${MAIN_SERVICE_PORT:-8000}:8000"
+    volumes:
+      - ./services/main-service:/app
+    depends_on:
+      main-db:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks:
+      - main-network
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fake_api.rule=Host(`${FAKE_API_HOST}`)"
-      - "traefik.http.routers.fake_api.entrypoints=${TRAEFIK_ENTRYPOINT}"
-      - "traefik.http.routers.fake_api.tls=${TLS_ENABLED}"
-      - "traefik.http.routers.fake_api.tls.certresolver=${CERT_RESOLVER}"
-    environment:
-      DB_DSN: ${FAKE_API_DB_DSN}
-    depends_on:
-      fake_api_db:
-        condition: service_healthy
+      - "traefik.http.routers.main-service.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/health`)"
+      - "traefik.http.services.main-service.loadbalancer.server.port=8000"
 
-  fake_api_db:
-    image: postgres:16
-    container_name: main-service-db
+  main-db:
+    image: postgres:15-alpine
+    container_name: main-db
     environment:
-      POSTGRES_USER: ${FAKE_API_DB_USER}
-      POSTGRES_PASSWORD: ${FAKE_API_DB_PASSWORD}
-      POSTGRES_DB: ${FAKE_API_DB_NAME}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${FAKE_API_DB_USER} -d ${FAKE_API_DB_NAME}"]
-      interval: 5s
-      retries: 5
+      POSTGRES_USER: ${MAIN_DB_USER}
+      POSTGRES_PASSWORD: ${MAIN_DB_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
+    ports:
+      - "${MAIN_DB_PORT:-5432}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data/
+      - main_db_data:/var/lib/postgresql/data
+    networks:
+      - main-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    container_name: valkey
+    command: valkey-server --requirepass ${CACHE_PASSWORD} --appendonly yes
+    ports:
+      - "${CACHE_PORT:-6379}:6379"
+    volumes:
+      - valkey_data:/data
+    networks:
+      - main-network
+    healthcheck:
+      test: [ "CMD", "valkey-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
-  db_data:
+  main_db_data:
+  valkey_data:
 
 networks:
   main-network:
