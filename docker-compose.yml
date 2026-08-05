@@ -1,7 +1,7 @@
 name: rovno-dev
-
 include:
-  # - backend/docker-compose.yml
+  - tg-bot/docker-compose.yml
+  - backend/docker-compose.yml
   - webapp/docker-compose.yml
 
 services:

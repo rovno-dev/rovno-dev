@@ -32,7 +32,7 @@ export default function Header() {
         </div>
 
         <Button className="hidden sm:flex" asChild>
-          <Link href={"https://forms.yandex.com/cloud/6936a4b1d0468820623c548e"}>
+          <Link href={"/order"}>
             <DesignServicesIcon />
             Оформить заказ
           </Link>

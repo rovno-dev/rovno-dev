@@ -55,7 +55,7 @@ export default function BottomAppBar() {
             size="medium"
             onClick={() => setOpen(true)}
           >
-            <Link href={'https://forms.yandex.com/cloud/6936a4b1d0468820623c548e'}>
+            <Link href={'/order'}>
               <DesignServicesIcon className="size-[26px]!" />
               <span className="text-display-4">Заказ</span>
             </Link>

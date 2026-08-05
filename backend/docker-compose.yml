@@ -4,19 +4,14 @@ services:
       context: ./services/main-service
       dockerfile: Dockerfile
     container_name: main-service
-    env_file:
-      - .env
+    env_file: ../.env
     environment:
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - MAIN_DB_NAME=${MAIN_DB_NAME}
-    ports:
-      - "${MAIN_SERVICE_PORT:-8000}:8000"
+      - MAIN_DB_HOST=main-db
     volumes:
       - ./services/main-service:/app
+      - ../storage:/app/storage
     depends_on:
       main-db:
-        condition: service_healthy
-      valkey:
         condition: service_healthy
     networks:
       - main-network
@@ -29,18 +24,17 @@ services:
   main-db:
     image: postgres:15-alpine
     container_name: main-db
+    env_file: ../.env
     environment:
       POSTGRES_USER: ${MAIN_DB_USER}
       POSTGRES_PASSWORD: ${MAIN_DB_PASSWORD}
       POSTGRES_DB: ${MAIN_DB_NAME}
-    ports:
-      - "${MAIN_DB_PORT:-5432}:5432"
     volumes:
       - main_db_data:/var/lib/postgresql/data
     networks:
       - main-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,10 +44,6 @@ services:
     image: valkey/valkey:7-alpine
     container_name: valkey
     command: valkey-server --requirepass ${CACHE_PASSWORD} --appendonly yes
-    ports:
-      - "${CACHE_PORT:-6379}:6379"
-    volumes:
-      - valkey_data:/data
     networks:
       - main-network
     healthcheck:
@@ -65,8 +55,3 @@ services:
 
 volumes:
   main_db_data:
-  valkey_data:
-
-networks:
-  main-network:
-    driver: bridge
