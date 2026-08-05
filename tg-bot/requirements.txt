@@ -1,2 +1,6 @@
 aiogram==3.10.0
 python-dotenv
+openpyxl
+Pillow
+sqlalchemy
+psycopg2-binary
