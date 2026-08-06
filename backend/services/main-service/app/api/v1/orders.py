@@ -1,4 +1,4 @@
-import os, uuid, json, httpx
+import os, uuid, json, httpx, asyncio
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form
@@ -9,36 +9,38 @@ from app.models.order import Order, OrderFile
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ADMIN_IDS = os.getenv("ADMIN_IDS", "").split(",")
 
 async def notify_bot(order_id: str, name: str, contact: str, description: str, file_paths: List[str]):
-    if not BOT_TOKEN: return
+    print(f"[DEBUG] Notification trigger for order {order_id}")
+    if not BOT_TOKEN:
+        print("[ERROR] TELEGRAM_BOT_TOKEN is missing!")
+        return
     
-    # Construction of plain text message to avoid 400 Bad Request formatting errors
+    # Try to find admin IDs from both common env names
+    raw_ids = os.getenv("ADMIN_IDS") or os.getenv("TELEGRAM_BOT_ALLOWED_USERS") or ""
+    admin_ids = [uid.strip() for uid in raw_ids.split(",") if uid.strip()]
+    
+    if not admin_ids:
+        print("[ERROR] No admin IDs found in ADMIN_IDS or TELEGRAM_BOT_ALLOWED_USERS")
+        return
+
     text = (f"🚀 Новый заказ!\n\n"
             f"👤 Имя: {name}\n"
             f"📞 Контакт: {contact}\n"
             f"📝 Описание: {description}\n\n"
             f"ID: {order_id}")
 
-    async with httpx.AsyncClient() as client:
-        for admin_id in ADMIN_IDS:
-            admin_id = admin_id.strip()
-            if not admin_id: continue
-            
-            # 1. Send Text Info
+    # Use a longer timeout and explicit DNS-friendly client
+    async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+        for admin_id in admin_ids:
+            # 1. Send Text
             try:
                 url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-                resp = await client.post(url, json={
-                    "chat_id": admin_id,
-                    "text": text
-                }, timeout=10.0)
+                resp = await client.post(url, json={"chat_id": admin_id, "text": text})
+                print(f"[DEBUG] Text to {admin_id}: {resp.status_code}")
                 resp.raise_for_status()
-            except httpx.HTTPStatusError as e:
-                # ponytail: hide token by not printing the exception object which contains the URL
-                print(f"[LOG] TG Text Error: Admin {admin_id} received {e.response.status_code}")
             except Exception as e:
-                print(f"[LOG] TG Text Connection Error: {type(e).__name__}")
+                print(f"[ERROR] Failed text to {admin_id}: {str(e)[:100]}")
 
             # 2. Send Files
             for path in file_paths:
@@ -49,12 +51,11 @@ async def notify_bot(order_id: str, name: str, contact: str, description: str, f
                         resp = await client.post(
                             doc_url,
                             data={"chat_id": admin_id},
-                            files={"document": f},
-                            timeout=20.0
+                            files={"document": f}
                         )
-                    resp.raise_for_status()
+                    print(f"[DEBUG] File {os.path.basename(path)} to {admin_id}: {resp.status_code}")
                 except Exception as e:
-                    print(f"[LOG] TG File Error: Could not send {os.path.basename(path)}")
+                    print(f"[ERROR] Failed file to {admin_id}: {str(e)[:100]}")
 
 @router.post("/create")
 async def create_order(
@@ -96,7 +97,7 @@ async def create_order(
     
     db.commit()
     
-    # Notify admins with text and the actual files
-    await notify_bot(str(order.id), user_name, user_contact, description, saved_paths)
+    # Run notification in background so the user doesn't wait for TG API
+    asyncio.create_task(notify_bot(str(order.id), user_name, user_contact, description, saved_paths))
     
     return {"status": "ok", "order_id": str(order.id)}

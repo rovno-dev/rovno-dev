@@ -4,6 +4,9 @@ services:
       context: ./services/main-service
       dockerfile: Dockerfile
     container_name: main-service
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     env_file: ../.env
     environment:
       - MAIN_DB_HOST=main-db
