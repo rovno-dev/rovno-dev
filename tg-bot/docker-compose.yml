@@ -5,6 +5,9 @@ services:
     container_name: tg-bot
     env_file:
       - ../.env
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     depends_on:
       main-db:
         condition: service_healthy

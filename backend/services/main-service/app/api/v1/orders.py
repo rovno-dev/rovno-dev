@@ -7,34 +7,54 @@ from database.database import get_db
 from app.models.order import Order, OrderFile
 
 router = APIRouter(prefix="/orders", tags=["orders"])
+
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ADMIN_IDS = os.getenv("ADMIN_IDS", "").split(",")
 
-async def notify_bot(order_id: str, name: str, contact: str, description: str, f_count: int):
+async def notify_bot(order_id: str, name: str, contact: str, description: str, file_paths: List[str]):
     if not BOT_TOKEN: return
     
-    # Inline keyboard structure
-    contact_url = f"https://t.me/{contact.replace('@','')}" if contact.startswith('@') else f"tel:{contact}"
-    markup = {"inline_keyboard": [
-        [{"text": "✅ Принять", "callback_data": f"accept_{order_id}"}],
-        [{"text": "📞 Связаться", "url": contact_url}]
-    ]}
-
-    text = (f"🚀 {name} оставил заказ!\n\n"
+    # Construction of plain text message to avoid 400 Bad Request formatting errors
+    text = (f"🚀 Новый заказ!\n\n"
+            f"👤 Имя: {name}\n"
             f"📞 Контакт: {contact}\n"
-            f"📎 Файлов: {f_count}\n"
-            f"📝 Описание: {description[:250]}...\n\n"
-            f"ID: `{order_id}`")
+            f"📝 Описание: {description}\n\n"
+            f"ID: {order_id}")
 
     async with httpx.AsyncClient() as client:
         for admin_id in ADMIN_IDS:
+            admin_id = admin_id.strip()
             if not admin_id: continue
+            
+            # 1. Send Text Info
             try:
-                await client.post(
-                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                    json={"chat_id": admin_id, "text": text, "parse_mode": "Markdown", "reply_markup": markup}
-                )
-            except: pass
+                url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+                resp = await client.post(url, json={
+                    "chat_id": admin_id,
+                    "text": text
+                }, timeout=10.0)
+                resp.raise_for_status()
+            except httpx.HTTPStatusError as e:
+                # ponytail: hide token by not printing the exception object which contains the URL
+                print(f"[LOG] TG Text Error: Admin {admin_id} received {e.response.status_code}")
+            except Exception as e:
+                print(f"[LOG] TG Text Connection Error: {type(e).__name__}")
+
+            # 2. Send Files
+            for path in file_paths:
+                if not os.path.exists(path): continue
+                try:
+                    doc_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+                    with open(path, "rb") as f:
+                        resp = await client.post(
+                            doc_url,
+                            data={"chat_id": admin_id},
+                            files={"document": f},
+                            timeout=20.0
+                        )
+                    resp.raise_for_status()
+                except Exception as e:
+                    print(f"[LOG] TG File Error: Could not send {os.path.basename(path)}")
 
 @router.post("/create")
 async def create_order(
@@ -51,7 +71,6 @@ async def create_order(
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db)
 ):
-    # services can be JSON string or single string
     try: s_list = json.loads(services)
     except: s_list = [services]
 
@@ -65,17 +84,19 @@ async def create_order(
     storage_base = f"storage/orders/{datetime.now().year}/{order.id}"
     os.makedirs(storage_base, exist_ok=True)
     
-    saved_files = 0
+    saved_paths = []
     for f in files:
         if not f.filename: continue
-        ext = os.path.splitext(f.filename)[1]
-        path = f"{storage_base}/{uuid.uuid4()}{ext}"
+        path = f"{storage_base}/{uuid.uuid4()}{os.path.splitext(f.filename)[1]}"
         content = await f.read()
-        with open(path, "wb") as buffer:
-            buffer.write(content)
+        with open(path, "wb") as buf:
+            buf.write(content)
         db.add(OrderFile(order_id=order.id, file_path=path, filename=f.filename))
-        saved_files += 1
-
+        saved_paths.append(path)
+    
     db.commit()
-    await notify_bot(str(order.id), user_name, user_contact, description, saved_files)
+    
+    # Notify admins with text and the actual files
+    await notify_bot(str(order.id), user_name, user_contact, description, saved_paths)
+    
     return {"status": "ok", "order_id": str(order.id)}

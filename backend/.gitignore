@@ -36,4 +36,4 @@ go.work.sum
 .aider*
 .DS_Store
 
-
+services/*/storage/*
