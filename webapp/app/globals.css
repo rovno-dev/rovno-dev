@@ -167,7 +167,7 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar: var(--card);
   --color-ring: var(--primary);
-  --color-input: var(--input);
+  --color-input: var(--outline);
   --color-border: var(--outline);
   --color-destructive: var(--error);
   --color-muted-foreground: var(--on-bg-disabled);

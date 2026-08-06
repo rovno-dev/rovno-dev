@@ -1,4 +1,4 @@
-import os, uuid, json, httpx, asyncio
+import os, uuid, json, httpx, asyncio, html
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, UploadFile, File, Form
@@ -10,52 +10,55 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-async def notify_bot(order_id: str, name: str, contact: str, description: str, file_paths: List[str]):
-    print(f"[DEBUG] Notification trigger for order {order_id}")
-    if not BOT_TOKEN:
-        print("[ERROR] TELEGRAM_BOT_TOKEN is missing!")
-        return
+async def notify_bot(order_data: dict, file_paths: List[str]):
+    if not BOT_TOKEN: return
     
-    # Try to find admin IDs from both common env names
     raw_ids = os.getenv("ADMIN_IDS") or os.getenv("TELEGRAM_BOT_ALLOWED_USERS") or ""
     admin_ids = [uid.strip() for uid in raw_ids.split(",") if uid.strip()]
+    if not admin_ids: return
+
+    # Constructing detailed HTML message
+    # We use html.escape to prevent user input from breaking the Telegram API
+    services_str = ", ".join(order_data.get('services', []))
     
-    if not admin_ids:
-        print("[ERROR] No admin IDs found in ADMIN_IDS or TELEGRAM_BOT_ALLOWED_USERS")
-        return
+    text = (
+        f"🚀 <b>Новый заказ!</b>\n\n"
+        f"🆔 <b>ID:</b> <code>{order_data['id']}</code>\n"
+        f"🛠 <b>Услуги:</b> {html.escape(services_str)}\n"
+        f"🏢 <b>Компания:</b> {html.escape(order_data.get('company_name') or '—')}\n"
+        f"❓ <b>Нейминг:</b> {html.escape(order_data.get('naming_help') or '—')}\n"
+        f"📝 <b>Описание:</b> {html.escape(order_data.get('description') or '—')}\n"
+        f"📅 <b>Сроки:</b> {html.escape(order_data.get('deadline') or '—')}\n"
+        f"💰 <b>Бюджет:</b> {html.escape(order_data.get('budget') or '—')}\n\n"
+        f"👤 <b>Заказчик:</b> {html.escape(order_data['user_name'])}\n"
+        f"📞 <b>Контакт:</b> {html.escape(order_data['user_contact'])}\n"
+        f"📧 <b>Email:</b> {html.escape(order_data.get('user_email') or '—')}\n"
+        f"🔗 <b>Референсы:</b> {html.escape(order_data.get('references') or '—')}"
+    )
 
-    text = (f"🚀 Новый заказ!\n\n"
-            f"👤 Имя: {name}\n"
-            f"📞 Контакт: {contact}\n"
-            f"📝 Описание: {description}\n\n"
-            f"ID: {order_id}")
-
-    # Use a longer timeout and explicit DNS-friendly client
-    async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
         for admin_id in admin_ids:
-            # 1. Send Text
+            # 1. Send Full Text
             try:
-                url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-                resp = await client.post(url, json={"chat_id": admin_id, "text": text})
-                print(f"[DEBUG] Text to {admin_id}: {resp.status_code}")
-                resp.raise_for_status()
+                await client.post(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                    json={"chat_id": admin_id, "text": text, "parse_mode": "HTML"}
+                )
             except Exception as e:
-                print(f"[ERROR] Failed text to {admin_id}: {str(e)[:100]}")
+                print(f"[ERROR] TG Notify Text Error: {str(e)[:100]}")
 
             # 2. Send Files
             for path in file_paths:
                 if not os.path.exists(path): continue
                 try:
-                    doc_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
                     with open(path, "rb") as f:
-                        resp = await client.post(
-                            doc_url,
-                            data={"chat_id": admin_id},
+                        await client.post(
+                            f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument",
+                            data={"chat_id": admin_id, "caption": f"Файл к заказу {order_data['id']}"},
                             files={"document": f}
                         )
-                    print(f"[DEBUG] File {os.path.basename(path)} to {admin_id}: {resp.status_code}")
                 except Exception as e:
-                    print(f"[ERROR] Failed file to {admin_id}: {str(e)[:100]}")
+                    print(f"[ERROR] TG Notify File Error: {str(e)[:100]}")
 
 @router.post("/create")
 async def create_order(
@@ -97,7 +100,21 @@ async def create_order(
     
     db.commit()
     
-    # Run notification in background so the user doesn't wait for TG API
-    asyncio.create_task(notify_bot(str(order.id), user_name, user_contact, description, saved_paths))
+    # Prepare data for background task
+    order_info = {
+        "id": str(order.id),
+        "services": s_list,
+        "company_name": company_name,
+        "naming_help": naming_help,
+        "description": description,
+        "deadline": deadline,
+        "budget": budget,
+        "user_name": user_name,
+        "user_contact": user_contact,
+        "user_email": user_email,
+        "references": references
+    }
+    
+    asyncio.create_task(notify_bot(order_info, saved_paths))
     
     return {"status": "ok", "order_id": str(order.id)}
