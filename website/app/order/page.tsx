@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
-import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, KeyboardArrowLeftIcon } from "@/components/icons";
+import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, ArticleIcon, InfoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -25,51 +25,55 @@ const SERVICE_TYPES = [
   "Логотип / Фирменный стиль / Брендбук",
   "Дизайн презентации / Коммерческое предложение",
   "Создание сайта (Лендинг / Многостраничный / Интернет-магазин)",
-  "Моушн-дизайн / Видеоролик / Анимация",
-  "3D-моделирование / Визуализация / 3D-анимация",
+  "2д анимация (анимация логотипа, социальные ролики), Монтаж, Склейка",
+  "3D-моделирование, 3D-анимация (имиджевый ролик, коммерческий, социальный)",
   "Реклама и продвижение (SEO, Таргет, Контекст)",
-  "Другое (опишу ниже, в графе «О компании»)"
+  "Другое (опишу ниже, в графе «О проекте»"
 ];
 
 interface FileWithPreview {
   file: File;
   preview: string;
   id: string;
+  type: 'image' | 'pdf' | 'doc' | 'other';
 }
 
 export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
-
-  // Lightbox State
+  
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const imageAttachments = attachments.filter(a => a.preview !== '');
-
-  // Sync carousel position when index changes from outside (grid click)
   useEffect(() => {
     if (!api || !lightboxOpen) return;
-    api.scrollTo(activeIndex, true);
+    const timer = setTimeout(() => {
+        api.scrollTo(activeIndex, true);
+    }, 50);
+    return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
+
+  const getFileType = (file: File): 'image' | 'pdf' | 'doc' | 'other' => {
+    if (file.type.startsWith('image/')) return 'image';
+    if (file.type === 'application/pdf') return 'pdf';
+    if (file.name.match(/\.(doc|docx|md)$/i)) return 'doc';
+    return 'other';
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      addFiles(Array.from(e.target.files));
+      const newFiles = Array.from(e.target.files).map(file => ({
+        file,
+        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+        id: Math.random().toString(36).substring(7),
+        type: getFileType(file)
+      }));
+      setAttachments(prev => [...prev, ...newFiles].slice(0, 20));
     }
-  };
-
-  const addFiles = (newFiles: File[]) => {
-    const processed = newFiles.map(file => ({
-      file,
-      preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
-      id: Math.random().toString(36).substring(7)
-    }));
-    setAttachments(prev => [...prev, ...processed].slice(0, 20));
   };
 
   const removeFile = (id: string) => {
@@ -80,12 +84,9 @@ export default function OrderPage() {
     });
   };
 
-  const openLightbox = (id: string) => {
-    const idx = imageAttachments.findIndex(img => img.id === id);
-    if (idx !== -1) {
-      setActiveIndex(idx);
-      setLightboxOpen(true);
-    }
+  const openLightbox = (index: number) => {
+    setActiveIndex(index);
+    setLightboxOpen(true);
   };
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -94,9 +95,7 @@ export default function OrderPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     formData.append("services", JSON.stringify(selectedServices));
-    attachments.forEach((attr) => {
-      formData.append("files", attr.file);
-    });
+    attachments.forEach((attr) => formData.append("files", attr.file));
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
@@ -123,8 +122,8 @@ export default function OrderPage() {
       <section className="py-12 md:py-20 border-b border-(--outline)">
         <Container>
           <div className="max-w-[800px] animate-reveal">
-            <h1 className="text-display-1 text-(--on-bg-high) mb-6 uppercase tracking-tighter">Бриф на разработку</h1>
-            <p className="text-body-1 text-(--on-bg-medium) leading-relaxed">
+            <h1 className="text-display-1 text-(--on-bg-high) mb-6 uppercase tracking-tighter leading-none">Бриф на разработку</h1>
+            <p className="text-body-1 text-(--on-bg-medium) leading-relaxed font-medium text-balance">
               Опишите вашу задачу и мы подготовим предложение в течение рабочего дня.
             </p>
           </div>
@@ -133,16 +132,15 @@ export default function OrderPage() {
 
       <Container className="mt-12">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
-          {/* 1. Services */}
           <div className="space-y-4">
-            <h3 className="text-display-4 uppercase tracking-tight">1. Тип услуги</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">1. Тип услуги</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {SERVICE_TYPES.map((service) => (
                 <label
                   key={service}
                   className={cn(
-                    "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
-                    selectedServices.includes(service) ? "border-(--primary) bg-(--primary-glass)" : "border-(--outline) hover:bg-(--state-hover)"
+                    "flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-card",
+                    selectedServices.includes(service) ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)" : "border-(--outline) hover:border-(--on-bg-low)"
                   )}
                 >
                   <Checkbox
@@ -152,37 +150,35 @@ export default function OrderPage() {
                       else setSelectedServices(p => p.filter(s => s !== service));
                     }}
                   />
-                  <span className="text-body-3 select-none">{service}</span>
+                  <span className="text-body-4 font-medium leading-tight select-none">{service}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* 2. Description */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">2. О проекте</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
             <Field>
               <Textarea
                 name="description"
                 required
-                className="min-h-[120px] text-body-2!"
+                className="min-h-[160px] text-body-2! rounded-2xl!"
                 placeholder="Расскажите о целях проекта, целевой аудитории и ваших пожеланиях..."
               />
             </Field>
           </div>
 
-          {/* 3. Company */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">3. О компании</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. О компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field>
                 <FieldLabel>Название бренда</FieldLabel>
-                <Input name="company_name" placeholder="Название" />
+                <Input name="company_name" placeholder="Название" className="h-12! rounded-xl!" />
               </Field>
               <Field>
                 <FieldLabel>Нужен нейминг?</FieldLabel>
                 <Select name="naming_help" defaultValue="no">
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-12! rounded-xl! w-full!"><SelectValue /></SelectTrigger>
                   <SelectContent position="popper">
                     <SelectItem value="yes">Да, нужно название</SelectItem>
                     <SelectItem value="no">Нет, уже есть</SelectItem>
@@ -193,27 +189,39 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {/* 4. Files Manager (Avito/Telegram Style) */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">4. Файлы (медиа, тз, заготовки и т.п.)</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {attachments.map((attr) => (
-                <div key={attr.id} className="relative aspect-square group rounded-xl border border-(--outline) overflow-hidden bg-(--card)">
-                  {attr.preview ? (
-                    <div className="cursor-pointer w-full h-full relative" onClick={() => openLightbox(attr.id)}>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (media, md, docx, pdf)</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {attachments.map((attr, idx) => (
+                <div key={attr.id} className="relative aspect-square group rounded-2xl border border-(--outline) overflow-hidden bg-card transition-shadow hover:shadow-lg">
+                  <div className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-4 relative" onClick={() => openLightbox(idx)}>
+                    {attr.type === 'image' ? (
                       <Image src={attr.preview} alt="preview" fill className="object-cover transition-transform group-hover:scale-105" />
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full p-2 text-center text-[10px] break-all text-(--on-bg-low)">
-                      {attr.file.name}
-                    </div>
-                  )}
+                    ) : (
+                      <>
+                        <div className={cn(
+                            "size-14 rounded-xl flex items-center justify-center mb-2 transition-colors",
+                            attr.type === 'pdf' ? "bg-red-50 text-red-600 dark:bg-red-950/30" : "bg-blue-50 text-blue-600 dark:bg-blue-950/30"
+                        )}>
+                            <ArticleIcon className="size-8!" />
+                        </div>
+                        <span className="text-[11px] font-semibold text-(--on-bg-medium) text-center break-all line-clamp-2 px-1">
+                            {attr.file.name}
+                        </span>
+                        <div className="absolute bottom-2 left-0 w-full text-center">
+                            <span className="text-[9px] uppercase tracking-widest text-(--on-bg-low) font-bold opacity-60">
+                                {attr.file.name.split('.').pop()}
+                            </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                   <button
                     type="button"
-                    onClick={() => removeFile(attr.id)}
-                    className="absolute top-1.5 right-1.5 z-10 size-6 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md"
+                    onClick={(e) => { e.stopPropagation(); removeFile(attr.id); }}
+                    className="absolute top-2 right-2 z-10 size-7 flex items-center justify-center rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-black hover:scale-110 backdrop-blur-md"
                   >
-                    <CloseSmallIcon className="size-4" />
+                    <CloseSmallIcon className="size-5" />
                   </button>
                 </div>
               ))}
@@ -221,34 +229,35 @@ export default function OrderPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-(--outline) hover:border-(--primary) hover:bg-(--primary-glass) transition-all text-(--on-bg-low) hover:text-(--primary)"
+                  className="aspect-square flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-(--outline) hover:border-(--primary) hover:bg-(--primary-glass) transition-all group"
                 >
-                  <CloudIcon className="size-6" />
-                  <span className="text-[10px] font-medium">Добавить</span>
+                  <div className="size-12 rounded-full bg-(--bg-disabled)/50 flex items-center justify-center group-hover:bg-(--primary)/10 transition-colors">
+                    <CloudIcon className="size-6 text-(--on-bg-low) group-hover:text-(--primary)" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-(--on-bg-low) group-hover:text-(--primary)">Добавить</span>
                 </button>
               )}
             </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              multiple
-              onChange={handleFileChange}
-              accept=".pdf,.doc,.docx,.jpg,.png,.zip"
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                multiple 
+                onChange={handleFileChange} 
+                accept="image/*,.pdf,.doc,.docx,.md,.txt,.zip,.rar"
             />
           </div>
 
-          {/* 5. Contacts */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">5. Контакты</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input name="user_name" required placeholder="Ваше имя" />
-              <Input name="user_contact" required placeholder="Телефон или Telegram" />
+              <Input name="user_name" required placeholder="Ваше имя" className="h-12! rounded-xl!" />
+              <Input name="user_contact" required placeholder="Телефон или Telegram" className="h-12! rounded-xl!" />
             </div>
           </div>
 
           <div className="pt-8">
-            <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl!" disabled={loading}>
+            <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl! text-lg! uppercase tracking-tighter" disabled={loading}>
               {loading ? "Отправка..." : "Отправить заявку"}
               <KeyboardArrowRightIcon className="size-6" />
             </Button>
@@ -256,42 +265,51 @@ export default function OrderPage() {
         </form>
       </Container>
 
-      {/* Telegram-style Multi-image Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent
-          className="!fixed !inset-0 !z-50 !flex !items-center !justify-center !w-screen !h-screen !max-w-none !max-h-none !p-0 !border-0 !bg-black/95 !rounded-none !translate-x-0 !translate-y-0 !top-0 !left-0"
-          showCloseButton={false}
-        >
-          <Button
-            variant="text"
-            className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
-            size="icon-medium"
-            onClick={() => setLightboxOpen(false)}
-          >
-            <CloseSmallIcon className="size-6!" />
+        <DialogContent className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-x-0 !translate-y-0">
+          <Button variant="text" className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full" size="icon-medium" onClick={() => setLightboxOpen(false)}>
+            <CloseSmallIcon className="size-8!" />
           </Button>
 
           <Carousel setApi={setApi} className="w-full h-full">
             <CarouselContent className="h-screen ml-0">
-              {imageAttachments.map((img, index) => (
-                <CarouselItem key={img.id} className="h-full flex items-center justify-center p-0 pl-0">
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <Image
-                      src={img.preview}
-                      alt={`Preview ${index + 1}`}
-                      fill
-                      className="object-contain"
-                      sizes="100vw"
-                      priority
-                    />
+              {attachments.map((attr) => (
+                <CarouselItem key={attr.id} className="h-full flex items-center justify-center p-0">
+                  <div className="relative w-full h-full max-w-6xl max-h-[85vh] flex items-center justify-center">
+                    {attr.type === 'image' ? (
+                      <div className="relative w-full h-full flex items-center justify-center px-4">
+                         <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-white/[0.03] backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
+                        <div className={cn(
+                            "size-32 rounded-3xl flex items-center justify-center shadow-inner",
+                            attr.type === 'pdf' ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500"
+                        )}>
+                          <ArticleIcon className="size-16!" />
+                        </div>
+                        <div className="space-y-3">
+                           <h2 className="text-display-3 text-white break-all line-clamp-3 px-4 leading-tight">{attr.file.name}</h2>
+                           <div className="flex items-center justify-center gap-2">
+                             <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest">
+                                {attr.file.name.split('.').pop()}
+                             </span>
+                             <span className="text-body-4 text-white/40">{(attr.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                           </div>
+                        </div>
+                        <Button variant="glass" shape="round" size="large" className="w-full h-14! text-base!" asChild>
+                           <a href={URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать документ</a>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {imageAttachments.length > 1 && (
+            {attachments.length > 1 && (
               <>
-                <CarouselPrevious className="left-6 z-50 bg-white/10 text-white hover:bg-white/20 border-0" />
-                <CarouselNext className="right-6 z-50 bg-white/10 text-white hover:bg-white/20 border-0" />
+                <CarouselPrevious className="left-6 z-50 bg-white/5 text-white hover:bg-white/20 border-white/10 size-12!" />
+                <CarouselNext className="right-6 z-50 bg-white/5 text-white hover:bg-white/20 border-white/10 size-12!" />
               </>
             )}
           </Carousel>
