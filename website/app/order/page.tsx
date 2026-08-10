@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import * as mammoth from "mammoth"; // mammoth is used for .docx to HTML conversion
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ const SERVICE_TYPES = [
 interface FileWithPreview {
   file: File;
   preview: string;
+  htmlPreview?: string; // ponytail: store converted HTML for docx preview
   id: string;
   type: 'image' | 'pdf' | 'doc' | 'other';
 }
@@ -62,18 +64,39 @@ export default function OrderPage() {
   const getFileType = (file: File): 'image' | 'pdf' | 'doc' | 'other' => {
     if (file.type.startsWith('image/')) return 'image';
     if (file.type === 'application/pdf') return 'pdf';
-    if (file.name.match(/\.(doc|docx|md)$/i)) return 'doc';
+    if (file.name.match(/\.(docx)$/i)) return 'doc'; // mammoth specifically handles .docx
     return 'other';
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files).map(file => ({
-        file,
-        preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
-        id: Math.random().toString(36).substring(7),
-        type: getFileType(file)
-      }));
-      setAttachments(prev => [...prev, ...newFiles].slice(0, 20));
+      const filesArray = Array.from(e.target.files);
+      filesArray.forEach(file => {
+        const id = Math.random().toString(36).substring(7);
+        const type = getFileType(file);
+        const newFile: FileWithPreview = {
+          file,
+          preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : '',
+          id,
+          type
+        };
+        setAttachments(prev => [...prev, newFile].slice(0, 20));
+        // ponytail: logic for docx preview generation
+        if (file.name.endsWith(".docx")) {
+          const reader = new FileReader();
+          reader.onload = async (loadEvent) => {
+            const arrayBuffer = loadEvent.target?.result as ArrayBuffer;
+            try {
+              const result = await mammoth.convertToHtml({ arrayBuffer });
+              setAttachments(prev => prev.map(attr => 
+                attr.id === id ? { ...attr, htmlPreview: result.value } : attr
+              ));
+            } catch (err) {
+              console.error("Mammoth error:", err);
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      });
     }
   };
   const removeFile = (id: string) => {
@@ -276,6 +299,13 @@ export default function OrderPage() {
                     {attr.type === 'image' ? (
                       <div className="relative w-full h-full flex items-center justify-center px-4">
                         <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />
+                      </div>
+                    ) : attr.type === 'doc' && attr.htmlPreview ? (
+                      <div className="w-full max-w-4xl max-h-[85vh] overflow-auto bg-white rounded-2xl p-8 md:p-16 shadow-2xl animate-reveal">
+                        <div 
+                          className="prose-doc text-black [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:mb-4 [&_p]:leading-relaxed" 
+                          dangerouslySetInnerHTML={{ __html: attr.htmlPreview }} 
+                        />
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
