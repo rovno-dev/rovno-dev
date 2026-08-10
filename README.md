@@ -4,7 +4,7 @@ This repository contains the source code for the Rovno.dev agency web applicatio
 
 ## Project Structure
 
-- **webapp**: The Next.js application built with Tailwind CSS v4 and Unideka UI.
+- **website**: The Next.js application built with Tailwind CSS v4 and Unideka UI.
 - **backend**: Docker configuration for the Fake API service and its database.
 - **docker-compose.yml**: The root orchestration file that coordinates Traefik and the sub-services.
 - **Makefile**: The primary entry point for managing the local and production environments.
@@ -14,7 +14,7 @@ This repository contains the source code for the Rovno.dev agency web applicatio
 ### Prerequisites
 
 - Docker and Docker Compose
-- Node.js (for local webapp development)
+- Node.js (for local website development)
 - Access to modify your system hosts file
 
 ### 1. (optinoal) Configure Hosts
@@ -56,7 +56,7 @@ The web application will be accessible at http://localhost.
 
 Traefik handles routing and SSL termination. In production, it automatically provisions certificates via Let's Encrypt using the TLS challenge. The configuration is logic-driven based on environment variables, eliminating the need to manually edit YAML files between deployments.
 
-### Next.js (Webapp)
+### Next.js (website)
 
 The frontend is a Next.js application running in standalone mode for optimized Docker performance. It uses Tailwind CSS v4 for styling and follows high-performance standards.
 

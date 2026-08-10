@@ -8,7 +8,7 @@ This repository is a dual-stack digital agency platform (Rovno.dev).
 - **Infrastructure**: Docker Compose, Traefik (Proxy), GitHub Actions.
 
 ## Directory Map
-- `webapp/`: Next.js application. Logic is in `app/`, reusable UI in `components/ui/`.
+- `website/`: Next.js application. Logic is in `app/`, reusable UI in `components/ui/`.
 - `backend/services/main-service/`: FastAPI service. Follows `app/api/v1/`, `app/models/`, `app/schemas/`, and `app/services/` structure.
 - `.agents/skills/`: Custom AI workflows. Use these commands to maintain standards.
 

@@ -1,8 +1,8 @@
 # CONTEXT.md — Domain Model & Glossary
 
 ## Glossary
-- **Expert**: Team member (e.g., Niyaz, Mikhail). Found in `webapp/app/[slug]/(Expert)/_data.tsx`.
-- **Project**: Agency case study with metrics and media. Found in `webapp/app/[slug]/(Project)/_data.tsx`.
+- **Expert**: Team member (e.g., Niyaz, Mikhail). Found in `website/app/[slug]/(Expert)/_data.tsx`.
+- **Project**: Agency case study with metrics and media. Found in `website/app/[slug]/(Project)/_data.tsx`.
 - **Client**: Organizations for whom projects are built.
 - **Order**: Lead generation via Yandex Forms.
 - **Main Service**: The core API handling Auth (OTP/Email), User management, and Product/Project catalogs.

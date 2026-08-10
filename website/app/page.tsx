@@ -3,10 +3,10 @@
 
 "use client";
 
-import BestWorksSection from "./best-projects-section";
-import HeroSection from "./hero-section";
-import ServicesSection from "./services-section";
-import SocialsSection from "./socials-section";
+import BestWorksSection from "./_components/best-projects-section";
+import HeroSection from "./_components/hero-section";
+import ServicesSection from "./_components/services-section";
+import SocialsSection from "./_components/socials-section";
 
 export default function Home() {
   return (
