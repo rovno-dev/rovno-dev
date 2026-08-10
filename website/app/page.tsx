@@ -1,8 +1,6 @@
-/* LLM context: Enhancing HeroSection with architectural background lines and glassmorphic illustration cards to match high-end aesthetics. 
-   Using predefined glass variables and backdrop blurs while maintaining existing structure and content. */
-
 "use client";
 
+import { ScrollReveal } from "@/components/layout/scroll-reveal";
 import BestWorksSection from "./_components/best-projects-section";
 import HeroSection from "./_components/hero-section";
 import ServicesSection from "./_components/services-section";
@@ -12,9 +10,18 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <BestWorksSection />
-      <ServicesSection />
-      <SocialsSection />
+
+      <ScrollReveal threshold={0.15}>
+        <BestWorksSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={100} threshold={0.2}>
+        <ServicesSection />
+      </ScrollReveal>
+
+      <ScrollReveal delay={150} threshold={0.2}>
+        <SocialsSection />
+      </ScrollReveal>
     </>
   );
 }
