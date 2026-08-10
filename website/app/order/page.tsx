@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
-import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, ArticleIcon, InfoIcon } from "@/components/icons";
+import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -42,17 +42,29 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
-  
+
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Keyboard navigation for Carousel
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!api || !lightboxOpen) return;
+    if (e.key === "ArrowLeft") api.scrollPrev();
+    if (e.key === "ArrowRight") api.scrollNext();
+  }, [api, lightboxOpen]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   useEffect(() => {
     if (!api || !lightboxOpen) return;
     const timer = setTimeout(() => {
-        api.scrollTo(activeIndex, true);
+      api.scrollTo(activeIndex, true);
     }, 50);
     return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
@@ -123,7 +135,7 @@ export default function OrderPage() {
         <Container>
           <div className="max-w-[800px] animate-reveal">
             <h1 className="text-display-1 text-(--on-bg-high) mb-6 uppercase tracking-tighter leading-none">Бриф на разработку</h1>
-            <p className="text-body-1 text-(--on-bg-medium) leading-relaxed font-medium text-balance">
+            <p className="text-body-1 text-(--on-bg-medium) leading-relaxed font-medium">
               Опишите вашу задачу и мы подготовим предложение в течение рабочего дня.
             </p>
           </div>
@@ -196,33 +208,34 @@ export default function OrderPage() {
                 <div key={attr.id} className="relative aspect-square group rounded-2xl border border-(--outline) overflow-hidden bg-card transition-shadow hover:shadow-lg">
                   <div className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-4 relative" onClick={() => openLightbox(idx)}>
                     {attr.type === 'image' ? (
-                      <Image src={attr.preview} alt="preview" fill className="object-cover transition-transform group-hover:scale-105" />
+                      <Image src={attr.preview} alt="preview" fill className="object-contain transition-transform group-hover:scale-105" />
                     ) : (
                       <>
                         <div className={cn(
-                            "size-14 rounded-xl flex items-center justify-center mb-2 transition-colors",
-                            attr.type === 'pdf' ? "bg-red-50 text-red-600 dark:bg-red-950/30" : "bg-blue-50 text-blue-600 dark:bg-blue-950/30"
+                          "size-14 rounded-xl flex items-center justify-center mb-2 transition-colors",
+                          attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500"
                         )}>
-                            <ArticleIcon className="size-8!" />
+                          <ArticleIcon className="size-8! fill-current" />
                         </div>
                         <span className="text-[11px] font-semibold text-(--on-bg-medium) text-center break-all line-clamp-2 px-1">
-                            {attr.file.name}
+                          {attr.file.name}
                         </span>
                         <div className="absolute bottom-2 left-0 w-full text-center">
-                            <span className="text-[9px] uppercase tracking-widest text-(--on-bg-low) font-bold opacity-60">
-                                {attr.file.name.split('.').pop()}
-                            </span>
+                          <span className="text-[9px] uppercase tracking-widest text-(--on-bg-low) font-bold opacity-60">
+                            {attr.file.name.split('.').pop()}
+                          </span>
                         </div>
                       </>
                     )}
                   </div>
-                  <button
-                    type="button"
+                  <Button
+                    size={'icon-small'}
+                    variant={'glass'}
                     onClick={(e) => { e.stopPropagation(); removeFile(attr.id); }}
-                    className="absolute top-2 right-2 z-10 size-7 flex items-center justify-center rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-black hover:scale-110 backdrop-blur-md"
+                    className="absolute top-2 right-2 z-10 size-7 flex items-center justify-center rounded-full"
                   >
-                    <CloseSmallIcon className="size-5" />
-                  </button>
+                    <CloseSmallIcon className="size-5!" />
+                  </Button>
                 </div>
               ))}
               {attachments.length < 20 && (
@@ -238,13 +251,13 @@ export default function OrderPage() {
                 </button>
               )}
             </div>
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                multiple 
-                onChange={handleFileChange} 
-                accept="image/*,.pdf,.doc,.docx,.md,.txt,.zip,.rar"
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              multiple
+              onChange={handleFileChange}
+              accept="image/*,.pdf,.doc,.docx,.md,.txt,.zip,.rar,.7zip"
             />
           </div>
 
@@ -266,9 +279,17 @@ export default function OrderPage() {
       </Container>
 
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-x-0 !translate-y-0">
-          <Button variant="text" className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full" size="icon-medium" onClick={() => setLightboxOpen(false)}>
-            <CloseSmallIcon className="size-8!" />
+        <DialogContent
+          showCloseButton={false}
+          className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-x-0 !translate-y-0"
+        >
+          <Button
+            variant="text"
+            className="absolute top-4 right-4 z-50 text-white/50 hover:text-white hover:bg-white/10 rounded-full"
+            size="icon-medium"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <CloseSmallIcon className="size-10!" />
           </Button>
 
           <Carousel setApi={setApi} className="w-full h-full">
@@ -278,27 +299,27 @@ export default function OrderPage() {
                   <div className="relative w-full h-full max-w-6xl max-h-[85vh] flex items-center justify-center">
                     {attr.type === 'image' ? (
                       <div className="relative w-full h-full flex items-center justify-center px-4">
-                         <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />
+                        <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-white/[0.03] backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
+                      <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
                         <div className={cn(
-                            "size-32 rounded-3xl flex items-center justify-center shadow-inner",
-                            attr.type === 'pdf' ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500"
+                          "size-32 rounded-3xl flex items-center justify-center shadow-inner",
+                          attr.type === 'pdf' ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500"
                         )}>
-                          <ArticleIcon className="size-16!" />
+                          <ArticleIcon className="size-16! [&>path]:fill-(--dark-1)!" />
                         </div>
                         <div className="space-y-3">
-                           <h2 className="text-display-3 text-white break-all line-clamp-3 px-4 leading-tight">{attr.file.name}</h2>
-                           <div className="flex items-center justify-center gap-2">
-                             <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest">
-                                {attr.file.name.split('.').pop()}
-                             </span>
-                             <span className="text-body-4 text-white/40">{(attr.file.size / 1024 / 1024).toFixed(2)} MB</span>
-                           </div>
+                          <h2 className="text-display-3 text-white break-all line-clamp-3 px-4 leading-tight">{attr.file.name}</h2>
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest">
+                              {attr.file.name.split('.').pop()}
+                            </span>
+                            <span className="text-body-4 text-(--dark-1)">{(attr.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                          </div>
                         </div>
-                        <Button variant="glass" shape="round" size="large" className="w-full h-14! text-base!" asChild>
-                           <a href={URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать документ</a>
+                        <Button variant="glass" shape="round" size="large" className="w-full h-14! text-base! text-white!" asChild>
+                          <a href={URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать документ</a>
                         </Button>
                       </div>
                     )}
