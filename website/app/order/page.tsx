@@ -187,7 +187,7 @@ export default function OrderPage() {
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
           <div className="space-y-4">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">1. Тип услуги</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               {SERVICE_TYPES.map((service) => (
                 <label key={service} className={cn("flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-card", selectedServices.includes(service) ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)" : "border-(--outline) hover:border-(--primary-card)")}>
                   <Checkbox checked={selectedServices.includes(service)} onCheckedChange={(checked) => {
@@ -206,16 +206,16 @@ export default function OrderPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">Желаемые сроки</label>
+                <label className="text-body-4 text-(--on-bg-low)">Желаемые сроки</label>
                 <Select name="deadline">
-                  <SelectTrigger className="w-full h-12! rounded-xl! bg-card border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите срок" /></SelectTrigger>
+                  <SelectTrigger className="w-full h-12! rounded-xl! border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите срок" /></SelectTrigger>
                   <SelectContent>{DEADLINE_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">Ориентировочный бюджет</label>
-                <Select name="budget">
-                  <SelectTrigger className="w-full h-12! rounded-xl! bg-card border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите бюджет" /></SelectTrigger>
+                <label className="text-body-4 text-(--on-bg-low)">Ориентировочный бюджет</label>
+                <Select name="budget" defaultValue="">
+                  <SelectTrigger className="w-full h-12! rounded-xl! border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите бюджет" /></SelectTrigger>
                   <SelectContent>{BUDGET_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
@@ -224,6 +224,7 @@ export default function OrderPage() {
 
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. Файлы (макс. 10мб.)</h3>
+            <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}. Остальные файлы можно отправить во время обсуждения заказа.</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {attachments.map((attr, idx) => (
                 <div key={attr.id} className="relative aspect-square group rounded-2xl border border-(--outline) overflow-hidden bg-card transition-shadow hover:shadow-lg">
@@ -249,7 +250,7 @@ export default function OrderPage() {
 
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Контакты</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Input name="user_name" required placeholder="Ваше имя" className="h-12! rounded-xl!" />
               <Input name="user_contact" required placeholder="Телефон или Telegram" className="h-12! rounded-xl!" />
               <Input name="user_email" type="email" placeholder="Email (необязательно)" className="h-12! rounded-xl!" />
