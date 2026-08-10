@@ -25,15 +25,13 @@ async def notify_bot(order_data: dict, file_paths: List[str]):
         f"🚀 <b>Новый заказ!</b>\n\n"
         f"🆔 <b>ID:</b> <code>{order_data['id']}</code>\n"
         f"🛠 <b>Услуги:</b> {html.escape(services_str)}\n"
-        f"🏢 <b>Компания:</b> {html.escape(order_data.get('company_name') or '—')}\n"
-        f"❓ <b>Нейминг:</b> {html.escape(order_data.get('naming_help') or '—')}\n"
+        f"🏢 <b>Наименование компании:</b> {html.escape(order_data.get('company_name') or '—')}\n"
+        f"❓ <b>Нужен ли нейминг:</b> {html.escape(order_data.get('naming_help') or '—')}\n"
         f"📝 <b>Описание:</b> {html.escape(order_data.get('description') or '—')}\n"
         f"📅 <b>Сроки:</b> {html.escape(order_data.get('deadline') or '—')}\n"
         f"💰 <b>Бюджет:</b> {html.escape(order_data.get('budget') or '—')}\n\n"
         f"👤 <b>Заказчик:</b> {html.escape(order_data['user_name'])}\n"
         f"📞 <b>Контакт:</b> {html.escape(order_data['user_contact'])}\n"
-        f"📧 <b>Email:</b> {html.escape(order_data.get('user_email') or '—')}\n"
-        f"🔗 <b>Референсы:</b> {html.escape(order_data.get('references') or '—')}"
     )
 
     async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
@@ -70,8 +68,6 @@ async def create_order(
     budget: Optional[str] = Form(None),
     user_name: str = Form(...),
     user_contact: str = Form(...),
-    user_email: Optional[str] = Form(None),
-    references: Optional[str] = Form(None),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db)
 ):

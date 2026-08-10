@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { toast } from "sonner";
-import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
+import { CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -37,7 +36,7 @@ interface FileWithPreview {
   preview: string | null;
   htmlPreview?: string;
   id: string;
-  type: 'image' | 'pdf' | 'doc' | 'docx' | 'md' | 'mdx' | 'other';
+  type: 'image' | 'pdf' | 'doc' | 'md' | 'other';
 }
 
 const AVALIABLE_FILE_TYPES = 'image/*, .pdf, .docx, .doc, .md, .mdx, .xls, .xlsx, .zip, .7zip';
@@ -70,11 +69,12 @@ export default function OrderPage() {
     return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
 
-  const getFileType = (file: File): 'image' | 'pdf' | 'doc' | 'other' => {
+  const getFileType = (file: File): 'image' | 'pdf' | 'doc' | 'md' | 'other' => {
     const name = file.name.toLowerCase();
     if (file.type.startsWith('image/') || name.match(/\.(jpg|jpeg|png|gif|webp)$/)) return 'image';
     if (file.type === 'application/pdf' || name.endsWith('.pdf')) return 'pdf';
-    if (name.endsWith('.docx')) return 'doc';
+    if (name.endsWith('.docx') || name.endsWith('.doc')) return 'doc';
+    if (name.endsWith('.md') || name.endsWith('.mdx')) return 'md';
     return 'other';
   };
 
@@ -84,8 +84,6 @@ export default function OrderPage() {
       filesArray.forEach(file => {
         const id = Math.random().toString(36).substring(7);
         const type = getFileType(file);
-
-        // Generate blob URL for images and PDFs
         const isPreviewable = type === 'image' || type === 'pdf';
         const previewUrl = isPreviewable ? URL.createObjectURL(file) : null;
 
@@ -98,7 +96,6 @@ export default function OrderPage() {
 
         setAttachments(prev => [...prev, newFile].slice(0, 20));
 
-        // Generate Word preview if docx
         if (type === 'doc') {
           const reader = new FileReader();
           reader.onload = async (loadEvent) => {
@@ -113,6 +110,26 @@ export default function OrderPage() {
             }
           };
           reader.readAsArrayBuffer(file);
+        }
+
+        if (type === 'md') {
+          const reader = new FileReader();
+          reader.onload = (loadEvent) => {
+            const text = loadEvent.target?.result as string;
+            // Simple markdown parsing for preview
+            const html = text
+              .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+              .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+              .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+              .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
+              .replace(/\*(.*)\*/gim, '<i>$1</i>')
+              .replace(/\n/gim, '<br />');
+            
+            setAttachments(prev => prev.map(attr =>
+              attr.id === id ? { ...attr, htmlPreview: html } : attr
+            ));
+          };
+          reader.readAsText(file);
         }
       });
     }
@@ -173,7 +190,6 @@ export default function OrderPage() {
 
       <Container className="mt-12">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
-          {/* Services */}
           <div className="space-y-4">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">1. Тип услуги</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -198,7 +214,6 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {/* Description */}
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
             <Field>
@@ -211,7 +226,6 @@ export default function OrderPage() {
             </Field>
           </div>
 
-          {/* Files */}
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. Файлы (макс. - 10мб.)</h3>
             <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}</p>
@@ -273,7 +287,6 @@ export default function OrderPage() {
             />
           </div>
 
-          {/* Contacts */}
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -285,13 +298,11 @@ export default function OrderPage() {
           <div className="pt-8">
             <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl! text-lg! uppercase tracking-tighter" disabled={loading}>
               {loading ? "Отправка..." : "Отправить заявку"}
-              {/* <KeyboardArrowRightIcon className="size-6" /> */}
             </Button>
           </div>
         </form>
       </Container>
 
-      {/* Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent
           showCloseButton={false}
@@ -305,74 +316,52 @@ export default function OrderPage() {
           >
             <CloseSmallIcon className="size-10! [&>path]:fill-(--white)" />
           </Button>
-
           <Carousel setApi={setApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">
               {attachments.map((attr) => (
                 <CarouselItem key={attr.id} className="h-full flex items-center justify-center p-0">
                   <div className="relative w-full h-full flex items-center justify-center">
-
-                    {/* 1. IMAGE PREVIEW */}
                     {attr.type === 'image' && attr.preview ? (
                       <div className="relative w-full h-full flex items-center justify-center px-4">
                         <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />
                       </div>
-                    ) :
-
-                      /* 2. PDF PREVIEW */
-                      attr.type === 'pdf' && attr.preview ? (
-                        <div className="w-full h-full flex items-center justify-center p-4 pt-16 md:p-12 md:pt-20">
-                          <iframe
-                            src={attr.preview}
-                            className="w-full h-full rounded-xl bg-white border-0 overflow-hidden"
-                            title={attr.file.name}
-                          />
+                    ) : attr.type === 'pdf' && attr.preview ? (
+                      <div className="w-full h-full flex items-center justify-center p-4 pt-16 md:p-12 md:pt-20">
+                        <iframe
+                          src={attr.preview}
+                          className="w-full h-full rounded-xl bg-white border-0 overflow-hidden"
+                          title={attr.file.name}
+                        />
+                      </div>
+                    ) : (attr.type === 'doc' || attr.type === 'md') && attr.htmlPreview ? (
+                      <div className="w-full max-w-4xl max-h-[85vh] overflow-auto bg-white rounded-2xl p-8 md:p-16 shadow-2xl animate-reveal">
+                        <div
+                          className="prose-doc text-black [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:mb-4 [&_p]:leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: attr.htmlPreview }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
+                        <div className={cn(
+                          "size-32 rounded-3xl flex items-center justify-center shadow-inner",
+                          attr.type === 'pdf' ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500"
+                        )}>
+                          <ArticleIcon className="size-16! [&>path]:fill-(--dark-1)!" />
                         </div>
-                      ) :
-
-                        /* 3. DOCX PREVIEW (MAMMOTH) */
-                        (attr.type === 'doc' || attr.type === 'docx') && attr.htmlPreview ? (
-                          <div className="w-full max-w-4xl max-h-[85vh] overflow-auto bg-white rounded-2xl p-8 md:p-16 shadow-2xl animate-reveal">
-                            <div
-                              className="prose-doc text-black [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:mb-4 [&_p]:leading-relaxed"
-                              dangerouslySetInnerHTML={{ __html: attr.htmlPreview }}
-                            />
+                        <div className="space-y-3">
+                          <h2 className="text-display-3 text-white break-all line-clamp-3 px-4 leading-tight">{attr.file.name}</h2>
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest">
+                              {attr.file.name.split('.').pop()}
+                            </span>
+                            <span className="text-body-4 text-(--dark-1)">{(attr.file.size / 1024 / 1024).toFixed(2)} MB</span>
                           </div>
-                        ) :
-
-                          /* 4. MD PREVIEW (MAMMOTH) */
-                          (attr.type === 'md' || attr.type === 'mdx') && attr.htmlPreview ? (
-                            <div className="w-full max-w-4xl max-h-[85vh] overflow-auto bg-white rounded-2xl p-8 md:p-16 shadow-2xl animate-reveal">
-                              <div
-                                className="prose-doc text-black [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:mb-4 [&_p]:leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: attr.htmlPreview }}
-                              />
-                            </div>
-                          ) :
-
-                            /* 5. FALLBACK CARD (OTHER FILES) */
-                            (
-                              <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg animate-reveal shadow-2xl">
-                                <div className={cn(
-                                  "size-32 rounded-3xl flex items-center justify-center shadow-inner",
-                                  attr.type === 'pdf' ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500"
-                                )}>
-                                  <ArticleIcon className="size-16! [&>path]:fill-(--dark-1)!" />
-                                </div>
-                                <div className="space-y-3">
-                                  <h2 className="text-display-3 text-white break-all line-clamp-3 px-4 leading-tight">{attr.file.name}</h2>
-                                  <div className="flex items-center justify-center gap-2">
-                                    <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest">
-                                      {attr.file.name.split('.').pop()}
-                                    </span>
-                                    <span className="text-body-4 text-(--dark-1)">{(attr.file.size / 1024 / 1024).toFixed(2)} MB</span>
-                                  </div>
-                                </div>
-                                <Button variant="glass" shape="round" size="large" className="w-full h-14! text-base! text-white!" asChild>
-                                  <a href={attr.preview || URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать документ</a>
-                                </Button>
-                              </div>
-                            )}
+                        </div>
+                        <Button variant="glass" shape="round" size="large" className="w-full h-14! text-base! text-white!" asChild>
+                          <a href={attr.preview || URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать документ</a>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CarouselItem>
               ))}
