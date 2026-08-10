@@ -1,7 +1,7 @@
 /* LLM context: Refactoring Dispatcher logic to resolve projects by their internal unique ID instead of record keys. */
 
 import ExpertPage from "./(Expert)/expert-page";
-import ProjectPage from "./(Project)/project-page";
+import ProjectPage from "./(Project)/page";
 import { PROJECTS } from "./(Project)/_data";
 import { EXPERTS_DATA } from "./(Expert)/_data";
 import { notFound } from "next/navigation";

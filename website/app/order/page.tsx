@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
-import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon } from "@/components/icons";
+import { KeyboardArrowRightIcon, CloudIcon, CloseSmallIcon, KeyboardArrowLeftIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const SERVICE_TYPES = [
   "Логотип / Фирменный стиль / Брендбук",
@@ -32,7 +41,21 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
+
+  // Lightbox State
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const imageAttachments = attachments.filter(a => a.preview !== '');
+
+  // Sync carousel position when index changes from outside (grid click)
+  useEffect(() => {
+    if (!api || !lightboxOpen) return;
+    api.scrollTo(activeIndex, true);
+  }, [api, activeIndex, lightboxOpen]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -51,20 +74,25 @@ export default function OrderPage() {
 
   const removeFile = (id: string) => {
     setAttachments(prev => {
-      const filtered = prev.filter(f => f.id !== id);
       const target = prev.find(f => f.id === id);
       if (target?.preview) URL.revokeObjectURL(target.preview);
-      return filtered;
+      return prev.filter(f => f.id !== id);
     });
+  };
+
+  const openLightbox = (id: string) => {
+    const idx = imageAttachments.findIndex(img => img.id === id);
+    if (idx !== -1) {
+      setActiveIndex(idx);
+      setLightboxOpen(true);
+    }
   };
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-
     const form = e.currentTarget;
     const formData = new FormData(form);
-
     formData.append("services", JSON.stringify(selectedServices));
     attachments.forEach((attr) => {
       formData.append("files", attr.file);
@@ -75,7 +103,6 @@ export default function OrderPage() {
         method: "POST",
         body: formData,
       });
-
       if (res.ok) {
         toast.success("Заявка успешно отправлена!");
         form.reset();
@@ -106,7 +133,6 @@ export default function OrderPage() {
 
       <Container className="mt-12">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
-
           {/* 1. Services */}
           <div className="space-y-4">
             <h3 className="text-display-4 uppercase tracking-tight">1. Тип услуги</h3>
@@ -167,14 +193,16 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {/* 4. Files Manager (Avito Style) */}
+          {/* 4. Files Manager (Avito/Telegram Style) */}
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight">4. Файлы (медиа, тз, заготовки и т.п.)</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {attachments.map((attr) => (
                 <div key={attr.id} className="relative aspect-square group rounded-xl border border-(--outline) overflow-hidden bg-(--card)">
                   {attr.preview ? (
-                    <Image src={attr.preview} alt="preview" fill className="object-cover" />
+                    <div className="cursor-pointer w-full h-full relative" onClick={() => openLightbox(attr.id)}>
+                      <Image src={attr.preview} alt="preview" fill className="object-cover transition-transform group-hover:scale-105" />
+                    </div>
                   ) : (
                     <div className="flex items-center justify-center h-full p-2 text-center text-[10px] break-all text-(--on-bg-low)">
                       {attr.file.name}
@@ -183,13 +211,12 @@ export default function OrderPage() {
                   <button
                     type="button"
                     onClick={() => removeFile(attr.id)}
-                    className="absolute top-1 right-1 size-6 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1.5 right-1.5 z-10 size-6 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md"
                   >
                     <CloseSmallIcon className="size-4" />
                   </button>
                 </div>
               ))}
-
               {attachments.length < 20 && (
                 <button
                   type="button"
@@ -226,9 +253,50 @@ export default function OrderPage() {
               <KeyboardArrowRightIcon className="size-6" />
             </Button>
           </div>
-
         </form>
       </Container>
+
+      {/* Telegram-style Multi-image Lightbox */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent
+          className="!fixed !inset-0 !z-50 !flex !items-center !justify-center !w-screen !h-screen !max-w-none !max-h-none !p-0 !border-0 !bg-black/95 !rounded-none !translate-x-0 !translate-y-0 !top-0 !left-0"
+          showCloseButton={false}
+        >
+          <Button
+            variant="text"
+            className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
+            size="icon-medium"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <CloseSmallIcon className="size-6!" />
+          </Button>
+
+          <Carousel setApi={setApi} className="w-full h-full">
+            <CarouselContent className="h-screen ml-0">
+              {imageAttachments.map((img, index) => (
+                <CarouselItem key={img.id} className="h-full flex items-center justify-center p-0 pl-0">
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <Image
+                      src={img.preview}
+                      alt={`Preview ${index + 1}`}
+                      fill
+                      className="object-contain"
+                      sizes="100vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {imageAttachments.length > 1 && (
+              <>
+                <CarouselPrevious className="left-6 z-50 bg-white/10 text-white hover:bg-white/20 border-0" />
+                <CarouselNext className="right-6 z-50 bg-white/10 text-white hover:bg-white/20 border-0" />
+              </>
+            )}
+          </Carousel>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
