@@ -28,9 +28,9 @@ async def notify_bot(order_data: dict, file_paths: List[str]):
         f"🏢 <b>Наименование компании:</b> {html.escape(order_data.get('company_name') or '—')}\n"
         f"❓ <b>Нужен ли нейминг:</b> {html.escape(order_data.get('naming_help') or '—')}\n"
         f"📝 <b>Описание:</b> {html.escape(order_data.get('description') or '—')}\n"
-        f"📅 <b>Сроки:</b> {html.escape(order_data.get('deadline') or '—')}\n"
-        f"💰 <b>Бюджет:</b> {html.escape(order_data.get('budget') or '—')}\n\n"
-        f"👤 <b>Заказчик:</b> {html.escape(order_data['user_name'])}\n"
+        f"📅 <b>Ориентировочные сроки:</b> {html.escape(order_data.get('deadline') or '—')}\n"
+        f"💰 <b>Ориентировочный бюджет:</b> {html.escape(order_data.get('budget') or '—')}\n\n"
+        f"👤 <b>Имя заказчика:</b> {html.escape(order_data['user_name'])}\n"
         f"📞 <b>Контакт:</b> {html.escape(order_data['user_contact'])}\n"
     )
 

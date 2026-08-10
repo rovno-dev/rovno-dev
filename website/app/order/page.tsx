@@ -28,7 +28,7 @@ const SERVICE_TYPES = [
   "2д анимация (анимация логотипа, социальные ролики), Монтаж, Склейка",
   "3D-моделирование, 3D-анимация (имиджевый ролик, коммерческий, социальный)",
   "Реклама и продвижение (SEO, Таргет, Контекст)",
-  "Другое (опишу ниже, в графе «О проекте»"
+  "Что-либо другое (опишу ниже, в графе «О проекте»"
 ];
 
 interface FileWithPreview {
@@ -124,7 +124,7 @@ export default function OrderPage() {
               .replace(/\*\*(.*)\*\*/gim, '<b>$1</b>')
               .replace(/\*(.*)\*/gim, '<i>$1</i>')
               .replace(/\n/gim, '<br />');
-            
+
             setAttachments(prev => prev.map(attr =>
               attr.id === id ? { ...attr, htmlPreview: html } : attr
             ));
@@ -198,7 +198,7 @@ export default function OrderPage() {
                   key={service}
                   className={cn(
                     "flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-card",
-                    selectedServices.includes(service) ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)" : "border-(--outline) hover:border-(--on-bg-low)"
+                    selectedServices.includes(service) ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)" : "border-(--outline) hover:border-(--primary-card)"
                   )}
                 >
                   <Checkbox
