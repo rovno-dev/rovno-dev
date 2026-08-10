@@ -20,7 +20,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-
 const SERVICE_TYPES = [
   "Логотип / Фирменный стиль / Брендбук",
   "Дизайн презентации / Коммерческое предложение",
@@ -30,37 +29,29 @@ const SERVICE_TYPES = [
   "Реклама и продвижение (SEO, Таргет, Контекст)",
   "Другое (опишу ниже, в графе «О проекте»"
 ];
-
 interface FileWithPreview {
   file: File;
   preview: string;
   id: string;
   type: 'image' | 'pdf' | 'doc' | 'other';
 }
-
 export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
-
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Keyboard navigation for Carousel
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!api || !lightboxOpen) return;
     if (e.key === "ArrowLeft") api.scrollPrev();
     if (e.key === "ArrowRight") api.scrollNext();
   }, [api, lightboxOpen]);
-
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
-
   useEffect(() => {
     if (!api || !lightboxOpen) return;
     const timer = setTimeout(() => {
@@ -68,14 +59,12 @@ export default function OrderPage() {
     }, 50);
     return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
-
   const getFileType = (file: File): 'image' | 'pdf' | 'doc' | 'other' => {
     if (file.type.startsWith('image/')) return 'image';
     if (file.type === 'application/pdf') return 'pdf';
     if (file.name.match(/\.(doc|docx|md)$/i)) return 'doc';
     return 'other';
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files).map(file => ({
@@ -87,7 +76,6 @@ export default function OrderPage() {
       setAttachments(prev => [...prev, ...newFiles].slice(0, 20));
     }
   };
-
   const removeFile = (id: string) => {
     setAttachments(prev => {
       const target = prev.find(f => f.id === id);
@@ -95,12 +83,10 @@ export default function OrderPage() {
       return prev.filter(f => f.id !== id);
     });
   };
-
   const openLightbox = (index: number) => {
     setActiveIndex(index);
     setLightboxOpen(true);
   };
-
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -108,7 +94,6 @@ export default function OrderPage() {
     const formData = new FormData(form);
     formData.append("services", JSON.stringify(selectedServices));
     attachments.forEach((attr) => formData.append("files", attr.file));
-
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
         method: "POST",
@@ -128,7 +113,6 @@ export default function OrderPage() {
       setLoading(false);
     }
   }
-
   return (
     <main className="min-h-screen bg-(--bg) pb-20">
       <section className="py-12 md:py-20 border-b border-(--outline)">
@@ -141,7 +125,6 @@ export default function OrderPage() {
           </div>
         </Container>
       </section>
-
       <Container className="mt-12">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
           <div className="space-y-4">
@@ -167,7 +150,6 @@ export default function OrderPage() {
               ))}
             </div>
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
             <Field>
@@ -179,7 +161,6 @@ export default function OrderPage() {
               />
             </Field>
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. О компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,7 +181,6 @@ export default function OrderPage() {
               </Field>
             </div>
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (media, md, docx, pdf)</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -260,7 +240,6 @@ export default function OrderPage() {
               accept="image/*,.pdf,.doc,.docx,.md,.txt,.zip,.rar,.7zip"
             />
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -268,7 +247,6 @@ export default function OrderPage() {
               <Input name="user_contact" required placeholder="Телефон или Telegram" className="h-12! rounded-xl!" />
             </div>
           </div>
-
           <div className="pt-8">
             <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl! text-lg! uppercase tracking-tighter" disabled={loading}>
               {loading ? "Отправка..." : "Отправить заявку"}
@@ -277,26 +255,24 @@ export default function OrderPage() {
           </div>
         </form>
       </Container>
-
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent
           showCloseButton={false}
-          className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-x-0 !translate-y-0"
+          className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0"
         >
           <Button
             variant="text"
-            className="absolute top-4 right-4 z-50 text-white/50 hover:text-white hover:bg-white/10 rounded-full"
+            className="absolute top-4 right-4 z-[60] text-white/50 hover:text-white hover:bg-white/10 rounded-full"
             size="icon-medium"
             onClick={() => setLightboxOpen(false)}
           >
             <CloseSmallIcon className="size-10!" />
           </Button>
-
           <Carousel setApi={setApi} className="w-full h-full">
-            <CarouselContent className="h-screen ml-0">
+            <CarouselContent className="h-[100dvh] ml-0">
               {attachments.map((attr) => (
                 <CarouselItem key={attr.id} className="h-full flex items-center justify-center p-0">
-                  <div className="relative w-full h-full max-w-6xl max-h-[85vh] flex items-center justify-center">
+                  <div className="relative w-full h-full flex items-center justify-center">
                     {attr.type === 'image' ? (
                       <div className="relative w-full h-full flex items-center justify-center px-4">
                         <Image src={attr.preview} alt={attr.file.name} fill className="object-contain" sizes="100vw" priority />

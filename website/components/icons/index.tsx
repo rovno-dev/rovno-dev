@@ -26,6 +26,7 @@ export * from "./unideka-icons/system-theme-icon"
 export * from "./unideka-icons/article-icon"
 export * from "./unideka-icons/deployed-code-icon"
 export * from "./unideka-icons/cloud-icon"
+export * from "./unideka-icons/work-icon"
 
 export * from "./logotypes/chrome-logotype-icon"
 export * from "./logotypes/telegram-logotype-icon"

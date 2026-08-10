@@ -14,7 +14,7 @@ export function MediaLightbox({ src, alt, children }: { src: string; alt: string
       <DialogTrigger asChild>{children}</DialogTrigger>
       {/* Force fullscreen by overriding all centering and constraints */}
       <DialogContent
-        className="!fixed !inset-0 !z-50 !flex !items-center !justify-center !w-screen !h-screen !max-w-none !max-h-none !p-0 !border-0 !bg-black/95 !rounded-none !translate-x-0 !translate-y-0 !top-0 !left-0"
+        className="!fixed !inset-0 !z-50 !flex !items-center !justify-center !w-screen !h-screen !max-w-none !max-h-none !p-0 !border-0 !bg-black/95 !rounded-none !translate-none !top-0 !left-0"
         showCloseButton={false}
         style={{ transform: 'none' }}
       >
