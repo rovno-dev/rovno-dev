@@ -19,7 +19,7 @@ const SERVICE_TYPES = [
   "Моушн-дизайн / Видеоролик / Анимация",
   "3D-моделирование / Визуализация / 3D-анимация",
   "Реклама и продвижение (SEO, Таргет, Контекст)",
-  "Другое (опишу ниже)"
+  "Другое (опишу ниже, в графе «О компании»)"
 ];
 
 interface FileWithPreview {
@@ -61,10 +61,10 @@ export default function OrderPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    
+
     const form = e.currentTarget;
     const formData = new FormData(form);
-    
+
     formData.append("services", JSON.stringify(selectedServices));
     attachments.forEach((attr) => {
       formData.append("files", attr.file);
@@ -98,7 +98,7 @@ export default function OrderPage() {
           <div className="max-w-[800px] animate-reveal">
             <h1 className="text-display-1 text-(--on-bg-high) mb-6 uppercase tracking-tighter">Бриф на разработку</h1>
             <p className="text-body-1 text-(--on-bg-medium) leading-relaxed">
-              Опишите вашу задачу, и мы подготовим предложение в течение рабочего дня.
+              Опишите вашу задачу и мы подготовим предложение в течение рабочего дня.
             </p>
           </div>
         </Container>
@@ -106,21 +106,21 @@ export default function OrderPage() {
 
       <Container className="mt-12">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
-          
+
           {/* 1. Services */}
           <div className="space-y-4">
             <h3 className="text-display-4 uppercase tracking-tight">1. Тип услуги</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {SERVICE_TYPES.map((service) => (
-                <label 
-                  key={service} 
+                <label
+                  key={service}
                   className={cn(
                     "flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer",
                     selectedServices.includes(service) ? "border-(--primary) bg-(--primary-glass)" : "border-(--outline) hover:bg-(--state-hover)"
                   )}
                 >
-                  <Checkbox 
-                    checked={selectedServices.includes(service)} 
+                  <Checkbox
+                    checked={selectedServices.includes(service)}
                     onCheckedChange={(checked) => {
                       if (checked) setSelectedServices(p => [...p, service]);
                       else setSelectedServices(p => p.filter(s => s !== service));
@@ -132,9 +132,22 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {/* 2. Company */}
+          {/* 2. Description */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">2. О компании</h3>
+            <h3 className="text-display-4 uppercase tracking-tight">2. О проекте</h3>
+            <Field>
+              <Textarea
+                name="description"
+                required
+                className="min-h-[120px] text-body-2!"
+                placeholder="Расскажите о целях проекта, целевой аудитории и ваших пожеланиях..."
+              />
+            </Field>
+          </div>
+
+          {/* 3. Company */}
+          <div className="space-y-6">
+            <h3 className="text-display-4 uppercase tracking-tight">3. О компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field>
                 <FieldLabel>Название бренда</FieldLabel>
@@ -147,29 +160,16 @@ export default function OrderPage() {
                   <SelectContent position="popper">
                     <SelectItem value="yes">Да, нужно название</SelectItem>
                     <SelectItem value="no">Нет, уже есть</SelectItem>
-                    <SelectItem value="discuss">Обсудим</SelectItem>
+                    <SelectItem value="discuss">Да, но хотел бы обсудить его</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
             </div>
           </div>
 
-          {/* 3. Description */}
-          <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">3. О проекте</h3>
-            <Field>
-              <Textarea 
-                name="description" 
-                required
-                className="min-h-[120px] text-body-2!"
-                placeholder="Расскажите о целях проекта, целевой аудитории и ваших пожеланиях..." 
-              />
-            </Field>
-          </div>
-
           {/* 4. Files Manager (Avito Style) */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight">4. Файлы и ТЗ</h3>
+            <h3 className="text-display-4 uppercase tracking-tight">4. Файлы (медиа, тз, заготовки и т.п.)</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {attachments.map((attr) => (
                 <div key={attr.id} className="relative aspect-square group rounded-xl border border-(--outline) overflow-hidden bg-(--card)">
@@ -180,7 +180,7 @@ export default function OrderPage() {
                       {attr.file.name}
                     </div>
                   )}
-                  <button 
+                  <button
                     type="button"
                     onClick={() => removeFile(attr.id)}
                     className="absolute top-1 right-1 size-6 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
@@ -189,7 +189,7 @@ export default function OrderPage() {
                   </button>
                 </div>
               ))}
-              
+
               {attachments.length < 20 && (
                 <button
                   type="button"
@@ -201,11 +201,11 @@ export default function OrderPage() {
                 </button>
               )}
             </div>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              multiple 
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              multiple
               onChange={handleFileChange}
               accept=".pdf,.doc,.docx,.jpg,.png,.zip"
             />
@@ -220,7 +220,7 @@ export default function OrderPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-(--outline)">
+          <div className="pt-8">
             <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl!" disabled={loading}>
               {loading ? "Отправка..." : "Отправить заявку"}
               <KeyboardArrowRightIcon className="size-6" />
