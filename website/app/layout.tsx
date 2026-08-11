@@ -7,12 +7,12 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import BottomAppBar from "@/components/layout/bottom-app-bar";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { Toaster } from "@/components/ui/sonner";
 
 export const NotoSans = localFont({
   src: '../public/fonts/NotoSans.woff2',
   variable: '--font-sans',
 });
-
 export const Oswald = localFont({
   src: '../public/fonts/Oswald.woff2',
   variable: '--font-heading',
@@ -62,9 +62,15 @@ export default function RootLayout({
             </main>
             <Footer />
             <BottomAppBar />
+            <Toaster 
+              position="bottom-right" 
+              closeButton 
+              gap={8}
+              visibleToasts={3}
+            />
           </TooltipProvider>
         </ThemeProvider>
       </body>
-    </html >
+    </html>
   );
 }

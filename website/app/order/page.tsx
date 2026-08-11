@@ -31,14 +31,12 @@ const SERVICE_TYPES = [
   "Реклама и продвижение (SEO, Таргет, Контекст)",
   "Что-либо другое (опишу ниже, в графе «О проекте»"
 ];
-
 const DEADLINE_OPTIONS = [
   "Как можно скорее",
   "До 1 месяца",
   "1–3 месяца",
   "Не горит, обсуждаем"
 ];
-
 const BUDGET_OPTIONS = [
   "До 15 000 ₽",
   "15 000 – 50 000 ₽",
@@ -104,7 +102,6 @@ export default function OrderPage() {
         const previewUrl = isPreviewable ? URL.createObjectURL(file) : null;
         const newFile: FileWithPreview = { file, preview: previewUrl, id, type };
         setAttachments(prev => [...prev, newFile].slice(0, 20));
-
         if (type === 'doc') {
           const reader = new FileReader();
           reader.onload = async (loadEvent) => {
@@ -146,38 +143,27 @@ export default function OrderPage() {
     setLightboxOpen(true);
   };
 
-  // website/app/order/page.tsx
-
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-
     const form = e.currentTarget;
     const formData = new FormData(form);
-
-    // Add our custom fields
     formData.append("services", JSON.stringify(selectedServices));
     attachments.forEach((attr) => formData.append("files", attr.file));
-
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
         method: "POST",
         body: formData,
       });
-
       const data = await res.json();
-
       if (res.ok) {
-        toast.success("Заявка успешно отправлена!");
+        toast.success("Заявка принята!", { description: "Мы создали запись в CRM и скоро свяжемся с вами." });
         form.reset();
         setSelectedServices([]);
         setAttachments([]);
       } else {
         const details = data.detail;
-
         if (Array.isArray(details)) {
-          // 1. Handle standard Pydantic array
-          const err = details[0];
           const fieldMap: Record<string, string> = {
             user_email: "Email",
             user_name: "Имя",
@@ -185,25 +171,21 @@ export default function OrderPage() {
             description: "О проекте",
             services: "Услуги"
           };
-          const field = fieldMap[err.loc[err.loc.length - 1]] || err.loc[err.loc.length - 1];
-
-          // Clean up common technical messages
-          let msg = err.msg;
-          if (msg.includes("value is not a valid email")) msg = "Некорректный формат почты";
-          if (msg.includes("at least 10 characters")) msg = "Описание слишком короткое (мин. 10 симв.)";
-
-          toast.error(`${field}: ${msg}`);
-        } else if (typeof details === "string") {
-          // 2. Handle the "Validation failed" string if it still happens
-          const cleanMsg = details.replace("Validation failed: ", "").split('\n')[0];
-          toast.error(cleanMsg);
+          const err = details[0];
+          const fieldName = err.loc[err.loc.length - 1];
+          const humanField = fieldMap[fieldName] || fieldName;
+          
+          let msg = err.msg || "некорректные данные";
+          if (msg.toLowerCase().includes("valid email")) msg = "некорректный формат почты";
+          if (msg.toLowerCase().includes("at least 10 characters")) msg = "минимум 10 символов";
+          
+          toast.error(`Ошибка в поле "${humanField}"`, { description: msg });
         } else {
-          toast.error("Ошибка при отправке. Проверьте данные.");
+          toast.error(typeof details === 'string' ? details : "Ошибка при отправке.");
         }
       }
     } catch (err) {
-      console.error("Submission error:", err);
-      toast.error("Сетевая ошибка. Проверьте соединение с интернетом.");
+      toast.error("Сетевая ошибка.");
     } finally {
       setLoading(false);
     }
@@ -231,11 +213,9 @@ export default function OrderPage() {
               ))}
             </div>
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
             <Field><Textarea name="description" required className="min-h-[160px] text-body-2! rounded-2xl!" placeholder="Расскажите о целях проекта..." /></Field>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="space-y-2">
                 <label className="text-body-4 text-(--on-bg-low)">Желаемые сроки</label>
@@ -253,8 +233,6 @@ export default function OrderPage() {
               </div>
             </div>
           </div>
-
-          {/* 3. Company */}
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight">3. О компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -275,7 +253,6 @@ export default function OrderPage() {
               </Field>
             </div>
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (макс. 10мб.)</h3>
             <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}. Остальные файлы можно отправить во время обсуждения заказа.</p>
@@ -301,7 +278,6 @@ export default function OrderPage() {
             </div>
             <input type="file" ref={fileInputRef} className="hidden" multiple onChange={handleFileChange} accept={AVALIABLE_FILE_TYPES} />
           </div>
-
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -310,13 +286,11 @@ export default function OrderPage() {
               <Input name="user_email" type="email" placeholder="Email (необязательно)" className="h-12! rounded-xl!" />
             </div>
           </div>
-
           <div className="pt-8">
             <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl! text-lg! uppercase tracking-tighter" disabled={loading}>{loading ? "Отправка..." : "Отправить заявку"}</Button>
           </div>
         </form>
       </Container>
-
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent showCloseButton={false} className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0">
           <Button variant="glass" className="absolute top-4 right-4 z-[999]! rounded-full border-(--white)" size="icon-medium" onClick={() => setLightboxOpen(false)}>
