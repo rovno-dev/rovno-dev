@@ -8,54 +8,50 @@ from app.models.order import Order, OrderFile
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-MAX_FILE_SIZE = 10 * 1024 * 1024 # 10MB
+# Notification goes to this ID (Group or Admin)
+NOTIFY_CHAT_ID = os.getenv("TELEGRAM_NOTIFY_CHAT_ID") or (os.getenv("TELEGRAM_BOT_ALLOWED_USERS") or "").split(",")[0]
+
+MAX_FILE_SIZE = 10 * 1024 * 1024 
 
 def truncate(text: str, limit: int = 1000) -> str:
     if not text: return "—"
     return (text[:limit] + '...') if len(text) > limit else text
 
 async def notify_bot(order_data: dict, file_paths: List[str]):
-    if not BOT_TOKEN: return
-    raw_ids = os.getenv("ADMIN_IDS") or os.getenv("TELEGRAM_BOT_ALLOWED_USERS") or ""
-    admin_ids = [uid.strip() for uid in raw_ids.split(",") if uid.strip()]
-    if not admin_ids: return
+    if not BOT_TOKEN or not NOTIFY_CHAT_ID: return
 
     services_str = ", ".join(order_data.get('services', []))
     text = (
         f"🚀 <b>Новый заказ!</b>\n\n"
         f"🆔 <b>ID:</b> <code>{order_data['id']}</code>\n"
         f"🛠 <b>Услуги:</b> {html.escape(truncate(services_str))}\n"
-        f"🏢 <b>Компания:</b> {html.escape(truncate(order_data.get('company_name') or '—'))}\n"
-        f"❓ <b>Нужен ли нейминг:</b> {html.escape(truncate(order_data.get('naming_help') or '—'))}\n"
-        f"📝 <b>Описание:</b> {html.escape(truncate(order_data.get('description') or '—'))}\n"
-        f"📅 <b>Сроки:</b> {html.escape(truncate(order_data.get('deadline') or '—'))}\n"
-        f"💰 <b>Бюджет:</b> {html.escape(truncate(order_data.get('budget') or '—'))}\n\n"
+        f"🏢 <b>Компания:</b> {html.escape(truncate(order_data.get('company_name')))}\n"
+        f"❓ <b>Нужен ли нейминг:</b> {html.escape(truncate(order_data.get('naming_help')))}\n"
+        f"📝 <b>Описание:</b> {html.escape(truncate(order_data.get('description')))}\n"
+        f"📅 <b>Сроки:</b> {html.escape(truncate(order_data.get('deadline')))}\n"
+        f"💰 <b>Бюджет:</b> {html.escape(truncate(order_data.get('budget')))}\n\n"
         f"👤 <b>Имя:</b> {html.escape(truncate(order_data.get('user_name')))}\n"
         f"📞 <b>Контакт:</b> {html.escape(truncate(order_data.get('user_contact')))}\n"
-        f"📧 <b>Email:</b> {html.escape(truncate(order_data.get('user_email') or '—'))}\n"
+        f"📧 <b>Email:</b> {html.escape(truncate(order_data.get('user_email')))}\n"
     )
 
-    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=30.0), follow_redirects=True) as client:
-        for admin_id in admin_ids:
-            try:
-                await client.post(
-                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                    json={"chat_id": admin_id, "text": text, "parse_mode": "HTML"}
-                )
-            except Exception as e:
-                print(f"[ERROR] TG Notify Text Error: {str(e)}")
-
+    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=10.0), follow_redirects=True) as client:
+        try:
+            await client.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                json={"chat_id": NOTIFY_CHAT_ID, "text": text, "parse_mode": "HTML"}
+            )
+            # Send files once
             for path in file_paths:
-                if not os.path.exists(path): continue
-                try:
+                if os.path.exists(path):
                     with open(path, "rb") as f:
                         await client.post(
                             f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument",
-                            data={"chat_id": admin_id, "caption": f"Файл к заказу {order_data['id']}"},
+                            data={"chat_id": NOTIFY_CHAT_ID, "caption": f"К заказу {order_data['id']}"},
                             files={"document": f}
                         )
-                except Exception as e:
-                    print(f"[ERROR] TG Notify File Error: {str(e)}")
+        except Exception as e:
+            print(f"[ERROR] TG Notify Error: {str(e)}")
 
 @router.post("/create")
 async def create_order(
@@ -73,21 +69,15 @@ async def create_order(
 ):
     for f in files:
         if f.size and f.size > MAX_FILE_SIZE:
-            raise HTTPException(status_code=413, detail=f"File {f.filename} is too large")
+            raise HTTPException(status_code=413, detail="File too large")
 
     try: s_list = json.loads(services)
     except: s_list = [services]
 
     order = Order(
-        services=s_list, 
-        company_name=company_name, 
-        naming_help=naming_help,
-        description=description, 
-        deadline=deadline, 
-        budget=budget,
-        user_name=user_name, 
-        user_contact=user_contact,
-        user_email=user_email
+        services=s_list, company_name=company_name, naming_help=naming_help,
+        description=description, deadline=deadline, budget=budget,
+        user_name=user_name, user_contact=user_contact, user_email=user_email
     )
     db.add(order)
     db.flush()
@@ -105,18 +95,6 @@ async def create_order(
         saved_paths.append(path)
 
     db.commit()
-    
-    order_info = {
-        "id": str(order.id),
-        "services": s_list,
-        "company_name": company_name,
-        "naming_help": naming_help,
-        "description": description,
-        "deadline": deadline,
-        "budget": budget,
-        "user_name": user_name,
-        "user_contact": user_contact,
-        "user_email": user_email
-    }
+    order_info = {"id": str(order.id), "services": s_list, "company_name": company_name, "naming_help": naming_help, "description": description, "deadline": deadline, "budget": budget, "user_name": user_name, "user_contact": user_contact, "user_email": user_email}
     asyncio.create_task(notify_bot(order_info, saved_paths))
     return {"status": "ok", "order_id": str(order.id)}

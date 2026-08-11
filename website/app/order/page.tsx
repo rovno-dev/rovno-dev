@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Field } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
 import { CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -204,7 +204,7 @@ export default function OrderPage() {
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
             <Field><Textarea name="description" required className="min-h-[160px] text-body-2! rounded-2xl!" placeholder="Расскажите о целях проекта..." /></Field>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="space-y-2">
                 <label className="text-body-4 text-(--on-bg-low)">Желаемые сроки</label>
                 <Select name="deadline">
@@ -222,8 +222,30 @@ export default function OrderPage() {
             </div>
           </div>
 
+          {/* 3. Company */}
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. Файлы (макс. 10мб.)</h3>
+            <h3 className="text-display-4 uppercase tracking-tight">3. О компании</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <Field>
+                <FieldLabel>Название бренда</FieldLabel>
+                <Input name="company_name" placeholder="Название" />
+              </Field>
+              <Field>
+                <FieldLabel>Нужен нейминг?</FieldLabel>
+                <Select name="naming_help" defaultValue="no">
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="yes">Да, нужно название</SelectItem>
+                    <SelectItem value="no">Нет, уже есть</SelectItem>
+                    <SelectItem value="discuss">Да, но хотел бы обсудить его</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (макс. 10мб.)</h3>
             <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}. Остальные файлы можно отправить во время обсуждения заказа.</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {attachments.map((attr, idx) => (
@@ -249,7 +271,7 @@ export default function OrderPage() {
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Контакты</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Input name="user_name" required placeholder="Ваше имя" className="h-12! rounded-xl!" />
               <Input name="user_contact" required placeholder="Телефон или Telegram" className="h-12! rounded-xl!" />
