@@ -23,7 +23,7 @@ Add the following entries to your `/etc/hosts` (Linux/macOS) or `C:\Windows\Syst
 
 ```text
 127.0.0.1  localhost
-127.0.0.1  fake-api.localhost
+127.0.0.1  crm.localhost
 127.0.0.1  i.localhost
 ```
 
@@ -49,6 +49,20 @@ docker compose up --build --force-recreate
 ```
 
 The web application will be accessible at http://localhost.
+
+### 4. Removing old docker containers and volumes (optional)
+
+If you want to remove them (e.g. delete db) run
+
+> ⚠️ Run with caution
+
+```bash
+docker stop $(docker ps -aq)
+
+docker rm $(docker ps -aq)
+
+docker volume rm $(docker volume ls -q)
+```
 
 ## Infrastructure Details
 

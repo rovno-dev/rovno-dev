@@ -146,11 +146,16 @@ export default function OrderPage() {
     setLightboxOpen(true);
   };
 
+  // website/app/order/page.tsx
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
+
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    // Add our custom fields
     formData.append("services", JSON.stringify(selectedServices));
     attachments.forEach((attr) => formData.append("files", attr.file));
 
@@ -159,31 +164,58 @@ export default function OrderPage() {
         method: "POST",
         body: formData,
       });
+
+      const data = await res.json();
+
       if (res.ok) {
         toast.success("Заявка успешно отправлена!");
         form.reset();
         setSelectedServices([]);
         setAttachments([]);
       } else {
-        toast.error("Ошибка при отправке.");
+        const details = data.detail;
+
+        if (Array.isArray(details)) {
+          // 1. Handle standard Pydantic array
+          const err = details[0];
+          const fieldMap: Record<string, string> = {
+            user_email: "Email",
+            user_name: "Имя",
+            user_contact: "Контакт",
+            description: "О проекте",
+            services: "Услуги"
+          };
+          const field = fieldMap[err.loc[err.loc.length - 1]] || err.loc[err.loc.length - 1];
+
+          // Clean up common technical messages
+          let msg = err.msg;
+          if (msg.includes("value is not a valid email")) msg = "Некорректный формат почты";
+          if (msg.includes("at least 10 characters")) msg = "Описание слишком короткое (мин. 10 симв.)";
+
+          toast.error(`${field}: ${msg}`);
+        } else if (typeof details === "string") {
+          // 2. Handle the "Validation failed" string if it still happens
+          const cleanMsg = details.replace("Validation failed: ", "").split('\n')[0];
+          toast.error(cleanMsg);
+        } else {
+          toast.error("Ошибка при отправке. Проверьте данные.");
+        }
       }
     } catch (err) {
-      toast.error("Сетевая ошибка.");
+      console.error("Submission error:", err);
+      toast.error("Сетевая ошибка. Проверьте соединение с интернетом.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-(--bg) pb-20">
-      <section className="py-12 md:py-20 border-b border-(--outline)">
-        <Container><div className="max-w-[800px] animate-reveal">
-          <h1 className="text-display-1 text-(--on-bg-high) mb-6 uppercase tracking-tighter leading-none">Бриф на разработку</h1>
-          <p className="text-body-1 text-(--on-bg-medium) leading-relaxed font-medium">Опишите вашу задачу и мы подготовим предложение.</p>
-        </div></Container>
-      </section>
-
+    <>
       <Container className="mt-12">
+        <Container className="pt-8 pb-12">
+          <h1 className="text-display-2 mb-3 uppercase tracking-tighter leading-none">Сделать заказ</h1>
+          <p className="text-body-1 text-(--on-bg-low) leading-relaxed font-medium">Опишите вашу задачу и мы подготовим предложение.</p>
+        </Container>
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
           <div className="space-y-4">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">1. Тип услуги</h3>
@@ -323,6 +355,6 @@ export default function OrderPage() {
           </Carousel>
         </DialogContent>
       </Dialog>
-    </main>
+    </>
   );
 }

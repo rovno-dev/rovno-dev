@@ -25,24 +25,6 @@ export function proxy(req: NextRequest) {
     return response;
   }
 
-
-  if (
-    url.pathname.startsWith('/_next') ||
-    url.pathname.includes('.') ||
-    url.pathname.startsWith('/fake-api')
-  ) {
-    return NextResponse.next();
-  }
-
-  if (url.pathname.startsWith('/FAKE-API') && !hostname.startsWith('fake-api.')) {
-    return NextResponse.rewrite(new URL('/404', req.url));
-  }
-
-  if (hostname.startsWith('fake-api.')) {
-    url.pathname = `/FAKE-API${url.pathname}`;
-    return NextResponse.rewrite(url);
-  }
-
   return NextResponse.next();
 }
 

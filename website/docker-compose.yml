@@ -13,3 +13,9 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=${CERT_RESOLVER}"
     networks:
       - main-network
+
+networks:
+  main-network:
+    name: main-network
+    external: false
+  default:

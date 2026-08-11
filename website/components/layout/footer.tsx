@@ -1,5 +1,3 @@
-/* LLM context: Updating Footer social icons to support external links using Button asChild pattern */
-
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "../icons";
 import { Button } from "../ui/button";
@@ -8,103 +6,110 @@ import RovnoLogotypeWordmark from "./rovno-dev-logotype/rovno-dev-logotype-wordm
 import { NavLink } from "./nav-link";
 import { ThemeSwitcher } from "./theme-switcher";
 import Link from "next/link";
+import { GithubLogotypeMonoIcon } from "../icons/logotypes/github-logotype-mono-icon";
 
 export default function Footer() {
-  const footerSections = [
+  const sections = [
     {
-      id: 'main',
-      title: (
-        <div>
-          <div className="flex mb-3 gap-2 items-center">
-            <ThemeSwitcher />
-            <RovnoLogotypeWordmark className="w-calc(100%-1rem)!" />
-          </div>
-          <SocialMediaIcons className="block lg:hidden!" />
-        </div>
-      ),
+      title: "Агентство",
       links: [
-        ROUTES.projects,
-        ROUTES.about,
-        ROUTES.journal,
-        // ROUTES.job,
+        { title: "Избранные проекты", href: ROUTES.projects.href },
+        { title: "О команде", href: ROUTES.about.href },
+        { title: "Блог", href: ROUTES.blog.href },
+        { title: "Карьера", href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
       ],
     },
     {
-      id: 'journal',
-      title: "Журнал Ровня",
+      title: "Услуги",
       links: [
-        // {
-        //   title: 'Стать редактором',
-        //   href: '/rovnya/become-editor',
-        // },
-        {
-          title: 'Предложить статью',
-          href: 'https://t.me/rovno_dev?direct',
-        },
-      ]
+        { title: "Веб-разработка", href: ROUTES.order.href },
+        { title: "UX/UI Дизайн", href: ROUTES.order.href },
+        { title: "Айдентика", href: ROUTES.order.href },
+        { title: "3D & Motion", href: ROUTES.order.href },
+      ],
     },
     {
-      title: "Студентам",
+      title: "Медиа",
       links: [
-        {
-          title: 'Пройти стажировку',
-          href: 'https://forms.yandex.com/u/69975d0849af47b15b4c80df',
-        },
-        {
-          title: 'Повышение квалификации',
-          href: 'https://forms.yandex.com/u/69975d0849af47b15b4c80df',
-        },
+        { title: "Журнал «Ровня»", href: ROUTES.journal.href },
+        { title: "Предложить статью", href: "https://t.me/rovno_dev" },
+        { title: "База знаний", href: "/fake-api" },
       ],
-    }
+    },
   ];
 
   return (
-    <footer className="bg-card pb-[100px] pt-[30px] sm:pt-[50px] border-t border-t-outline">
-      <Container className="sm:flex sm:gap-8">
-        <div className="w-full grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 mt-4">
-          {footerSections.map((section, index) => (
-            <div key={index} className="w-full">
-              {section.title && typeof section.title == 'string' ? <h3 className="text-(--on-bg-medium) text-heading-3">{section.title}</h3> : section.title}
-              <ul className="flex flex-col gap-2 mt-2.5">
-                {section.links.map((link, key) => (
-                  <li key={key}>
-                    <NavLink className="text-body-3 text-(--on-bg-low)" href={link.href}>{link.title}</NavLink>
-                  </li>
-                ))}
-              </ul>
+    <footer className="bg-(--bg) pt-20 pb-12 border-t border-(--outline)">
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
+          {/* Brand Column */}
+          <div className="flex flex-col gap-6 max-w-sm">
+            <Link href="/" className="w-fit">
+              <RovnoLogotypeWordmark className="h-8! w-auto" />
+            </Link>
+            <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
+              Проектируем и разрабатываем высоконагруженные цифровые продукты для лидеров рынка.
+            </p>
+            <div className="flex items-center gap-1 mt-2">
+              <SocialButton href="https://t.me/rovno_dev" icon={<TelegramLogotypeMonoIcon />} />
+              <SocialButton href="https://github.com/rovno-dev" icon={<GithubLogotypeMonoIcon />} />
+              <SocialButton href="https://vk.com/rovno_dev" icon={<VKLogotypeMonoIcon />} />
+              <SocialButton href="https://dprofile.ru/rovno_dev" icon={<DprofileLogotypeMonoIcon />} />
             </div>
-          ))}
+          </div>
+
+          {/* Links Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
+            {sections.map((section) => (
+              <div key={section.title} className="flex flex-col gap-5">
+                <h4 className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">
+                  {section.title}
+                </h4>
+                <ul className="flex flex-col gap-3">
+                  {section.links.map((link) => (
+                    <li key={link.title}>
+                      <NavLink
+                        href={link.href}
+                        className="text-body-3 text-(--on-bg-medium) hover:text-(--primary) transition-colors p-0 bg-transparent!"
+                      >
+                        {link.title}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
-        <SocialMediaIcons className="hidden lg:block" />
+
+        {/* Bottom Row */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <span className="text-body-5 text-(--on-bg-low)">
+              © {new Date().getFullYear()} Rovno.dev
+            </span>
+            <Link href="" className="text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors">
+              Политика конфиденциальности
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col items-end">
+              <ThemeSwitcher />
+            </div>
+          </div>
+        </div>
       </Container>
     </footer>
   );
 }
 
-interface SocialMediaIconsProps {
-  className?: string,
-}
-
-function SocialMediaIcons({ className }: SocialMediaIconsProps) {
-  const socialIcons = [
-    { icon: <TelegramLogotypeMonoIcon />, href: "https://t.me/rovno_dev" },
-    { icon: <VKLogotypeMonoIcon />, href: "https://vk.com/rovno_dev" },
-    { icon: <DprofileLogotypeMonoIcon />, href: "https://dprofile.ru/rovno_dev" },
-    { icon: <PinterestLogotypeMonoIcon />, href: "https://pinterest.com/rovno_dev" },
-  ];
-
+function SocialButton({ href, icon }: { href: string; icon: React.ReactNode }) {
   return (
-    <div className={`${className} block`}>
-      <h3 className="text-heading-3 text-(--on-bg-medium) sm:text-heading-2">Мы в соц. сетях</h3>
-      <div className="flex gap-1 mt-2 sm:flex-wrap lg:flex-nowrap">
-        {socialIcons.map((item, key) => (
-          <Button variant={'text'} key={key} size={'icon-large'} asChild>
-            <Link href={item.href} target="_blank" rel="noopener noreferrer">
-              {item.icon}
-            </Link>
-          </Button>
-        ))}
-      </div>
-    </div>
-  )
+    <Button variant="text" size="icon-small" asChild className="hover:bg-(--primary-glass)! group">
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {icon}
+      </a>
+    </Button>
+  );
 }

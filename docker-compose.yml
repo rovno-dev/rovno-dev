@@ -3,7 +3,7 @@ include:
   - tg-bot/docker-compose.yml
   - backend/docker-compose.yml
   - website/docker-compose.yml
-
+  - twenty/docker-compose.yml
 services:
   traefik:
     image: traefik:latest
@@ -28,4 +28,5 @@ services:
 
 networks:
   main-network:
+    name: main-network
     driver: bridge

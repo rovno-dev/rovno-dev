@@ -16,3 +16,9 @@ services:
     networks:
       - main-network
     restart: unless-stopped
+
+networks:
+  main-network:
+    name: main-network
+    external: false
+  default:

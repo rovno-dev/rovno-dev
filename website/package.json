@@ -1,12 +1,12 @@
 {
-  "name": "rovno-dev-frontend",
+  "name": "rovno-dev-website",
   "version": "1.0.0",
   "private": false,
   "author": "Niyaz Gimadiev niyaztutor@gmail.com (https://rovno.dev/niyazgim)",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rovno-dev/rovno-dev-frontend"
+    "url": "git+https://github.com/rovno-dev/rovno-dev"
   },
   "scripts": {
     "dev": "next dev",

@@ -1,43 +1,45 @@
-/* LLM context: Fixing icon overlap in trigger and enhancing DropdownMenu item layout */
-
 "use client"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/providers/theme-provider"
 import { SystemThemeIcon, SunIcon, NightIcon } from "../icons"
+import { cn } from "@/lib/utils"
 
 export function ThemeSwitcher() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+
+  const options = [
+    { value: "system", icon: SystemThemeIcon, label: "Системная" },
+    { value: "light", icon: SunIcon, label: "Светлая" },
+    { value: "dark", icon: NightIcon, label: "Тёмная" },
+  ] as const
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="tonal-card" size="icon-small" className="relative">
-          <SunIcon className="size-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <NightIcon className="absolute size-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Поменять тему</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" sideOffset={8} className="min-w-40">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="gap-2.5 cursor-pointer">
-          <SunIcon className="size-4 opacity-70" />
-          <span className="text-body-3">Светлая</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="gap-2.5 cursor-pointer">
-          <NightIcon className="size-4 opacity-70" />
-          <span className="text-body-3">Тёмная</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="gap-2.5 cursor-pointer">
-          <SystemThemeIcon className="size-4 opacity-70" />
-          <span className="text-body-3">Системная</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-0.5 rounded-full border border-(--outline) bg-(--card) p-0.5 w-fit h-9">
+      {options.map((opt) => {
+        const Icon = opt.icon
+        const isActive = theme === opt.value
+        return (
+          <button
+            key={opt.value}
+            onClick={() => setTheme(opt.value)}
+            className={cn(
+              "group relative flex size-8 items-center justify-center rounded-full transition-all duration-200 outline-none cursor-pointer",
+              isActive
+                ? "bg-(--on-bg-high) shadow-sm"
+                : "hover:bg-(--state-hover)"
+            )}
+          >
+            <Icon 
+              className={cn(
+                "size-4! transition-colors",
+                isActive 
+                  ? "[&_path]:fill-(--bg)" 
+                  : "[&_path]:fill-(--on-bg-low) group-hover:[&_path]:fill-(--on-bg-high)"
+              )} 
+            />
+            <span className="sr-only">{opt.label}</span>
+          </button>
+        )
+      })}
+    </div>
   )
 }

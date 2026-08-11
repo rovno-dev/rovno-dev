@@ -1,57 +1,48 @@
-import os, uuid, json, httpx, asyncio, html
-from datetime import datetime
+import os, json, httpx, asyncio, html
 from typing import List, Optional
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
-from sqlalchemy.orm import Session
-from database.database import get_db
-from app.models.order import Order, OrderFile
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from pydantic import BaseModel, EmailStr, Field, ValidationError
+from app.shared.twenty import push_to_twenty_proxy
 
 router = APIRouter(prefix="/orders", tags=["orders"])
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-# Notification goes to this ID (Group or Admin)
-NOTIFY_CHAT_ID = os.getenv("TELEGRAM_NOTIFY_CHAT_ID") or (os.getenv("TELEGRAM_BOT_ALLOWED_USERS") or "").split(",")[0]
 
-MAX_FILE_SIZE = 10 * 1024 * 1024 
+# ponytail: Validation schema for incoming form data
+class OrderValidation(BaseModel):
+    user_name: str = Field(..., min_length=2)
+    user_contact: str = Field(..., min_length=1)
+    user_email: Optional[EmailStr] = None
+    description: str = Field(..., min_length=10)
+    company_name: Optional[str] = None
+    naming_help: Optional[str] = None
+    deadline: Optional[str] = None
+    budget: Optional[str] = None
+    services: List[str]
 
-def truncate(text: str, limit: int = 1000) -> str:
-    if not text: return "—"
-    return (text[:limit] + '...') if len(text) > limit else text
-
-async def notify_bot(order_data: dict, file_paths: List[str]):
-    if not BOT_TOKEN or not NOTIFY_CHAT_ID: return
-
-    services_str = ", ".join(order_data.get('services', []))
+async def notify_telegram(order_data: dict, twenty_url: str):
+    """
+    Sends a summary and the CRM link to the configured Telegram chat.
+    """
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_NOTIFY_CHAT_ID")
+    if not token or not chat_id:
+        return
+    
     text = (
-        f"🚀 <b>Новый заказ!</b>\n\n"
-        f"🆔 <b>ID:</b> <code>{order_data['id']}</code>\n"
-        f"🛠 <b>Услуги:</b> {html.escape(truncate(services_str))}\n"
-        f"🏢 <b>Компания:</b> {html.escape(truncate(order_data.get('company_name')))}\n"
-        f"❓ <b>Нужен ли нейминг:</b> {html.escape(truncate(order_data.get('naming_help')))}\n"
-        f"📝 <b>Описание:</b> {html.escape(truncate(order_data.get('description')))}\n"
-        f"📅 <b>Сроки:</b> {html.escape(truncate(order_data.get('deadline')))}\n"
-        f"💰 <b>Бюджет:</b> {html.escape(truncate(order_data.get('budget')))}\n\n"
-        f"👤 <b>Имя:</b> {html.escape(truncate(order_data.get('user_name')))}\n"
-        f"📞 <b>Контакт:</b> {html.escape(truncate(order_data.get('user_contact')))}\n"
-        f"📧 <b>Email:</b> {html.escape(truncate(order_data.get('user_email')))}\n"
+        f"🚀 <b>Новый заказ в CRM!</b>\n\n"
+        f"👤 <b>Клиент:</b> {html.escape(order_data['user_name'])}\n"
+        f"🛠 <b>Услуги:</b> {html.escape(', '.join(order_data['services']))}\n"
+        f"💰 <b>Бюджет:</b> {html.escape(order_data.get('budget', '—'))}\n\n"
+        f"🔗 <a href='{twenty_url}'><b>ОТКРЫТЬ В TWENTY CRM</b></a>"
     )
-
-    async with httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=10.0), follow_redirects=True) as client:
+    
+    async with httpx.AsyncClient() as client:
         try:
             await client.post(
-                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                json={"chat_id": NOTIFY_CHAT_ID, "text": text, "parse_mode": "HTML"}
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
             )
-            # Send files once
-            for path in file_paths:
-                if os.path.exists(path):
-                    with open(path, "rb") as f:
-                        await client.post(
-                            f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument",
-                            data={"chat_id": NOTIFY_CHAT_ID, "caption": f"К заказу {order_data['id']}"},
-                            files={"document": f}
-                        )
         except Exception as e:
-            print(f"[ERROR] TG Notify Error: {str(e)}")
+            print(f"[ERROR] TG Notify Failed: {e}")
 
 @router.post("/create")
 async def create_order(
@@ -64,37 +55,60 @@ async def create_order(
     user_name: str = Form(...),
     user_contact: str = Form(...),
     user_email: Optional[str] = Form(None),
-    files: List[UploadFile] = File([]),
-    db: Session = Depends(get_db)
+    files: List[UploadFile] = File([])
 ):
-    for f in files:
-        if f.size and f.size > MAX_FILE_SIZE:
-            raise HTTPException(status_code=413, detail="File too large")
+    """
+    Proxy endpoint: Validates data and uploads everything to Twenty CRM.
+    No local database storage used.
+    """
+    # 1. Parse and Validate
+    try:
+        s_list = json.loads(services)
+        # Handle empty strings from frontend for optional EmailStr
+        email = user_email.strip() if user_email and "@" in user_email else None
+        
+        valid_data = OrderValidation(
+            services=s_list,
+            company_name=company_name,
+            naming_help=naming_help,
+            description=description,
+            deadline=deadline,
+            budget=budget,
+            user_name=user_name,
+            user_contact=user_contact,
+            user_email=email
+        )
+    except ValidationError as e:
+        # Returns structured errors for frontend parsing
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            detail=e.errors()
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            detail=[{"msg": "Invalid data format", "loc": ["body"]}]
+        )
 
-    try: s_list = json.loads(services)
-    except: s_list = [services]
+    # 2. Proxy to Twenty
+    try:
+        # We await proxy completion to ensure files and records are created
+        twenty_url = await push_to_twenty_proxy(valid_data.model_dump(), files)
+        
+        # 3. Trigger notification in background
+        asyncio.create_task(notify_telegram(valid_data.model_dump(), twenty_url))
+        
+        return {"status": "ok", "url": twenty_url}
 
-    order = Order(
-        services=s_list, company_name=company_name, naming_help=naming_help,
-        description=description, deadline=deadline, budget=budget,
-        user_name=user_name, user_contact=user_contact, user_email=user_email
-    )
-    db.add(order)
-    db.flush()
-
-    storage_base = f"storage/orders/{datetime.now().year}/{order.id}"
-    os.makedirs(storage_base, exist_ok=True)
-    saved_paths = []
-    for f in files:
-        if not f.filename: continue
-        path = f"{storage_base}/{uuid.uuid4()}{os.path.splitext(f.filename)[1]}"
-        content = await f.read()
-        with open(path, "wb") as buf:
-            buf.write(content)
-        db.add(OrderFile(order_id=order.id, file_path=path, filename=f.filename))
-        saved_paths.append(path)
-
-    db.commit()
-    order_info = {"id": str(order.id), "services": s_list, "company_name": company_name, "naming_help": naming_help, "description": description, "deadline": deadline, "budget": budget, "user_name": user_name, "user_contact": user_contact, "user_email": user_email}
-    asyncio.create_task(notify_bot(order_info, saved_paths))
-    return {"status": "ok", "order_id": str(order.id)}
+    except httpx.HTTPStatusError as e:
+        print(f"CRM API ERROR: {e.response.status_code} - {e.response.text}")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="CRM service returned an error."
+        )
+    except Exception as e:
+        print(f"PROXY ERROR: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal error during CRM sync."
+        )
