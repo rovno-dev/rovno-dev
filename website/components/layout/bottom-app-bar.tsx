@@ -6,9 +6,9 @@ import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../ui/button";
 import { DesignServicesIcon } from "../icons";
-import { DeployedCodeIcon } from "../icons/unideka-icons/deployed-code-icon";
-import { ArticleIcon } from "../icons/unideka-icons/article-icon";
-import { WorkIcon } from "../icons/unideka-icons/work-icon";
+import { DeployedCodeIcon } from "../icons/unidoka-icons/deployed-code-icon";
+import { ArticleIcon } from "../icons/unidoka-icons/article-icon";
+import { WorkIcon } from "../icons/unidoka-icons/work-icon";
 import Link from "next/link";
 import RovnoLogotypeIconEmpty from "./rovno-dev-logotype/rovno-dev-logotype-icon-empty";
 

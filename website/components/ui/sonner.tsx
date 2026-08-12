@@ -12,11 +12,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       closeButton={true}
       icons={{
-        success: <CheckCircleIcon className="size-5 text-green-500" />,
-        info: <InfoIcon className="size-5 text-blue-500" />,
-        warning: <WarningIcon className="size-5 text-yellow-500" />,
-        error: <OctagonIcon className="size-5 text-red-500" />,
-        loading: <ProgressActivityIcon className="size-5 animate-spin text-primary" />,
+        success: <CheckCircleIcon className="size-4 [&>path]:fill-(--success)" />,
+        info: <InfoIcon className="size-4 [&>path]:fill-blue-500" />,
+        warning: <WarningIcon className="size-4 [&>path]:fill-(--warning)" />,
+        error: <WarningIcon className="size-4 [&>path]:fill-(--error)" />,
+        loading: <ProgressActivityIcon className="size-4 animate-spin [&>path]:fill-primary" />,
       }}
       toastOptions={{
         classNames: {

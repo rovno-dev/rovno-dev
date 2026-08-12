@@ -22,9 +22,9 @@ function CheckboxCard({
   return (
     <label
       className={cn(
-        "flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-card",
+        "flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-transparent disabled:bg-input/50 dark:bg-input/30 dark:disabled:bg-input/80",
         checked
-          ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)"
+          ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)!"
           : "border-(--outline) hover:border-(--primary)",
         className
       )}

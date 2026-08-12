@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon, ArticleIcon, DiamondIcon, PublicIcon, StylusNoteIcon } from "@/components/icons";
-import { DeployedCodeIcon } from "@/components/icons/unideka-icons/deployed-code-icon";
+import { DeployedCodeIcon } from "@/components/icons/unidoka-icons/deployed-code-icon";
 import { cn } from "@/lib/utils";
 
 /* ---------- Hero Section ---------- */
