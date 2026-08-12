@@ -2,12 +2,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import * as mammoth from "mammoth";
+import { z } from "zod";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { CheckboxCard } from "@/components/ui/checkbox-card";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { toast } from "sonner";
 import { CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { Label } from "@/components/ui/label";
 
 const SERVICE_TYPES = [
   "Логотип / Фирменный стиль / Брендбук",
@@ -31,12 +33,14 @@ const SERVICE_TYPES = [
   "Реклама и продвижение (SEO, Таргет, Контекст)",
   "Что-либо другое (опишу ниже, в графе «О проекте»"
 ];
+
 const DEADLINE_OPTIONS = [
   "Как можно скорее",
   "До 1 месяца",
   "1–3 месяца",
   "Не горит, обсуждаем"
 ];
+
 const BUDGET_OPTIONS = [
   "До 15 000 ₽",
   "15 000 – 50 000 ₽",
@@ -44,6 +48,24 @@ const BUDGET_OPTIONS = [
   "Более 150 000 ₽",
   "Нужна консультация по цене"
 ];
+
+/**
+ * ponytail: Order form validation schema matching backend constraints.
+ * Minimalist but strict.
+ */
+const orderSchema = z.object({
+  user_name: z.string().min(2, "Имя должно быть не короче 2 символов"),
+  user_contact: z.string().min(1, "Укажите контакт для связи"),
+  user_email: z.string().email("Некорректный формат email").optional().or(z.literal("")),
+  description: z.string().min(10, "Опишите проект подробнее (минимум 10 символов)"),
+  services: z.array(z.string()).min(1, "Выберите хотя бы одну услугу"),
+  company_name: z.string().optional(),
+  naming_help: z.string().optional(),
+  deadline: z.string().optional(),
+  budget: z.string().optional(),
+});
+
+type OrderFormValues = z.infer<typeof orderSchema>;
 
 interface FileWithPreview {
   file: File;
@@ -59,6 +81,8 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
+  const [errors, setErrors] = useState<Partial<Record<keyof OrderFormValues, string>>>({});
+  
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
@@ -102,6 +126,7 @@ export default function OrderPage() {
         const previewUrl = isPreviewable ? URL.createObjectURL(file) : null;
         const newFile: FileWithPreview = { file, preview: previewUrl, id, type };
         setAttachments(prev => [...prev, newFile].slice(0, 20));
+        
         if (type === 'doc') {
           const reader = new FileReader();
           reader.onload = async (loadEvent) => {
@@ -146,14 +171,47 @@ export default function OrderPage() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
+
     const form = e.currentTarget;
     const formData = new FormData(form);
-    formData.append("services", JSON.stringify(selectedServices));
-    attachments.forEach((attr) => formData.append("files", attr.file));
+    
+    // Prepare data for Zod validation
+    const rawData = {
+      services: selectedServices,
+      description: formData.get("description"),
+      deadline: formData.get("deadline"),
+      budget: formData.get("budget"),
+      company_name: formData.get("company_name"),
+      naming_help: formData.get("naming_help"),
+      user_name: formData.get("user_name"),
+      user_contact: formData.get("user_contact"),
+      user_email: formData.get("user_email"),
+    };
+
+    const result = orderSchema.safeParse(rawData);
+
+    if (!result.success) {
+      const fieldErrors: Partial<Record<keyof OrderFormValues, string>> = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0] as keyof OrderFormValues;
+        if (!fieldErrors[path]) fieldErrors[path] = issue.message;
+      });
+      setErrors(fieldErrors);
+      setLoading(false);
+      toast.error("Проверьте правильность заполнения полей");
+      return;
+    }
+
+    // Append attachments and finalized services string
+    const finalFormData = new FormData(form);
+    finalFormData.set("services", JSON.stringify(selectedServices));
+    attachments.forEach((attr) => finalFormData.append("files", attr.file));
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
         method: "POST",
-        body: formData,
+        body: finalFormData,
       });
       const data = await res.json();
       if (res.ok) {
@@ -162,27 +220,7 @@ export default function OrderPage() {
         setSelectedServices([]);
         setAttachments([]);
       } else {
-        const details = data.detail;
-        if (Array.isArray(details)) {
-          const fieldMap: Record<string, string> = {
-            user_email: "Email",
-            user_name: "Имя",
-            user_contact: "Контакт",
-            description: "О проекте",
-            services: "Услуги"
-          };
-          const err = details[0];
-          const fieldName = err.loc[err.loc.length - 1];
-          const humanField = fieldMap[fieldName] || fieldName;
-          
-          let msg = err.msg || "некорректные данные";
-          if (msg.toLowerCase().includes("valid email")) msg = "некорректный формат почты";
-          if (msg.toLowerCase().includes("at least 10 characters")) msg = "минимум 10 символов";
-          
-          toast.error(`Ошибка в поле "${humanField}"`, { description: msg });
-        } else {
-          toast.error(typeof details === 'string' ? details : "Ошибка при отправке.");
-        }
+        toast.error("Ошибка сервера", { description: data.detail?.[0]?.msg || "Попробуйте позже" });
       }
     } catch (err) {
       toast.error("Сетевая ошибка.");
@@ -203,36 +241,46 @@ export default function OrderPage() {
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">1. Тип услуги</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               {SERVICE_TYPES.map((service) => (
-                <label key={service} className={cn("flex items-center gap-3 p-4 rounded-2xl border transition-all cursor-pointer min-h-[72px] bg-card", selectedServices.includes(service) ? "border-(--primary) ring-1 ring-(--primary)/30 bg-(--primary-glass)" : "border-(--outline) hover:border-(--primary-card)")}>
-                  <Checkbox checked={selectedServices.includes(service)} onCheckedChange={(checked) => {
+                <CheckboxCard 
+                  key={service} 
+                  checked={selectedServices.includes(service)} 
+                  onCheckedChange={(checked) => {
                     if (checked) setSelectedServices(p => [...p, service]);
                     else setSelectedServices(p => p.filter(s => s !== service));
-                  }} />
-                  <span className="text-body-4 font-medium leading-tight select-none">{service}</span>
-                </label>
+                  }}
+                >
+                  {service}
+                </CheckboxCard>
               ))}
             </div>
+            {errors.services && <p className="text-sm text-destructive font-medium">{errors.services}</p>}
           </div>
+
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. О проекте</h3>
-            <Field><Textarea name="description" required className="min-h-[160px] text-body-2! rounded-2xl!" placeholder="Расскажите о целях проекта..." /></Field>
+            <Field data-invalid={!!errors.description}>
+              <Textarea name="description" className="min-h-[100px]" placeholder="Расскажите о целях проекта..." />
+              <FieldError errors={errors.description ? [{ message: errors.description }] : []} />
+            </Field>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <label className="text-body-4 text-(--on-bg-low)">Желаемые сроки</label>
+              <div className="space-y-3">
+                <Label>Желаемые сроки</Label>
                 <Select name="deadline">
-                  <SelectTrigger className="w-full h-12! rounded-xl! border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите срок" /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue placeholder="Выберите срок" /></SelectTrigger>
                   <SelectContent>{DEADLINE_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <label className="text-body-4 text-(--on-bg-low)">Ориентировочный бюджет</label>
-                <Select name="budget" defaultValue="">
-                  <SelectTrigger className="w-full h-12! rounded-xl! border-(--outline) hover:border-(--primary-card)"><SelectValue placeholder="Выберите бюджет" /></SelectTrigger>
+              <div className="space-y-3">
+                <Label>Ориентировочный бюджет</Label>
+                <Select name="budget" defaultValue="" >
+                  <SelectTrigger className="w-full"><SelectValue placeholder="Выберите бюджет" /></SelectTrigger>
                   <SelectContent>{BUDGET_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
           </div>
+
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight">3. О компании</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -253,9 +301,10 @@ export default function OrderPage() {
               </Field>
             </div>
           </div>
+
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (макс. 10мб.)</h3>
-            <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}. Остальные файлы можно отправить во время обсуждения заказа.</p>
+            <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}.</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {attachments.map((attr, idx) => (
                 <div key={attr.id} className="relative aspect-square group rounded-2xl border border-(--outline) overflow-hidden bg-card transition-shadow hover:shadow-lg">
@@ -278,19 +327,31 @@ export default function OrderPage() {
             </div>
             <input type="file" ref={fileInputRef} className="hidden" multiple onChange={handleFileChange} accept={AVALIABLE_FILE_TYPES} />
           </div>
+
           <div className="space-y-6">
             <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Input name="user_name" required placeholder="Ваше имя" className="h-12! rounded-xl!" />
-              <Input name="user_contact" required placeholder="Телефон или Telegram" className="h-12! rounded-xl!" />
-              <Input name="user_email" type="email" placeholder="Email (необязательно)" className="h-12! rounded-xl!" />
+              <Field data-invalid={!!errors.user_name}>
+                <Input name="user_name" placeholder="Ваше имя" />
+                <FieldError errors={errors.user_name ? [{ message: errors.user_name }] : []} />
+              </Field>
+              <Field data-invalid={!!errors.user_contact}>
+                <Input name="user_contact" placeholder="Телефон или Telegram" />
+                <FieldError errors={errors.user_contact ? [{ message: errors.user_contact }] : []} />
+              </Field>
+              <Field data-invalid={!!errors.user_email}>
+                <Input name="user_email" type="email" placeholder="Email (необязательно)" />
+                <FieldError errors={errors.user_email ? [{ message: errors.user_email }] : []} />
+              </Field>
             </div>
           </div>
+
           <div className="pt-8">
-            <Button type="submit" size="large" className="w-full md:w-fit h-16! px-12! rounded-2xl! text-lg! uppercase tracking-tighter" disabled={loading}>{loading ? "Отправка..." : "Отправить заявку"}</Button>
+            <Button type="submit" size="xlarge" className="w-full md:w-fit px-12! " disabled={loading}>{loading ? "Отправка..." : "Отправить заявку"}</Button>
           </div>
         </form>
       </Container>
+
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent showCloseButton={false} className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0">
           <Button variant="glass" className="absolute top-4 right-4 z-[999]! rounded-full border-(--white)" size="icon-medium" onClick={() => setLightboxOpen(false)}>

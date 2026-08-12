@@ -30,9 +30,11 @@ export const iconButtonSizes = {
 }
 
 export const buttonSizes = {
-  small: "h-[36px] px-4 text-xs gap-1 [&_svg]:size-3.5",
-  medium: "h-[42px] px-6 text-sm gap-1.5 [&_svg]:size-4",
-  large: "h-[54px] px-6 text-base gap-2 [&_svg]:size-5",
+  xsmall: "h-[24px] px-4 text-xs gap-1 [&_svg]:size-3 text-heading-6!",
+  small: "h-[36px] px-4 text-xs gap-1 [&_svg]:size-3.5 text-heading-6!",
+  medium: "h-[42px] px-6 gap-1.5 [&_svg]:size-4 text-heading-5!",
+  large: "h-[54px] px-6 gap-2 [&_svg]:size-5 text-heading-4!",
+  xlarge: "h-[64px] px-6 gap-2 [&_svg]:size-6 text-heading-3!",
 }
 
 const buttonVariants = cva(
@@ -46,7 +48,7 @@ const buttonVariants = cva(
         ...chipSizes,
       },
       shape: {
-        square: "rounded-md",
+        square: "rounded-xl",
         round: "rounded-full",
       }
     },

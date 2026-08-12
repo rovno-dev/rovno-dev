@@ -355,3 +355,124 @@
 [data-sonner-toast][data-variant="error"] {
   border-left: 4px solid #ef4444 !important;
 }
+
+@layer components {
+  /* ponytail: Ensure Sonner toasts adhere to the 1px solid utilitarian border rule */
+  [data-sonner-toast] {
+    border: 1px solid var(--outline) !important;
+    background: var(--card) !important;
+    font-family: var(--font-sans) !important;
+  }
+  .dark [data-sonner-toast] {
+    background: var(--dark-9) !important;
+    border-color: var(--dark-6) !important;
+  }
+}
+
+@layer components {
+  /* ponytail: Mimic the premium stacking and border-contrast from reference */
+  [data-sonner-toast] {
+    --toast-border-radius: 18px;
+    --toast-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.1);
+    
+    border: 1px solid var(--outline) !important;
+    background: var(--card) !important;
+    box-shadow: var(--toast-shadow) !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s !important;
+  }
+
+  /* The "stack" effect styling (the toasts behind) */
+  [data-sonner-toast][data-expanded="false"][data-front="false"] {
+    border-color: transparent !important;
+    opacity: 0.6 !important;
+  }
+
+  .dark [data-sonner-toast] {
+    background: #121212 !important; /* Deep charcoal for reference match */
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Force icon alignment to match the screenshot exactly */
+  [data-sonner-toast] [data-icon] {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Close button style fix */
+  [data-close-button] {
+    top: 50% !important;
+    right: 12px !important;
+    transform: translateY(-50%) !important;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  
+  [data-close-button]:hover {
+    opacity: 1;
+    background: transparent !important;
+  }
+}
+
+@layer components {
+  /* ponytail: Force close button to the right and vertically center it to match reference */
+  [data-sonner-toast] [data-close-button] {
+    left: auto !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    border: none !important;
+    opacity: 0.4;
+    color: var(--on-bg-high) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: opacity 0.2s, background 0.2s !important;
+    padding: 4px !important;
+    height: 24px !important;
+    width: 24px !important;
+  }
+
+  [data-sonner-toast] [data-close-button]:hover {
+    opacity: 1;
+    background: var(--state-hover) !important;
+    border-radius: 6px !important;
+  }
+
+  /* ponytail: adjust content padding to prevent text overlapping the close button */
+  [data-sonner-toast] [data-content] {
+    padding-right: 32px !important;
+  }
+}
+
+@layer components {
+  /* Target the specific close button within the toast container */
+  [data-sonner-toast] [data-close-button] {
+    /* Reset Sonner's default left/top placement */
+    left: auto !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    
+    /* Style cleanup to match the high-end reference */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--on-bg-low) !important;
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+  }
+
+  [data-sonner-toast] [data-close-button]:hover {
+    opacity: 1;
+    color: var(--on-bg-high) !important;
+    background: var(--state-hover) !important;
+  }
+
+  /* Increase right padding on the content so text doesn't hit the X */
+  [data-sonner-toast] [data-content] {
+    padding-right: 36px !important;
+  }
+}
