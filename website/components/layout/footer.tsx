@@ -13,10 +13,9 @@ export default function Footer() {
     {
       title: "Агентство",
       links: [
-        { title: "Избранные проекты", href: ROUTES.projects.href },
-        { title: "О команде", href: ROUTES.about.href },
-        { title: "Блог", href: ROUTES.blog.href },
-        { title: "Карьера", href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
+        { title: "Проекты", href: ROUTES.projects.href },
+        { title: "О нас", href: ROUTES.about.href },
+        { title: "Карьера в Rovno.dev", href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
       ],
     },
     {
@@ -26,14 +25,15 @@ export default function Footer() {
         { title: "UX/UI Дизайн", href: ROUTES.order.href },
         { title: "Айдентика", href: ROUTES.order.href },
         { title: "3D & Motion", href: ROUTES.order.href },
+        { title: "Другое", href: ROUTES.order.href },
       ],
     },
     {
       title: "Медиа",
       links: [
         { title: "Журнал «Ровня»", href: ROUTES.journal.href },
-        { title: "Предложить статью", href: "https://t.me/rovno_dev" },
-        { title: "База знаний", href: "/fake-api" },
+        { title: "Предложить статью", href: "https://t.me/rovno_dev?direct" },
+        // { title: "База знаний", href: "" },
       ],
     },
   ];
@@ -48,12 +48,12 @@ export default function Footer() {
               <RovnoLogotypeWordmark className="h-8! w-auto" />
             </Link>
             <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
-              Проектируем и разрабатываем высоконагруженные цифровые продукты для лидеров рынка.
+              Проектируем и разрабатываем ровные, высоконагруженные цифровые продукты для решения сложных задач
             </p>
             <div className="flex items-center gap-1 mt-2">
               <SocialButton href="https://t.me/rovno_dev" icon={<TelegramLogotypeMonoIcon />} />
-              <SocialButton href="https://github.com/rovno-dev" icon={<GithubLogotypeMonoIcon />} />
               <SocialButton href="https://vk.com/rovno_dev" icon={<VKLogotypeMonoIcon />} />
+              <SocialButton href="https://github.com/rovno-dev" icon={<GithubLogotypeMonoIcon />} />
               <SocialButton href="https://dprofile.ru/rovno_dev" icon={<DprofileLogotypeMonoIcon />} />
             </div>
           </div>
@@ -86,11 +86,11 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <span className="text-body-5 text-(--on-bg-low)">
-              © {new Date().getFullYear()} Rovno.dev
+              © 2023–{new Date().getFullYear()} Цифровое агентство полного цикла Rovno.dev, все права защищены
             </span>
-            <Link href="" className="text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors">
+            {/* <Link href="i.rovno.dev/docs/pd-policy" className="text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors">
               Политика конфиденциальности
-            </Link>
+            </Link> */}
           </div>
 
           <div className="flex items-center gap-6">

@@ -8,6 +8,8 @@ import BottomAppBar from "@/components/layout/bottom-app-bar";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
+import { YandexMetrika } from "@/components/layout/marketing/yandex-metrika";
+import { CookieConsent } from "@/components/layout/marketing/cookie-consent";
 
 export const NotoSans = localFont({
   src: '../public/fonts/NotoSans.woff2',
@@ -62,14 +64,16 @@ export default function RootLayout({
             </main>
             <Footer />
             <BottomAppBar />
-            <Toaster 
-              position="bottom-right" 
-              closeButton 
+            <Toaster
+              position="bottom-right"
+              closeButton
               gap={8}
               visibleToasts={3}
             />
+            <CookieConsent />
           </TooltipProvider>
         </ThemeProvider>
+        <YandexMetrika />
       </body>
     </html>
   );

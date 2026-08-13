@@ -1,9 +1,9 @@
 name: rovno-dev
 include:
-  - tg-bot/docker-compose.yml
-  - backend/docker-compose.yml
+  # - tg-bot/docker-compose.yml
+  # - backend/docker-compose.yml
   - website/docker-compose.yml
-  - twenty/docker-compose.yml
+  # - twenty/docker-compose.yml
 services:
   traefik:
     image: traefik:latest

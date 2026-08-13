@@ -1,6 +1,7 @@
 /* LLM context: Adding staggering and subtle reveal effects to socials section */
 
-import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
+import { DprofileLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
+import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
 import { servicesIconsStyles, ShowcaseCard } from "@/components/layout/showcase-card";
 import { Container } from "@/components/ui/container";
 
@@ -25,9 +26,9 @@ export default function SocialsSection() {
       delay: "delay-200"
     },
     {
-      name: "Пинтерест",
-      icon: <PinterestLogotypeMonoIcon className={servicesIconsStyles} />,
-      href: "https://pinterest.com/rovno_dev",
+      name: "Наш ГитХаб",
+      icon: <GithubLogotypeMonoIcon className={servicesIconsStyles} />,
+      href: "https://github.com/rovno-dev",
       delay: "delay-250"
     },
   ];

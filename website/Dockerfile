@@ -1,7 +1,7 @@
 # ===============================
 # Base
 # ===============================
-FROM node:20-alpine AS base
+FROM node:lts-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -23,7 +23,7 @@ RUN npm run build
 # ===============================
 # Prod
 # ===============================
-FROM node:20-alpine AS prod
+FROM node:lts-alpine AS prod
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

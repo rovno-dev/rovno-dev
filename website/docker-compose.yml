@@ -1,9 +1,13 @@
 services:
-  next_js:
+  next-js:
     container_name: next-js
+    env_file:
+      - ./.env
     build:
       context: .
       target: prod
+    profiles:
+      - prod
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"

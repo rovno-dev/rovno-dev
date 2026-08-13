@@ -32,7 +32,7 @@ export default function Header() {
         </div>
 
         <Button className="hidden sm:flex" asChild>
-          <Link href={"/order"}>
+          <Link href={ROUTES.order.href}>
             <DesignServicesIcon />
             Оформить заказ
           </Link>

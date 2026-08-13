@@ -55,7 +55,7 @@ export default function BottomAppBar() {
             size="medium"
             onClick={() => setOpen(true)}
           >
-            <Link href={'/order'}>
+            <Link href={ROUTES.order.href}>
               <DesignServicesIcon className="size-[26px]!" />
               <span className="text-display-4">Заказ</span>
             </Link>
