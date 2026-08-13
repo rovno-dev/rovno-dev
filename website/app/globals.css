@@ -220,6 +220,7 @@
   --bg-disabled: var(--gray-9);
   --on-bg-disabled: var(--gray-7);
   --card: var(--dark-9);
+  --sidebar-accent: var(--dark-7);
   --on-bg-high: var(--white);
   --on-bg-medium: var(--dark-1);
   --on-bg-low: var(--dark-2);
@@ -474,5 +475,54 @@
   /* Increase right padding on the content so text doesn't hit the X */
   [data-sonner-toast] [data-content] {
     padding-right: 36px !important;
+  }
+}
+
+@layer utilities {
+  .animate-circuit-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: circuit-draw 2s ease-out forwards;
+  }
+
+  .animate-pulse-flow {
+    stroke-dasharray: 40, 1000;
+    stroke-dashoffset: 1000;
+    animation: pulse-flow 4s linear infinite;
+  }
+
+  @keyframes circuit-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes pulse-flow {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .bg-grid-white {
+    background-size: 40px 40px;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  }
+}
+
+@layer utilities {
+  @keyframes pulse-move {
+    0% { stroke-dashoffset: 1; }
+    100% { stroke-dashoffset: -1; }
+  }
+
+  .animate-pulse-path {
+    animation: pulse-move 3s linear infinite;
+  }
+
+  /* CPU Pins Styling */
+  [data-connector] {
+    @apply block bg-zinc-700 rounded-sm;
+  }
+  [data-side="top"] [data-connector], [data-side="bottom"] [data-connector] {
+    @apply w-1 h-2.5;
+  }
+  [data-side="left"] [data-connector], [data-side="right"] [data-connector] {
+    @apply h-1 w-2.5;
   }
 }
