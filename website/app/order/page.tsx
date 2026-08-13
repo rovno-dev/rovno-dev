@@ -1,12 +1,15 @@
 "use client";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import * as mammoth from "mammoth";
 import { z } from "zod";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { CloseSmallIcon, ArticleIcon } from "@/components/icons";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -19,12 +22,10 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-
 import { ServiceSelection } from "./_components/service-selection";
 import { ProjectDetails } from "./_components/project-details";
 import { FileUpload } from "./_components/file-upload";
 import { ContactInfo } from "./_components/contact-info";
-
 const orderSchema = z.object({
   user_name: z.string().min(2, "Имя должно быть не короче 2 символов"),
   user_contact: z.string().min(1, "Укажите контакт для связи"),
@@ -35,10 +36,9 @@ const orderSchema = z.object({
   naming_help: z.string().optional(),
   deadline: z.string().optional(),
   budget: z.string().optional(),
+  agreement: z.boolean().refine((val) => val === true, "Необходимо согласие для отправки"),
 });
-
 type OrderFormValues = z.infer<typeof orderSchema>;
-
 interface FileWithPreview {
   file: File;
   preview: string | null;
@@ -46,9 +46,7 @@ interface FileWithPreview {
   id: string;
   type: 'image' | 'pdf' | 'doc' | 'md' | 'other';
 }
-
 const AVALIABLE_FILE_TYPES = 'image/*, .pdf, .docx, .doc, .md, .mdx, .xls, .xlsx, .zip, .7zip';
-
 export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -58,18 +56,15 @@ export default function OrderPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!api || !lightboxOpen) return;
     if (e.key === "ArrowLeft") api.scrollPrev();
     if (e.key === "ArrowRight") api.scrollNext();
   }, [api, lightboxOpen]);
-
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
-
   useEffect(() => {
     if (!api || !lightboxOpen) return;
     const timer = setTimeout(() => {
@@ -77,7 +72,6 @@ export default function OrderPage() {
     }, 50);
     return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -89,11 +83,9 @@ export default function OrderPage() {
         else if (file.type === 'application/pdf' || name.endsWith('.pdf')) type = 'pdf';
         else if (name.endsWith('.docx') || name.endsWith('.doc')) type = 'doc';
         else if (name.endsWith('.md') || name.endsWith('.mdx')) type = 'md';
-
         const previewUrl = (type === 'image' || type === 'pdf') ? URL.createObjectURL(file) : null;
         const newFile: FileWithPreview = { file, preview: previewUrl, id, type };
         setAttachments(prev => [...prev, newFile].slice(0, 20));
-
         if (type === 'doc') {
           const reader = new FileReader();
           reader.onload = async (loadEvent) => {
@@ -112,7 +104,6 @@ export default function OrderPage() {
       });
     }
   };
-
   const removeFile = (id: string) => {
     setAttachments(prev => {
       const target = prev.find(f => f.id === id);
@@ -120,7 +111,6 @@ export default function OrderPage() {
       return prev.filter(f => f.id !== id);
     });
   };
-
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -136,8 +126,8 @@ export default function OrderPage() {
       user_name: formData.get("user_name"),
       user_contact: formData.get("user_contact"),
       user_email: formData.get("user_email"),
+      agreement: formData.get("agreement") === "on",
     };
-
     const result = orderSchema.safeParse(rawData);
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof OrderFormValues, string>> = {};
@@ -147,11 +137,9 @@ export default function OrderPage() {
       toast.error("Проверьте правильность заполнения полей");
       return;
     }
-
     const finalFormData = new FormData(e.currentTarget);
     finalFormData.set("services", JSON.stringify(selectedServices));
     attachments.forEach(attr => finalFormData.append("files", attr.file));
-
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
         method: "POST",
@@ -169,7 +157,6 @@ export default function OrderPage() {
     } catch { toast.error("Сетевая ошибка."); }
     finally { setLoading(false); }
   }
-
   return (
     <>
       <Container className="pt-8 pb-12">
@@ -193,12 +180,20 @@ export default function OrderPage() {
           </div>
           <FileUpload attachments={attachments} onRemoveFile={removeFile} onOpenLightbox={(i) => { setActiveIndex(i); setLightboxOpen(true); }} fileInputRef={fileInputRef} onFileChange={handleFileChange} />
           <ContactInfo errors={errors} />
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Checkbox id="agreement" name="agreement" />
+              <Label htmlFor="agreement" className="text-body-4 text-(--on-bg-medium) leading-tight cursor-pointer">
+                Даю согласие на обработку моих Персональных Данных
+              </Label>
+            </div>
+            {errors.agreement && <p className="text-sm text-destructive font-medium">{errors.agreement}</p>}
+          </div>
           <div className="pt-6">
             <Button type="submit" size="xlarge" className="w-full sm:w-fit! sm:px-16!" disabled={loading}>{loading ? "Отправка..." : "Отправить заявку"}</Button>
           </div>
         </form>
       </Container>
-
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent showCloseButton={false} className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0">
           <Button variant="glass" className="absolute top-4 right-4 z-[999]! rounded-full border-(--white)" size="icon-medium" onClick={() => setLightboxOpen(false)}>
