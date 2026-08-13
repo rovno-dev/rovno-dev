@@ -1,6 +1,7 @@
 "use client"
 import React from "react";
 import { Container } from "@/components/ui/container";
+import { Card } from "@/components/ui/card";
 
 // --- ICONS ---
 const CodeIcon = () => (
@@ -27,32 +28,33 @@ type ServiceType = {
 const services: ServiceType[] = [
   {
     title: "Разработка",
-    description: "От высоконагруженных систем до Telegram-ботов. Пишем чистый код на передовом стеке.",
+    description: "От Telegram-ботов до высоконагруженных систем с внедрением ИИ в бизнес-процессы и разработкой умных агентов и автоматизаций.",
     icon: <CodeIcon />,
     color: "#3b82f6",
-    stack: ["React", "Next.js", "FastAPI", "PostgreSQL"]
+    stack: ["React", "Next.js", "FastAPI", "PSQL", "Redis", "Aiogram", "NemoClaw", "Hermes", "Python", "Go", "Docker", "Kubernetes"]
   },
   {
     title: "UX/UI Дизайн",
     description: "Продуманные интерфейсы и сценарии, повышающие конверсию вашего продукта.",
     icon: <PaintIcon />,
     color: "#ec4899",
-    stack: ["Figma", "Illustrator", "Photoshop"]
+    stack: ["Figma", "Photoshop", "Nano Banana Pro"]
   },
   {
-    title: "ИИ-Автоматизация",
-    description: "Внедрение нейросетей в бизнес-процессы. Разработка умных агентов и автоматизаций.",
+    title: "Айдентика",
+    description: "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
     icon: <SparklesIcon />,
     color: "#a855f7",
-    stack: ["Claude", "Cursor", "Aider", "Aiogram"]
+    stack: ["Illustrator", "Photoshop", "Nano Banana Pro"]
   },
   {
     title: "3D & Motion",
     description: "CGI, рекламные ролики и 3D-графика, которые выделяют вас на фоне конкурентов.",
     icon: <BoxIcon />,
     color: "#f59e0b",
-    stack: ["Blender", "After Effects", "Premiere Pro"]
+    stack: ["Blender", "After Effects", "Premiere Pro", "Hyperframes", "3ds Max", "Kling AI", "DaVinci Resolve", "Auto-subs"]
   },
+
 ];
 
 function ICChip() {
@@ -74,7 +76,6 @@ function ICChip() {
       <div className="relative bg-[#0e0e10] border-2 border-[#1c1c1f] rounded-xl px-12 py-8 shadow-[0_20px_60px_rgba(0,0,0,1)] ring-1 ring-white/10">
         <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-black/50 border border-white/5 shadow-inner" />
         <div className="relative flex flex-col items-center">
-          <span className="text-[8px] font-mono tracking-[0.5em] text-zinc-500 uppercase mb-2">System Architecture</span>
           <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tighter uppercase bg-gradient-to-b from-white to-zinc-600 bg-clip-text text-transparent">
             Наши услуги
           </h2>
@@ -87,7 +88,7 @@ function ICChip() {
 
 export default function ServicesSection() {
   return (
-    <section className="relative py-24 bg-black overflow-hidden selection:bg-white/10">
+    <section className="relative py-24 overflow-hidden selection:bg-white/10">
       <style jsx global>{`
         @keyframes beam-flow {
           0% { stroke-dashoffset: 1200; }
@@ -169,7 +170,7 @@ function ResponsiveCircuitry() {
 
 function ServiceCard({ service }: { service: ServiceType }) {
   return (
-    <div className="group relative flex flex-col justify-between rounded-2xl border border-zinc-800/50 bg-[#080809]/90 backdrop-blur-md p-7 md:p-8 transition-all duration-500 hover:border-zinc-700 hover:bg-zinc-900/40">
+    <Card className="p-4 sm:p-6 group relative flex flex-col justify-between rounded-2xl border border-zinc-800/50 backdrop-blur-md transition-all duration-500 hover:border-zinc-700">
       <div className="absolute top-1/2 -right-px -translate-y-1/2 w-[3px] h-10 md:hidden block opacity-40 group-hover:opacity-100 transition-opacity"
         style={{ backgroundColor: service.color, boxShadow: `0 0 15px ${service.color}` }} />
 
@@ -190,13 +191,13 @@ function ServiceCard({ service }: { service: ServiceType }) {
         </p>
       </div>
 
-      <div className="mt-8 pt-5 border-t border-white/5 flex flex-wrap gap-1.5">
+      <div className="mt-2 pt-4 border-t border-white/5 flex flex-wrap gap-1.5">
         {service.stack.map((tech: string) => (
           <span key={tech} className="px-2 py-0.5 rounded-md bg-zinc-900/50 border border-white/5 text-[9px] font-mono text-zinc-600 uppercase tracking-widest group-hover:text-zinc-300">
             {tech}
           </span>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
