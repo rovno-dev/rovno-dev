@@ -78,12 +78,20 @@ export default function ServicesSection() {
         {/* Header: Next.js Foundation Style */}
         <ICChip></ICChip>
 
-        {/* The Grid: 1px border logic with flush edges */}
-        <div className="grid grid-cols-1 border border-(--outline) md:grid-cols-2 lg:grid-cols-4">
+        {/* The Grid: Perfectly flush 1px internal dividers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {services.map((service, idx) => (
             <div
               key={idx}
-              className="group relative border-b border-(--outline) p-8 transition-colors hover:bg-(--primary-glass) md:border-r lg:p-10"
+              className="group relative p-8 transition-colors hover:bg-(--primary-glass) lg:p-10 border-(--outline)
+                /* Mobile: Bottom borders everywhere except the last item */
+                border-b last:border-b-0
+                /* Desktop: Reset mobile layout borders */
+                md:border-b-0 md:last:border-b-0
+                /* Desktop: Add vertical divider after the first item in each row */
+                md:[&:nth-child(odd)]:border-r
+                /* Desktop: Add horizontal divider under the first row items */
+                md:[&:nth-child(-n+2)]:border-b"
             >
               {/* Subtle background glow effect on hover */}
               <div

@@ -7,12 +7,13 @@ import { TerminalStyledInline } from "@/components/layout/terminal-styled-inline
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden py-14 md:py-24 min-h-[70vh] flex items-center bg-(--bg)">
+    <section className="relative overflow-hidden py-14 md:py-24 min-h-[70vh] flex items-center">
       {/* Gradient overlay */}
-      <div className="absolute inset-0 pointer-events-none hero-gradient-bg" />
+      <div className="absolute inset-0 pointer-events-none" />
 
       {/* Animated Grid Background */}
-      <div className="absolute inset-0 pointer-events-none grid-bg" />
+      <div className="absolute inset-0 pointer-events-none grid-bg " />
+      <div className="z-10 absolute h-full w-full bottom-0 left-0 bg-gradient-to-t from-(--bg) to-(--bg)/0 to-20%" />
 
       <Container className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-semibold leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
@@ -23,10 +24,11 @@ export default function HeroSection() {
           Разработка, дизайн, 3D-анимация и айдентика. Создаём высоконагруженные решения, которые работают на результат.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
           <Button
             size="large"
             shape="round"
+            className="w-full sm:w-fit"
             asChild
           >
             <Link href={ROUTES.order.href}>
@@ -37,6 +39,7 @@ export default function HeroSection() {
             variant="glass"
             size="large"
             shape="round"
+            className="w-full sm:w-fit"
             asChild
           >
             <Link href="/projects">
