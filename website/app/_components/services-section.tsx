@@ -3,6 +3,7 @@
 import React from "react";
 import { Container } from "@/components/ui/container";
 import { DeployedCodeIcon, DesignServicesIcon, DiamondIcon, StylusNoteIcon } from "@/components/icons";
+import { Badge } from "@/components/ui/badge";
 
 type ServiceType = {
   title: string;
@@ -48,19 +49,19 @@ function ICChip() {
   return (
     <div className="relative z-30 group mb-16 w-[80%] sm:w-[300px] mx-auto">
       <div className="absolute -left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-r from-zinc-600 to-zinc-800 rounded-l-sm border-y border-white/10" />)}
+        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-r from-(--on-bg-low) to-(--on-bg-medium) rounded-l-sm border-y border-(--outline)" />)}
       </div>
       <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-l from-zinc-600 to-zinc-800 rounded-r-sm border-y border-white/10" />)}
+        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-l from-(--on-bg-low) to-(--on-bg-medium) rounded-r-sm border-y border-(--outline)" />)}
       </div>
       <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-5">
-        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-b from-zinc-600 to-zinc-800 rounded-t-sm border-x border-white/10" />)}
+        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-b from-(--on-bg-low) to-(--on-bg-medium) rounded-t-sm border-x border-(--outline)" />)}
       </div>
       <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-5">
-        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-t from-zinc-600 to-zinc-800 rounded-b-sm border-x border-white/10" />)}
+        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-t from-(--on-bg-low) to-(--on-bg-medium) rounded-b-sm border-x border-(--outline)" />)}
       </div>
 
-      <div className="relative bg-[#0e0e10] border-2 border-[#1c1c1f] rounded-xl px-12 py-8 shadow-[0_20px_60px_rgba(0,0,0,1)] ring-1 ring-white/10">
+      <div className="relative bg-(--card) border-2 border-(--outline) rounded-xl px-12 py-8 shadow-[0_20px_60px_var(--primary-glass)] ring-1 ring-(--outline)">
         <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-black/50 border border-white/5 shadow-inner" />
         <h2 className="text-display-2 text-center">
           Наши услуги
@@ -82,7 +83,7 @@ export default function ServicesSection() {
           {services.map((service, idx) => (
             <div
               key={idx}
-              className="group relative border-b border-white/10 p-8 transition-colors hover:bg-zinc-900/50 md:border-r lg:p-10"
+              className="group relative border-b border-(--outline) p-8 transition-colors hover:bg-(--primary-glass) md:border-r lg:p-10"
             >
               {/* Subtle background glow effect on hover */}
               <div
@@ -95,29 +96,30 @@ export default function ServicesSection() {
               <div className="relative z-10">
                 {/* Icon Box */}
                 <div
-                  className="mb-8 flex size-10 items-center justify-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-400 transition-colors group-hover:text-white"
+                  className="mb-6 flex size-10 items-center justify-center rounded-lg border border-(--outline) bg-(--card) text-zinc-400 transition-colors group-hover:text-white"
                   style={{ color: service.color }}
                 >
                   {service.icon}
                 </div>
 
                 {/* Content */}
-                <h3 className="mb-3 text-lg font-semibold tracking-tight text-white">
+                <h3 className="mb-2 text-lg font-semibold tracking-tight text-(--on-bg-medium)">
                   {service.title}
                 </h3>
-                <p className="mb-8 text-sm leading-relaxed text-zinc-400">
+                <p className="mb-8 text-sm leading-relaxed text-(--on-bg-low)">
                   {service.description}
                 </p>
 
                 {/* Tech Stack Chips */}
                 <div className="flex flex-wrap gap-1.5">
                   {service.stack.map((tech) => (
-                    <span
+                    <Badge
+                      size={'chip-small'}
+                      variant={'glass-static'}
                       key={tech}
-                      className="rounded bg-zinc-800/50 px-2 py-0.5 font-mono text-[10px] font-medium tracking-wider text-zinc-500 uppercase transition-colors group-hover:text-zinc-300"
                     >
                       {tech}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>

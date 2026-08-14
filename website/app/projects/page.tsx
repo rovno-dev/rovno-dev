@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useMemo } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import PageHeadingSection from "@/components/layout/page/page-heading-section";
 
 export default function ProjectsPage() {
   const projectsList = useMemo(() => Object.values(PROJECTS), []);
-
   // Extract unique categories from projects
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -18,9 +16,7 @@ export default function ProjectsPage() {
     });
     return Array.from(cats).sort();
   }, [projectsList]);
-
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
   const filteredProjects = useMemo(() => {
     if (!activeCategory) return projectsList;
     return projectsList.filter((p) => p.category === activeCategory);
@@ -55,7 +51,6 @@ export default function ProjectsPage() {
           </div>
         </Container>
       </section>
-
       {/* Projects Grid */}
       <section className="pb-24 md:pb-32">
         <Container>
@@ -64,7 +59,7 @@ export default function ProjectsPage() {
               Нет проектов в этой категории
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 xl:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredProjects.map((project, idx) => (
                 <ProjectCard key={project.id} project={project} index={idx} />
               ))}

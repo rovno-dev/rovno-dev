@@ -1,7 +1,5 @@
 /* LLM context: Updating expert page with immersive transitions and dynamic project card entry */
-
 "use client";
-
 import React, { useState } from "react";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
@@ -26,9 +24,7 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
           alt={expert.name}
           priority
         />
-
         <div className="absolute inset-0 bg-gradient-to-t from-(--bg) via-transparent to-transparent z-10" />
-
         <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-col gap-1">
           {expert.socials.map((social, key) => (
             <Button variant={'text'} key={key} size={'icon-large'} asChild className="animate-reveal" style={{ animationDelay: `${400 + key * 100}ms` }}>
@@ -38,13 +34,11 @@ function ExpertHeroSection({ expert }: { expert: ExpertData }) {
             </Button>
           ))}
         </div>
-
         <div className="absolute inset-0 z-20 flex flex-col justify-end items-start md:items-center p-4 md:p-6">
           <div className="flex items-center gap-3 mb-4 md:mb-6 animate-reveal delay-200 fill-mode-both">
             <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high)">{expert.name}</h1>
             <TatarstanIcon className="size-9 md:size-14 shrink-0 shadow-lg rounded-full duration-[2000ms]" />
           </div>
-
           <div className="w-full overflow-x-auto overflow-y-hidden no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
             <div className="flex flex-nowrap gap-2 md:flex-wrap md:justify-center pb-1">
               {expert.tags.map((tag, index) => (
@@ -77,11 +71,9 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
     // "Награды", 
     // "Мысли вслух"
   ];
-
   return (
     <div className="pb-20">
       <ExpertHeroSection expert={expert} />
-
       <Container variant="full-width" className="py-4 md:py-12">
         <div className="max-w-[1200px] mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6 md:mb-10 animate-reveal delay-500 fill-mode-both">
@@ -97,9 +89,8 @@ export default function ExpertPage({ expert }: { expert: ExpertData }) {
               ))}
             </TabsList>
           </Tabs>
-
           {activeTab === "Проекты" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {expert.projects.map((project, idx) => (
                 <ProjectCard key={idx} project={project} index={idx} />
               ))}

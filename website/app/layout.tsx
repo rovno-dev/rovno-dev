@@ -11,8 +11,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { YandexMetrika } from "@/components/layout/marketing/yandex-metrika";
 import { CookieConsent } from "@/components/layout/marketing/cookie-consent";
 
-export const NotoSans = localFont({
-  src: '../public/fonts/NotoSans.woff2',
+export const Geist = localFont({
+  src: '../public/fonts/Geist-VariableFont_wght.woff2',
   variable: '--font-sans',
 });
 export const Oswald = localFont({
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(NotoSans.className, "font-sans")}
+      className={cn(Geist.className, "font-sans")}
       suppressHydrationWarning
     >
       <head>

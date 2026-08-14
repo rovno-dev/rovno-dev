@@ -1,37 +1,40 @@
 import { Project } from "@/app/[slug]/(Project)/_data";
-import { Card } from "@/components/ui/card";
-import Image from "next/image"
+import Image from "next/image";
+import Link from "next/link";
 
 export default function ProjectCard({ project, index }: { project: Project, index?: number }) {
   return (
-    <a
+    <Link
       href={`/${project.id}`}
-      rel="noopener noreferrer"
       className="group block animate-reveal fill-mode-both"
-      style={{ animationDelay: `${index ? index : 1 * 100}ms` }}
+      style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
     >
-      <Card className="relative overflow-hidden rounded-3xl bg-card aspect-4/3! transition-all active:scale-[0.98]">
-        <Image
-          fill
-          src={project.cover}
-          alt={project.title}
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+      <div className="relative h-full flex flex-col overflow-hidden rounded-2xl bg-(--card) border border-(--outline) transition-all duration-300 hover:border-(--primary)/30 hover:shadow-lg hover:shadow-(--primary)/5">
+        {/* Image - full width, no text overlay */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden shrink-0">
+          <Image
+            src={project.cover}
+            alt={project.title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </div>
 
-        {/* Enhanced gradient overlay for ultimate contrast and readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-        <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6">
-          <h3 className="text-display-4 md:text-display-3 text-white leading-tight max-w-[90%] drop-shadow-lg transition-transform group-hover:-translate-y-1">
-            {project.title}
-          </h3>
-          {project.shortDescription && (
-            <p className="mt-2 text-body-2 md:text-body-1 text-white/80 leading-relaxed max-w-[90%] drop-shadow-md line-clamp-3 transition-transform group-hover:-translate-y-1">
-              {project.shortDescription}
+        {/* Content below image */}
+        <div className="p-5 md:p-6 flex flex-col gap-1 flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-body-1 md:text-display-5 font-semibold text-(--on-bg-high) leading-tight">
+              {project.title}
+            </h3>
+            <span className="text-(--on-bg-low) text-xs">↗</span>
+          </div>
+          {project.category && (
+            <p className="text-body-4 text-(--on-bg-medium) font-medium">
+              {project.category}
             </p>
           )}
         </div>
-      </Card>
-    </a>
+      </div>
+    </Link>
   );
 }
