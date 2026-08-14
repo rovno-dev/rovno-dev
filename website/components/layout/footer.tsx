@@ -39,7 +39,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-(--bg) pt-20 pb-12 border-t border-(--outline)">
+    <footer className="bg-(--bg) pt-20 pb-32 border-t border-(--outline)">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
           {/* Brand Column */}
@@ -59,13 +59,13 @@ export default function Footer() {
           </div>
 
           {/* Links Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
             {sections.map((section) => (
-              <div key={section.title} className="flex flex-col gap-5">
+              <div key={section.title} className="flex flex-col gap-4">
                 <h4 className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">
                   {section.title}
                 </h4>
-                <ul className="flex flex-col gap-3">
+                <ul className="flex flex-col gap-2">
                   {section.links.map((link) => (
                     <li key={link.title}>
                       <NavLink

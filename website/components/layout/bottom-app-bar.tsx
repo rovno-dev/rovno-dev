@@ -24,7 +24,7 @@ export default function BottomAppBar() {
   ]
 
   return (
-    <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
+    <nav className="md:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
       <Container aria-label="Bottom app bar">
         <div className="p-2 grid grid-cols-[1fr_125px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
           <div className="w-full h-full grid grid-cols-3 items-center">
