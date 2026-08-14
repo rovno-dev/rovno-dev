@@ -1,11 +1,11 @@
-import { Project } from "@/app/[slug]/(Project)/_data";
+import { Project } from "@/app/_data/projects";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function ProjectCard({ project, index }: { project: Project, index?: number }) {
   return (
     <Link
-      href={`/${project.id}`}
+      href={`/projects/${project.slug}`}
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
     >

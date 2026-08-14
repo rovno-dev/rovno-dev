@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { PROJECTS } from "@/app/[slug]/(Project)/_data";
+import { PROJECTS } from "@/app/_data/projects";
 import ProjectCard from "@/components/layout/project-card/project-card";
 import PageHeadingSection from "@/components/layout/page/page-heading-section";
 

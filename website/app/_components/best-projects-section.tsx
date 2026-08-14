@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/container";
-import { PROJECTS } from "../[slug]/(Project)/_data";
+import { PROJECTS } from "@/app/_data/projects";
 import ProjectCard from "@/components/layout/project-card/project-card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link'
