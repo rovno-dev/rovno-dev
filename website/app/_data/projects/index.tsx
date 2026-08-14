@@ -13,8 +13,8 @@ export interface Project {
   shortDescription?: string;
   tags?: ProjectTagType[];
   cover: {
-    videoSrc?: string,
-    imageSrc: string,
+    videoSrc?: string;
+    imageSrc: string;
   };
   href?: string;
   category?: string;
@@ -22,8 +22,7 @@ export interface Project {
   platform?: string;
   period?: string;
   techStack?: string[];
-  metrics?: { label: string; value: string; description: string }[];
-  media?: { type: 'image' | 'video'; src: string }[];
+  // metrics and media are now stored in MDX files under content/
 }
 
 export const PROJECTS: Record<string, Project> = {
@@ -42,16 +41,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "1",
     period: "2024",
     techStack: ["Figma", "Adobe Illustrator"],
-    metrics: [
-      { label: "Конверсия", value: "+45%", description: "рост регистраций" },
-      { label: "Отток", value: "-20%", description: "снижение отказов" },
-    ],
-    media: [
-      { type: 'image', src: '/_static/projects/vanguard/vanguard-1.png' },
-      { type: 'image', src: '/_static/projects/vanguard/vanguard-2.png' },
-      { type: 'image', src: '/_static/projects/vanguard/vanguard-3.png' },
-      { type: 'image', src: '/_static/projects/vanguard/vanguard-4.png' },
-    ],
   },
   alx: {
     id: "2",
@@ -69,16 +58,6 @@ export const PROJECTS: Record<string, Project> = {
     platform: "Веб-сайт",
     period: "2024",
     techStack: ["Figma", "After Effects"],
-    metrics: [
-      { label: "Узнаваемость", value: "+60%", description: "Ребрендинг помог бренду сильно продвинуться в медиа благодаря качественной анимации от наших 3D-художников" },
-    ],
-    media: [
-      { type: 'image', src: '/_static/projects/alx/alx-1.png' },
-      { type: 'image', src: '/_static/projects/alx/alx-2.png' },
-      { type: 'image', src: '/_static/projects/alx/alx-3.png' },
-      { type: 'image', src: '/_static/projects/alx/alx-4.png' },
-      { type: 'video', src: 'https://kinescope.io/wJ6WmWZCkVYZr6yEDvYmLo' },
-    ],
   },
   sadovod: {
     id: "3",
@@ -95,14 +74,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "3",
     period: "2024",
     techStack: ["Figma", "Adobe Illustrator"],
-    metrics: [
-      { label: "Конверсия", value: "+35%", description: "Увеличение конверсии после редизайна" },
-    ],
-    media: [
-      { type: 'image', src: '/_static/projects/sadovod/sadovod-1.png' },
-      { type: 'image', src: '/_static/projects/sadovod/sadovod-2.png' },
-      { type: 'image', src: '/_static/projects/sadovod/sadovod-3.png' },
-    ],
   },
   courtElegance: {
     id: "4",
@@ -119,11 +90,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "4",
     period: "2025",
     techStack: ["Figma", "Wix"],
-    media: [
-      { type: 'image', src: '/_static/projects/courtElegance/courtElegance-cover.png' },
-      { type: 'image', src: '/_static/projects/courtElegance/courtElegance-cover.png' },
-      { type: 'image', src: '/_static/projects/courtElegance/courtElegance-cover.png' },
-    ],
   },
   bread: {
     id: "5",
@@ -140,13 +106,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "5",
     period: "2026",
     techStack: ["Figma", "Blender", "Adobe After Effects", "Adobe Premier Pro", "Crita"],
-    media: [
-      { type: 'video', src: 'https://kinescope.io/aeKrj7KerGCQnPo7rPo22t' },
-      { type: 'image', src: '/_static/projects/bread/bread-1.png' },
-      { type: 'image', src: '/_static/projects/bread/bread-2.png' },
-      { type: 'image', src: '/_static/projects/bread/bread-3.png' },
-      { type: 'image', src: '/_static/projects/bread/bread-4.png' },
-    ],
   },
   concord: {
     id: "6",
@@ -163,17 +122,6 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "6",
     period: "2025",
     techStack: ["Figma", "Adobe Illustrator", "Blender"],
-    metrics: [
-      { label: "Расходы на СММ", value: "-35%", description: "Благодаря простому дизайну удалось повысить узнаваемость среди конкурентов и сократить создание постов до 5 часов в неделю" },
-      { label: "Конверсия", value: "+15%", description: "Повышенная узнаваемость позволила увеличить количество заявок на работы" },
-      { label: "Экономия на мерче", value: "75%", description: "Простой дизайн позволяет выпускать простые и очень яркие элементы фирменной экипировки что критично в больших масштабах строительной области" },
-    ],
-    media: [
-      { type: 'image', src: '/_static/projects/concord/concord-1.png' },
-      { type: 'image', src: '/_static/projects/concord/concord-2.png' },
-      { type: 'image', src: '/_static/projects/concord/concord-3.png' },
-      { type: 'video', src: 'https://kinescope.io/jpn627TNuBgbK3gJ7dsMqP' },
-    ],
   },
   lostPlay: {
     id: "7",
@@ -190,15 +138,5 @@ export const PROJECTS: Record<string, Project> = {
     clientId: "6",
     period: "2025",
     techStack: ["Figma", "Adobe Illustrator", "Blender"],
-    metrics: [
-      { label: "Расходы на СММ", value: "-35%", description: "Благодаря простому дизайну удалось повысить узнаваемость среди конкурентов и сократить создание постов до 5 часов в неделю" },
-      { label: "Конверсия", value: "+15%", description: "Повышенная узнаваемость позволила увеличить количество заявок на работы" },
-      { label: "Экономия на мерче", value: "75%", description: "Простой дизайн позволяет выпускать простые и очень яркие элементы фирменной экипировки что критично в больших масштабах строительной области" },
-    ],
-    media: [
-      { type: 'image', src: '/_static/projects/lostPlay/lostPlay-1.png' },
-      { type: 'image', src: '/_static/projects/lostPlay/lostPlay-2.png' },
-      { type: 'image', src: '/_static/projects/lostPlay/lostPlay-3.png' },
-    ],
   },
 };
