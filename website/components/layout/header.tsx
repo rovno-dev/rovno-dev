@@ -42,7 +42,7 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="hidden sm:flex" asChild>
+          <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
               <DesignServicesIcon />
               Оформить заказ

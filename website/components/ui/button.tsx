@@ -24,9 +24,11 @@ export const chipSizes = {
 }
 
 export const iconButtonSizes = {
-  "icon-small": "h-[48px] aspect-square [&_svg]:size-[24px]",
-  "icon-medium": "h-[54px] aspect-square [&_svg]:size-[30px]",
-  "icon-large": "h-[60px] aspect-square [&_svg]:size-[36px]",
+  "icon-xsmall": "h-[24px] aspect-square [&_svg]:size-[24px]",
+  "icon-small": "h-[36px] aspect-square [&_svg]:size-[24px]",
+  "icon-medium": "h-[42px] aspect-square [&_svg]:size-[30px]",
+  "icon-large": "h-[54px] aspect-square [&_svg]:size-[36px]",
+  "icon-xlarge": "h-[64px] aspect-square [&_svg]:size-[36px]",
 }
 
 export const buttonSizes = {
