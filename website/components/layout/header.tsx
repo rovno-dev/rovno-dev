@@ -4,7 +4,7 @@ import Link from "next/link";
 import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
 import { Button } from "../ui/button";
 import { NavLink } from "./nav-link";
-import { DesignServicesIcon, DiamondIcon } from "../icons";
+import { DesignServicesIcon, UserIcon } from "../icons";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import {
@@ -42,7 +42,7 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Button size={'medium'} className="hidden sm:flex" asChild>
+          <Button className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
               <DesignServicesIcon />
               Оформить заказ
@@ -54,7 +54,7 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="glass" size="icon-small" className="ml-2">
-                      <DiamondIcon />
+                      <UserIcon />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
