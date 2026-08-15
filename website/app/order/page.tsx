@@ -141,7 +141,7 @@ export default function OrderPage() {
     finalFormData.set("services", JSON.stringify(selectedServices));
     attachments.forEach(attr => finalFormData.append("files", attr.file));
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/main/v1/orders/create`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/main/v1/orders/create`, {
         method: "POST",
         body: finalFormData,
       });

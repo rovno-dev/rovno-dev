@@ -10,6 +10,7 @@ import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner";
 import { YandexMetrika } from "@/components/layout/marketing/yandex-metrika";
 import { CookieConsent } from "@/components/layout/marketing/cookie-consent";
+import UserProvider from "@/entities/user/model/user-context";
 
 export const Geist = localFont({
   src: '../public/fonts/Geist-VariableFont_wght.woff2',
@@ -19,12 +20,10 @@ export const Oswald = localFont({
   src: '../public/fonts/Oswald.woff2',
   variable: '--font-heading',
 });
-
 export const metadata: Metadata = {
   title: "Цифровое агентство полного цикла Rovno.dev",
   description: "Digital-агентство полного цикла Rovno.dev - дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,21 +56,23 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <TooltipProvider>
-            <Header />
-            <main className="mt-[46px] md:mt-[70px] mb-[100px]">
-              {children}
-            </main>
-            <Footer />
-            <BottomAppBar />
-            <Toaster
-              position="bottom-right"
-              closeButton
-              gap={8}
-              visibleToasts={3}
-            />
-            <CookieConsent />
-          </TooltipProvider>
+          <UserProvider>
+            <TooltipProvider>
+              <Header />
+              <main className="mt-[46px] md:mt-[70px] mb-[100px]">
+                {children}
+              </main>
+              <Footer />
+              <BottomAppBar />
+              <Toaster
+                position="bottom-right"
+                closeButton
+                gap={8}
+                visibleToasts={3}
+              />
+              <CookieConsent />
+            </TooltipProvider>
+          </UserProvider>
         </ThemeProvider>
         <YandexMetrika />
       </body>

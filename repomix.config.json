@@ -1,6 +1,7 @@
 {
   "output": {
     "style": "markdown",
+    "filePath": "repomix-output-rd.md",
     "removeComments": false,
     "removeEmptyLines": true,
     "showLineNumbers": false

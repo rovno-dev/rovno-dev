@@ -1,15 +1,15 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Text, JSON, DECIMAL
+from sqlalchemy import Column, String, DateTime, Text, JSON, UUID as SQLUUID
 from sqlalchemy.dialects.postgresql import UUID
 from database.database import Base
 
 class Order(Base):
     __tablename__ = "orders"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    services = Column(JSON, nullable=False) # List of types
+    services = Column(JSON, nullable=False)
     company_name = Column(String, nullable=True)
-    naming_help = Column(String, nullable=True) # Yes/No/Already have
+    naming_help = Column(String, nullable=True)
     description = Column(Text, nullable=False)
     deadline = Column(String, nullable=True)
     budget = Column(String, nullable=True)

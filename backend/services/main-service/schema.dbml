@@ -1,0 +1,164 @@
+
+Project rovno_dev_main_db {
+  database_type: 'PostgreSQL'
+  Note: 'Rovno.dev main service db'
+}
+
+Enum lifecycle_stage {
+  lead
+  prospect
+  customer
+  regular
+}
+
+Table companies {
+  id bigint [pk, increment]
+  name varchar [not null, note: 'Client name, e.g. Apple, Anthropic, Google, Yandex']
+  website varchar [note: 'Website URL']
+  logotype_url varchar [note: 'URL to company logo asset']
+  industry varchar
+  lifecycle_stage lifecycle_stage [default: 'lead']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table contacts {
+  id bigint [pk, increment]
+  company_id bigint [ref: > companies.id, note: 'Associated company account']
+  user_id bigint [ref: > users.id]
+  role_title varchar [note: 'e.g. Marketing Director']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Enum estimate_deadline {
+  asap
+  under_1_month
+  1_3_months
+  flexible
+}
+
+Enum estimate_budget {
+  30k_75k
+  75k_150k
+  150k_500k
+  500k_1kk
+  over_1kk
+  need_consultation
+}
+
+Table order_requests {
+  id bigint [pk, increment]
+  contact_id bigint [ref: > contacts.id]
+  service_types_json jsonb [note: 'Array of services objects string[]']
+  about varchar
+  estimate_deadline estimate_deadline
+  estimate_budget estimate_budget
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Enum user_role {
+  client, // can only get notifications
+  user, // can make user articles, have and profile (in future)
+  admin, // user + can make crud of all users (except admins), articles, projects, etc.
+  root, // admin + can make crud of all users
+}
+
+Enum user_status {
+  pending_verification
+  verificated
+  blocked
+}
+
+Table users {
+  id bigint [pk, increment]
+  username varchar [note: 'Slug-based string ID like niyazgim']
+  name varchar
+  surname varchar
+  email varchar [unique]
+  phone varchar [unique]
+  password varchar [not null]
+  description text [note: 'Short bio/description']
+  avatar_url varchar
+  telegram_username varchar [unique]
+  linkedin_username varchar [unique]
+  github_username varchar [unique]
+  behance_username varchar [unique]
+  youtube_username varchar [unique]
+  vk_username varchar [unique]
+  telegram_channel_username varchar [unique]
+  vk_public_username varchar [unique]
+  user_role user_role [default: 'user']
+  user_status user_status [default: 'pending_verification']
+  other_socials_json jsonb [note: 'Array of other social objects {title: string, url: string}']
+  tags_json jsonb [note: 'Array of tags with optional icon mappings {title: string, icon?: string}[]']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table team_members {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  role varchar [not null, note: 'Internal role description']
+  sort_order int [default: 0]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Enum publication_status {
+  draft
+  published
+  rejected
+  deleted
+}
+
+Table projects {
+  id varchar [pk, note: 'Short code identifier like alx, sadovod']
+  slug varchar [unique, not null]
+  title varchar [not null]
+  client_id bigint [ref: > companies.id]
+  category varchar
+  platform varchar
+  period varchar [note: 'e.g. 2025 - Present']
+  short_description text
+  description text
+  cover_image_src varchar [not null]
+  cover_video_src varchar
+  href varchar
+  seo_title varchar
+  meta_description varchar
+  tech_stack jsonb [note: 'Array of strings representing tech stack string[]']
+  mdx_content text [note: 'Raw MDX payload managed from MDXEditor']
+  is_featured boolean [default: false]
+  publication_status publication_status [default: 'draft']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table project_team_assignments {
+  project_id varchar [ref: > projects.id]
+  team_member_id bigint [ref: > team_members.id]
+  role_on_project varchar
+  
+  indexes {
+    (project_id, team_member_id) [pk]
+  }
+}
+
+Table articles {
+  id bigint [pk, increment]
+  slug varchar [unique, not null]
+  title varchar [not null]
+  description varchar [not null, note: 'Short description']
+  image_url varchar [not null]
+  date timestamp [not null]
+  tags jsonb [note: 'Array of tag strings string[]']
+  author_id bigint [ref: > team_members.id]
+  mdx_content text [not null, note: 'Raw MDX body payload for blog posts']
+  seo_title varchar
+  meta_description varchar
+  publication_status publication_status [default: 'draft']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}

@@ -23,3 +23,5 @@ jobs:
             git fetch origin main && git reset --hard origin/main
 
             docker compose --profile prod up -d --build --force-recreate
+
+            docker system prune

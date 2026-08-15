@@ -16,7 +16,7 @@ export default function HeroSection() {
       <div className="z-10 absolute h-full w-full bottom-0 left-0 bg-gradient-to-t from-(--bg) to-(--bg)/0 to-20%" />
 
       <Container className="relative z-10 flex flex-col items-center text-center">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-semibold leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
+        <h1 className="text-display-1 font-italic leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
           Цифровые продукты <br />
           <span className="text-(--on-bg-medium)">полного цикла</span>
         </h1>
