@@ -83,7 +83,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
 
   async function logout() {
     const refresh_token = safeCookieStorage.getItem("refresh_token")
-    await $fetch("/api/v0/logout", {
+    await $fetch("/api/v1/logout", {
       method: "POST",
       body: JSON.stringify({ refresh_token }),
       headers: { "Content-Type": "application/json" }

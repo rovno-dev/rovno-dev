@@ -6,16 +6,19 @@ import {
   DeployedCodeIcon,
   DiamondIcon,
   DesignServicesIcon,
+  UserIcon,
+  SettingsIcon,
 } from "@/components/icons";
 
 const navItems: SidebarItem[] = [
   { label: "Дашборд", href: "", icon: ArticleIcon },
-  { label: "Пользователи", href: "/users", icon: WorkIcon },
+  { label: "Пользователи", href: "/users", icon: UserIcon },
   { label: "Заявки", href: "/orders", icon: DesignServicesIcon },
-  { label: "Клиенты", href: "/clients", icon: DiamondIcon },
+  { label: "Компании", href: "/companies", icon: DiamondIcon },
+  { label: "Клиенты", href: "/clients", icon: WorkIcon },
   { label: "Проекты", href: "/projects", icon: DeployedCodeIcon },
   { label: "Статьи", href: "/articles", icon: ArticleIcon },
-  { label: "Команда", href: "/team", icon: WorkIcon },
+  { label: "Команда", href: "/team", icon: SettingsIcon },
 ];
 
 export function AdminSidebar({ secret }: { secret: string }) {

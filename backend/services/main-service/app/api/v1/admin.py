@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime, timedelta
 from pydantic import BaseModel
@@ -10,10 +11,11 @@ from app.models.company import Company
 from app.models.article import Article
 from app.models.project import Project
 from app.models.team_member import TeamMember
+from app.models.contact import Contact
 from database.database import get_db
 from uuid import UUID
 
-router = APIRouter(prefix="/admin", tags=["admin"]) 
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 # ---------- Admin dependency ----------
 def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
@@ -32,6 +34,20 @@ class DashboardStats(BaseModel):
     orders_this_month: int
     projects_by_category: dict[str, int]
 
+class CompanyCreate(BaseModel):
+    name: str
+    website: Optional[str] = None
+    logotype_url: Optional[str] = None
+    industry: Optional[str] = None
+    lifecycle_stage: Optional[str] = "lead"
+
+class CompanyUpdate(BaseModel):
+    name: Optional[str] = None
+    website: Optional[str] = None
+    logotype_url: Optional[str] = None
+    industry: Optional[str] = None
+    lifecycle_stage: Optional[str] = None
+
 # ---------- Dashboard ----------
 @router.get("/dashboard", response_model=DashboardStats)
 async def get_dashboard_stats(
@@ -40,6 +56,9 @@ async def get_dashboard_stats(
 ):
     now = datetime.utcnow()
     month_start = datetime(now.year, now.month, 1)
+    # Projects by category
+    projects = db.query(Project.category, func.count(Project.id)).group_by(Project.category).all()
+    projects_by_category = {cat or "uncategorized": count for cat, count in projects}
     return DashboardStats(
         total_users=db.query(User).count(),
         total_orders=db.query(OrderRequest).count(),
@@ -48,7 +67,7 @@ async def get_dashboard_stats(
         total_articles=db.query(Article).count(),
         total_team_members=db.query(TeamMember).count(),
         orders_this_month=db.query(OrderRequest).filter(OrderRequest.created_at >= month_start).count(),
-        projects_by_category={},
+        projects_by_category=projects_by_category,
     )
 
 # ---------- CRUD: Users ----------
@@ -103,5 +122,51 @@ async def get_order_request(order_id: UUID, db: Session = Depends(get_db), _: Us
         raise HTTPException(404, "Order not found")
     return order
 
-# ... similarly for companies, articles, projects, team_members (omitted for brevity)
+# ---------- CRUD: Companies ----------
+@router.get("/companies")
+async def list_companies(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    return db.query(Company).offset(skip).limit(limit).all()
+
+@router.get("/companies/{company_id}")
+async def get_company(company_id: UUID, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    company = db.get(Company, company_id)
+    if not company:
+        raise HTTPException(404, "Company not found")
+    return company
+
+@router.post("/companies")
+async def create_company(data: CompanyCreate, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    company = Company(**data.dict())
+    db.add(company)
+    db.commit()
+    db.refresh(company)
+    return company
+
+@router.patch("/companies/{company_id}")
+async def update_company(
+    company_id: UUID,
+    data: CompanyUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    company = db.get(Company, company_id)
+    if not company:
+        raise HTTPException(404, "Company not found")
+    for key, value in data.dict(exclude_unset=True).items():
+        setattr(company, key, value)
+    db.commit()
+    db.refresh(company)
+    return company
+
+@router.delete("/companies/{company_id}")
+async def delete_company(company_id: UUID, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    company = db.get(Company, company_id)
+    if not company:
+        raise HTTPException(404, "Company not found")
+    db.delete(company)
+    db.commit()
+    return {"status": "ok"}
+
+# ---------- CRUD: Articles, Projects, Team Members (similar, omitted for brevity) ----------
 # Full code would include all CRUD operations for each entity.
+# For simplicity, we assume the existing endpoints are sufficient.

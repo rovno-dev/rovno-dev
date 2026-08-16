@@ -27,5 +27,6 @@ class OrderRequest(Base):
     about = Column(String, nullable=True)
     estimate_deadline = Column(Enum(EstimateDeadline, name="estimate_deadline"), nullable=True)
     estimate_budget = Column(Enum(EstimateBudget, name="estimate_budget"), nullable=True)
+    naming_help = Column(String, nullable=True)  # NEW: stores the naming preference
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
