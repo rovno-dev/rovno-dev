@@ -5,10 +5,7 @@ import { Container } from "../ui/container";
 import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../ui/button";
-import { DesignServicesIcon } from "../icons";
-import { DeployedCodeIcon } from "../icons/unidoka-icons/deployed-code-icon";
-import { ArticleIcon } from "../icons/unidoka-icons/article-icon";
-import { WorkIcon } from "../icons/unidoka-icons/work-icon";
+import { Box, Newspaper, Paintbrush } from "lucide-react"
 import Link from "next/link";
 import RovnoLogotypeIconEmpty from "./rovno-dev-logotype/rovno-dev-logotype-icon-empty";
 
@@ -17,9 +14,9 @@ export default function BottomAppBar() {
 
   const links = [
     // Pass the COMPONENT, not <Component />
-    { ...ROUTES.projects, icon: DeployedCodeIcon },
+    { ...ROUTES.projects, icon: Box },
     { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
-    { href: ROUTES.journal.href, title: "Журнал", icon: ArticleIcon },
+    { href: ROUTES.journal.href, title: "Журнал", icon: Newspaper },
     // { ...ROUTES.job, icon: WorkIcon },
   ]
 
@@ -56,7 +53,7 @@ export default function BottomAppBar() {
             onClick={() => setOpen(true)}
           >
             <Link href={ROUTES.order.href}>
-              <DesignServicesIcon className="size-[26px]!" />
+              <Paintbrush className="size-[26px]!" />
               <span className="text-display-4">Заказ</span>
             </Link>
           </Button>

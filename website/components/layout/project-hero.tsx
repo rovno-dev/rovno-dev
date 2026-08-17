@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DprofileLogotypeMonoIcon, ArticleIcon, PublicIcon } from "@/components/icons";
+import { DprofileLogotypeMonoIcon, Newspaper, PublicIcon } from "lucide-react";
 
 interface ProjectHeroProps {
   title: string;
@@ -46,9 +46,8 @@ export function ProjectHero({
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden w-full h-full">
         {/* Preloader overlay */}
         <div
-          className={`absolute inset-0 bg-(--bg) z-10 transition-opacity duration-700 flex items-center justify-center ${
-            videoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
+          className={`absolute inset-0 bg-(--bg) z-10 transition-opacity duration-700 flex items-center justify-center ${videoLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
         >
           <div className="flex flex-col items-center gap-4">
             <div className="size-12 border-4 border-(--primary) border-t-transparent rounded-full animate-spin" />
@@ -61,9 +60,8 @@ export function ProjectHero({
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto aspect-video object-cover scale-[1.3] md:scale-100">
             <iframe
               src={`${cover.videoSrc}?autoplay=1&muted=1&loop=1`}
-              className={`absolute top-0 left-0 w-full h-full border-0 transition-opacity duration-700 ${
-                videoLoaded ? "opacity-100" : "opacity-0"
-              }`}
+              className={`absolute top-0 left-0 w-full h-full border-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"
+                }`}
               allow="autoplay; encrypted-media; fullscreen; accelerometer; gyroscope; picture-in-picture"
               allowFullScreen
               onLoad={() => setVideoLoaded(true)}

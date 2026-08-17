@@ -7,7 +7,7 @@ import useEmblaCarousel, {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { KeyboardArrowLeftIcon, KeyboardArrowRightIcon } from "@/components/icons"
+import { KeyboardArrowLeftIcon, SquareArrowRight } from "lucide-react"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -225,7 +225,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <KeyboardArrowRightIcon />
+      <SquareArrowRight />
       <span className="sr-only">Next slide</span>
     </Button>
   )

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/entities/user/model/user-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LogOut, User, Settings, BriefcaseBusiness } from "lucide-react";
 
 export function ProfileSidebar() {
   const pathname = usePathname();
@@ -20,9 +21,9 @@ export function ProfileSidebar() {
 
   // TODO: move to the app. subdomain
   const navItems = [
-    { label: "Профиль", href: `/app/profile`, icon: PersonIcon },
-    { label: "Настройки", href: `/app/profile/settings`, icon: SettingsIcon },
-    { label: "Безопасность", href: `/app/profile/security`, icon: WorkIcon },
+    { label: "Профиль", href: `/app/profile`, icon: User },
+    { label: "Настройки", href: `/app/profile/settings`, icon: Settings },
+    { label: "Безопасность", href: `/app/profile/security`, icon: BriefcaseBusiness },
   ];
 
   const handleLogout = async () => {
@@ -59,7 +60,7 @@ export function ProfileSidebar() {
           onClick={handleLogout}
           className="flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-(--on-bg-medium) hover:bg-(--state-hover)"
         >
-          <LogoutIcon className="size-5 shrink-0" />
+          <LogOut className="size-5 shrink-0" />
           <span className="text-sm">Выйти</span>
         </button>
       </nav>

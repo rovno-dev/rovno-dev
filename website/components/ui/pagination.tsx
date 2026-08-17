@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { KeyboardArrowLeftIcon, KeyboardArrowRightIcon, MoreHorizontalIcon } from "@/components/icons"
+import { KeyboardArrowLeftIcon, SquareArrowRight, MoreHorizontalIcon } from "lucide-react"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -92,7 +92,7 @@ function PaginationNext({
       {...props}
     >
       <span className="hidden sm:block">{text}</span>
-      <KeyboardArrowRightIcon data-icon="inline-end" />
+      <SquareArrowRight data-icon="inline-end" />
     </PaginationLink>
   )
 }

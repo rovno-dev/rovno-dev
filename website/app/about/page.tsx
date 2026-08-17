@@ -9,7 +9,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon } from "@/components/icons";
+import { SquareArrowRight } from "lucide-react";
 import { EXPERTS_DATA } from "@/app/_data/experts";
 
 const experts = Object.values(EXPERTS_DATA);
@@ -54,7 +54,7 @@ function ExpertCard({ expert, index }: { expert: typeof experts[0], index: numbe
 
           <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <Button size="icon-small" shape="round" className="bg-white text-black hover:bg-white">
-              <KeyboardArrowRightIcon className="size-5!" />
+              <SquareArrowRight className="size-5!" />
             </Button>
           </div>
         </div>

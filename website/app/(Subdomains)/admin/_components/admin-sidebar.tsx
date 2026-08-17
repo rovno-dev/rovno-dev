@@ -2,22 +2,22 @@
 import { Sidebar, SidebarItem } from "@/components/layout/sidebar";
 import {
   WorkIcon,
-  ArticleIcon,
-  DeployedCodeIcon,
-  DiamondIcon,
-  DesignServicesIcon,
-  PersonIcon,
+  Newspaper,
+  Box,
+  Gem,
+  Paintbrush,
+  User,
   SettingsIcon,
-} from "@/components/icons";
+} from "lucide-react";
 
 const navItems: SidebarItem[] = [
-  { label: "Дашборд", href: "", icon: ArticleIcon },
-  { label: "Пользователи", href: "/users", icon: PersonIcon },
-  { label: "Заявки", href: "/orders", icon: DesignServicesIcon },
-  { label: "Компании", href: "/companies", icon: DiamondIcon },
+  { label: "Дашборд", href: "", icon: Newspaper },
+  { label: "Пользователи", href: "/users", icon: User },
+  { label: "Заявки", href: "/orders", icon: Paintbrush },
+  { label: "Компании", href: "/companies", icon: Gem },
   { label: "Клиенты", href: "/clients", icon: WorkIcon },
-  { label: "Проекты", href: "/projects", icon: DeployedCodeIcon },
-  { label: "Статьи", href: "/articles", icon: ArticleIcon },
+  { label: "Проекты", href: "/projects", icon: Box },
+  { label: "Статьи", href: "/articles", icon: Newspaper },
   { label: "Команда", href: "/team", icon: SettingsIcon },
 ];
 

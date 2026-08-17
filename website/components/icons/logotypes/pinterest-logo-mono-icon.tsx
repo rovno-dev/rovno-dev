@@ -1,4 +1,4 @@
-import { Icon, IconProps } from "@/components/icons/icon"
+import { Icon, IconProps } from "../icon"
 
 export function PinterestLogotypeMonoIcon(props: IconProps) {
   return (

@@ -4,7 +4,7 @@ import Link from "next/link";
 import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
 import { Button } from "../ui/button";
 import { NavLink } from "./nav-link";
-import { DesignServicesIcon, PersonIcon } from "../icons";
+import { Paintbrush, User } from "lucide-react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import {
@@ -44,7 +44,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
-              <DesignServicesIcon />
+              <Paintbrush />
               Оформить заказ
             </Link>
           </Button>
@@ -53,8 +53,8 @@ export default function Header() {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="glass" size="icon-small" className="ml-2">
-                      <PersonIcon />
+                    <Button variant="glass" size="icon-small" className="ml-2 fill-none!">
+                      <User />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

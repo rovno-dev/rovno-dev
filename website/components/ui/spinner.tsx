@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { ProgressActivityIcon } from "@/components/icons"
+import { ProgressActivityIcon } from "lucide-react"
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (

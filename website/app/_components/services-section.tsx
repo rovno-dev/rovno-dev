@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Container } from "@/components/ui/container";
-import { DeployedCodeIcon, DesignServicesIcon, DiamondIcon, StylusNoteIcon } from "@/components/icons";
+import { Box, Paintbrush, Gem, Signature, } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type ServiceType = {
@@ -17,28 +17,28 @@ const services: ServiceType[] = [
   {
     title: "Разработка",
     description: "От Telegram-ботов до высоконагруженных систем с внедрением ИИ в бизнес-процессы и разработкой умных агентов и автоматизаций.",
-    icon: <DeployedCodeIcon />,
+    icon: <Box />,
     color: "#3b82f6",
     stack: ["React", "Next.js", "FastAPI", "PSQL", "Redis", "Aiogram", "NemoClaw", "Hermes", "Python", "Go", "Docker", "Kubernetes"]
   },
   {
     title: "3D & Motion",
     description: "CGI, рекламные ролики и 3D-графика, которые выделяют вас на фоне конкурентов.",
-    icon: <DiamondIcon />,
+    icon: <Gem />,
     color: "#f59e0b",
     stack: ["Blender", "After Effects", "Premiere Pro", "Hyperframes", "3ds Max", "Kling AI", "DaVinci Resolve", "Auto-subs"]
   },
   {
     title: "UX/UI Дизайн",
     description: "Продуманные интерфейсы и сценарии, повышающие конверсию вашего продукта.",
-    icon: <DesignServicesIcon />,
+    icon: <Paintbrush />,
     color: "#ec4899",
     stack: ["Figma", "Photoshop", "Nano Banana Pro"]
   },
   {
     title: "Айдентика",
     description: "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
-    icon: <StylusNoteIcon />,
+    icon: <Signature />,
     color: "#a855f7",
     stack: ["Illustrator", "Photoshop", "Nano Banana Pro"]
   },

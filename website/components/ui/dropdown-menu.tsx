@@ -4,7 +4,7 @@ import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { CheckSmallIcon, KeyboardArrowRightIcon } from "@/components/icons"
+import { CircleCheck, SquareArrowRight } from "lucide-react"
 
 function DropdownMenu({
   ...props
@@ -106,7 +106,7 @@ function DropdownMenuCheckboxItem({
         data-slot="dropdown-menu-checkbox-item-indicator"
       >
         <DropdownMenuPrimitive.ItemIndicator>
-          <CheckSmallIcon
+          <CircleCheck
           />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
@@ -149,7 +149,7 @@ function DropdownMenuRadioItem({
         data-slot="dropdown-menu-radio-item-indicator"
       >
         <DropdownMenuPrimitive.ItemIndicator>
-          <CheckSmallIcon
+          <CircleCheck
           />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
@@ -232,7 +232,7 @@ function DropdownMenuSubTrigger({
       {...props}
     >
       {children}
-      <KeyboardArrowRightIcon className="ml-auto" />
+      <SquareArrowRight className="ml-auto" />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }

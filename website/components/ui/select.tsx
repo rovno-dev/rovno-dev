@@ -4,7 +4,7 @@ import * as React from "react"
 import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { KeyboardArrowDownIcon, CheckSmallIcon, KeyboardArrowUpIcon } from "@/components/icons"
+import { KeyboardArrowDownIcon, CircleCheck, KeyboardArrowUpIcon } from "lucide-react"
 
 function Select({
   ...props
@@ -119,7 +119,7 @@ function SelectItem({
     >
       <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <CheckSmallIcon className="pointer-events-none" />
+          <CircleCheck className="pointer-events-none" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

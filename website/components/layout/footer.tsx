@@ -1,5 +1,5 @@
 import { ROUTES } from "@/utils/constants/routes";
-import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "../icons";
+import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
 import { Button } from "../ui/button";
 import { Container } from "../ui/container";
 import RovnoLogotypeWordmark from "./rovno-dev-logotype/rovno-dev-logotype-wordmark";

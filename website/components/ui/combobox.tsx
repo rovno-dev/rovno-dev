@@ -11,7 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { KeyboardArrowDownIcon, CloseSmallIcon, CheckSmallIcon } from "@/components/icons"
+import { KeyboardArrowDownIcon, CloseSmallIcon, CircleCheck } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
 
@@ -153,7 +153,7 @@ function ComboboxItem({
           <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
         }
       >
-        <CheckSmallIcon className="pointer-events-none" />
+        <CircleCheck className="pointer-events-none" />
       </ComboboxPrimitive.ItemIndicator>
     </ComboboxPrimitive.Item>
   )

@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { CloudIcon, CloseSmallIcon, ArticleIcon } from "@/components/icons";
+import { CloudIcon, CloseSmallIcon, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,15 +13,15 @@ interface FileWithPreview {
 
 const AVALIABLE_FILE_TYPES = 'image/*, .pdf, .docx, .doc, .md, .mdx, .xls, .xlsx, .zip, .7zip';
 
-export function FileUpload({ 
-  attachments, 
-  onRemoveFile, 
-  onOpenLightbox, 
-  fileInputRef, 
-  onFileChange 
-}: { 
-  attachments: FileWithPreview[], 
-  onRemoveFile: (id: string) => void, 
+export function FileUpload({
+  attachments,
+  onRemoveFile,
+  onOpenLightbox,
+  fileInputRef,
+  onFileChange
+}: {
+  attachments: FileWithPreview[],
+  onRemoveFile: (id: string) => void,
   onOpenLightbox: (idx: number) => void,
   fileInputRef: React.RefObject<HTMLInputElement | null>,
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -38,7 +38,7 @@ export function FileUpload({
                 <Image src={attr.preview} alt="preview" fill className="object-contain" />
               ) : (
                 <>
-                  <div className={cn("size-14 rounded-xl flex items-center justify-center mb-2", attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}><ArticleIcon className="size-8! fill-current" /></div>
+                  <div className={cn("size-14 rounded-xl flex items-center justify-center mb-2", attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}><Newspaper className="size-8! fill-current" /></div>
                   <span className="text-[11px] font-semibold text-(--on-bg-medium) text-center line-clamp-2 px-1">{attr.file.name}</span>
                 </>
               )}

@@ -1,7 +1,7 @@
 "use client"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CheckCircleIcon, InfoIcon, WarningIcon, OctagonIcon, ProgressActivityIcon } from "@/components/icons"
+import { CircleCheck, Info, LoaderCircle, TriangleAlert } from "lucide-react"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
@@ -12,11 +12,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       closeButton={true}
       icons={{
-        success: <CheckCircleIcon className="size-4 [&>path]:fill-(--success)" />,
-        info: <InfoIcon className="size-4 [&>path]:fill-blue-500" />,
-        warning: <WarningIcon className="size-4 [&>path]:fill-(--warning)" />,
-        error: <WarningIcon className="size-4 [&>path]:fill-(--error)" />,
-        loading: <ProgressActivityIcon className="size-4 animate-spin [&>path]:fill-primary" />,
+        success: <CircleCheck className="size-4 [&>path]:fill-(--success)" />,
+        info: <Info className="size-4 [&>path]:fill-blue-500" />,
+        warning: <TriangleAlert className="size-4 [&>path]:fill-(--warning)" />,
+        error: <TriangleAlert className="size-4 [&>path]:fill-(--error)" />,
+        loading: <LoaderCircle className="size-4 animate-spin [&>path]:fill-primary" />,
       }}
       toastOptions={{
         classNames: {

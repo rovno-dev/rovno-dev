@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon } from "@/components/icons";
+import { SquareArrowRight } from "lucide-react";
 import { ARTICLES, Article } from "./data";
 
 function ArticleCard({ article, index }: { article: Article; index: number }) {
@@ -57,7 +57,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
             shape="round"
             className="bg-white text-black hover:bg-white"
           >
-            <KeyboardArrowRightIcon className="size-5!" />
+            <SquareArrowRight className="size-5!" />
           </Button>
         </div>
       </Card>

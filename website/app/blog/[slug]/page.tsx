@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { KeyboardArrowRightIcon } from "@/components/icons";
+import { SquareArrowRight } from "lucide-react";
 import { ARTICLES } from "../data";
 
 interface ArticlePageProps {
@@ -58,7 +58,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <Button size="large" shape="round" asChild>
                 <Link href={article.href} target="_blank" rel="noopener noreferrer">
                   Читать в Telegram
-                  <KeyboardArrowRightIcon className="size-5" />
+                  <SquareArrowRight className="size-5" />
                 </Link>
               </Button>
             </div>

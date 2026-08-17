@@ -3,11 +3,10 @@ import React, { ReactNode } from "react";
 import {
   VKLogotypeMonoIcon,
   TelegramLogotypeMonoIcon,
-  DiamondIcon
+  GithubLogotypeMonoIcon,
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
 import { Project, PROJECTS } from "@/app/_data/projects/";
-import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logo-mono-icon";
 
 export interface ExpertTag {
   label: string;

@@ -1,5 +1,5 @@
 "use client";
-import * as Icons from "@/components/icons";
+import * as Icons from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -25,8 +25,8 @@ export default function IconShowcase() {
           {allIcons.map(([name, IconComponent]) => {
             const Icon = IconComponent as React.ComponentType<any>;
             return (
-              <Card 
-                key={name} 
+              <Card
+                key={name}
                 className="group flex flex-col items-center justify-center p-6 gap-3 cursor-pointer hover:bg-card transition-all active:scale-95"
                 onClick={() => copyToClipboard(name)}
               >

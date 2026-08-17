@@ -1,6 +1,6 @@
 "use client"
 import { useTheme } from "@/providers/theme-provider"
-import { SystemThemeIcon, SunIcon, NightIcon } from "../icons"
+import { SunMoon, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 
@@ -11,9 +11,9 @@ export function ThemeSwitcher() {
     setMounted(true)
   }, [])
   const options = [
-    { value: "system", icon: SystemThemeIcon, label: "Системная" },
-    { value: "light", icon: SunIcon, label: "Светлая" },
-    { value: "dark", icon: NightIcon, label: "Тёмная" },
+    { value: "system", icon: SunMoon, label: "Системная" },
+    { value: "light", icon: Sun, label: "Светлая" },
+    { value: "dark", icon: Moon, label: "Тёмная" },
   ] as const
   return (
     <div className="flex items-center gap-0.5 rounded-full border border-(--outline) bg-(--card) p-0.5 w-fit h-9">
@@ -31,13 +31,13 @@ export function ThemeSwitcher() {
                 : "hover:bg-(--state-hover)"
             )}
           >
-            <Icon 
+            <Icon
               className={cn(
                 "size-4! transition-colors",
-                isActive 
-                  ? "[&_path]:fill-(--bg)" 
+                isActive
+                  ? "[&_path]:fill-(--bg)"
                   : "[&_path]:fill-(--on-bg-low) group-hover:[&_path]:fill-(--on-bg-high)"
-              )} 
+              )}
             />
             <span className="sr-only">{opt.label}</span>
           </button>

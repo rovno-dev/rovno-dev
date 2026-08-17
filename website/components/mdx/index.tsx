@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CloseSmallIcon } from "@/components/icons";
+import { CloseSmallIcon } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -230,9 +230,8 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
                 <button
                   key={idx}
                   onClick={() => carouselApi?.scrollTo(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    carouselApi?.selectedScrollSnap() === idx ? "w-6 bg-white" : "w-2 bg-white/30"
-                  }`}
+                  className={`h-2 rounded-full transition-all ${carouselApi?.selectedScrollSnap() === idx ? "w-6 bg-white" : "w-2 bg-white/30"
+                    }`}
                 />
               ))}
             </div>

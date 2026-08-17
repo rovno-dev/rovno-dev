@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CloseSmallIcon } from "@/components/icons";
+import { CloseSmallIcon } from "lucide-react";
 
 export function MediaLightbox({ src, alt, children }: { src: string; alt: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);

@@ -11,7 +11,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { CloseSmallIcon, ArticleIcon } from "@/components/icons";
+import { CloseSmallIcon, Newspaper } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -214,7 +214,7 @@ export default function OrderPage() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg">
-                        <ArticleIcon className="size-16! [&>path]:fill-(--dark-1)!" />
+                        <Newspaper className="size-16! [&>path]:fill-(--dark-1)!" />
                         <h2 className="text-display-3 text-white break-all">{attr.file.name}</h2>
                         <Button variant="glass" shape="round" size="large" asChild><a href={attr.preview || URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать</a></Button>
                       </div>

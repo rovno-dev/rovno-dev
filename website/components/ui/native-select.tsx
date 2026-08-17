@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { KeyboardArrowDownIcon } from "@/components/icons"
+import { KeyboardArrowDownIcon } from "lucide-react"
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
   size?: "sm" | "default"
