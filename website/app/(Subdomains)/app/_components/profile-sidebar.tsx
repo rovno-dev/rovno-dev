@@ -7,6 +7,7 @@ import { useUser } from "@/entities/user/model/user-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LogOut, User, Settings, BriefcaseBusiness } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function ProfileSidebar() {
   const pathname = usePathname();
@@ -34,7 +35,7 @@ export function ProfileSidebar() {
   return (
     <aside className="w-full md:w-64 shrink-0 h-fit rounded-3xl border border-(--outline) bg-(--card) p-6 shadow-md transition-all">
       <div className="mb-6 pb-6 border-b border-(--outline)">
-        <h2 className="text-xl font-bold tracking-tight">Личный кабинет</h2>
+        <h2 className="text-heading-3">Личный кабинет</h2>
       </div>
       <nav className="flex flex-col space-y-1">
         {navItems.map((item) => {
@@ -52,7 +53,7 @@ export function ProfileSidebar() {
               )}
             >
               <Icon className="size-5 shrink-0" />
-              <span className="text-sm">{item.label}</span>
+              <span className="text-body-4">{item.label}</span>
             </Link>
           );
         })}

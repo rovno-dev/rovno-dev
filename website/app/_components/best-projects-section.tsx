@@ -3,7 +3,7 @@ import { PROJECTS } from "@/app/_data/projects";
 import ProjectCard from "@/components/layout/project-card/project-card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link'
-import { SquareArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 export default function BestWorksSection() {
   return (
@@ -18,7 +18,7 @@ export default function BestWorksSection() {
         <Button className="w-full md:w-fit mt-8" variant="glass" size="large" asChild>
           <Link href="/projects">
             Все проекты
-            <SquareArrowRight className="size-4" />
+            <ChevronRight className="size-4" />
           </Link>
         </Button>
       </Container>

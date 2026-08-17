@@ -37,42 +37,33 @@ export default function SettingsPage() {
   };
 
   return (
-    <CheckUser>
-      <div className="min-h-screen bg-(--bg) py-12 md:py-16">
-        <Container>
-          <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-            <ProfileSidebar />
-            <main className="flex-1 space-y-6">
-              <div>
-                <h1 className="text-display-2 font-serif italic tracking-tight mb-1">
-                  Настройки
-                </h1>
-                <p className="text-body-2 text-(--on-bg-medium)">
-                  Управление настройками аккаунта
-                </p>
-              </div>
-              <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
-                <h2 className="text-heading-3 mb-4">Подписки</h2>
-                <Field orientation="horizontal" className="items-center">
-                  <Checkbox
-                    id="email-subscription"
-                    checked={emailSubscribed}
-                    onCheckedChange={(checked) => setEmailSubscribed(checked === true)}
-                  />
-                  <Label htmlFor="email-subscription" className="text-body-3">
-                    Получать email-рассылки о новых проектах, статьях и акциях
-                  </Label>
-                </Field>
-                <div className="mt-6">
-                  <Button onClick={handleSave} disabled={isSaving}>
-                    {isSaving ? "Сохранение..." : "Сохранить настройки"}
-                  </Button>
-                </div>
-              </Card>
-            </main>
-          </div>
-        </Container>
+    <>
+      <div>
+        <h1 className="text-display-2  mb-1">
+          Настройки
+        </h1>
+        <p className="text-body-2 text-(--on-bg-medium)">
+          Управление настройками аккаунта
+        </p>
       </div>
-    </CheckUser>
+      <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
+        <h2 className="text-heading-3 mb-4">Подписки</h2>
+        <Field orientation="horizontal" className="items-center">
+          <Checkbox
+            id="email-subscription"
+            checked={emailSubscribed}
+            onCheckedChange={(checked) => setEmailSubscribed(checked === true)}
+          />
+          <Label htmlFor="email-subscription" className="text-body-3">
+            Получать email-рассылки о новых проектах, статьях и акциях
+          </Label>
+        </Field>
+        <div className="mt-6">
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Сохранение..." : "Сохранить настройки"}
+          </Button>
+        </div>
+      </Card>
+    </>
   );
 }

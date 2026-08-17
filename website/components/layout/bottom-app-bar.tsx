@@ -17,7 +17,7 @@ export default function BottomAppBar() {
     { ...ROUTES.projects, icon: Box },
     { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
     { href: ROUTES.journal.href, title: "Журнал", icon: Newspaper },
-    // { ...ROUTES.job, icon: WorkIcon },
+    // { ...ROUTES.job, icon: BriefcaseBusiness  },
   ]
 
   return (

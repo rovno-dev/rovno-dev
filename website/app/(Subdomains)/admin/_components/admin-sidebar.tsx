@@ -1,7 +1,7 @@
 "use client";
 import { Sidebar, SidebarItem } from "@/components/layout/sidebar";
 import {
-  WorkIcon,
+  BriefcaseBusiness,
   Newspaper,
   Box,
   Gem,
@@ -15,7 +15,7 @@ const navItems: SidebarItem[] = [
   { label: "Пользователи", href: "/users", icon: User },
   { label: "Заявки", href: "/orders", icon: Paintbrush },
   { label: "Компании", href: "/companies", icon: Gem },
-  { label: "Клиенты", href: "/clients", icon: WorkIcon },
+  { label: "Клиенты", href: "/clients", icon: BriefcaseBusiness },
   { label: "Проекты", href: "/projects", icon: Box },
   { label: "Статьи", href: "/articles", icon: Newspaper },
   { label: "Команда", href: "/team", icon: SettingsIcon },

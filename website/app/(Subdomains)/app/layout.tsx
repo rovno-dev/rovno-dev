@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CheckUser } from "@/entities/user/model/check-user";
-import AdminRootClientLayout from "./client-layout";
+import ProfileRootClientLayout from "./client-layout";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -14,9 +14,9 @@ export default function AdminRootLayout({
 }) {
   return (
     <CheckUser>
-      <AdminRootClientLayout params={params} >
+      <ProfileRootClientLayout params={params} >
         {children}
-      </AdminRootClientLayout>
+      </ProfileRootClientLayout>
     </CheckUser>
   )
 }

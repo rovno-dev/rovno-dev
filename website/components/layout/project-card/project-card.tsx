@@ -1,15 +1,14 @@
 import { Project } from "@/app/_data/projects";
 import Image from "next/image";
 import Link from "next/link";
-
 export default function ProjectCard({
   project,
   index,
-  categoryMap,
+  categoryMap = {},
 }: {
   project: Project;
   index?: number;
-  categoryMap: Record<string, string>;
+  categoryMap?: Record<string, string>;
 }) {
   return (
     <Link

@@ -51,85 +51,76 @@ export default function ProfilePage() {
   };
 
   return (
-    <CheckUser>
-      <div className="min-h-screen bg-(--bg) py-12 md:py-16">
-        <Container>
-          <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-            <ProfileSidebar />
-            <main className="flex-1 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-display-2 font-serif italic tracking-tight mb-1">
-                    Профиль
-                  </h1>
-                  <p className="text-body-2 text-(--on-bg-medium)">
-                    Управление личными данными
-                  </p>
-                </div>
-                {!isEditing ? (
-                  <Button variant="outlined" onClick={() => setIsEditing(true)}>
-                    Редактировать
-                  </Button>
-                ) : (
-                  <div className="flex gap-2">
-                    <Button variant="text" onClick={() => setIsEditing(false)}>
-                      Отмена
-                    </Button>
-                    <Button onClick={handleSave} disabled={isSaving}>
-                      {isSaving ? "Сохранение..." : "Сохранить"}
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Field>
-                    <FieldLabel>Имя</FieldLabel>
-                    <Input
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Фамилия</FieldLabel>
-                    <Input
-                      value={form.surname}
-                      onChange={(e) => setForm({ ...form, surname: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Email</FieldLabel>
-                    <Input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Телефон</FieldLabel>
-                    <Input
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </Field>
-                  <Field className="md:col-span-2">
-                    <FieldLabel>О себе</FieldLabel>
-                    <Input
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </Field>
-                </div>
-              </Card>
-            </main>
+    <>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-display-2 font-serif italic tracking-tight mb-1">
+            Профиль
+          </h1>
+          <p className="text-body-2 text-(--on-bg-medium)">
+            Управление личными данными
+          </p>
+        </div>
+        {!isEditing ? (
+          <Button variant="outlined" onClick={() => setIsEditing(true)}>
+            Редактировать
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="text" onClick={() => setIsEditing(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? "Сохранение..." : "Сохранить"}
+            </Button>
           </div>
-        </Container>
+        )}
       </div>
-    </CheckUser>
+      <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Field>
+            <FieldLabel>Имя</FieldLabel>
+            <Input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              disabled={!isEditing}
+            />
+          </Field>
+          <Field>
+            <FieldLabel>Фамилия</FieldLabel>
+            <Input
+              value={form.surname}
+              onChange={(e) => setForm({ ...form, surname: e.target.value })}
+              disabled={!isEditing}
+            />
+          </Field>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              disabled={!isEditing}
+            />
+          </Field>
+          <Field>
+            <FieldLabel>Телефон</FieldLabel>
+            <Input
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              disabled={!isEditing}
+            />
+          </Field>
+          <Field className="md:col-span-2">
+            <FieldLabel>О себе</FieldLabel>
+            <Input
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              disabled={!isEditing}
+            />
+          </Field>
+        </div>
+      </Card>
+    </>
   );
 }
