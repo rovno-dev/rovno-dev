@@ -1,7 +1,7 @@
 /* LLM context: Adding staggering and subtle reveal effects to socials section */
 
 import { DprofileLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
-import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
+import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logo-mono-icon";
 import { servicesIconsStyles, ShowcaseCard } from "@/components/layout/showcase-card";
 import { Container } from "@/components/ui/container";
 

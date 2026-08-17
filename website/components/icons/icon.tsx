@@ -1,10 +1,8 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string,
 }
-
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(
   ({ className, size = 24, children, ...props }, ref) => {
     return (
@@ -27,5 +25,4 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(
     )
   }
 )
-
 Icon.displayName = "Icon"

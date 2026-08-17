@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { KeyboardArrowRightIcon } from "@/components/icons";
-import { EXPERTS_DATA } from "@/app/[slug]/(Expert)/_data";
+import { EXPERTS_DATA } from "@/app/_data/experts";
 
 const experts = Object.values(EXPERTS_DATA);
 

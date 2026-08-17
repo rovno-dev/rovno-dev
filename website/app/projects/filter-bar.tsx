@@ -4,9 +4,19 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/layout/project-card/project-card";
 import { Project } from "@/app/_data/projects";
+import { ProjectCategory } from "@/utils/api/categories";
 
-export function FilterBar({ categories, projects }: { categories: string[]; projects: Project[] }) {
+export function FilterBar({
+  projects,
+  categories,
+  categoryMap,
+}: {
+  projects: Project[];
+  categories: ProjectCategory[];
+  categoryMap: Record<string, string>;
+}) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
   const filteredProjects = useMemo(() => {
     if (!activeCategory) return projects;
     return projects.filter((p) => p.category === activeCategory);
@@ -27,13 +37,13 @@ export function FilterBar({ categories, projects }: { categories: string[]; proj
             </Button>
             {categories.map((cat) => (
               <Button
-                key={cat}
-                variant={activeCategory === cat ? "filled" : "tonal-card"}
+                key={cat.code}
+                variant={activeCategory === cat.code ? "filled" : "tonal-card"}
                 size="chip-large"
                 shape="round"
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => setActiveCategory(cat.code)}
               >
-                {cat}
+                {cat.label}
               </Button>
             ))}
           </div>
@@ -48,7 +58,7 @@ export function FilterBar({ categories, projects }: { categories: string[]; proj
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredProjects.map((project, idx) => (
-                <ProjectCard key={project.id} project={project} index={idx} />
+                <ProjectCard key={project.id} project={project} index={idx} categoryMap={categoryMap} />
               ))}
             </div>
           )}

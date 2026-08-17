@@ -4,7 +4,7 @@ import Link from "next/link";
 import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
 import { Button } from "../ui/button";
 import { NavLink } from "./nav-link";
-import { DesignServicesIcon, UserIcon } from "../icons";
+import { DesignServicesIcon, PersonIcon } from "../icons";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import {
@@ -54,7 +54,7 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="glass" size="icon-small" className="ml-2">
-                      <UserIcon />
+                      <PersonIcon />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

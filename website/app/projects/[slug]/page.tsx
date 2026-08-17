@@ -28,17 +28,14 @@ import {
   MDXTd,
   MDXCard,
 } from "@/components/mdx";
+import { fetchProjectCategories } from "@/utils/api/categories";
 
 export const dynamic = "force-static";
-
 export async function generateStaticParams() {
   const projects = getAllProjects();
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+  return projects.map((project) => ({ slug: project.slug }));
 }
 
-// ✅ Build a stable components object – no client hooks, no re‑creation
 const components = {
   h1: (props: any) => <MDXHeading level={1} {...props} />,
   h2: (props: any) => <MDXHeading level={2} {...props} />,
@@ -65,7 +62,6 @@ const components = {
   MetricCard,
 };
 
-// ✅ Memoize MDX compilation per slug and file content
 const getCompiledMDX = cache(async (content: string, slug: string) => {
   const { content: compiled } = await compileMDX({
     source: content,
@@ -77,31 +73,30 @@ const getCompiledMDX = cache(async (content: string, slug: string) => {
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-
-  // 1. Get project from index (source of truth for existence)
   const allProjects = getAllProjects();
   const projectData = allProjects.find((p) => p.slug === slug);
-  if (!projectData) {
-    notFound();
-  }
+  if (!projectData) notFound();
 
-  // 2. Try to read the MDX file for additional content
   let mdxContent = null;
   const filePath = path.join(process.cwd(), "_data/projects/content", `${slug}.mdx`);
   let source: string | undefined;
   try {
     source = fs.readFileSync(filePath, "utf8");
-  } catch {
-    // MDX file not found – skip content
-    source = undefined;
-  }
+  } catch {}
   if (source) {
     const { data, content } = matter(source);
-    // We ignore the frontmatter from MDX and rely on index data
     mdxContent = await getCompiledMDX(content, slug);
   }
 
   const client = projectData.clientId ? CLIENTS[projectData.clientId] : null;
+
+  // Fetch category label
+  let categoryLabel = projectData.category || "";
+  if (projectData.category) {
+    const categories = await fetchProjectCategories();
+    const found = categories.find(c => c.code === projectData.category);
+    if (found) categoryLabel = found.label;
+  }
 
   return (
     <>
@@ -109,7 +104,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         title={projectData.title}
         description={projectData.description || ""}
         cover={projectData.cover}
-        category={projectData.category}
+        category={categoryLabel}  // now label, not code
         clientName={client?.name}
         period={projectData.period}
         techStack={projectData.techStack}

@@ -24,6 +24,8 @@ EOF
 
 Write all paths in bash commands inside commas please. If there're no files with that name you need to create it first to prevent errors (including dir). No docker, docker compose or installation commands. I will execute it manually.
 
+Show all `docker`, `alembic`, `npm`, `composer`, `docker compose` etc. commands separately. Dont use `cd` command!
+
 ### Important thing about Markdown code
 
 If you giving some markdown code you need to do next things inside code blocks inside Markdown code:
@@ -41,9 +43,9 @@ sed -E 's/@@@([a-zA-Z0-9_-]+)/```\1/g; s/@@@/```/g'
 **Example**:
 
 ```
-CODEbash
+@@@bash
 ...some bash script
-CODE
+@@@
 
 # then sed command to make it back
 ```

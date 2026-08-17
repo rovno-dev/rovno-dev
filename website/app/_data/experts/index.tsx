@@ -7,7 +7,7 @@ import {
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
 import { Project, PROJECTS } from "@/app/_data/projects/";
-import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logotype-mono-icon";
+import { GithubLogotypeMonoIcon } from "@/components/icons/logotypes/github-logo-mono-icon";
 
 export interface ExpertTag {
   label: string;
@@ -48,9 +48,11 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
     ],
     socials: [
       {
-        icon: <VKLogotypeMonoIcon />, href: "https:/ / vk.com / niyazgim" },
+        icon: <VKLogotypeMonoIcon />, href: "https:/ / vk.com / niyazgim"
+      },
       {
-          icon: <TelegramLogotypeMonoIcon />, href: "https:/ / t.me / niyazgim" },
+        icon: <TelegramLogotypeMonoIcon />, href: "https:/ / t.me / niyazgim"
+      },
       { icon: <GithubLogotypeMonoIcon />, href: "https:/ / github.com / niyazgim" },
     ],
     projects: [

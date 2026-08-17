@@ -6,13 +6,13 @@ import {
   DeployedCodeIcon,
   DiamondIcon,
   DesignServicesIcon,
-  UserIcon,
+  PersonIcon,
   SettingsIcon,
 } from "@/components/icons";
 
 const navItems: SidebarItem[] = [
   { label: "Дашборд", href: "", icon: ArticleIcon },
-  { label: "Пользователи", href: "/users", icon: UserIcon },
+  { label: "Пользователи", href: "/users", icon: PersonIcon },
   { label: "Заявки", href: "/orders", icon: DesignServicesIcon },
   { label: "Компании", href: "/companies", icon: DiamondIcon },
   { label: "Клиенты", href: "/clients", icon: WorkIcon },

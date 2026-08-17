@@ -3,6 +3,8 @@ from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Text, JSON, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from database.database import Base
+from app.models.article_category import ArticleCategory
+from sqlalchemy.orm import relationship
 from .project import PublicationStatus
 
 class Article(Base):
@@ -21,3 +23,5 @@ class Article(Base):
     publication_status = Column(Enum(PublicationStatus, name="publication_status"), default=PublicationStatus.draft)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("article_categories.id"), nullable=True)
+    category = relationship("ArticleCategory", lazy="joined")

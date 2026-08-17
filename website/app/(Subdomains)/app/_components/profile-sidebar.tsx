@@ -1,31 +1,28 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  DiamondIcon,
-  ExitIcon,
-} from "@/components/icons";
 import { useUser } from "@/entities/user/model/user-context";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function ProfileSidebar() {
-  const [domain, setDomain] = useState('');
   const pathname = usePathname();
   const { logout } = useUser();
   const router = useRouter();
+  const [domain, setDomain] = useState('');
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setDomain(window.location.hostname);
     }
   }, []);
 
-
+  // TODO: move to the app. subdomain
   const navItems = [
-    { label: "Профиль", href: `app.${domain}/profile`, icon: DiamondIcon },
-    { label: "Настройки", href: "/app/settings", icon: DiamondIcon },
-    { label: "Безопасность", href: "/app/security", icon: DiamondIcon },
+    { label: "Профиль", href: `/app/profile`, icon: PersonIcon },
+    { label: "Настройки", href: `/app/profile/settings`, icon: SettingsIcon },
+    { label: "Безопасность", href: `/app/profile/security`, icon: WorkIcon },
   ];
 
   const handleLogout = async () => {
@@ -34,11 +31,11 @@ export function ProfileSidebar() {
   };
 
   return (
-    <aside className="w-64 border-r border-(--outline) bg-(--card) flex flex-col h-screen fixed left-0 top-0 z-40 pt-16">
-      <div className="p-6 border-b border-(--outline)">
-        <h1 className="font-bold text-lg tracking-tighter">Личный кабинет</h1>
+    <aside className="w-full md:w-64 shrink-0 h-fit rounded-3xl border border-(--outline) bg-(--card) p-6 shadow-md transition-all">
+      <div className="mb-6 pb-6 border-b border-(--outline)">
+        <h2 className="text-xl font-bold tracking-tight">Личный кабинет</h2>
       </div>
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex flex-col space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -47,21 +44,23 @@ export function ProfileSidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors",
-                isActive ? "bg-(--primary-glass) text-(--primary)" : "text-(--on-bg-medium) hover:bg-(--state-hover)"
+                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                isActive
+                  ? "bg-(--primary-glass) text-(--primary) font-medium"
+                  : "text-(--on-bg-medium) hover:bg-(--state-hover)"
               )}
             >
-              <Icon className="size-5" />
-              {item.label}
+              <Icon className="size-5 shrink-0" />
+              <span className="text-sm">{item.label}</span>
             </Link>
           );
         })}
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-4 py-2 rounded-lg transition-colors text-(--on-bg-medium) hover:bg-(--state-hover)"
+          className="flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-(--on-bg-medium) hover:bg-(--state-hover)"
         >
-          <ExitIcon className="size-5" />
-          Выйти
+          <LogoutIcon className="size-5 shrink-0" />
+          <span className="text-sm">Выйти</span>
         </button>
       </nav>
     </aside>

@@ -6,7 +6,7 @@ import RovnoLogotypeWordmark from "./rovno-dev-logotype/rovno-dev-logotype-wordm
 import { NavLink } from "./nav-link";
 import { ThemeSwitcher } from "./theme-switcher";
 import Link from "next/link";
-import { GithubLogotypeMonoIcon } from "../icons/logotypes/github-logotype-mono-icon";
+import { GithubLogotypeMonoIcon } from "../icons/logotypes/github-logo-mono-icon";
 
 export default function Footer() {
   const sections = [

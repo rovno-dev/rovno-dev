@@ -1,3 +1,5 @@
+import { ArticleCategoryCode } from "@/app/_data/categories";
+
 export interface Article {
   id: string;
   slug: string;
@@ -7,6 +9,7 @@ export interface Article {
   href: string;
   date: string;
   tags: string[];
+  category: ArticleCategoryCode;
 }
 
 export const ARTICLES: Article[] = [
@@ -19,6 +22,7 @@ export const ARTICLES: Article[] = [
     href: "https://t.me/rovno_dev/1",
     date: "2025-03-15",
     tags: ["Дизайн", "Fintech"],
+    category: "design",
   },
   {
     id: "2",
@@ -29,6 +33,7 @@ export const ARTICLES: Article[] = [
     href: "https://t.me/rovno_dev/2",
     date: "2025-02-20",
     tags: ["Разработка", "Next.js"],
+    category: "dev",
   },
   {
     id: "3",
@@ -39,6 +44,7 @@ export const ARTICLES: Article[] = [
     href: "https://t.me/rovno_dev/3",
     date: "2025-01-10",
     tags: ["Motion", "UX"],
+    category: "design",
   },
   {
     id: "4",
@@ -49,6 +55,7 @@ export const ARTICLES: Article[] = [
     href: "https://t.me/rovno_dev/4",
     date: "2024-12-05",
     tags: ["Айдентика", "Брендинг"],
+    category: "design",
   },
   {
     id: "5",
@@ -59,5 +66,6 @@ export const ARTICLES: Article[] = [
     href: "https://t.me/rovno_dev/5",
     date: "2024-11-18",
     tags: ["UI", "Open Source"],
+    category: "dev",
   },
 ];

@@ -1,3 +1,4 @@
+import { ProjectCategoryCode, getProjectCategoryLabel } from "@/app/_data/categories";
 import { CLIENTS, Client } from "../clients";
 
 export type ProjectTagType = {
@@ -17,12 +18,11 @@ export interface Project {
     imageSrc: string;
   };
   href?: string;
-  category?: string;
+  category: ProjectCategoryCode;  // now a code
   clientId: string;
   platform?: string;
   period?: string;
   techStack?: string[];
-  // metrics and media are now stored in MDX files under content/
 }
 
 export const PROJECTS: Record<string, Project> = {
@@ -37,7 +37,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/vanguard/vanguard-cover.png',
     },
     href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
-    category: "E-commerce",
+    category: "e-commerce",
     clientId: "1",
     period: "2024",
     techStack: ["Figma", "Adobe Illustrator"],
@@ -53,7 +53,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/alx/alx-cover.png',
     },
     href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
-    category: "Айдентика",
+    category: "identity",
     clientId: "2",
     platform: "Веб-сайт",
     period: "2024",
@@ -70,7 +70,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/sadovod/sadovod-cover.png',
     },
     href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
-    category: "E-commerce",
+    category: "e-commerce",
     clientId: "3",
     period: "2024",
     techStack: ["Figma", "Adobe Illustrator"],
@@ -86,7 +86,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/courtElegance/courtElegance-cover.png',
     },
     href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
-    category: "E-commerce",
+    category: "e-commerce",
     clientId: "4",
     period: "2025",
     techStack: ["Figma", "Wix"],
@@ -102,7 +102,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/bread/bread-cover.png',
     },
     href: "https://dprofile.ru/case/168046/xlebnaia-strana-promo-rolik",
-    category: "Айдентика",
+    category: "identity",
     clientId: "5",
     period: "2026",
     techStack: ["Figma", "Blender", "Adobe After Effects", "Adobe Premier Pro", "Crita"],
@@ -118,7 +118,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/concord/concord-cover.png',
     },
     href: "https://dprofile.ru/case/185165/concord-construction-stroitelnaia-kompaniia",
-    category: "Корпоративные сайты",
+    category: "corporative",
     clientId: "6",
     period: "2025",
     techStack: ["Figma", "Adobe Illustrator", "Blender"],
@@ -134,7 +134,7 @@ export const PROJECTS: Record<string, Project> = {
       imageSrc: '/_static/projects/lostPlay/lostPlay-cover.png',
     },
     href: "https://dprofile.ru/case/185165/concord-construction-stroitelnaia-kompaniia",
-    category: "Корпоративные сайты",
+    category: "corporative",
     clientId: "6",
     period: "2025",
     techStack: ["Figma", "Adobe Illustrator", "Blender"],
