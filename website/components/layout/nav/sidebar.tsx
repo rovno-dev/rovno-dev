@@ -95,7 +95,7 @@ export function Sidebar({
           const isActive = pathname === href || (item.href !== "" && pathname.startsWith(href));
           const Icon = item.icon;
           return (
-            <Tooltip key={item.href} delayDuration={0}>
+            <Tooltip key={item.href} delayDuration={0} disableHoverableContent={!isCollapsed}>
               <TooltipTrigger asChild>
                 <Button
                   variant={isActive ? 'glass' : 'text'}
