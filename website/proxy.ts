@@ -2,6 +2,12 @@ import { NextResponse, NextRequest } from 'next/server';
 
 export function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
+  if (url.pathname.startsWith("/admin/")) {
+    const secret = url.pathname.split("/")[2];
+    if (secret !== process.env.ADMIN_SECRET_URI) {
+      return new NextResponse("Not Found", { status: 404 });
+    }
+  }
   const hostname = req.headers.get('host') || "";
 
   if (hostname.startsWith('i.')) {

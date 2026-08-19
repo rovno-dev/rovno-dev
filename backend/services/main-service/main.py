@@ -14,7 +14,7 @@ logger.info("Starting main service")
 app = FastAPI(title="Main Service", version="1.0.0", root_path="/api")
 
 # CORS
-raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost")
+raw_origins = os.getenv("ALLOWED_ORIGINS")
 origins = [origin.strip() for origin in raw_origins.split(",")]
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +27,7 @@ app.add_middleware(
 app.middleware("http")(global_rate_limit)
 
 app.include_router(router)
+
 
 @app.get("/health")
 async def health():

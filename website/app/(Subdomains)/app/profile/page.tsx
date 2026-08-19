@@ -54,7 +54,7 @@ export default function ProfilePage() {
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-display-2 font-serif italic tracking-tight mb-1">
+          <h1 className="text-display-2 mb-1">
             Профиль
           </h1>
           <p className="text-body-2 text-(--on-bg-medium)">

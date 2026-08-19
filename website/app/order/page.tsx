@@ -11,7 +11,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { CloseSmallIcon, Newspaper } from "lucide-react";
+import { X, Newspaper } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -197,7 +197,7 @@ export default function OrderPage() {
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent showCloseButton={false} className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0">
           <Button variant="glass" className="absolute top-4 right-4 z-[999]! rounded-full border-(--white)" size="icon-medium" onClick={() => setLightboxOpen(false)}>
-            <CloseSmallIcon className="size-10! [&>path]:fill-(--white)" />
+            <X className="size-10! [&>path]:fill-(--white)" />
           </Button>
           <Carousel setApi={setApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">

@@ -4,7 +4,7 @@ import * as React from "react"
 import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { KeyboardArrowDownIcon, CircleCheck, KeyboardArrowUpIcon } from "lucide-react"
+import { SquareArrowDown, CircleCheck, ChevronDown } from "lucide-react"
 
 function Select({
   ...props
@@ -51,7 +51,7 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <KeyboardArrowDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+        <SquareArrowDown className="pointer-events-none size-4 text-muted-foreground" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
@@ -153,8 +153,7 @@ function SelectScrollUpButton({
       )}
       {...props}
     >
-      <KeyboardArrowUpIcon
-      />
+      <ChevronDown />
     </SelectPrimitive.ScrollUpButton>
   )
 }
@@ -172,7 +171,7 @@ function SelectScrollDownButton({
       )}
       {...props}
     >
-      <KeyboardArrowDownIcon
+      <SquareArrowDown
       />
     </SelectPrimitive.ScrollDownButton>
   )

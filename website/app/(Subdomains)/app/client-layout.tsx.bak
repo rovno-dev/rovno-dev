@@ -1,20 +1,20 @@
 "use client"
-import { AdminSidebar } from "./_components/admin-sidebar";
+import { ProfileSidebar } from "./_components/profile-sidebar";
 import { Container } from "@/components/ui/container";
-import { CheckUser } from "@/entities/user/model/check-user";
 
-export default function AdminRootClientLayout({
-  children,
-  secret,
+export default function ProfileRootClientLayout({
+  children, params
 }: {
   children: React.ReactNode;
-  secret: string;
+  params: Promise<{ secret: string }>
 }) {
   return (
     <div className="min-h-screen bg-(--bg) py-12 md:py-16">
       <Container>
-        <div className="flex flex-col md:flex-row gap-6">
-          <AdminSidebar secret={secret} />
+        <div className="flex flex-col md:flex-row gap-8 lg:gap-12 [&>[data-collapsed=true]]:gap-4 lg:[&>[data-collapsed=true]]:gap-6">
+          <aside className="w-full md:w-64 shrink-0">
+            <ProfileSidebar />
+          </aside>
           <main className="flex-1 flex justify-center">
             <div className="w-full max-w-5xl space-y-8">
               {children}
@@ -23,5 +23,5 @@ export default function AdminRootClientLayout({
         </div>
       </Container>
     </div>
-  );
+  )
 }

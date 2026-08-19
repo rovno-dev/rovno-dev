@@ -6,17 +6,20 @@ export const metadata: Metadata = {
   title: "Admin Dashboard",
   description: "Admin panel",
 };
-export default function AdminRootLayout({
-  children, params
+
+export default async function AdminRootLayout({
+  children,
+  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ secret: string }>
+  params: Promise<{ secret: string }>;
 }) {
+  const { secret } = await params;
   return (
     <CheckUser>
-      <AdminRootClientLayout params={params} >
+      <AdminRootClientLayout secret={secret}>
         {children}
       </AdminRootClientLayout>
     </CheckUser>
-  )
+  );
 }

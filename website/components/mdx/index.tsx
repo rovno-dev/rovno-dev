@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CloseSmallIcon } from "lucide-react";
+import { X } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -190,7 +190,7 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
             size="icon-medium"
             onClick={() => setLightboxOpen(false)}
           >
-            <CloseSmallIcon className="size-10! [&>path]:fill-white" />
+            <X className="size-10! [&>path]:fill-white" />
           </Button>
           <Carousel setApi={setCarouselApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">

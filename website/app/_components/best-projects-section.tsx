@@ -9,7 +9,7 @@ export default function BestWorksSection() {
   return (
     <section className="py-8 md:py-10">
       <Container>
-        <h2 className="mb-8 text-display-2 text-(--on-bg-high) tracking-tight">ИЗБРАННЫЕ ПРОЕКТЫ</h2>
+        <h2 className="mb-8 text-display-2 text-(--on-bg-high) tracking-tight">Избранные проекты</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[PROJECTS.alx, PROJECTS.sadovod, PROJECTS.vanguard, PROJECTS.courtElegance, PROJECTS.bread, PROJECTS.concord].map((project, idx) => (
             <ProjectCard key={idx} project={project} index={idx} />

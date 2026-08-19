@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CloseSmallIcon } from "lucide-react";
+import { X } from "lucide-react";
 
 export function MediaLightbox({ src, alt, children }: { src: string; alt: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
@@ -24,7 +24,7 @@ export function MediaLightbox({ src, alt, children }: { src: string; alt: string
           size="icon-medium"
           onClick={() => setOpen(false)}
         >
-          <CloseSmallIcon className="size-6!" />
+          <X className="size-6!" />
         </Button>
         <div className="relative w-full h-full flex items-center justify-center">
           <Image

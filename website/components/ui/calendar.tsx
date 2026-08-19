@@ -10,7 +10,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { KeyboardArrowLeftIcon, SquareArrowRight, KeyboardArrowDownIcon } from "lucide-react"
+import { KeyboardArrowLeftIcon, SquareArrowRight, SquareArrowDown } from "lucide-react"
 
 function Calendar({
   className,
@@ -158,7 +158,7 @@ function Calendar({
           }
 
           return (
-            <KeyboardArrowDownIcon className={cn("size-4", className)} {...props} />
+            <SquareArrowDown className={cn("size-4", className)} {...props} />
           )
         },
         DayButton: ({ ...props }) => (

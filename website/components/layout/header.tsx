@@ -14,21 +14,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
-  const router = useRouter();
+  const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
+  const pathname = usePathname();
 
-  const adminSecret = process.env.NEXT_PUBLIC_ADMIN_SECRET;
+  // Check if current route is admin or app/profile
+  const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
 
   return (
     <header
-      className="h-[55px] md:h-[70px] 
-      fixed top-0 left-0 right-0 w-full z-50 
+      className="h-[55px] md:h-[70px]
+      fixed top-0 left-0 right-0 w-full z-50
       flex items-center
       bg-(--card-glass) backdrop-blur-glass border-b border-b-(--card-glass)"
     >
       <Container
+        variant={isFullWidth ? 'full-width' : 'default'}
         className="flex justify-center sm:justify-between"
       >
         <div className="flex items-center gap-8">
@@ -48,33 +54,39 @@ export default function Header() {
               Оформить заказ
             </Link>
           </Button>
-          {!isLoading && (
-            <>
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="glass" size="icon-small" className="ml-2 fill-none!">
-                      <User />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href="/app/profile">Профиль</Link>
-                    </DropdownMenuItem>
-                    {(user.role === 'admin' || user.role === 'root') && adminSecret && (
-                      <DropdownMenuItem asChild>
-                        <Link href={`/admin/${adminSecret}`}>Админ-панель</Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={logout}>Выйти</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                // Login button (commented out for now)
-                // <Button variant="text" asChild><Link href="/login">Войти</Link></Button>
-                null
-              )}
-            </>
+          {isLoading ? (
+            <div className="ml-2 flex items-center">
+              <Skeleton className="size-8 rounded-full" />
+            </div>
+          ) : (
+            user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="glass" size="icon-small" className="ml-2">
+                    <User />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/app/profile">Профиль</Link>
+                  </DropdownMenuItem>
+                  {(user?.role === 'admin' || user?.role === 'root') && (
+                    <>
+                      {adminSecret ? (
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/${adminSecret}`}>Админ-панель</Link>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem disabled>
+                          {adminSecretLoading ? '⏳ Загрузка...' : '❌ Секрет не найден'}
+                        </DropdownMenuItem>
+                      )}
+                    </>
+                  )}
+                  <DropdownMenuItem onClick={logout}>Выйти</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null
           )}
         </div>
       </Container>

@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { CloudIcon, CloseSmallIcon, Newspaper } from "lucide-react";
+import { CloudIcon, X, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ export function FileUpload({
                 </>
               )}
             </div>
-            <Button variant={'glass'} size={'icon-small'} onClick={(e) => { e.stopPropagation(); onRemoveFile(attr.id); }} className="absolute top-2 right-2 size-7 rounded-full"><CloseSmallIcon className="size-5!" /></Button>
+            <Button variant={'glass'} size={'icon-small'} onClick={(e) => { e.stopPropagation(); onRemoveFile(attr.id); }} className="absolute top-2 right-2 size-7 rounded-full"><X className="size-5!" /></Button>
           </div>
         ))}
         <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-(--outline) hover:border-(--primary) hover:bg-(--primary-glass) transition-all group">

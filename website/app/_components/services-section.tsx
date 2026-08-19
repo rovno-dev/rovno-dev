@@ -9,7 +9,7 @@ type ServiceType = {
   title: string;
   description: string;
   icon: React.JSX.Element;
-  color: string;
+  color?: string;
   stack: string[];
 }
 
@@ -18,28 +18,28 @@ const services: ServiceType[] = [
     title: "Разработка",
     description: "От Telegram-ботов до высоконагруженных систем с внедрением ИИ в бизнес-процессы и разработкой умных агентов и автоматизаций.",
     icon: <Box />,
-    color: "#3b82f6",
+    // color: "#3b82f6",
     stack: ["React", "Next.js", "FastAPI", "PSQL", "Redis", "Aiogram", "NemoClaw", "Hermes", "Python", "Go", "Docker", "Kubernetes"]
   },
   {
     title: "3D & Motion",
     description: "CGI, рекламные ролики и 3D-графика, которые выделяют вас на фоне конкурентов.",
     icon: <Gem />,
-    color: "#f59e0b",
+    // color: "#f59e0b",
     stack: ["Blender", "After Effects", "Premiere Pro", "Hyperframes", "3ds Max", "Kling AI", "DaVinci Resolve", "Auto-subs"]
   },
   {
     title: "UX/UI Дизайн",
     description: "Продуманные интерфейсы и сценарии, повышающие конверсию вашего продукта.",
     icon: <Paintbrush />,
-    color: "#ec4899",
+    // color: "#ec4899",
     stack: ["Figma", "Photoshop", "Nano Banana Pro"]
   },
   {
     title: "Айдентика",
     description: "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
     icon: <Signature />,
-    color: "#a855f7",
+    // color: "#a855f7",
     stack: ["Illustrator", "Photoshop", "Nano Banana Pro"]
   },
 
@@ -75,8 +75,10 @@ export default function ServicesSection() {
   return (
     <section className="pt-2 sm:pt-4 pb-8 sm:pb-18">
       <Container className="pt-6 sm:pt-14">
-        {/* Header: Next.js Foundation Style */}
         <ICChip></ICChip>
+        {/* <h2 className="text-display-2 mb-6">
+          Наши услуги
+        </h2> */}
 
         {/* The Grid: Perfectly flush 1px internal dividers */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">

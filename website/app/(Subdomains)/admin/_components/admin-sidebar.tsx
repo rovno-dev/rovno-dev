@@ -1,5 +1,6 @@
 "use client";
 import { Sidebar, SidebarItem } from "@/components/layout/sidebar";
+import { useAdminSecret } from "@/hooks/use-admin-secret";
 import {
   BriefcaseBusiness,
   Newspaper,
@@ -8,10 +9,11 @@ import {
   Paintbrush,
   User,
   SettingsIcon,
+  ChartSpline,
 } from "lucide-react";
 
 const navItems: SidebarItem[] = [
-  { label: "Дашборд", href: "", icon: Newspaper },
+  { label: "Дашборд", href: "", icon: ChartSpline },
   { label: "Пользователи", href: "/users", icon: User },
   { label: "Заявки", href: "/orders", icon: Paintbrush },
   { label: "Компании", href: "/companies", icon: Gem },
@@ -22,10 +24,11 @@ const navItems: SidebarItem[] = [
 ];
 
 export function AdminSidebar({ secret }: { secret: string }) {
+  const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
   return (
     <Sidebar
       items={navItems}
-      basePath={`/admin/${secret}`}
+      basePath={`/admin/${adminSecret}`}
       title="Админ-панель"
       className="mb-6"
     />
