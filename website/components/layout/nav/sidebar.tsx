@@ -70,8 +70,8 @@ export function Sidebar({
     <aside
       data-collapsed={isCollapsed ? "true" : "false"}
       className={cn(
-        "h-fit rounded-3xl border border-(--outline) bg-(--card) shadow-md transition-all duration-300",
-        isCollapsed ? "w-16 p-3" : "w-full sm:w-fit sm:max-w-64 p-3",
+        "h-fit rounded-3xl border border-(--outline) bg-(--card) shadow-md transition-[width,padding] duration-200 ease-in-out",
+        isCollapsed ? "w-16 p-3" : "w-64 p-3",
         className
       )}
     >
@@ -111,7 +111,7 @@ export function Sidebar({
                 </Button>
               </TooltipTrigger>
               {isCollapsed && (
-                <TooltipContent side="right" className="px-2 py-1 text-xs">
+                <TooltipContent side="right" className="px-3 py-2 text-sm font-medium shadow-lg rounded-lg" sideOffset={8}>
                   {item.label}
                 </TooltipContent>
               )}

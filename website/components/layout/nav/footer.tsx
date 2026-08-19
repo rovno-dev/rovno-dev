@@ -1,12 +1,12 @@
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
-import { Button } from "../ui/button";
-import { Container } from "../ui/container";
-import RovnoLogotypeWordmark from "./rovno-dev-logotype/rovno-dev-logotype-wordmark";
+import { Button } from "../../ui/button";
+import { Container } from "../../ui/container";
+import RovnoLogotypeWordmark from "../logo/logo-wordmark";
 import { NavLink } from "./nav-link";
-import { ThemeSwitcher } from "./theme-switcher";
+import { ThemeSwitcher } from "../theme-switcher";
 import Link from "next/link";
-import { GithubLogotypeMonoIcon } from "../icons/logotypes/github-logo-mono-icon";
+import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-icon";
 
 export default function Footer() {
   const sections = [

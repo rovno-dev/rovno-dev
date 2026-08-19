@@ -1,8 +1,8 @@
 "use client";
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
-import RovnoLogotype from "./rovno-dev-logotype/rovno-dev-logotype";
-import { Button } from "../ui/button";
+import Logo from "@/components/layout/logo/logo";
+import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
 import { Paintbrush, User } from "lucide-react";
 import { ROUTES } from "@/utils/constants/routes";
@@ -39,7 +39,7 @@ export default function Header() {
       >
         <div className="flex items-center gap-8">
           <Link href={'/'}>
-            <RovnoLogotype className="!h-[30px] sm:h-[40px]" />
+            <Logo className="!h-[30px] sm:h-[40px]" />
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>Проекты</NavLink>

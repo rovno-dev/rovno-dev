@@ -5,7 +5,7 @@ import {
   TelegramLogotypeMonoIcon,
   GithubLogotypeMonoIcon,
 } from "@/components/icons";
-import RovnoLogotypeIcon from "@/components/layout/rovno-dev-logotype/rovno-dev-logotype-icon";
+import RovnoLogotypeIcon from "@/components/layout/logo/logo-icon";
 import { Project, PROJECTS } from "@/app/_data/projects/";
 
 export interface ExpertTag {

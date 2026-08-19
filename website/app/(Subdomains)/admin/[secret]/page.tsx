@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { CreateCompanyDialog } from "@/components/admin/create-company-dialog";
+import { CreateCompanyDialog } from "@/app/(Subdomains)/admin/_components/create-company-dialog";
 import { $fetch } from "@/utils/fetch";
 
 interface Stats {
@@ -62,13 +62,12 @@ export default function AdminDashboard() {
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-display-2 mb-1">Панель управления</h2>
-          <p className="text-(--on-bg-medium) text-sm">Обзор ключевых метрик</p>
+          <h2 className="text-display-2 mb-2">Панель управления</h2>
+          <p className="text-(--on-bg-medium) text-body-3">Обзор ключевых метрик</p>
         </div>
-        <CreateCompanyDialog onSuccess={refreshStats} />
       </div>
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="p-6 shadow-sm border-(--outline) rounded-3xl">
               <div className="space-y-2">
@@ -89,13 +88,13 @@ export default function AdminDashboard() {
       )}
       {!loading && !error && stats && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
             <StatCard label="Пользователи" value={stats.total_users} />
             <StatCard label="Заявки" value={stats.total_orders} sub={`в этом месяце: ${stats.orders_this_month}`} />
             <StatCard label="Проекты" value={stats.total_projects} />
             <StatCard label="Компании" value={stats.total_companies} />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <StatCard label="Статьи" value={stats.total_articles} />
             <StatCard label="Команда" value={stats.total_team_members} />
           </div>

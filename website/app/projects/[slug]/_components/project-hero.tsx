@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DprofileLogotypeMonoIcon, Newspaper, PublicIcon } from "lucide-react";
+import { DprofileLogotypeMonoIcon } from "../../../../components/icons";
 
 interface ProjectHeroProps {
   title: string;

@@ -1,6 +1,6 @@
 import { IconProps } from "@/utils/interfaces";
 
-export default function RovnoLogotype({ style, className }: IconProps) {
+export default function Logo({ style, className }: IconProps) {
   return (
     <svg style={style} width="164" height="41" className={`${className} w-auto h-auto`} viewBox="0 0 164 41" fill="none" xmlns="http://www.w3.org/2000/svg" >
       <path d="M40.0315 0H0V40.0315H40.0315V0Z" fill="var(--on-bg-high)" />

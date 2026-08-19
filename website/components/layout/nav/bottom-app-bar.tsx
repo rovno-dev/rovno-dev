@@ -1,13 +1,13 @@
 "use client"
 
 import { ROUTES } from "@/utils/constants/routes";
-import { Container } from "../ui/container";
+import { Container } from "../../ui/container";
 import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { Box, Newspaper, Paintbrush } from "lucide-react"
 import Link from "next/link";
-import RovnoLogotypeIconEmpty from "./rovno-dev-logotype/rovno-dev-logotype-icon-empty";
+import RovnoLogotypeIconEmpty from "../logo/logo-icon-empty";
 
 export default function BottomAppBar() {
   const [open, setOpen] = useState(false);

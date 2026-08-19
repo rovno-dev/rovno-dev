@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import ProjectCard from "@/components/layout/project-card/project-card";
+import ProjectCard from "@/components/layout/projects/project-card";
 import { Project } from "@/app/_data/projects";
 import { ProjectCategory } from "@/utils/api/categories";
 

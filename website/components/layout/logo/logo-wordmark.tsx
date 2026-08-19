@@ -1,6 +1,6 @@
 import { IconProps } from "@/utils/interfaces";
 
-export default function RovnoLogotypeWordmark({ width = 178, height = 32, style, className }: IconProps) {
+export default function LogoWordmark({ width = 178, height = 32, style, className }: IconProps) {
   return (
     <svg className={`h-auto w-auto ${className}`} style={style} width={width} height={height} viewBox="0 0 178 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

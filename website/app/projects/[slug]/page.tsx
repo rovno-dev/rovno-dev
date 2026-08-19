@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
-import { ProjectHero } from "@/components/layout/project-hero";
+import { ProjectHero } from "@/app/projects/[slug]/_components/project-hero";
 import {
   Gallery,
   MetricCard,
@@ -82,7 +82,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   let source: string | undefined;
   try {
     source = fs.readFileSync(filePath, "utf8");
-  } catch {}
+  } catch { }
   if (source) {
     const { data, content } = matter(source);
     mdxContent = await getCompiledMDX(content, slug);

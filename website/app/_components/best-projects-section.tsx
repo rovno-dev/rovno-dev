@@ -1,6 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { PROJECTS } from "@/app/_data/projects";
-import ProjectCard from "@/components/layout/project-card/project-card";
+import ProjectCard from "@/components/layout/projects/project-card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link'
 import { ChevronRight } from "lucide-react";
