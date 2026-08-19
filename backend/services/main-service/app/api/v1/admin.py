@@ -175,9 +175,6 @@ async def delete_user(user_id: UUID, db: Session = Depends(get_db), current_user
     db.commit()
     return {"status": "ok"}
 # ---------- CRUD: Order Requests ----------
-@router.get("/order-requests")
-async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    return db.query(OrderRequest).offset(skip).limit(limit).all()
 @router.get("/order-requests/{order_id}")
 async def get_order_request(order_id: UUID, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
     order = db.get(OrderRequest, order_id)
@@ -227,3 +224,103 @@ async def delete_company(company_id: UUID, db: Session = Depends(get_db), _: Use
 # ---------- CRUD: Articles, Projects, Team Members (similar, omitted for brevity) ----------
 # Full code would include all CRUD operations for each entity.
 # For simplicity, we assume the existing endpoints are sufficient.
+from app.models.order_request_file import OrderRequestFile
+from sqlalchemy.orm import joinedload
+
+class OrderRequestFileResponse(BaseModel):
+    id: UUID
+    filename: str
+    file_path: str
+
+class OrderRequestWithFiles(BaseModel):
+    id: UUID
+    contact_id: Optional[UUID]
+    service_types_json: Optional[List[str]]
+    about: Optional[str]
+    estimate_deadline: Optional[str]
+    estimate_budget: Optional[str]
+    naming_help: Optional[str]
+    created_at: datetime
+    files: List[OrderRequestFileResponse]
+    class Config:
+        from_attributes = True
+
+@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
+async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
+    return orders
+from app.models.order_request_file import OrderRequestFile
+from sqlalchemy.orm import joinedload
+
+class OrderRequestFileResponse(BaseModel):
+    id: UUID
+    filename: str
+    file_path: str
+
+class OrderRequestWithFiles(BaseModel):
+    id: UUID
+    contact_id: Optional[UUID]
+    service_types_json: Optional[List[str]]
+    about: Optional[str]
+    estimate_deadline: Optional[str]
+    estimate_budget: Optional[str]
+    naming_help: Optional[str]
+    created_at: datetime
+    files: List[OrderRequestFileResponse]
+    class Config:
+        from_attributes = True
+
+@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
+async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
+    return orders
+from app.models.order_request_file import OrderRequestFile
+from sqlalchemy.orm import joinedload
+
+class OrderRequestFileResponse(BaseModel):
+    id: UUID
+    filename: str
+    file_path: str
+
+class OrderRequestWithFiles(BaseModel):
+    id: UUID
+    contact_id: Optional[UUID]
+    service_types_json: Optional[List[str]]
+    about: Optional[str]
+    estimate_deadline: Optional[str]
+    estimate_budget: Optional[str]
+    naming_help: Optional[str]
+    created_at: datetime
+    files: List[OrderRequestFileResponse]
+    class Config:
+        from_attributes = True
+
+@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
+async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
+    return orders
+from app.models.order_request_file import OrderRequestFile
+from sqlalchemy.orm import joinedload
+
+class OrderRequestFileResponse(BaseModel):
+    id: UUID
+    filename: str
+    file_path: str
+
+class OrderRequestWithFiles(BaseModel):
+    id: UUID
+    contact_id: Optional[UUID]
+    service_types_json: Optional[List[str]]
+    about: Optional[str]
+    estimate_deadline: Optional[str]
+    estimate_budget: Optional[str]
+    naming_help: Optional[str]
+    created_at: datetime
+    files: List[OrderRequestFileResponse]
+    class Config:
+        from_attributes = True
+
+@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
+async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
+    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
+    return orders

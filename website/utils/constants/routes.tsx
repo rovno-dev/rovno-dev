@@ -7,8 +7,7 @@ export interface RouteLinkProps {
 export const ROUTES = {
   home: { id: 'home', href: "/", title: 'Главная' },
   projects: { id: 'projects', href: "/projects", title: 'Проекты' },
-  order: { id: 'order', href: "https://forms.yandex.com/cloud/6936a4b1d0468820623c548e/", title: 'Оставить заявку' },
+  order: { id: 'order', href: "/order", title: 'Оставить заявку' },
   about: { id: 'about', href: "/about", title: 'О нас' },
-  journal: { id: 'journal', href: "https://t.me/rovno_dev", title: "Журнал Ровня" },
-  // blog: { id: 'blog', href: "/blog", title: 'Блог' },
+  blog: { id: 'blog', href: "/blog", title: "Ровный блог" },
 }

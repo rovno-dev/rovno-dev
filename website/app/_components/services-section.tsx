@@ -106,7 +106,7 @@ export default function ServicesSection() {
               <div className="relative z-10">
                 {/* Icon Box */}
                 <div
-                  className="mb-6 flex size-10 items-center justify-center rounded-lg border border-(--outline) bg-(--card) text-zinc-400 transition-colors group-hover:text-white"
+                  className="mb-6 flex size-10 items-center justify-center rounded-lg border border-(--outline) bg-(--card) text-zinc-400 transition-colors group-hover:text-primary"
                   style={{ color: service.color }}
                 >
                   {service.icon}

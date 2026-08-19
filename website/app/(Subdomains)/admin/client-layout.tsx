@@ -11,14 +11,12 @@ export default function AdminRootClientLayout({
   secret: string;
 }) {
   return (
-    <div className="min-h-screen bg-(--bg) py-12 md:py-16">
-      <Container>
+    <div className="min-h-screen py-12 md:py-16">
+      <Container variant="full-width">
         <div className="flex flex-col md:flex-row gap-6">
           <AdminSidebar secret={secret} />
-          <main className="flex-1 flex justify-center">
-            <div className="w-full max-w-5xl space-y-8">
-              {children}
-            </div>
+          <main className="w-full">
+            {children}
           </main>
         </div>
       </Container>

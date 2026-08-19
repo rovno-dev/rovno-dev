@@ -843,7 +843,7 @@ Choose exactly 4:
 - collection shelf
 - habit tracker block
 - checkout summary card
-- journal entry card
+- blog entry card
 - achievement tile row
 
 ### Decorative Asset Set

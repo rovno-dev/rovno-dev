@@ -47,7 +47,7 @@ export function FileUpload({
           </div>
         ))}
         <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-(--outline) hover:border-(--primary) hover:bg-(--primary-glass) transition-all group">
-          <CloudIcon className="size-6 [&>path]:fill-(--dark-1)! group-hover:[&>path]:fill-(--primary)!" /><span className="text-xs font-bold uppercase text-(--on-bg-low) group-hover:text-(--primary)">Добавить</span>
+          <CloudIcon className="size-6 [&>path]:text-(--dark-1)! group-hover:[&>path]:text-(--primary)!" /><span className="text-xs font-bold uppercase text-(--on-bg-low) group-hover:text-(--primary)">Добавить</span>
         </button>
       </div>
       <input type="file" ref={fileInputRef} className="hidden" multiple onChange={onFileChange} accept={AVALIABLE_FILE_TYPES} />

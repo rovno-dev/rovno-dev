@@ -1,3 +1,4 @@
+import uuid
 import os
 import json
 import secrets
@@ -13,6 +14,10 @@ from app.models.user import User, UserRole, UserStatus
 from app.models.company import Company, LifecycleStage
 from app.models.contact import Contact
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
+from app.models.order_request_file import OrderRequestFile
+from app.models.order_request_file import OrderRequestFile
+from app.models.order_request_file import OrderRequestFile
+from app.models.order_request_file import OrderRequestFile
 from app.shared.auth import hash_password
 from database.database import get_db
 
@@ -160,9 +165,22 @@ async def create_order(
     db.commit()
     db.refresh(order_request)
 
-    # 6. (Optional) Save uploaded files – currently not used, but could be extended
-
-    # 7. Notify Telegram (async)
+    # 6. Save uploaded files
+    storage_path = os.getenv("STORAGE_PATH", "./storage/order_files")
+    os.makedirs(storage_path, exist_ok=True)
+    for file in files:
+        if file.filename:
+            file_path = os.path.join(storage_path, f"{uuid.uuid4()}_{file.filename}")
+            content = await file.read()
+            with open(file_path, "wb") as f:
+                f.write(content)
+            order_file = OrderRequestFile(
+                order_request_id=order_request.id,
+                file_path=file_path,
+                filename=file.filename
+            )
+            db.add(order_file)
+    db.commit()
     asyncio.create_task(notify_telegram(valid_data.model_dump(), str(order_request.id)))
 
     return {"status": "ok", "order_id": str(order_request.id)}

@@ -1,3 +1,5 @@
+"use client"
+
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
 import { Button } from "../../ui/button";
@@ -7,6 +9,7 @@ import { NavLink } from "./nav-link";
 import { ThemeSwitcher } from "../theme-switcher";
 import Link from "next/link";
 import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-icon";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const sections = [
@@ -31,16 +34,18 @@ export default function Footer() {
     {
       title: "Медиа",
       links: [
-        { title: "Журнал «Ровня»", href: ROUTES.journal.href },
+        { title: "Журнал «Ровня»", href: ROUTES.blog.href },
         { title: "Предложить статью", href: "https://t.me/rovno_dev?direct" },
         // { title: "База знаний", href: "" },
       ],
     },
   ];
+  const pathname = usePathname();
+  const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
 
   return (
     <footer className="bg-(--bg) pt-20 pb-32 border-t border-(--outline)">
-      <Container>
+      <Container variant={isFullWidth ? 'full-width' : 'default'}>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
           {/* Brand Column */}
           <div className="flex flex-col gap-6 max-w-sm">

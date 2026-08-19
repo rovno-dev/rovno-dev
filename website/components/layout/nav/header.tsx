@@ -13,7 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { usePathname } from "next/navigation";
@@ -44,7 +43,7 @@ export default function Header() {
           <nav className="hidden md:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>Проекты</NavLink>
             <NavLink href={ROUTES.about.href}>О нас</NavLink>
-            <NavLink href={ROUTES.journal.href}>{'Журнал "Ровня"'}</NavLink>
+            <NavLink href={ROUTES.blog.href}>{'Журнал "Ровня"'}</NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-2">
@@ -77,9 +76,7 @@ export default function Header() {
                           <Link href={`/admin/${adminSecret}`}>Админ-панель</Link>
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem disabled>
-                          {adminSecretLoading ? '⏳ Загрузка...' : '❌ Секрет не найден'}
-                        </DropdownMenuItem>
+                        ""
                       )}
                     </>
                   )}

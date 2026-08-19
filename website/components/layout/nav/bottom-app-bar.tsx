@@ -16,7 +16,7 @@ export default function BottomAppBar() {
     // Pass the COMPONENT, not <Component />
     { ...ROUTES.projects, icon: Box },
     { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
-    { href: ROUTES.journal.href, title: "Журнал", icon: Newspaper },
+    { href: ROUTES.blog.href, title: "Журнал", icon: Newspaper },
     // { ...ROUTES.job, icon: BriefcaseBusiness  },
   ]
 

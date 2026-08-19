@@ -25,10 +25,14 @@ Table companies {
 Table contacts {
   id bigint [pk, increment]
   company_id bigint [ref: > companies.id, note: 'Associated company account']
-  user_id bigint [ref: > users.id]
+  user_id bigint [ref: > users.id] // if contact is signed up
   role_title varchar [note: 'e.g. Marketing Director']
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+  phone varchar [unique]
+  telegram_username varchar
+  email varchar [unique]
+  name varchar
 }
 
 Enum estimate_deadline {
@@ -51,6 +55,7 @@ Table order_requests {
   id bigint [pk, increment]
   contact_id bigint [ref: > contacts.id]
   service_types_json jsonb [note: 'Array of services objects string[]']
+  agreement bool [not null]
   about varchar
   estimate_deadline estimate_deadline
   estimate_budget estimate_budget
@@ -65,7 +70,7 @@ Enum user_role {
   root, // admin + can make crud of all users
 }
 
-Enum user_status {
+Enum user_status { 
   pending_verification
   verificated
   blocked
@@ -81,14 +86,14 @@ Table users {
   password varchar [not null]
   description text [note: 'Short bio/description']
   avatar_url varchar
-  telegram_username varchar [unique]
-  linkedin_username varchar [unique]
-  github_username varchar [unique]
-  behance_username varchar [unique]
-  youtube_username varchar [unique]
-  vk_username varchar [unique]
-  telegram_channel_username varchar [unique]
-  vk_public_username varchar [unique]
+  telegram_username varchar 
+  linkedin_username varchar 
+  github_username varchar 
+  behance_username varchar
+  youtube_username varchar
+  vk_username varchar 
+  telegram_channel_username varchar
+  vk_public_username varchar
   user_role user_role [default: 'user']
   user_status user_status [default: 'pending_verification']
   other_socials_json jsonb [note: 'Array of other social objects {title: string, url: string}']
@@ -114,7 +119,7 @@ Enum publication_status {
 }
 
 Table projects {
-  id varchar [pk, note: 'Short code identifier like alx, sadovod']
+  id varchar [pk, increment]
   slug varchar [unique, not null]
   title varchar [not null]
   client_id bigint [ref: > companies.id]
@@ -146,6 +151,20 @@ Table project_team_assignments {
   }
 }
 
+Table project_categories {
+  id varchar [pk, increment]
+  name varchar [not null]
+}
+
+Table projects_categories {
+  project_id varchar [ref: > projects.id]
+  project_category_id bigint [ref: > project_categories.id]
+  
+  indexes {
+    (project_id, project_category_id) [pk]
+  }
+}
+
 Table articles {
   id bigint [pk, increment]
   slug varchar [unique, not null]
@@ -161,4 +180,18 @@ Table articles {
   publication_status publication_status [default: 'draft']
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
+}
+
+Table articles_categories {
+  id varchar [pk, increment]
+  name varchar [not null]
+}
+
+Table articles_categories {
+  article_id varchar [ref: > articles.id]
+  article_category_id bigint [ref: > articles_categories.id]
+  
+  indexes {
+    (article_id, article_category_id) [pk]
+  }
 }

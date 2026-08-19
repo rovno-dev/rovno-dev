@@ -3,13 +3,16 @@ import { CheckboxCard } from "@/components/ui/checkbox-card";
 import { cn } from "@/lib/utils";
 
 const SERVICE_TYPES = [
-  "Логотип / Фирменный стиль / Брендбук",
-  "Дизайн презентации / Коммерческое предложение",
-  "Создание сайта (Лендинг / Многостраничный / Интернет-магазин)",
-  "2д анимация (анимация логотипа, социальные ролики), Монтаж, Склейка",
-  "3D-моделирование, 3D-анимация (имиджевый ролик, коммерческий, социальный)",
+  "Логотип",
+  "Фирменный стиль",
+  "Брендбук",
+  "Дизайн презентации",
+  "Сайт",
+  "Монтаж, Склейка",
+  "2д анимация",
+  "3D-моделирование, 3D-анимация",
   "Реклама и продвижение (SEO, Таргет, Контекст)",
-  "Что-либо другое (опишу ниже, в графе «О проекте»"
+  "Что-либо другое (опишу в графе «О проекте»)"
 ];
 
 interface ServiceSelectionProps {
@@ -26,9 +29,9 @@ export function ServiceSelection({ selectedServices, setSelectedServices, error 
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
         {SERVICE_TYPES.map((service) => (
-          <CheckboxCard 
-            key={service} 
-            checked={selectedServices.includes(service)} 
+          <CheckboxCard
+            key={service}
+            checked={selectedServices.includes(service)}
             onCheckedChange={(checked) => {
               if (checked) setSelectedServices(p => [...p, service]);
               else setSelectedServices(p => p.filter(s => s !== service));

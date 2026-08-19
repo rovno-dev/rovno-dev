@@ -664,7 +664,7 @@ These patterns came out of real LLM-generated landing-page tests. They are the s
 * **NO generic step labels.** "Stage 1 / Stage 2 / Stage 3", "Step 1 / Step 2 / Step 3", "Phase 01 / Phase 02 / Phase 03", "Pass One / Pass Two / Pass Three". Banned. The actual step content is the label. If you must show progression, use the verb-noun directly ("Install", "Configure", "Ship") not "Stage 1: Install".
 
 **Pills, labels and version stamps**
-* **NO pills/labels/tags overlaid on images.** No `<span>` overlays on photos with tags like `Brand · 02`, `PLATE · BRAND`, `Field notes - journal`. Either let the image speak alone, or add a caption directly below (outside the image).
+* **NO pills/labels/tags overlaid on images.** No `<span>` overlays on photos with tags like `Brand · 02`, `PLATE · BRAND`, `Field notes - blog`. Either let the image speak alone, or add a caption directly below (outside the image).
 * **NO photo-credit captions as decoration.** Strings like `Field study no. 12 · Ines Caetano`, `Plate 03 · House archive`, `Frame XII · 35mm` under stock/picsum images are pretentious. Photo credit is allowed ONLY when there is a real photographer being credited for a real photo (with permission). Otherwise: skip the caption or use a one-line functional caption ("The 6-quart, in Sage.").
 * **NO version footers on marketing pages.** Footer strings like `v1.4.2`, `Build 0048`, `last sync 4s ago · main` are CLI / devtool fixtures, not landing-page content. Banned on marketing/landing/portfolio pages.
 * **NO "Reservation 412 of 800"-style live-stock counters** as decoration. Only if the brief is explicitly a limited-run waitlist with real data.
@@ -945,7 +945,7 @@ Run this matrix before outputting code. This is the last filter.
 - [ ] **Bento has rhythm AND exact cell count** (N items → N cells, no empty cells in middle or at end)?
 - [ ] **Long lists use the right UI component** (not default `<ul>` with `divide-y` for > 5 items - see Section 4.9 alternatives)?
 - [ ] **Real images used** (gen-tool first, then Picsum-seed, then explicit placeholder slots) - NO div-based fake screenshots, NO hand-rolled decorative SVGs, NO pure-text minimalism?
-- [ ] **No pills/labels overlaid on images** (no `Plate · Brand`, no `Field notes - journal`)?
+- [ ] **No pills/labels overlaid on images** (no `Plate · Brand`, no `Field notes - blog`)?
 - [ ] **No photo-credit captions as decoration** (`Field study no. 12 · Ines Caetano`)?
 - [ ] **No version footers** (`v1.4.2`, `Build 0048`) on marketing pages?
 - [ ] **No micro-meta-sentences** under eyebrows ("Each of these is a feature we ship today...")?
