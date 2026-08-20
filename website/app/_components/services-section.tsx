@@ -11,6 +11,10 @@ type ServiceType = {
   icon: React.JSX.Element;
   color?: string;
   services: string[];
+  price: {
+    from: string,
+    avg: string,
+  };
 }
 
 const services: ServiceType[] = [
@@ -18,29 +22,45 @@ const services: ServiceType[] = [
     title: "Разработка",
     description: "Сделаем цифровой продукт любой сложности",
     icon: <Box />,
-    // color: "#3b82f6",
-    services: ["Сайты", "MCP", "Мобильные приложения", "Telegram- & Max- боты", "Telegram Mini apps"]
+    color: "#3b82f6",
+    services: ["Сайты", "MCP", "Мобильные приложения", "Telegram- & Max- боты", "Telegram Mini apps"],
+    price: {
+      from: "50 000",
+      avg: "150 000",
+    },
   },
   {
     title: "3D & Motion",
     description: "Сделаем видео любой сложности",
     icon: <Gem />,
-    // color: "#f59e0b",
-    services: ["CGI-графика", "Рекламные ролики", "3D", "Монтаж", "Скейка", "Анимация"]
+    color: "#f59e0b",
+    services: ["CGI-графика", "Рекламные ролики", "3D", "Монтаж", "Скейка", "Анимация"],
+    price: {
+      from: "45 000",
+      avg: "100 000",
+    },
   },
   {
     title: "Продвижение",
     description: "Сделаем всё, чтобы о вас знали",
     icon: <ChartSpline />,
-    // color: "#ec4899",
-    services: ["Контекстная реклама", "Таргет", "Я.Директ", "SEO", "UX-Аудит", "SMM"]
+    color: "#ec4899",
+    services: ["Контекстная реклама", "Таргет", "Я.Директ", "SEO", "UX-Аудит", "SMM"],
+    price: {
+      from: "40 000",
+      avg: "70 000",
+    },
   },
   {
     title: "Брендинг",
     description: "Сделаем бренд, который будут узнавать",
     icon: <Signature />,
-    // color: "#a855f7",
-    services: ["Логотипы", "Брендбук", "Фирменный стиль", "Айдентика"]
+    color: "#a855f7",
+    services: ["Логотипы", "Брендбук", "Фирменный стиль", "Айдентика"],
+    price: {
+      from: "75 000",
+      avg: "150 000",
+    },
   },
 
 ];
@@ -50,7 +70,8 @@ export default function ServicesSection() {
     <section className="pt-2 sm:pt-4 pb-8 sm:pb-18">
       <Container className="pt-6 sm:pt-14">
         <h2 className="text-display-1 mb-10 text-center">
-          Наши услуги
+          Ровные решения<br />
+          для развития бизнеса
         </h2>
 
         {/* The Grid: Perfectly flush 1px internal dividers */}
@@ -72,19 +93,29 @@ export default function ServicesSection() {
               <div
                 className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10"
                 style={{
-                  background: `radial-gradient(circle at center, ${service.color} 0%, transparent 70%)`
+                  background: `radial-gradient(circle at center, ${service.color} 0%, transparent 90%)`
                 }}
               />
 
               <div className="relative z-10">
                 {/* Icon Box */}
-                <div
-                  className="mb-6 flex size-10 items-center justify-center rounded-lg border border-(--outline) bg-(--card) text-zinc-400 transition-colors group-hover:text-primary"
-                  style={{ color: service.color }}
-                >
-                  {service.icon}
-                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <div
+                    className="mb-10 flex size-10 items-center justify-center rounded-lg border border-(--outline) bg-(--card) text-zinc-400 transition-colors group-hover:text-primary"
+                  // style={{ color: service.color }}
+                  >
+                    {service.icon}
+                  </div>
+                  <div className="flex flex-col gap-1 items-end">
+                    <p className="text-(--on-bg-medium) text-body-3">
+                      <span className="text-body-5">от</span> {service.price.from} ₽
+                    </p>
+                    <p className="text-(--on-bg-medium) text-body-3">
+                      <span className="text-body-5"><span className="">Ровно</span> от</span> {service.price.avg} ₽
+                    </p>
+                  </div>
 
+                </div>
                 {/* Content */}
                 <h3 className="mb-2 text-lg font-semibold tracking-tight text-(--on-bg-medium)">
                   {service.title}

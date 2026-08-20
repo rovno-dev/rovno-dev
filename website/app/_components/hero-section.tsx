@@ -16,12 +16,12 @@ export default function HeroSection() {
       <div className="z-10 absolute h-full w-full bottom-0 left-0 bg-gradient-to-t from-(--bg) to-(--bg)/0 to-20%" />
 
       <Container className="relative z-10 flex flex-col items-center text-center">
-        <h1 className="text-display-2 sm:text-display-1 lg:text-[5rem] font-italic leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
+        <h1 className="text-display-2 sm:text-display-1 md:text-[3.5rem] lg:text-[5rem] font-italic leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
           Цифровые продукты <br />
           <span className="text-(--on-bg-medium)">полного цикла</span>
         </h1>
-        <p className="text-body-1 md:text-body-0 text-(--on-bg-medium) max-w-2xl mx-auto mb-10 leading-relaxed">
-          Разработка, дизайн, 3D-анимация и айдентика. Создаём высоконагруженные решения, которые работают на результат.
+        <p className="text-body-1 md:text-body-0 text-(--on-bg-medium) max-w-xl mx-auto mb-10 leading-relaxed">
+          Создаём ровные решения любой сложности, которые работают на результат.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
