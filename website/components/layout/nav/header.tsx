@@ -30,9 +30,9 @@ export default function Header() {
   return (
     <header
       className="
-      fixed top-0 left-0 right-0 w-full z-50
+      fixed top-0 left-0 right-0 w-full md:max-w-[900px] z-50
       justify-center
-      flex items-center"
+      flex items-center mx-auto"
     >
       <Container
         variant={isFullWidth ? 'full-width' : 'default'}

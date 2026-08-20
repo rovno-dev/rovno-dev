@@ -1,36 +1,46 @@
 "use client";
-
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { RocketBlueprint } from "@/components/layout/fancy/rocket-blueprint";
 
 export default function CtaSection() {
   return (
-    <section className="relative overflow-hidden py-24 md:py-32">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-(--brand-9) via-(--brand-6) to-(--brand-3) opacity-20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_70%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.05),transparent_60%)]" />
-      <div className="absolute inset-0 grid-bg opacity-10" />
+    <section className="relative overflow-hidden py-24 md:py-32 bg-[#0f2b46]">
+      {/* Blueprint grid background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `linear-gradient(rgba(29,77,122,0.4) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(29,77,122,0.4) 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0f2b46]/80" />
+      </div>
+
+      {/* Blueprint Rocket SVG */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 pointer-events-none w-full px-4 aspect-[400/500] blur-[1.5px]">
+        <RocketBlueprint className="w-full!" />
+      </div>
 
       <Container className="relative z-10">
-        <div
-          className="max-w-4xl mx-auto text-center"
-        >
-          <h2 className="text-5xl md:text-7xl font-heading font-bold leading-tight tracking-tight text-(--on-bg-high) mb-6">
-            Готовы <span>начать проект</span>?
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-5xl md:text-7xl font-heading font-bold leading-tight tracking-tight text-white mb-6">
+            Найдём решение<br />
           </h2>
-          <p className="text-xl md:text-2xl text-(--on-bg-medium) leading-relaxed mb-8 max-w-2xl mx-auto">
-            Запишитесь на бесплатный аудит или опишите задачу прямо сейчас — ответим в течение 3 часов*
+          <p className="text-xl md:text-2xl text-white/80 leading-relaxed max-w-2xl mx-auto">
+            Напишите <span><Link href={"/niyazgim"}>техническому директору</Link></span> в личку — он ответит в течение 3х часов*
             <br />
-            <span className="text-sm text-(--on-bg-low)">*с 8 до 23 по мск</span>
+            <span className="text-sm text-white/50">*с 8 до 23 по мск</span>
           </p>
-          <div
-          >
-            <Button size="xlarge" shape="round" asChild className="shadow-2xl shadow-(--primary)/40">
-              <Link href="https://max.ru/+79375803414">
-                Написать в Max
-              </Link>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto sm:max-w-md">
+            <Button size="xlarge" variant={'filled'} asChild>
+              <Link href="https://max.ru/+79375803414">Написать в Max</Link>
+            </Button>
+            <Button size="xlarge" variant={'filled'} asChild>
+              <Link href="https://t.me/niyazgim">Написать в ТГ</Link>
             </Button>
           </div>
         </div>
