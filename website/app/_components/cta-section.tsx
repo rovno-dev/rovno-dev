@@ -2,11 +2,11 @@
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { RocketBlueprint } from "@/components/layout/fancy/rocket-blueprint";
+import SpeedIllustration from "@/components/layout/fancy/rocket-blueprint";
 
 export default function CtaSection() {
   return (
-    <section className="relative overflow-hidden py-24 md:py-32 bg-[#0f2b46]">
+    <section className="relative overflow-hidden py-24 md:py-32 bg-[rgba(29,77,122)]/50">
       {/* Blueprint grid background */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -21,8 +21,8 @@ export default function CtaSection() {
       </div>
 
       {/* Blueprint Rocket SVG */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 pointer-events-none w-full px-4 aspect-[400/500] blur-[1.5px]">
-        <RocketBlueprint className="w-full!" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 pointer-events-none w-full px-4 aspect-[400/500] blur-[1px]">
+        {/* <SpeedIllustration /> */}
       </div>
 
       <Container className="relative z-10">

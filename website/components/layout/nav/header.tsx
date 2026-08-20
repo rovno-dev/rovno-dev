@@ -8,6 +8,7 @@ import { NavLink } from "./nav-link";
 import { Paintbrush, User } from "lucide-react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,15 @@ import { cn } from "@/lib/utils";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
   const pathname = usePathname();
 
@@ -29,10 +39,10 @@ export default function Header() {
 
   return (
     <header
-      className="
-      fixed top-0 left-0 right-0 w-full md:max-w-[900px] z-50
-      justify-center
-      flex items-center mx-auto"
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 justify-center w-full flex items-center mx-auto transition-width duration-400 ease-in-out",
+        isScrolled ? "max-w-[900px]" : "max-w-full"
+      )}
     >
       <Container
         variant={isFullWidth ? 'full-width' : 'default'}
