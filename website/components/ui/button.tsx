@@ -4,13 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 export const buttonUnidekaVariants = {
-  filled: "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  outlined: "border border-border bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  tonal: "bg-[var(--primary-card)] text-[var(--on-primary-card)] hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  "tonal-card": "bg-card text-card-foreground border border-border/50 hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  "tonal-primary": "bg-[var(--primary-card)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  text: "bg-transparent text-foreground hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
-  glass: "bg-[var(--primary-glass)] backdrop-blur-glass border border-[var(--outline-primary-glass)] text-primary hover:bg-[var(--state-hover)] cursor-pointer active:scale-[0.98] [&_svg]:text-current",
+  filled: "bg-[image:var(--primary-gradient)] text-[var(--on-primary)] cursor-pointer [&_svg]:text-current",
+  outlined: "border border-border bg-transparent text-foreground [&_svg]:text-current",
+  tonal: "bg-[var(--primary-card)] text-[var(--on-primary-card)] [&_svg]:text-current",
+  "tonal-card": "bg-card text-card-foreground border border-border/50 [&_svg]:text-current",
+  "tonal-primary": "bg-[var(--primary-card)] text-primary [&_svg]:text-current",
+  text: "bg-transparent text-foreground [&_svg]:text-current",
+  glass: "bg-[var(--primary-glass)] backdrop-blur-[var(--blur-glass)] border border-[var(--outline-primary-glass)] text-primary [&_svg]:text-current",
   selected: "bg-[var(--primary-card)] text-primary border border-primary cursor-pointer [&_svg]:text-current",
 };
 export const chipSizes = {
@@ -34,7 +34,7 @@ export const buttonSizes = {
   xlarge: "h-[64px] px-6 gap-2 [&_svg]:size-6 text-heading-3!",
 }
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-[var(--state-focus)]/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: buttonUnidekaVariants,
@@ -75,7 +75,7 @@ function Button({
     <Comp
       ref={ref}
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, shape, className }))}
+      className={cn("relative after:absolute after:inset-0 after:bg-(--state-hover) after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-200 overflow-hidden active:scale-[0.98]", buttonVariants({ variant, size, shape, className }))}
       {...props}
     />
   )

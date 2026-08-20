@@ -5,7 +5,7 @@ import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
-import { Paintbrush, User } from "lucide-react";
+import { Lightbulb, User } from "lucide-react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import { useState, useEffect } from "react";
@@ -64,7 +64,7 @@ export default function Header() {
         <div className="flex items-center gap-1">
           <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
-              <Paintbrush />
+              <Lightbulb />
               Оформить заказ
             </Link>
           </Button>

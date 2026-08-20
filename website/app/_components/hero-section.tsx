@@ -28,24 +28,14 @@ export default function HeroSection() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
           <Button
-            size="large"
+            size="xlarge"
             shape="round"
             className="w-full sm:w-fit"
+            variant={'filled'}
             asChild
           >
             <Link href={ROUTES.order.href}>
               Начать проект
-            </Link>
-          </Button>
-          <Button
-            variant="glass"
-            size="large"
-            shape="round"
-            className="w-full sm:w-fit"
-            asChild
-          >
-            <Link href="/projects">
-              Смотреть кейсы
             </Link>
           </Button>
         </div>

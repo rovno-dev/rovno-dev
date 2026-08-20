@@ -5,7 +5,7 @@ import { Container } from "../../ui/container";
 import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../../ui/button";
-import { Box, Newspaper, Paintbrush } from "lucide-react"
+import { Box, Newspaper, Lightbulb } from "lucide-react"
 import Link from "next/link";
 import RovnoLogotypeIconEmpty from "../logo/logo-icon-empty";
 
@@ -53,7 +53,7 @@ export default function BottomAppBar() {
             onClick={() => setOpen(true)}
           >
             <Link href={ROUTES.order.href}>
-              <Paintbrush className="size-[26px]!" />
+              <Lightbulb className="size-[26px]!" />
               <span className="text-display-4">Заказ</span>
             </Link>
           </Button>
