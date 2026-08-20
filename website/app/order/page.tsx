@@ -188,21 +188,8 @@ export default function OrderPage() {
       <Container>
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
           <ServiceSelection selectedServices={selectedServices} setSelectedServices={setSelectedServices} error={errors.services} />
-          <ProjectDetails error={errors.description} />
           <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">3. О компании</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Field><FieldLabel>Название бренда</FieldLabel><Input name="company_name" placeholder="Название" /></Field>
-              <Field><FieldLabel>Нужен нейминг?</FieldLabel>
-                <Select name="naming_help" defaultValue="no"><SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent position="popper"><SelectItem value="yes">Да, нужно название</SelectItem><SelectItem value="no">Нет, уже есть</SelectItem><SelectItem value="discuss">Да, но хотел бы обсудить его</SelectItem></SelectContent>
-                </Select>
-              </Field>
-            </div>
-          </div>
-          <FileUpload attachments={attachments} onRemoveFile={removeFile} onOpenLightbox={(i) => { setActiveIndex(i); setLightboxOpen(true); }} fileInputRef={fileInputRef} onFileChange={handleFileChange} />
-          <div className="space-y-6">
-            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">2. Контакты</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Field data-invalid={!!errors.user_name}>
                 <FieldLabel>Ваше имя <span className="text-destructive">*</span></FieldLabel>
@@ -230,6 +217,19 @@ export default function OrderPage() {
               </Field>
             </div>
           </div>
+          <ProjectDetails error={errors.description} />
+          <div className="space-y-6">
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. О компании</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field><FieldLabel>Название бренда</FieldLabel><Input name="company_name" placeholder="Название" /></Field>
+              <Field><FieldLabel>Нужен нейминг?</FieldLabel>
+                <Select name="naming_help" defaultValue="no"><SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper"><SelectItem value="yes">Да, нужно название</SelectItem><SelectItem value="no">Нет, уже есть</SelectItem><SelectItem value="discuss">Да, но хотел бы обсудить его</SelectItem></SelectContent>
+                </Select>
+              </Field>
+            </div>
+          </div>
+          <FileUpload attachments={attachments} onRemoveFile={removeFile} onOpenLightbox={(i) => { setActiveIndex(i); setLightboxOpen(true); }} fileInputRef={fileInputRef} onFileChange={handleFileChange} />
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Checkbox id="agreement" name="agreement" />

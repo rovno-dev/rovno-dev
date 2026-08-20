@@ -164,7 +164,7 @@ export default function AdminOrdersPage() {
                     <p> {order.contact?.email || "—"}</p>
                   </div>
                   <div className="flex gap-1 items-center">
-                    <TelegramLogotypeMonoIcon className="size-3!" />
+                    <TelegramLogotypeMonoIcon className="size-3! [&>path]:fill-(--on-bg-high)" />
                     <p>{order.contact?.telegram_username || "—"}</p>
                   </div>
                 </div>

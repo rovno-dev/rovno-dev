@@ -28,7 +28,7 @@ export function FileUpload({
 }) {
   return (
     <div className="space-y-6">
-      <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">4. Файлы (макс. 10мб.)</h3>
+      <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Доп. файлы (макс. 10мб.)</h3>
       <p className="text-(--on-bg-low)">Можно загрузить файлы с расширением {AVALIABLE_FILE_TYPES}.</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {attachments.map((attr, idx) => (

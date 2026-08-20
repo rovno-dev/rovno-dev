@@ -35,8 +35,8 @@ export function ThemeSwitcher() {
               className={cn(
                 "size-4! transition-colors",
                 isActive
-                  ? "[&_path]:fill-(--bg)"
-                  : "[&_path]:fill-(--on-bg-low) group-hover:[&_path]:fill-(--on-bg-high)"
+                  ? "[&_path]:stroke-(--bg)"
+                  : "[&_path]:stroke-(--on-bg-low) group-hover:[&_path]:stroke-(--on-bg-high)"
               )}
             />
             <span className="sr-only">{opt.label}</span>

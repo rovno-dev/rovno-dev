@@ -21,7 +21,7 @@ export function ProjectDetails({ error }: { error?: string }) {
   return (
     <div className="space-y-6">
       <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">
-        2. О проекте
+        3. О проекте
       </h3>
       <div className="space-y-4">
 
