@@ -33,7 +33,7 @@ export function CookieConsent() {
             Про Cookie-файлы 🍪
           </h4>
           <p className="text-xs leading-relaxed text-(--on-bg-medium)">
-            Мы используем cookie-файлы для улучшения работы сайта и анализа трафика чтобы делать крутые и самые ровные цифровые продукты.
+            Для корректной и ровной работы сайта нужны Cookie
           </p>
         </div>
         <div className="flex items-center gap-2">

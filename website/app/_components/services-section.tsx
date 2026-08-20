@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Container } from "@/components/ui/container";
-import { Box, Paintbrush, Gem, Signature, } from "lucide-react";
+import { Box, ChartSpline, Gem, Signature, } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type ServiceType = {
@@ -10,90 +10,63 @@ type ServiceType = {
   description: string;
   icon: React.JSX.Element;
   color?: string;
-  stack: string[];
+  services: string[];
 }
 
 const services: ServiceType[] = [
   {
     title: "Разработка",
-    description: "От Telegram-ботов до высоконагруженных систем с внедрением ИИ в бизнес-процессы и разработкой умных агентов и автоматизаций.",
+    description: "Сделаем цифровой продукт любой сложности",
     icon: <Box />,
     // color: "#3b82f6",
-    stack: ["React", "Next.js", "FastAPI", "PSQL", "Redis", "Aiogram", "NemoClaw", "Hermes", "Python", "Go", "Docker", "Kubernetes"]
+    services: ["Сайты", "MCP", "Мобильные приложения", "Telegram- & Max- боты", "Telegram Mini apps"]
   },
   {
     title: "3D & Motion",
-    description: "CGI, рекламные ролики и 3D-графика, которые выделяют вас на фоне конкурентов.",
+    description: "Сделаем видео любой сложности",
     icon: <Gem />,
     // color: "#f59e0b",
-    stack: ["Blender", "After Effects", "Premiere Pro", "Hyperframes", "3ds Max", "Kling AI", "DaVinci Resolve", "Auto-subs"]
+    services: ["CGI-графика", "Рекламные ролики", "3D", "Монтаж", "Скейка", "Анимация"]
   },
   {
-    title: "UX/UI Дизайн",
-    description: "Продуманные интерфейсы и сценарии, повышающие конверсию вашего продукта.",
-    icon: <Paintbrush />,
+    title: "Продвижение",
+    description: "Сделаем всё, чтобы о вас знали",
+    icon: <ChartSpline />,
     // color: "#ec4899",
-    stack: ["Figma", "Photoshop", "Nano Banana Pro"]
+    services: ["Контекстная реклама", "Таргет", "Я.Директ", "SEO", "UX-Аудит", "SMM"]
   },
   {
-    title: "Айдентика",
-    description: "Логотипы, фирменные стили и брендбуки, которые работают вдолгую и формируют сильный образ.",
+    title: "Брендинг",
+    description: "Сделаем бренд, который будут узнавать",
     icon: <Signature />,
     // color: "#a855f7",
-    stack: ["Illustrator", "Photoshop", "Nano Banana Pro"]
+    services: ["Логотипы", "Брендбук", "Фирменный стиль", "Айдентика"]
   },
 
 ];
-
-function ICChip() {
-  return (
-    <div className="relative z-30 group mb-16 w-[80%] sm:w-[300px] mx-auto">
-      <div className="absolute -left-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-r from-(--on-bg-low) to-(--on-bg-medium) rounded-l-sm border-y border-(--outline)" />)}
-      </div>
-      <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-        {[...Array(3)].map((_, i) => <div key={i} className="w-4 h-2 bg-gradient-to-l from-(--on-bg-low) to-(--on-bg-medium) rounded-r-sm border-y border-(--outline)" />)}
-      </div>
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-5">
-        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-b from-(--on-bg-low) to-(--on-bg-medium) rounded-t-sm border-x border-(--outline)" />)}
-      </div>
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-5">
-        {[...Array(5)].map((_, i) => <div key={i} className="w-2 h-4 bg-gradient-to-t from-(--on-bg-low) to-(--on-bg-medium) rounded-b-sm border-x border-(--outline)" />)}
-      </div>
-
-      <div className="relative bg-(--card) border-2 border-(--outline) rounded-xl px-12 py-8 shadow-[0_20px_60px_var(--primary-glass)] ring-1 ring-(--outline)">
-        <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-black/50 border border-white/5 shadow-inner" />
-        <h2 className="text-display-2 text-center">
-          Наши услуги
-        </h2>
-      </div>
-    </div>
-  );
-}
 
 export default function ServicesSection() {
   return (
     <section className="pt-2 sm:pt-4 pb-8 sm:pb-18">
       <Container className="pt-6 sm:pt-14">
-        <ICChip></ICChip>
-        {/* <h2 className="text-display-2 mb-6">
+        <h2 className="text-display-1 mb-10 text-center">
           Наши услуги
-        </h2> */}
+        </h2>
 
         {/* The Grid: Perfectly flush 1px internal dividers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
           {services.map((service, idx) => (
             <div
               key={idx}
-              className="group relative p-8 transition-colors hover:bg-(--primary-glass) lg:p-10 border-(--outline)
+              className="group relative p-8 transition-colors hover:bg-(--primary-glass) lg:p-6 border-(--outline)
                 /* Mobile: Bottom borders everywhere except the last item */
                 border-b last:border-b-0
                 /* Desktop: Reset mobile layout borders */
-                md:border-b-0 md:last:border-b-0
+                md:border-b-0 md:last:border-b-0 lg:border-r lg:last:border-r-0
                 /* Desktop: Add vertical divider after the first item in each row */
                 md:[&:nth-child(odd)]:border-r
                 /* Desktop: Add horizontal divider under the first row items */
-                md:[&:nth-child(-n+2)]:border-b"
+                md:[&:nth-child(-n+2)]:border-b lg:border-b-0!"
             >
               {/* Subtle background glow effect on hover */}
               <div
@@ -120,9 +93,9 @@ export default function ServicesSection() {
                   {service.description}
                 </p>
 
-                {/* Tech Stack Chips */}
+                {/* Tech services Chips */}
                 <div className="flex flex-wrap gap-1.5">
-                  {service.stack.map((tech) => (
+                  {service.services.map((tech) => (
                     <Badge
                       size={'chip-small'}
                       variant={'glass-static'}

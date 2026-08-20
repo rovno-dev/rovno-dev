@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ROUTES } from "@/utils/constants/routes";
-import { TerminalStyledInline } from "@/components/layout/terminal-styled-inline";
+import { TerminalStyledInline } from "@/components/layout/fancy/terminal-styled-inline";
 
 export default function HeroSection() {
   return (
@@ -16,7 +16,7 @@ export default function HeroSection() {
       <div className="z-10 absolute h-full w-full bottom-0 left-0 bg-gradient-to-t from-(--bg) to-(--bg)/0 to-20%" />
 
       <Container className="relative z-10 flex flex-col items-center text-center">
-        <h1 className="text-display-1 font-italic leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
+        <h1 className="text-display-2 sm:text-display-1 lg:text-[5rem] font-italic leading-[1.05] tracking-tight text-(--on-bg-high) mb-6">
           Цифровые продукты <br />
           <span className="text-(--on-bg-medium)">полного цикла</span>
         </h1>

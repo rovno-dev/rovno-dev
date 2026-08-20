@@ -36,7 +36,7 @@ export default function Header() {
         variant={isFullWidth ? 'full-width' : 'default'}
         className="flex justify-center sm:justify-between"
       >
-        <div className="flex items-center gap-8">
+        <div className="flex items-center justify-between gap-8">
           <Link href={'/'}>
             <Logo className="!h-[30px] sm:h-[40px]" />
           </Link>
