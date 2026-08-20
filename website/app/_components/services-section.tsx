@@ -67,8 +67,8 @@ const services: ServiceType[] = [
 
 export default function ServicesSection() {
   return (
-    <section className="pt-6 sm:pt-10 pb-8 sm:pb-18">
-      <Container className="pt-6 sm:pt-14">
+    <section className="pt-6 sm:pt-12 pb-8 sm:pb-18">
+      <Container>
         <h2 className="text-display-2 sm:text-display-1 mb-10 text-center">
           Ровные решения<br />
           для развития бизнеса

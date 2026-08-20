@@ -18,7 +18,7 @@ export default function CtaSection() {
           className="max-w-4xl mx-auto text-center"
         >
           <h2 className="text-5xl md:text-7xl font-heading font-bold leading-tight tracking-tight text-(--on-bg-high) mb-6">
-            Готовы <span className="text-(--primary)">начать проект</span>?
+            Готовы <span>начать проект</span>?
           </h2>
           <p className="text-xl md:text-2xl text-(--on-bg-medium) leading-relaxed mb-8 max-w-2xl mx-auto">
             Запишитесь на бесплатный аудит или опишите задачу прямо сейчас — ответим в течение 3 часов*
@@ -28,7 +28,9 @@ export default function CtaSection() {
           <div
           >
             <Button size="xlarge" shape="round" asChild className="shadow-2xl shadow-(--primary)/40">
-              <Link href="">Записаться на аудит</Link>
+              <Link href="https://max.ru/+79375803414">
+                Написать в Max
+              </Link>
             </Button>
           </div>
         </div>

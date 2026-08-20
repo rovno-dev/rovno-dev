@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <HeroSection />
 
-      <ScrollReveal threshold={0.2}>
+      <ScrollReveal threshold={0.05}>
         <ServicesSection />
       </ScrollReveal>
 

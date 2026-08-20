@@ -23,7 +23,7 @@ export default function HeroSection() {
       <Container className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-display-2 sm:text-display-1 md:text-[3.5rem] lg:text-[5rem] font-italic leading-[1.05] tracking-tight text-(--white) mb-6">
           Цифровые продукты <br />
-          <span className="text-(--dark-1)">полного цикла</span>
+          <span className="text-(--dark-1)">любой сложности</span>
         </h1>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full">
