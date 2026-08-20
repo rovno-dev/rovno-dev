@@ -1,4 +1,5 @@
 "use client";
+
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
@@ -16,6 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
@@ -27,16 +29,19 @@ export default function Header() {
 
   return (
     <header
-      className="h-[55px] md:h-[70px]
+      className="
       fixed top-0 left-0 right-0 w-full z-50
-      flex items-center
-      bg-(--card-glass) backdrop-blur-glass border-b border-b-(--card-glass)"
+      justify-center
+      flex items-center"
     >
       <Container
         variant={isFullWidth ? 'full-width' : 'default'}
-        className="flex justify-center sm:justify-between"
+        className="flex justify-center gap-6 sm:justify-between
+        bg-[var(--bg)]/40 backdrop-blur-glass border-b border-b-(--card-glass)
+        rounded-full mx-4 sm:px-6 sm:mx-0 mt-2 h-[55px] sm:h-[80px] px-6
+        "
       >
-        <div className="flex items-center justify-between gap-8">
+        <div className={cn((isLoading || user) ? "justify-between" : "justify-center", "w-full flex items-center gap-6")}>
           <Link href={'/'}>
             <Logo className="!h-[30px] sm:h-[40px]" />
           </Link>
@@ -46,7 +51,7 @@ export default function Header() {
             <NavLink href={ROUTES.blog.href}>{'Журнал "Ровня"'}</NavLink>
           </nav>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
               <Paintbrush />
@@ -61,8 +66,8 @@ export default function Header() {
             user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="glass" size="icon-small" className="ml-2">
-                    <User />
+                  <Button variant="text" size="icon-small" className="ml-2">
+                    <User className="stroke-primary" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

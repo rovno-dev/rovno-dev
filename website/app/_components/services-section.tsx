@@ -67,9 +67,9 @@ const services: ServiceType[] = [
 
 export default function ServicesSection() {
   return (
-    <section className="pt-2 sm:pt-4 pb-8 sm:pb-18">
+    <section className="pt-6 sm:pt-10 pb-8 sm:pb-18">
       <Container className="pt-6 sm:pt-14">
-        <h2 className="text-display-1 mb-10 text-center">
+        <h2 className="text-display-2 sm:text-display-1 mb-10 text-center">
           Ровные решения<br />
           для развития бизнеса
         </h2>
@@ -111,7 +111,7 @@ export default function ServicesSection() {
                       <span className="text-body-5">от</span> {service.price.from} ₽
                     </p>
                     <p className="text-(--on-bg-medium) text-body-3">
-                      <span className="text-body-5"><span className="">Ровно</span> от</span> {service.price.avg} ₽
+                      <span className="text-body-5"><span className="">Ровно:</span> от</span> {service.price.avg} ₽
                     </p>
                   </div>
 

@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { YandexMetrika } from "@/components/layout/marketing/yandex-metrika";
 import { CookieConsent } from "@/components/layout/marketing/cookie-consent";
 import UserProvider from "@/entities/user/model/user-context";
+import ClientRootLayout from "./client-layout";
 
 export const Geist = localFont({
   src: '../public/fonts/Geist-VariableFont_wght.woff2',
@@ -58,18 +59,9 @@ export default function RootLayout({
         <ThemeProvider>
           <UserProvider>
             <TooltipProvider>
-              <Header />
-              <main className="mt-[46px] md:mt-[70px] mb-[100px]">
+              <ClientRootLayout>
                 {children}
-              </main>
-              <Footer />
-              <BottomAppBar />
-              <Toaster
-                position="bottom-right"
-                closeButton
-                gap={8}
-                visibleToasts={3}
-              />
+              </ClientRootLayout>
               <CookieConsent />
             </TooltipProvider>
           </UserProvider>

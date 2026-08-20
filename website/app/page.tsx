@@ -10,9 +10,7 @@ import CtaSection from "./_components/cta-section";
 export default function Home() {
   return (
     <>
-      <ScrollReveal threshold={0}>
-        <HeroSection />
-      </ScrollReveal>
+      <HeroSection />
 
       <ScrollReveal threshold={0.2}>
         <ServicesSection />

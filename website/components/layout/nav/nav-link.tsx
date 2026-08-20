@@ -15,7 +15,7 @@ export function NavLink({
   href,
   className,
   activeClassName = "bg-accent text-accent-foreground",
-  inactiveClassName = "text-(--on-bg-medium) hover:text-foreground hover:bg-transparent",
+  inactiveClassName = "text-(--on-bg-high) hover:text-foreground hover:bg-transparent",
   ...props
 }: NavLinkProps) {
   const pathname = usePathname()
