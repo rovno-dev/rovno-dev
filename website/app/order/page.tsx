@@ -26,9 +26,12 @@ import { ServiceSelection } from "./_components/service-selection";
 import { ProjectDetails } from "./_components/project-details";
 import { FileUpload } from "./_components/file-upload";
 import { ContactInfo } from "./_components/contact-info";
+import { PhoneInputField } from "@/components/ui/phone-input";
+
 const orderSchema = z.object({
   user_name: z.string().min(2, "Имя должно быть не короче 2 символов"),
-  user_contact: z.string().min(1, "Укажите контакт для связи"),
+  user_phone: z.string().min(1, "Укажите номер телефона"),
+  user_telegram: z.string().optional(),
   user_email: z.email("Некорректный формат email").min(1, "Введите email"),
   description: z.string().optional(),
   services: z.array(z.string()).min(1, "Выберите хотя бы одну услугу"),
@@ -38,7 +41,9 @@ const orderSchema = z.object({
   budget: z.string().optional(),
   agreement: z.boolean().refine((val) => val === true, "Необходимо согласие для отправки"),
 });
+
 type OrderFormValues = z.infer<typeof orderSchema>;
+
 interface FileWithPreview {
   file: File;
   preview: string | null;
@@ -46,7 +51,9 @@ interface FileWithPreview {
   id: string;
   type: 'image' | 'pdf' | 'doc' | 'md' | 'other';
 }
+
 const AVALIABLE_FILE_TYPES = 'image/*, .pdf, .docx, .doc, .md, .mdx, .xls, .xlsx, .zip, .7zip';
+
 export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -56,15 +63,21 @@ export default function OrderPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Phone number state
+  const [phone, setPhone] = useState<string>("");
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!api || !lightboxOpen) return;
     if (e.key === "ArrowLeft") api.scrollPrev();
     if (e.key === "ArrowRight") api.scrollNext();
   }, [api, lightboxOpen]);
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
+
   useEffect(() => {
     if (!api || !lightboxOpen) return;
     const timer = setTimeout(() => {
@@ -72,6 +85,7 @@ export default function OrderPage() {
     }, 50);
     return () => clearTimeout(timer);
   }, [api, activeIndex, lightboxOpen]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
@@ -104,6 +118,7 @@ export default function OrderPage() {
       });
     }
   };
+
   const removeFile = (id: string) => {
     setAttachments(prev => {
       const target = prev.find(f => f.id === id);
@@ -111,6 +126,7 @@ export default function OrderPage() {
       return prev.filter(f => f.id !== id);
     });
   };
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -124,7 +140,8 @@ export default function OrderPage() {
       company_name: formData.get("company_name"),
       naming_help: formData.get("naming_help"),
       user_name: formData.get("user_name"),
-      user_contact: formData.get("user_contact"),
+      user_phone: phone, // from state
+      user_telegram: formData.get("user_telegram"),
       user_email: formData.get("user_email"),
       agreement: formData.get("agreement") === "on",
     };
@@ -139,6 +156,9 @@ export default function OrderPage() {
     }
     const finalFormData = new FormData(e.currentTarget);
     finalFormData.set("services", JSON.stringify(selectedServices));
+    finalFormData.set("user_phone", phone);
+    // remove the old "user_contact" if present
+    finalFormData.delete("user_contact");
     attachments.forEach(attr => finalFormData.append("files", attr.file));
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/api/v1/orders/create`, {
@@ -150,6 +170,7 @@ export default function OrderPage() {
         e.currentTarget.reset();
         setSelectedServices([]);
         setAttachments([]);
+        setPhone("");
       } else {
         const data = await res.json();
         toast.error("Ошибка сервера", { description: data.detail?.[0]?.msg || "Попробуйте позже" });
@@ -157,6 +178,7 @@ export default function OrderPage() {
     } catch { toast.error("Сетевая ошибка."); }
     finally { setLoading(false); }
   }
+
   return (
     <>
       <Container className="pt-8 pb-12">
@@ -179,7 +201,35 @@ export default function OrderPage() {
             </div>
           </div>
           <FileUpload attachments={attachments} onRemoveFile={removeFile} onOpenLightbox={(i) => { setActiveIndex(i); setLightboxOpen(true); }} fileInputRef={fileInputRef} onFileChange={handleFileChange} />
-          <ContactInfo errors={errors} />
+          <div className="space-y-6">
+            <h3 className="text-display-4 uppercase tracking-tight text-(--on-bg-medium)">5. Контакты</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field data-invalid={!!errors.user_name}>
+                <FieldLabel>Ваше имя <span className="text-destructive">*</span></FieldLabel>
+                <Input name="user_name" placeholder="Ваше имя" />
+                {errors.user_name && <p className="text-sm text-destructive">{errors.user_name}</p>}
+              </Field>
+              <Field data-invalid={!!errors.user_email}>
+                <FieldLabel>Электронная почта <span className="text-destructive">*</span></FieldLabel>
+                <Input name="user_email" type="email" placeholder="email@example.com" />
+                {errors.user_email && <p className="text-sm text-destructive">{errors.user_email}</p>}
+              </Field>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field data-invalid={!!errors.user_phone}>
+                <FieldLabel>Телефон <span className="text-destructive">*</span></FieldLabel>
+                <PhoneInputField
+                  value={phone}
+                  onChange={setPhone}
+                  error={errors.user_phone}
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Telegram (опционально)</FieldLabel>
+                <Input name="user_telegram" placeholder="@username" />
+              </Field>
+            </div>
+          </div>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Checkbox id="agreement" name="agreement" />

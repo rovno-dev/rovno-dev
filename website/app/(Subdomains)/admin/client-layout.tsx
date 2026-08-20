@@ -11,7 +11,7 @@ export default function AdminRootClientLayout({
   secret: string;
 }) {
   return (
-    <div className="min-h-screen py-12 md:py-16">
+    <div className="min-h-screen py-6 md:py-8">
       <Container variant="full-width">
         <div className="flex flex-col md:flex-row gap-6">
           <AdminSidebar secret={secret} />

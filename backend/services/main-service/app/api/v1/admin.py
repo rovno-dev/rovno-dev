@@ -224,8 +224,18 @@ async def delete_company(company_id: UUID, db: Session = Depends(get_db), _: Use
 # ---------- CRUD: Articles, Projects, Team Members (similar, omitted for brevity) ----------
 # Full code would include all CRUD operations for each entity.
 # For simplicity, we assume the existing endpoints are sufficient.
+# ---------- Order Requests with files and contact ----------
 from app.models.order_request_file import OrderRequestFile
 from sqlalchemy.orm import joinedload
+
+class ContactResponse(BaseModel):
+    id: UUID
+    name: Optional[str]
+    phone: Optional[str]
+    email: Optional[str]
+    telegram_username: Optional[str]
+    class Config:
+        from_attributes = True
 
 class OrderRequestFileResponse(BaseModel):
     id: UUID
@@ -242,85 +252,14 @@ class OrderRequestWithFiles(BaseModel):
     naming_help: Optional[str]
     created_at: datetime
     files: List[OrderRequestFileResponse]
+    contact: Optional[ContactResponse]
     class Config:
         from_attributes = True
 
 @router.get("/order-requests", response_model=List[OrderRequestWithFiles])
 async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
-    return orders
-from app.models.order_request_file import OrderRequestFile
-from sqlalchemy.orm import joinedload
-
-class OrderRequestFileResponse(BaseModel):
-    id: UUID
-    filename: str
-    file_path: str
-
-class OrderRequestWithFiles(BaseModel):
-    id: UUID
-    contact_id: Optional[UUID]
-    service_types_json: Optional[List[str]]
-    about: Optional[str]
-    estimate_deadline: Optional[str]
-    estimate_budget: Optional[str]
-    naming_help: Optional[str]
-    created_at: datetime
-    files: List[OrderRequestFileResponse]
-    class Config:
-        from_attributes = True
-
-@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
-async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
-    return orders
-from app.models.order_request_file import OrderRequestFile
-from sqlalchemy.orm import joinedload
-
-class OrderRequestFileResponse(BaseModel):
-    id: UUID
-    filename: str
-    file_path: str
-
-class OrderRequestWithFiles(BaseModel):
-    id: UUID
-    contact_id: Optional[UUID]
-    service_types_json: Optional[List[str]]
-    about: Optional[str]
-    estimate_deadline: Optional[str]
-    estimate_budget: Optional[str]
-    naming_help: Optional[str]
-    created_at: datetime
-    files: List[OrderRequestFileResponse]
-    class Config:
-        from_attributes = True
-
-@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
-async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
-    return orders
-from app.models.order_request_file import OrderRequestFile
-from sqlalchemy.orm import joinedload
-
-class OrderRequestFileResponse(BaseModel):
-    id: UUID
-    filename: str
-    file_path: str
-
-class OrderRequestWithFiles(BaseModel):
-    id: UUID
-    contact_id: Optional[UUID]
-    service_types_json: Optional[List[str]]
-    about: Optional[str]
-    estimate_deadline: Optional[str]
-    estimate_budget: Optional[str]
-    naming_help: Optional[str]
-    created_at: datetime
-    files: List[OrderRequestFileResponse]
-    class Config:
-        from_attributes = True
-
-@router.get("/order-requests", response_model=List[OrderRequestWithFiles])
-async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    orders = db.query(OrderRequest).options(joinedload(OrderRequest.files)).offset(skip).limit(limit).all()
+    orders = db.query(OrderRequest).options(
+        joinedload(OrderRequest.files),
+        joinedload(OrderRequest.contact)
+    ).offset(skip).limit(limit).all()
     return orders

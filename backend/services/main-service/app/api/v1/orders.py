@@ -9,14 +9,10 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, s
 from pydantic import BaseModel, EmailStr, Field, ValidationError, field_validator
 from sqlalchemy.orm import Session
 import phonenumbers
-
 from app.models.user import User, UserRole, UserStatus
 from app.models.company import Company, LifecycleStage
 from app.models.contact import Contact
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
-from app.models.order_request_file import OrderRequestFile
-from app.models.order_request_file import OrderRequestFile
-from app.models.order_request_file import OrderRequestFile
 from app.models.order_request_file import OrderRequestFile
 from app.shared.auth import hash_password
 from database.database import get_db
@@ -28,7 +24,8 @@ ALLOWED_REGIONS = ["RU", "US", "BY", "KZ", "UZ", "TJ", "KG", "AE", "CN"]
 
 class OrderValidation(BaseModel):
     user_name: str = Field(..., min_length=2)
-    user_contact: str = Field(..., min_length=1)
+    user_phone: str = Field(..., min_length=1)
+    user_telegram: Optional[str] = None
     user_email: Optional[EmailStr] = None
     description: Optional[str] = None
     company_name: Optional[str] = None
@@ -37,7 +34,7 @@ class OrderValidation(BaseModel):
     budget: Optional[str] = None
     services: List[str]
 
-    @field_validator('user_contact')
+    @field_validator('user_phone')
     @classmethod
     def validate_phone(cls, v):
         try:
@@ -87,7 +84,8 @@ async def create_order(
     deadline: Optional[str] = Form(None),
     budget: Optional[str] = Form(None),
     user_name: str = Form(...),
-    user_contact: str = Form(...),
+    user_phone: str = Form(...),
+    user_telegram: Optional[str] = Form(None),
     user_email: Optional[str] = Form(None),
     files: List[UploadFile] = File([]),
     db: Session = Depends(get_db)
@@ -104,7 +102,8 @@ async def create_order(
             deadline=deadline,
             budget=budget,
             user_name=user_name,
-            user_contact=user_contact,
+            user_phone=user_phone,
+            user_telegram=user_telegram,
             user_email=email
         )
     except ValidationError as e:
@@ -128,7 +127,7 @@ async def create_order(
             user_status=UserStatus.pending_verification,
             verified=False,
             blocked=False,
-            phone=valid_data.user_contact if valid_data.user_contact.startswith('+') else None
+            phone=valid_data.user_phone  # store phone on user too
         )
         db.add(user)
         db.flush()  # get user.id
@@ -143,11 +142,15 @@ async def create_order(
         db.add(company)
         db.flush()
 
-    # 4. Create Contact
+    # 4. Create Contact with phone and telegram fields
     contact = Contact(
         user_id=user.id,
         company_id=company.id if company else None,
-        role_title="Order contact"
+        role_title="Order contact",
+        phone=valid_data.user_phone,
+        telegram_username=valid_data.user_telegram,
+        email=valid_data.user_email,  # store email on contact as well
+        name=valid_data.user_name
     )
     db.add(contact)
     db.flush()
@@ -181,6 +184,6 @@ async def create_order(
             )
             db.add(order_file)
     db.commit()
-    asyncio.create_task(notify_telegram(valid_data.model_dump(), str(order_request.id)))
 
+    asyncio.create_task(notify_telegram(valid_data.model_dump(), str(order_request.id)))
     return {"status": "ok", "order_id": str(order_request.id)}

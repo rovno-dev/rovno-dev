@@ -13,16 +13,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { FileIcon, ImageIcon, FileText, Download } from "lucide-react";
+import { FileIcon, ImageIcon, FileText, Download, Phone, Mail } from "lucide-react";
 import { $fetch } from "@/utils/fetch";
 import Link from "next/link";
-
+import { TelegramLogotypeMonoIcon } from "@/components/icons";
 interface OrderFile {
   id: string;
   filename: string;
   file_path: string;
 }
-
 interface Order {
   id: string;
   contact_id: string;
@@ -33,19 +32,23 @@ interface Order {
   naming_help: string;
   created_at: string;
   files: OrderFile[];
+  contact?: {
+    id: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    telegram_username?: string;
+  };
 }
-
 export default function AdminOrdersPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     if (!user) return;
     fetchOrders();
   }, [user]);
-
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -61,13 +64,11 @@ export default function AdminOrdersPage() {
       setLoading(false);
     }
   };
-
   if (userLoading || !user) return null;
   if (user.role !== "admin" && user.role !== "root") {
     router.push("/");
     return null;
   }
-
   const exportToCSV = () => {
     // Build CSV rows
     const headers = ["ID", "Описание", "Услуги", "Срок", "Бюджет", "Нейминг", "Дата"];
@@ -99,7 +100,6 @@ export default function AdminOrdersPage() {
     link.click();
     URL.revokeObjectURL(link.href);
   };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -111,7 +111,6 @@ export default function AdminOrdersPage() {
           Экспорт CSV
         </Button>
       </div>
-
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
@@ -119,12 +118,10 @@ export default function AdminOrdersPage() {
           ))}
         </div>
       )}
-
       {!loading && orders.length === 0 && (
         <p className="text-muted-foreground text-center py-8">Нет заявок</p>
       )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {orders.map((order) => (
           <Card key={order.id} className="p-6 shadow-sm border-(--outline) rounded-3xl flex flex-col h-full">
             <div className="space-y-3">
@@ -135,72 +132,101 @@ export default function AdminOrdersPage() {
                 </span>
               </div>
               {order.about &&
-                <p className="text-body-3 text-muted-foreground line-clamp-2">
-                  <span className="font-medium">О проекте:</span>
-                  {order.about}
-                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="font-medium text-body-3">О проекте:</span>
+                    <p className="text-muted-foreground line-clamp-2">
+                      {order.about}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-body-3">О проекте:</span>
+                    <p className="text-muted-foreground line-clamp-2">
+                      {order.service_types_json?.join(", ") || "—"}
+                    </p>
+                  </div>
+                </div>
               }
-              <div className="text-body-5 space-y-1">
-                <p><span className="font-medium">Типы услуг:</span> {order.service_types_json?.join(", ") || "—"}</p>
-                <p><span className="font-medium">Срок:</span> {order.estimate_deadline || "—"}</p>
-                <p><span className="font-medium">Бюджет:</span> {order.estimate_budget || "—"}</p>
-                <p><span className="font-medium">Нейминг:</span> {order.naming_help || "—"}</p>
-                <p><span className="font-medium">Нужен нейминг:</span> {order.naming_help || "—"}</p>
-              </div>
-              <div className="text-body-5 space-y-1">
-                <p><span className="font-medium">Имя:</span> {order.user_name || "—"}</p>
-                <p><span className="font-medium">Телефон:</span> {order.estimate_deadline || "—"}</p>
-                <p><span className="font-medium">Email:</span> {order.estimate_budget || "—"}</p>
-                <p><span className="font-medium">Телеграм:</span> {order.naming_help || "—"}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-body-5 space-y-1">
+                  <p><span className="font-medium">Срок:</span> {order.estimate_deadline || "—"}</p>
+                  <p><span className="font-medium">Бюджет:</span> {order.estimate_budget || "—"}</p>
+                  <p><span className="font-medium">Нейминг:</span> {order.naming_help || "—"}</p>
+                </div>
+                <div className="text-body-5 space-y-1">
+                  <p><span className="font-medium">Имя:</span> {order.contact?.name || "—"}</p>
+                  <div className="flex gap-1 items-center">
+                    <Phone className="size-3" />
+                    <p>{order.contact?.phone || "—"}</p>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <Mail className="size-3" />
+                    <p> {order.contact?.email || "—"}</p>
+                  </div>
+                  <div className="flex gap-1 items-center">
+                    <TelegramLogotypeMonoIcon className="size-3!" />
+                    <p>{order.contact?.telegram_username || "—"}</p>
+                  </div>
+                </div>
               </div>
             </div>
-            {order.files && order.files.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-heading-5 mb-3">Файлы</h4>
-                <Carousel className="w-full mx-auto">
-                  <CarouselContent>
-                    {order.files.map((file, idx) => (
-                      <CarouselItem key={file.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3">
-                        <div className="flex flex-col items-center p-2 border rounded-lg h-24 justify-center bg-muted/20">
-                          {file.filename.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? (
-                            <ImageIcon className="size-8 aspect-square! text-muted-foreground" />
-                          ) : (
-                            <FileText className="size-8 aspect-square! text-muted-foreground" />
-                          )}
-                          <span className="text-[10px] truncate w-full text-center">{file.filename}</span>
-                          <a href={file.file_path} target="_blank" className="mt-1">
-                            <Download className="size-3 text-primary" />
-                          </a>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="-left-4" />
-                  <CarouselNext className="-right-4" />
-                </Carousel>
-              </div>
-            )}
-            <div aria-label="order-buttons" className="mt-2 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-              <Button
-                variant={'filled'}
-                asChild
-              >
-                <Link href={`https://t.me/${order.contact.telegram_username}`}>
-                  Написать в ТГ
-                </Link>
-              </Button>
-              <Button
-                variant={'filled'}
-                asChild
-              >
-                <Link href={`tel:${order.contact.phone}`}>
-                  Позвонить
-                </Link>
-              </Button>
-            </div>
+            {
+              order.files && order.files.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-heading-5 mb-3">Файлы</h4>
+                  <Carousel className="w-full mx-auto">
+                    <CarouselContent>
+                      {order.files.map((file, idx) => (
+                        <CarouselItem key={file.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3">
+                          <div className="flex flex-col items-center p-2 border rounded-lg h-24 justify-center bg-muted/20">
+                            {file.filename.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? (
+                              <ImageIcon className="size-8 aspect-square! text-muted-foreground" />
+                            ) : (
+                              <FileText className="size-8 aspect-square! text-muted-foreground" />
+                            )}
+                            <span className="text-[10px] truncate w-full text-center">{file.filename}</span>
+                            <a href={file.file_path} target="_blank" className="mt-1">
+                              <Download className="size-3 text-primary" />
+                            </a>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="-left-4" />
+                    <CarouselNext className="-right-4" />
+                  </Carousel>
+                </div>
+              )
+            }
+            {
+              (order.contact?.telegram_username && order.contact?.phone) ? (
+                <div aria-label="order-buttons" className="mt-2 grid gap-2 grid-cols-2">
+                  <Button
+                    variant={'filled'}
+                    asChild
+                  >
+                    <Link href={`https://t.me/${order.contact?.telegram_username || ""}`}>
+                      <TelegramLogotypeMonoIcon className="[&>path]:fill-white!" />
+                      Telegram
+                    </Link>
+                  </Button>
+                  <Button
+                    variant={'filled'}
+                    asChild
+                  >
+                    <Link href={`tel:${order.contact?.phone || ""}`}>
+                      <Phone />
+                      Позвонить
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                <p className="mt-2">Контакты отсутсвуют</p>
+              )
+            }
           </Card>
         ))}
       </div>
-    </div>
+    </div >
   );
 }

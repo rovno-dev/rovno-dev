@@ -21,11 +21,8 @@ class EstimateBudget(str, enum.Enum):
     budget_need_consultation = "need_consultation"
 
 class OrderRequest(Base):
-    files = relationship("OrderRequestFile", back_populates="order_request", cascade="all, delete-orphan")
-    files = relationship("OrderRequestFile", back_populates="order_request", cascade="all, delete-orphan")
-    files = relationship("OrderRequestFile", back_populates="order_request", cascade="all, delete-orphan")
-    files = relationship("OrderRequestFile", back_populates="order_request", cascade="all, delete-orphan")
     __tablename__ = "order_requests"
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     contact_id = Column(UUID(as_uuid=True), ForeignKey("contacts.id"))
     service_types_json = Column(JSON, nullable=True)
@@ -35,3 +32,8 @@ class OrderRequest(Base):
     naming_help = Column(String, nullable=True)  # NEW: stores the naming preference
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to Contact
+    contact = relationship("Contact", back_populates="order_requests")
+    # Relationship to OrderRequestFile
+    files = relationship("OrderRequestFile", back_populates="order_request", cascade="all, delete-orphan")

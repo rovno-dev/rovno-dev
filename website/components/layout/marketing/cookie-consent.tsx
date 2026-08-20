@@ -26,8 +26,8 @@ export function CookieConsent() {
   if (!show) return null;
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 md:right-8 md:bottom-8 animate-reveal">
-      <Card className="flex max-w-[320px] flex-col gap-4 p-5 shadow-2xl bg-(--card)/95 backdrop-blur-md border-(--outline)">
+    <div className="fixed right-0 bottom-25 md:bottom-4 z-50 md:right-8 md:bottom-8 animate-reveal">
+      <Card className="flex mx-4 max-w-full sm:max-w-[320px] flex-col gap-4 p-5 shadow-2xl bg-(--card)/95 backdrop-blur-md border-(--outline)">
         <div className="space-y-2">
           <h4 className="text-heading-4">
             Про Cookie-файлы 🍪

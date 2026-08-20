@@ -87,31 +87,18 @@ export default function AdminDashboard() {
         </Card>
       )}
       {!loading && !error && stats && (
-        <>
+        <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
             <StatCard label="Пользователи" value={stats.total_users} />
             <StatCard label="Заявки" value={stats.total_orders} sub={`в этом месяце: ${stats.orders_this_month}`} />
             <StatCard label="Проекты" value={stats.total_projects} />
             <StatCard label="Компании" value={stats.total_companies} />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6">
             <StatCard label="Статьи" value={stats.total_articles} />
             <StatCard label="Команда" value={stats.total_team_members} />
           </div>
-          {Object.keys(stats.projects_by_category).length > 0 && (
-            <Card className="p-6 shadow-sm border-(--outline) rounded-3xl">
-              <h3 className="text-heading-4 mb-4">Проекты по категориям</h3>
-              <div className="space-y-2">
-                {Object.entries(stats.projects_by_category).map(([cat, count]) => (
-                  <div key={cat} className="flex justify-between">
-                    <span>{cat}</span>
-                    <span className="font-semibold">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-        </>
+        </div>
       )}
     </>
   );
