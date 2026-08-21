@@ -4,7 +4,7 @@ This repository contains the source code for the Rovno.dev agency web applicatio
 
 ## Project Structure
 
-- **website**: The Next.js application built with Tailwind CSS v4 and Unideka UI.
+- **website**: The Next.js application built with Tailwind CSS v4 and Amorfa UI.
 - **backend**: Docker configuration for the Fake API service and its database.
 - **docker-compose.yml**: The root orchestration file that coordinates Traefik and the sub-services.
 - **Makefile**: The primary entry point for managing the local and production environments.
@@ -47,7 +47,7 @@ By default, the `.env` is configured for development:
 Use the Makefile to start the infrastructure:
 
 ```bash
-docker compose up --build --force-recreate
+docker compose --profile prod up -d --build
 ```
 
 The web application will be accessible at http://localhost.

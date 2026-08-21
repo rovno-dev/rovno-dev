@@ -3,7 +3,7 @@
 This repository is a dual-stack digital agency platform (Rovno.dev).
 
 ## Tech Stack
-- **Frontend**: Next.js (App Router), React 19, Tailwind CSS v4, Unideka UI.
+- **Frontend**: Next.js (App Router), React 19, Tailwind CSS v4, Amorfa UI.
 - **Backend**: FastAPI (Python 3.12), SQLAlchemy 2.0 (PostgreSQL), Valkey (Redis-compatible).
 - **Infrastructure**: Docker Compose, Traefik (Proxy), GitHub Actions.
 

@@ -59,8 +59,8 @@ export const ARTICLES: Article[] = [
   },
   {
     id: "5",
-    slug: "unideka-ui-nasha-dizajn-sistema-s-otkrytym-ishodnym-kodom",
-    title: "Unideka UI: наша дизайн-система с открытым исходным кодом",
+    slug: "amorfa-ui-nasha-dizajn-sistema-s-otkrytym-ishodnym-kodom",
+    title: "Amorfa UI: наша дизайн-система с открытым исходным кодом",
     description: "Почему мы решили поделиться своей библиотекой компонентов и как она помогает ускорять разработку.",
     image: "/images/projects/sadovod.png",
     href: "https://t.me/rovno_dev/5",
