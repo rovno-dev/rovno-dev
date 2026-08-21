@@ -37,7 +37,7 @@ export default function CtaSection() {
           </p>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto sm:max-w-md">
             <Button size="xlarge" variant={'filled'} asChild>
-              <Link href="https://max.ru/+79375803414">Написать в Max</Link>
+              <Link href="https://max.ru/+79999999999">Написать в Max</Link>
             </Button>
             <Button size="xlarge" variant={'filled'} asChild>
               <Link href="https://t.me/niyazgim">Написать в ТГ</Link>

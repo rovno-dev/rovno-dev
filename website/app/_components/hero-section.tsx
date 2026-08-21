@@ -1,9 +1,21 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Box, Gem, ChartSpline, Signature, ArrowUpRight } from "lucide-react";
+import { PROJECTS, type Project } from "@/app/_data/projects";
+
+// Маппинг услуг к списку проектов (можно расширить)
+const serviceToProjectSlugs: Record<string, string[]> = {
+  "Разработка": ["vanguard", "sadovod", "courtElegance", "concord"],
+  "3D & Motion": ["alx", "bread", "concord"],
+  "Продвижение": ["vanguard", "sadovod", "concord"],
+  "Брендинг": ["alx", "bread"],
+};
 
 const services = [
   {
@@ -40,85 +52,141 @@ const services = [
   },
 ];
 
+// Функция для получения последнего проекта (по периоду) для услуги
+function getLatestProjectForService(serviceTitle: string): Project {
+  const slugs = serviceToProjectSlugs[serviceTitle] || [];
+  const candidates = slugs
+    .map((slug) => PROJECTS[slug])
+    .filter(Boolean)
+    .sort((a, b) => {
+      const yearA = parseInt(a.period || "0", 10);
+      const yearB = parseInt(b.period || "0", 10);
+      return yearB - yearA;
+    });
+  return candidates[0] || PROJECTS.vanguard;
+}
+
 export default function HeroSection() {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Данные для текущей услуги
+  const currentService = services[selectedIndex];
+  const currentProject = getLatestProjectForService(currentService.title);
+  const Icon = currentService.icon;
+
   return (
-    <section className="relative overflow-hidden min-h-[calc(100dvh-46px)] md:min-h-[calc(100dvh-88px)] flex flex-col bg-black">
-      {/* Background image */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative min-h-[calc(100dvh-46px)] md:min-h-[calc(100dvh-88px)] overflow-hidden bg-black text-white">
+      {/* Фон – обложка последнего проекта текущей услуги */}
+      <div className="absolute inset-0 z-0 transition-opacity duration-700">
         <Image
-          src="/_static/projects/vanguard/vanguard-cover.png"
-          alt="Rovno.dev — цифровое агентство полного цикла"
+          src={currentProject.cover.imageSrc}
+          alt={currentProject.title}
           fill
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-black/60" />
       </div>
 
-      {/* Content */}
-      <Container className="relative z-10 flex flex-col justify-between flex-1 pt-28 pb-8 md:pt-36">
-        {/* Top meta row */}
-        <div className="flex items-center justify-between animate-reveal">
-          <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">Rovno.dev</span>
-          <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">2024—2026</span>
-        </div>
-
-        {/* Main typography */}
-        <div className="mt-auto mb-16">
-          <h1 className="font-heading font-bold leading-[0.9] tracking-tight text-white select-none">
-            <span className="block text-[14vw] md:text-[9vw] lg:text-[120px]">РАЗРАБОТКА</span>
-            <span className="block text-[14vw] md:text-[9vw] lg:text-[120px] text-white/30">ДИЗАЙН</span>
-            <span className="block text-[14vw] md:text-[9vw] lg:text-[120px] text-white/60">3D & MOTION</span>
-          </h1>
-        </div>
-
-        {/* Services strip */}
-        <div className="border-t border-white/15 pt-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service) => {
-              const Icon = service.icon;
-              return (
-                <div key={service.title} className="group">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="size-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 group-hover:text-white transition-colors">
-                      <Icon className="size-5" />
-                    </div>
-                    <h3 className="text-body-4 font-semibold uppercase tracking-wider text-white/80">
-                      {service.title}
-                    </h3>
-                  </div>
-                  <p className="text-body-5 text-white/40 leading-relaxed line-clamp-2 mb-3">
-                    {service.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {service.services.slice(0, 3).map((s) => (
-                      <span key={s} className="text-[11px] px-2 py-0.5 rounded-full border border-white/15 text-white/50">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-3 text-body-5 text-white/40">
-                    <span className="text-white/70">от {service.price.from} ₽</span> · в среднем {service.price.avg} ₽
-                  </div>
-                </div>
-              );
-            })}
+      {/* Контент */}
+      <div className="relative z-10 flex flex-col justify-between min-h-full pt-28 md:pt-36 pb-10">
+        <Container>
+          {/* Верхняя строка */}
+          <div className="flex items-center justify-between animate-reveal mb-12">
+            <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">Rovno.dev</span>
+            <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">2024—2026</span>
           </div>
-        </div>
 
-        {/* CTA */}
-        <div className="flex items-center justify-between mt-10">
-          <Button size="xlarge" shape="round" asChild className="bg-white text-black hover:bg-white/90">
-            <Link href="/order">
-              Начать проект
-              <ArrowUpRight className="size-5!" />
-            </Link>
-          </Button>
-          <span className="hidden md:block text-body-5 text-white/30 max-w-xs text-right">
-            Сайты · MCP · Приложения · Боты · Mini apps
-          </span>
+          {/* Гигантская типографика – название текущей услуги */}
+          <h1 className="font-heading font-bold leading-[0.9] tracking-tight select-none mb-6">
+            <span className="block text-[15vw] md:text-[10vw] lg:text-[140px] uppercase">
+              {currentService.title}
+            </span>
+          </h1>
+
+          {/* Описание услуги */}
+          <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-8">
+            {currentService.description}
+          </p>
+
+          {/* Список под-услуг текущей услуги */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {currentService.services.map((s) => (
+              <span key={s} className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80">
+                {s}
+              </span>
+            ))}
+          </div>
+
+          {/* Цена */}
+          <div className="flex items-center gap-6 text-white/60">
+            <div>
+              <span className="text-xs uppercase text-white/40">от</span>
+              <span className="text-2xl font-semibold text-white">{currentService.price.from} ₽</span>
+            </div>
+            <div>
+              <span className="text-xs uppercase text-white/40">в среднем</span>
+              <span className="text-2xl font-semibold text-white">{currentService.price.avg} ₽</span>
+            </div>
+          </div>
+        </Container>
+
+        {/* Карусель внизу – маленькие превью услуг */}
+        <div className="w-full mt-8">
+          <Container>
+            <div className="flex gap-4">
+              {services.map((service, index) => {
+                const serviceIcon = service.icon;
+                const project = getLatestProjectForService(service.title);
+                const isActive = index === selectedIndex;
+                return (
+                  <button
+                    key={service.title}
+                    onClick={() => setSelectedIndex(index)}
+                    className={`group flex flex-col items-start gap-2 p-3 rounded-2xl border transition-all duration-300 w-40 md:w-48 flex-shrink-0 ${isActive
+                      ? "border-white/40 bg-white/10"
+                      : "border-white/10 bg-white/5 hover:bg-white/10"
+                      }`}
+                  >
+                    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
+                      <Image
+                        src={project.cover.imageSrc}
+                        alt={project.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Signature className="size-4 text-white/70" />
+                      <span className="text-sm font-medium text-white/90">{service.title}</span>
+                    </div>
+                    <p className="text-xs text-white/40 line-clamp-2">{service.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* CTA */}
+            <div className="flex items-center justify-between mt-6">
+              <Button size="large" shape="round" asChild className="bg-white text-black hover:bg-white/90">
+                <Link href="/order">
+                  Обсудить проект
+                  <ArrowUpRight className="size-5!" />
+                </Link>
+              </Button>
+              <Link
+                href={`/projects/${currentProject.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-4"
+              >
+                Открыть кейс: {currentProject.title}
+              </Link>
+            </div>
+          </Container>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }
