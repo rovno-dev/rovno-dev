@@ -1,15 +1,14 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Box, Gem, ChartSpline, Signature, ArrowUpRight } from "lucide-react";
+import { Box, Gem, ChartSpline, Signature, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { PROJECTS, type Project } from "@/app/_data/projects";
 
-// Маппинг услуг к списку проектов (можно расширить)
+// Маппинг услуг к списку проектов
 const serviceToProjectSlugs: Record<string, string[]> = {
   "Разработка": ["vanguard", "sadovod", "courtElegance", "concord"],
   "3D & Motion": ["alx", "bread", "concord"],
@@ -52,7 +51,7 @@ const services = [
   },
 ];
 
-// Функция для получения последнего проекта (по периоду) для услуги
+// Получение последнего проекта для услуги
 function getLatestProjectForService(serviceTitle: string): Project {
   const slugs = serviceToProjectSlugs[serviceTitle] || [];
   const candidates = slugs
@@ -67,126 +66,191 @@ function getLatestProjectForService(serviceTitle: string): Project {
 }
 
 export default function HeroSection() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start", containScroll: "trimSnaps" });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
+  const hasInteracted = useRef(false);
 
-  // Данные для текущей услуги
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  const onSelect = useCallback((api: any) => {
+    setSelectedIndex(api.selectedScrollSnap());
+    setCanScrollPrev(api.canScrollPrev());
+    setCanScrollNext(api.canScrollNext());
+    // Reset progress on slide change
+    setProgress(0);
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect(emblaApi);
+    emblaApi.on("reInit", onSelect);
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  // Autoplay logic
+  useEffect(() => {
+    if (hasInteracted.current) return;
+    const startAutoplay = () => {
+      autoPlayTimer.current = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            emblaApi?.scrollNext();
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 60); // ~6 seconds total (100 * 60ms = 6000ms)
+    };
+    startAutoplay();
+    return () => {
+      if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+    };
+  }, [emblaApi]);
+
+  const handleInteraction = () => {
+    hasInteracted.current = true;
+    if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+  };
+
   const currentService = services[selectedIndex];
   const currentProject = getLatestProjectForService(currentService.title);
   const Icon = currentService.icon;
 
   return (
-    <section className="relative min-h-[calc(100dvh-46px)] md:min-h-[calc(100dvh-88px)] overflow-hidden bg-black text-white">
-      {/* Фон – обложка последнего проекта текущей услуги */}
-      <div className="absolute inset-0 z-0 transition-opacity duration-700">
-        <Image
-          src={currentProject.cover.imageSrc}
-          alt={currentProject.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-black/60" />
-      </div>
+    <section className="relative min-h-[calc(100dvh)] md:min-h-[calc(100dvh)] overflow-hidden text-on-bg-high">
+      {/* <Link
+        href={`/projects/${currentProject.slug}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
+      >
+        <span className="text-sm font-medium text-white">Открыть кейс</span>
+        <ArrowUpRight className="size-4 text-white" />
+      </Link> */}
 
-      {/* Контент */}
-      <div className="relative z-10 flex flex-col justify-between min-h-full pt-28 md:pt-36 pb-10">
+      <div className="relative z-10 flex flex-col justify-between min-h-full pt-12 md:pt-24 pb-10">
         <Container>
-          {/* Верхняя строка */}
-          <div className="flex items-center justify-between animate-reveal mb-12">
-            <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">Rovno.dev</span>
-            <span className="text-body-5 uppercase tracking-[0.3em] text-white/40">2024—2026</span>
-          </div>
-
-          {/* Гигантская типографика – название текущей услуги */}
-          <h1 className="font-heading font-bold leading-[0.9] tracking-tight select-none mb-6">
-            <span className="block text-[15vw] md:text-[10vw] lg:text-[140px] uppercase">
-              {currentService.title}
-            </span>
-          </h1>
-
-          {/* Описание услуги */}
-          <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-8">
-            {currentService.description}
-          </p>
-
-          {/* Список под-услуг текущей услуги */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {currentService.services.map((s) => (
-              <span key={s} className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80">
-                {s}
-              </span>
-            ))}
-          </div>
-
-          {/* Цена */}
-          <div className="flex items-center gap-6 text-white/60">
+          <div className="grid grid-cols-2 gap-10">
             <div>
-              <span className="text-xs uppercase text-white/40">от</span>
-              <span className="text-2xl font-semibold text-white">{currentService.price.from} ₽</span>
+              <h1 className="text-display-1 text-[3rem] sm:text-[6rem] mb-4">
+                {currentService.title}
+              </h1>
+              <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-6">
+                {currentService.description}
+              </p>
+
+              {/* Список под-услуг – на мобильном auto-scroll, на десктопе статичный */}
+              <div className="mb-6 overflow-hidden">
+                <div className="flex flex-nowrap gap-2 marquee-badges">
+                  {currentService.services.map((s) => (
+                    <span
+                      key={s}
+                      className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                  {/* Дублируем для бесшовного цикла на мобильном */}
+                  {currentService.services.map((s) => (
+                    <span
+                      key={`${s}-dup`}
+                      className="hidden md:hidden text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
+                      aria-hidden="true"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Цены – колонкой на мобильном, в ряд на десктопе */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
+                <div className="flex flex-col">
+                  <span className="text-xs uppercase text-white/40">от</span>
+                  <span className="text-3xl font-semibold text-white">{currentService.price.from} ₽</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs uppercase text-white/40">в среднем</span>
+                  <span className="text-3xl font-semibold text-white">{currentService.price.avg} ₽</span>
+                </div>
+              </div>
+              {/* Карусель внизу – маленькие превью услуг */}
+              <div className="w-full mt-6">
+                <Container>
+                  <div className="overflow-hidden" ref={emblaRef}>
+                    <div className="flex gap-4">
+                      {services.map((service, index) => {
+                        const ServiceIcon = service.icon;
+                        const project = getLatestProjectForService(service.title);
+                        const isActive = index === selectedIndex;
+                        return (
+                          <button
+                            key={service.title}
+                            onClick={() => {
+                              emblaApi?.scrollTo(index);
+                              handleInteraction();
+                            }}
+                            onPointerDown={handleInteraction}
+                            className={`group flex flex-col items-start gap-2 rounded-2xl border transition-all duration-300 w-40 md:w-48 flex-shrink-0 
+                              ${isActive
+                                ? "border-primary bg-primary-glass"
+                                : "border-white/10 bg-white/5 hover:bg-white/10"
+                              }`}
+                          >
+                            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden">
+                              <Image
+                                src={project.cover.imageSrc}
+                                alt={project.title}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                            </div>
+                            <div className="px-4 py-3 w-full">
+                              <div className="flex items-center gap-2">
+                                <ServiceIcon className="size-4 text-white/70" />
+                                <span className="text-sm font-medium text-white/90">{service.title}</span>
+                              </div>
+                              <div className={`mt-4 h-1 w-full bg-white/10 rounded-full overflow-hidden
+                                ${isActive
+                                  ? ""
+                                  : "hidden"
+                                }`}
+                              >
+                                <div
+                                  className={`h-full bg-white/50 transition-all duration-100`}
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </Container>
+              </div>
             </div>
             <div>
-              <span className="text-xs uppercase text-white/40">в среднем</span>
-              <span className="text-2xl font-semibold text-white">{currentService.price.avg} ₽</span>
+              <Image
+                src={currentProject.cover.imageSrc}
+                alt={currentProject.title}
+                width={1200}
+                height={900}
+                className="object-cover rounded-2xl"
+                priority
+              />
             </div>
           </div>
         </Container>
-
-        {/* Карусель внизу – маленькие превью услуг */}
-        <div className="w-full mt-8">
-          <Container>
-            <div className="flex gap-4">
-              {services.map((service, index) => {
-                const serviceIcon = service.icon;
-                const project = getLatestProjectForService(service.title);
-                const isActive = index === selectedIndex;
-                return (
-                  <button
-                    key={service.title}
-                    onClick={() => setSelectedIndex(index)}
-                    className={`group flex flex-col items-start gap-2 p-3 rounded-2xl border transition-all duration-300 w-40 md:w-48 flex-shrink-0 ${isActive
-                      ? "border-white/40 bg-white/10"
-                      : "border-white/10 bg-white/5 hover:bg-white/10"
-                      }`}
-                  >
-                    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
-                      <Image
-                        src={project.cover.imageSrc}
-                        alt={project.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Signature className="size-4 text-white/70" />
-                      <span className="text-sm font-medium text-white/90">{service.title}</span>
-                    </div>
-                    <p className="text-xs text-white/40 line-clamp-2">{service.description}</p>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* CTA */}
-            <div className="flex items-center justify-between mt-6">
-              <Button size="large" shape="round" asChild className="bg-white text-black hover:bg-white/90">
-                <Link href="/order">
-                  Обсудить проект
-                  <ArrowUpRight className="size-5!" />
-                </Link>
-              </Button>
-              <Link
-                href={`/projects/${currentProject.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-4"
-              >
-                Открыть кейс: {currentProject.title}
-              </Link>
-            </div>
-          </Container>
-        </div>
-      </div>
-    </section>
+      </div >
+    </section >
   );
 }
