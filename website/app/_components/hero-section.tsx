@@ -18,12 +18,12 @@ const serviceToProjectSlugs: Record<string, string[]> = {
 
 const services = [
   {
-    title: "Разработка",
+    title: "Разработку",
     description: "Сделаем цифровой продукт любой сложности",
     icon: Box,
     color: "#3b82f6",
     services: ["Сайты", "MCP", "Мобильные приложения", "Telegram- & Max- боты", "Telegram Mini apps"],
-    price: { from: "50 000", avg: "150 000" },
+    price: { from: "75 000", avg: "250 000" },
   },
   {
     title: "3D & Motion",
@@ -136,55 +136,59 @@ export default function HeroSection() {
         <ArrowUpRight className="size-4 text-white" />
       </Link> */}
 
-      <div className="relative z-10 flex flex-col justify-between min-h-full pt-12 md:pt-24 pb-10">
-        <Container>
-          <div className="grid grid-cols-2 gap-10">
-            <div>
-              <h1 className="text-display-1 text-[3rem] sm:text-[6rem] mb-4">
-                {currentService.title}
-              </h1>
-              <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-6">
-                {currentService.description}
-              </p>
+      <div className="relative z-10 flex flex-col justify-between min-h-full pt-[calc(2rem+64px)] md:pt-24 pb-10">
+        <Container className="h-full">
+          <div className="h-full grid grid-cols-1 sm:grid-cols-2 gap-10">
+            <div className="h-full">
+              <div className="flex flex-col justify-between">
+                <div>
+                  <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-4">
+                    Мы делаем...
+                  </p>
+                  <h1 className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6">
+                    {currentService.title}
+                  </h1>
+                  {/* <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-6">
+                    {currentService.description}
+                  </p> */}
 
-              {/* Список под-услуг – на мобильном auto-scroll, на десктопе статичный */}
-              <div className="mb-6 overflow-hidden">
-                <div className="flex flex-nowrap gap-2 marquee-badges">
-                  {currentService.services.map((s) => (
-                    <span
-                      key={s}
-                      className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                  {/* Дублируем для бесшовного цикла на мобильном */}
-                  {currentService.services.map((s) => (
-                    <span
-                      key={`${s}-dup`}
-                      className="hidden md:hidden text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
-                      aria-hidden="true"
-                    >
-                      {s}
-                    </span>
-                  ))}
+                  {/* Список под-услуг – на мобильном auto-scroll, на десктопе статичный */}
+                  <div className="mb-6 overflow-x-scroll no-scrollbar">
+                    <div className="flex flex-nowrap gap-2 marquee-badges">
+                      {currentService.services.map((s) => (
+                        <span
+                          key={s}
+                          className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                      {/* Дублируем для бесшовного цикла на мобильном */}
+                      {currentService.services.map((s) => (
+                        <span
+                          key={`${s}-dup`}
+                          className="hidden md:hidden text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
+                          aria-hidden="true"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Цены – колонкой на мобильном, в ряд на десктопе */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
+                    <div className="flex flex-col">
+                      <span className="text-xs uppercase text-white/40">от</span>
+                      <span className="text-3xl font-semibold text-white">{currentService.price.from} ₽</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs uppercase text-white/40">Rovno от:</span>
+                      <span className="text-3xl font-semibold text-white">{currentService.price.avg} ₽</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Цены – колонкой на мобильном, в ряд на десктопе */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
-                <div className="flex flex-col">
-                  <span className="text-xs uppercase text-white/40">от</span>
-                  <span className="text-3xl font-semibold text-white">{currentService.price.from} ₽</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs uppercase text-white/40">в среднем</span>
-                  <span className="text-3xl font-semibold text-white">{currentService.price.avg} ₽</span>
-                </div>
-              </div>
-              {/* Карусель внизу – маленькие превью услуг */}
-              <div className="w-full mt-6">
-                <Container>
+                {/* Карусель внизу – маленькие превью услуг */}
+                <div className="w-full mt-auto">
                   <div className="overflow-hidden" ref={emblaRef}>
                     <div className="flex gap-4">
                       {services.map((service, index) => {
@@ -235,10 +239,11 @@ export default function HeroSection() {
                       })}
                     </div>
                   </div>
-                </Container>
+                </div>
               </div>
+
             </div>
-            <div>
+            <div className="hidden sm:flex">
               <Image
                 src={currentProject.cover.imageSrc}
                 alt={currentProject.title}

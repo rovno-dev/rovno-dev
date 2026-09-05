@@ -51,7 +51,7 @@ export default function Header() {
         rounded-full mx-4 sm:px-6 sm:mx-0 mt-2 h-[55px] sm:h-[80px] px-6
         "
       >
-        <div className={cn((isLoading || user) ? "justify-between" : "justify-center", "w-full flex items-center gap-6")}>
+        <div className={cn((isLoading || user) ? "justify-between" : "justify-center sm:justify-between", "w-full flex items-center gap-6")}>
           <Link href={'/'}>
             <Logo className="!h-[30px] sm:h-[40px]" />
           </Link>

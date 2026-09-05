@@ -17,10 +17,6 @@ export const Geist = localFont({
   src: '../public/fonts/Geist-VariableFont_wght.woff2',
   variable: '--font-sans',
 });
-export const Oswald = localFont({
-  src: '../public/fonts/Oswald.woff2',
-  variable: '--font-heading',
-});
 export const metadata: Metadata = {
   title: "Цифровое агентство полного цикла Rovno.dev",
   description: "Digital-агентство полного цикла Rovno.dev - дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D",

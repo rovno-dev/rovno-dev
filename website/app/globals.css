@@ -64,7 +64,7 @@
   --on-g-dark: var(--white);
 
   --font-sans: "Geist", sans-serif;
-  --font-heading: "Oswald", sans-serif;
+  --font-heading: "Geist", sans-serif;
 
   --lh-heading: 1.2;
   --lh-body: 1.5;
@@ -592,5 +592,16 @@
 
   100% {
     background-position: 80px 80px;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

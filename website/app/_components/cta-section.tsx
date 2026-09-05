@@ -5,6 +5,9 @@ import Link from "next/link";
 import SpeedIllustration from "@/components/layout/fancy/rocket-blueprint";
 
 export default function CtaSection() {
+  const PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE;
+  const TELEGRAM = process.env.NEXT_PUBLIC_CONTACT_TELEGRAM;
+
   return (
     <section className="relative overflow-hidden py-24 md:py-32 bg-[rgba(29,77,122)]/50">
       {/* Blueprint grid background */}
@@ -31,16 +34,16 @@ export default function CtaSection() {
             Найдём решение<br />
           </h2>
           <p className="text-xl md:text-2xl text-white/80 leading-relaxed max-w-2xl mx-auto">
-            Напишите <span><Link href={"/niyazgim"}>техническому директору</Link></span> в личку — он ответит в течение 3х часов*
+            Напишите нам в личку — ответим в течение 3х часов*
             <br />
-            <span className="text-sm text-white/50">*с 8 до 23 по мск</span>
+            <span className="text-sm text-white/50">*с 8 до 22 по мск</span>
           </p>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto sm:max-w-md">
             <Button size="xlarge" variant={'filled'} asChild>
-              <Link href="https://max.ru/+79999999999">Написать в Max</Link>
+              <Link href={`https://max.ru/${PHONE}`}>Написать в Max</Link>
             </Button>
             <Button size="xlarge" variant={'filled'} asChild>
-              <Link href="https://t.me/niyazgim">Написать в ТГ</Link>
+              <Link href={`https://t.me/${TELEGRAM}`}>Написать в ТГ</Link>
             </Button>
           </div>
         </div>
