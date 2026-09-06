@@ -617,9 +617,9 @@
     position: absolute;
     left: -0.05em;
     right: -0.05em;
-    bottom: 0.05em;
-    height: 0.3em;
-    background: var(--primary, #ffff50);
+    bottom: 0.03em;
+    height: 1em;
+    background: #336dff70;
     z-index: -1;
     transform: skewX(-10deg) scaleX(0);
     transform-origin: left;
