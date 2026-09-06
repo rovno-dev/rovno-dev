@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { LightbulbIcon } from "@phosphor-icons/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 
@@ -20,79 +20,92 @@ const BADGES = [
   { label: { ru: "Решения", en: "Solutions" }, video: "/videos/solutions.webm" }
 ];
 
+const ITEM_WIDTH = 550;
+const ITEM_GAP = 48;
 
 export default function HeroSection() {
   const { t, lang } = useLanguage();
+
+  // Start exactly at the middle set for effortless infinite loops
   const [index, setIndex] = useState(BADGES.length);
-  const [offset, setOffset] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [isReady, setIsReady] = useState(false);
-  const [loadedVideos, setLoadedVideos] = useState<Record<number, boolean>>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // 1. Triple the list memoized to protect execution contexts
+  const extendedBadges = useMemo(() => [...BADGES, ...BADGES, ...BADGES], []);
+  const activeBadge = BADGES[index % BADGES.length];
+
+  // 2. Automated Infinite Carousel Tick Tracker
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => {
-        if (prev === BADGES.length * 3 - 1) return BADGES.length;
+        // Reset position seamlessly before hitting edge boundaries
+        if (prev >= BADGES.length * 2 - 1) return BADGES.length;
         return prev + 1;
       });
     }, 3000);
     return () => clearInterval(interval);
   }, []);
 
+  // 3. Performance Safe Viewport Resizing Observer (Eliminates layout thrashing)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const blockWidth = 550;
-    const gap = 48;
-    const totalOffset = index * (blockWidth + gap);
-    const centerOffset = container.offsetWidth / 2 - blockWidth / 2;
-    setOffset(centerOffset - totalOffset);
-    const timeout = setTimeout(() => setIsReady(true), 60);
-    return () => clearTimeout(timeout);
-  }, [index]);
 
-  const activeIndex = index % BADGES.length;
-  const extendedBadges = [...BADGES, ...BADGES, ...BADGES];
-  const handleVideoLoad = (idx: number) => {
-    setLoadedVideos((prev) => ({ ...prev, [idx]: true }));
-  };
+    setContainerWidth(container.clientWidth);
+    setIsReady(true);
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+
+    resizeObserver.observe(container);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  // 4. Pure CSS Math Offset Computation
+  const transformX = useMemo(() => {
+    if (!containerWidth) return 0;
+    const totalOffset = index * (ITEM_WIDTH + ITEM_GAP);
+    const centerOffset = containerWidth / 2 - ITEM_WIDTH / 2;
+    return centerOffset - totalOffset;
+  }, [index, containerWidth]);
 
   return (
     <section className="relative min-h-[85vh] py-36 flex flex-col justify-center overflow-hidden text-(--on-bg-high)">
+
+      {/* OPTIMIZATION #1: Single Context Video Element Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {extendedBadges.map((item, idx) => {
-          const isActive = idx % BADGES.length === activeIndex;
-          const isVideoLoaded = loadedVideos[idx];
-          return (
-            item.video && (
-              <video
-                key={`bg-video-${idx}`}
-                className={cn(
-                  "absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out",
-                  isActive && isVideoLoaded ? "opacity-100" : "opacity-0"
-                )}
-                autoPlay
-                muted
-                loop
-                playsInline
-                onLoadedData={() => handleVideoLoad(idx)}
-              >
-                <source src={item.video} type="video/mp4" />
-              </video>
-            )
-          );
-        })}
+        {activeBadge.video && (
+          <video
+            key={activeBadge.video} // Forces safe frame cleanup between asset switching
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+          >
+            <source src={activeBadge.video} type="video/webm" />
+          </video>
+        )}
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" />
         <div
           className="absolute inset-0"
           style={{ background: "radial-gradient(ellipse at top, var(--primary-glass), transparent 75%)" }}
         />
       </div>
+
       <Container className="relative z-10 w-full">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-center text-[2.5rem] sm:text-[4rem] lg:text-[5.5rem] font-heading font-bold leading-[1.05] tracking-tighter mb-6 select-none">
             {t("hero.title.part1")} <span className="marker-highlight">{t("hero.title.part2")}</span>
           </h1>
+
+          {/* Carousel Viewport Box Container */}
           <div
             ref={containerRef}
             className={cn(
@@ -102,16 +115,20 @@ export default function HeroSection() {
             style={{ maskImage: "linear-gradient(to right, transparent, black 20%, black 80%, transparent)" }}
           >
             <div
-              className="flex gap-12 transition-transform duration-700 ease-out"
-              style={{ transform: `translateX(${offset}px)` }}
+              className="flex transition-transform duration-700 ease-out will-change-transform"
+              style={{
+                gap: `${ITEM_GAP}px`,
+                transform: `translateX(${transformX}px)`
+              }}
             >
               {extendedBadges.map((item, idx) => {
-                const isActive = idx % BADGES.length === activeIndex;
+                const isActive = idx === index;
                 return (
                   <div
-                    key={idx}
+                    key={`${item.label.en}-${idx}`}
+                    style={{ width: `${ITEM_WIDTH}px` }}
                     className={cn(
-                      "shrink-0 w-[550px] h-[160px] flex items-center justify-center transition-all duration-700 select-none",
+                      "shrink-0 h-[160px] flex items-center justify-center transition-all duration-700 select-none",
                       isActive
                         ? "text-white scale-110 opacity-100 drop-shadow-[0_10px_20px_rgba(255,255,255,0.15)]"
                         : "text-white/20 scale-90 blur-[1px]"
@@ -141,6 +158,7 @@ export default function HeroSection() {
               })}
             </div>
           </div>
+
           <div className="flex flex-wrap gap-4 mt-12 justify-center">
             <Button size="large" className="w-[288px] h-14 text-lg shadow-xl relative z-20" asChild>
               <Link href={ROUTES.order.href}>

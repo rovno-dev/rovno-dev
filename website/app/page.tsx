@@ -11,9 +11,9 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <ScrollReveal threshold={0.05}>
+      {/* <ScrollReveal threshold={0.05}>
         <ServicesSection />
-      </ScrollReveal>
+      </ScrollReveal> */}
       <ScrollReveal threshold={0.05}>
         <NumbersSection />
       </ScrollReveal>
