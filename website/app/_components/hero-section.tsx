@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { LightbulbIcon } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 const BADGES = [
   "Сайты",
@@ -19,8 +20,18 @@ const BADGES = [
 ];
 
 export default function HeroSection() {
+  const [currentBadgeIndex, setCurrentBadgeIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBadgeIndex((prev) => (prev + 1) % BADGES.length);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="relative py-36 flex flex-col justify-center overflow-hidden text-(--on-bg-high)">
+    <section className="relative pt-36 pb-36 flex flex-col justify-center overflow-hidden text-(--on-bg-high)">
       {/* Subtle radial gradient background */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -33,13 +44,11 @@ export default function HeroSection() {
             Cамые{" "}<span className="marker-highlight"> ровные:</span>{" "}
           </h1>
           {/* Auto Carousel with Glass Badges */}
-          <div className="pointer-events-none">
-            <div className="flex w-max animate-marquee gap-4 pl-4">
-              {[...BADGES, ...BADGES].map((badge, idx) => (
-                <Badge variant={'glass-static'} size={'chip-xlarge'}>
-                  {badge}
-                </Badge>
-              ))}
+          <div className="pointer-events-none flex justify-center">
+            <div key={currentBadgeIndex} className="animate-in fade-in zoom-in-95 duration-500">
+              <Badge variant={'tonal-card-static'} size={'chip-xlarge'}>
+                {BADGES[currentBadgeIndex]}
+              </Badge>
             </div>
           </div>
           <div className="flex flex-wrap gap-4 mt-10 justify-center">

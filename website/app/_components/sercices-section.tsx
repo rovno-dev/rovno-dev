@@ -125,7 +125,7 @@ export default function ServicesSection() {
   const Icon = currentService.icon;
 
   return (
-    <section className="relative min-h-[calc(100dvh)] md:min-h-[calc(100dvh)] overflow-hidden text-on-bg-high">
+    <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">
       {/* <Link
         href={`/projects/${currentProject.slug}`}
         target="_blank"
@@ -136,7 +136,7 @@ export default function ServicesSection() {
         <ArrowUpRight className="size-4 text-white" />
       </Link> */}
 
-      <div className="relative z-10 flex flex-col justify-between min-h-full pt-[calc(2rem+64px)] md:pt-24 pb-10">
+      <div className="relative z-10 flex flex-col justify-between min-h-full">
         <Container className="h-full">
           <div className="h-full grid grid-cols-1 sm:grid-cols-2 gap-10">
             <div className="h-full">
