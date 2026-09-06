@@ -152,7 +152,6 @@ export default function ServicesSection() {
                     {currentService.description}
                   </p> */}
 
-                  {/* Список под-услуг – на мобильном auto-scroll, на десктопе статичный */}
                   <div className="mb-6 overflow-x-scroll no-scrollbar">
                     <div className="flex flex-nowrap gap-2 marquee-badges">
                       {currentService.services.map((s) => (
