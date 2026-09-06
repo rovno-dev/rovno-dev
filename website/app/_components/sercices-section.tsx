@@ -7,9 +7,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Box, Gem, ChartSpline, Signature, ChevronLeft, ChevronRight } from "lucide-react";
+import { CodeIcon, DiamondIcon, SignatureIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import { PROJECTS, type Project } from "@/app/_data/projects";
 import { useLanguage } from "@/providers/language-provider";
+import { Badge } from "@/components/ui/badge";
 
 // 1. Assign GLB model file paths to your service titles
 const serviceToProjectSlugs: Record<string, string[]> = {
@@ -54,7 +55,7 @@ export default function ServicesSection() {
     {
       title: t("services.development"),
       description: t("services.dev_description"),
-      icon: Box,
+      icon: CodeIcon,
       color: "#3b82f6",
       services: [t("services.dev_sub1"), t("services.dev_sub2"), t("services.dev_sub3"), t("services.dev_sub4"), t("services.dev_sub5")],
       price: { from: "75 000", avg: "250 000" },
@@ -62,7 +63,7 @@ export default function ServicesSection() {
     {
       title: t("services.motion"),
       description: t("services.motion_description"),
-      icon: Gem,
+      icon: DiamondIcon,
       color: "#f59e0b",
       services: [t("services.motion_sub1"), t("services.motion_sub2"), t("services.motion_sub3"), t("services.motion_sub4"), t("services.motion_sub5")],
       price: { from: "45 000", avg: "100 000" },
@@ -70,7 +71,7 @@ export default function ServicesSection() {
     {
       title: t("services.branding"),
       description: t("services.branding_description"),
-      icon: Signature,
+      icon: SignatureIcon,
       color: "#a855f7",
       services: [t("services.branding_sub1"), t("services.branding_sub2"), t("services.branding_sub3"), t("services.branding_sub4")],
       price: { from: "75 000", avg: "150 000" },
@@ -157,17 +158,15 @@ export default function ServicesSection() {
                 <h1 className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6">
                   {currentService.title}
                 </h1>
-                <div className="mb-6 overflow-x-scroll no-scrollbar">
-                  <div className="flex flex-nowrap gap-2 marquee-badges">
-                    {currentService.services.map((s) => (
-                      <span
-                        key={s}
-                        className="text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
+                <div className="mb-6 flex flex-wrap gap-2 marquee-badges">
+                  {currentService.services.map((s) => (
+                    <Badge
+                      variant={"outlined-static"}
+                      key={s}
+                    >
+                      {s}
+                    </Badge>
+                  ))}
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
                   <div className="flex flex-col">
@@ -181,39 +180,34 @@ export default function ServicesSection() {
                 </div>
               </div>
 
-              {/* Slider Toggles */}
-              <div className="w-full mt-auto">
-                <div ref={emblaRef} className="overflow-hidden">
-                  <div className="flex gap-2 w-full">
-                    {services.map((service, index) => {
-                      const ServiceIcon = service.icon;
-                      const isActive = index === selectedIndex;
-                      return (
-                        <Button
-                          variant={'outlined'}
-                          className="flex-col h-[64px] flex-1 min-w-[120px]"
-                          key={service.title}
-                          onClick={() => {
-                            emblaApi?.scrollTo(index);
-                            handleInteraction();
-                          }}
-                          onPointerDown={handleInteraction}
-                        >
-                          <div className="flex gap-2 items-center justify-center text-xs sm:text-sm">
-                            <ServiceIcon className="w-4 h-4" />
-                            {service.title}
-                          </div>
-                          <div className={`mt-2 h-1 w-full bg-white/10 rounded-full overflow-hidden ${isActive ? "" : "invisible"}`}>
-                            <div
-                              className="h-full bg-white/50 transition-all duration-100"
-                              style={{ width: `${progress * 100}%` }}
-                            />
-                          </div>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div className="flex gap-2 w-full">
+                {services.map((service, index) => {
+                  const ServiceIcon = service.icon;
+                  const isActive = index === selectedIndex;
+                  return (
+                    <Button
+                      variant={'outlined'}
+                      className="flex-col h-[64px] w-full p-1!"
+                      key={service.title}
+                      onClick={() => {
+                        emblaApi?.scrollTo(index);
+                        handleInteraction();
+                      }}
+                      onPointerDown={handleInteraction}
+                    >
+                      <div className="flex gap-2 items-center justify-center text-xs sm:text-sm">
+                        <ServiceIcon className="w-4 h-4" />
+                        {service.title}
+                      </div>
+                      <div className={`mt-2 h-1 w-full bg-white/10 rounded-full overflow-hidden ${isActive ? "" : "invisible"}`}>
+                        <div
+                          className="h-full bg-white/50 transition-all duration-100"
+                          style={{ width: `${progress * 100}%` }}
+                        />
+                      </div>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
@@ -236,8 +230,8 @@ export default function ServicesSection() {
             </div>
 
           </div>
-        </Container>
-      </div>
-    </section>
+        </Container >
+      </div >
+    </section >
   );
 }
