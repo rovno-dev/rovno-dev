@@ -7,8 +7,8 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Box, Gem, ChartSpline, Signature, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { PROJECTS, type Project } from "@/app/_data/projects";
+import { useLanguage } from "@/providers/language-provider";
 
-// Маппинг услуг к списку проектов
 const serviceToProjectSlugs: Record<string, string[]> = {
   "Разработка": ["vanguard", "sadovod", "courtElegance", "concord"],
   "3D & Motion": ["alx", "bread", "concord"],
@@ -16,42 +16,6 @@ const serviceToProjectSlugs: Record<string, string[]> = {
   "Брендинг": ["alx", "bread"],
 };
 
-const services = [
-  {
-    title: "Разработку",
-    description: "Сделаем цифровой продукт любой сложности",
-    icon: Box,
-    color: "#3b82f6",
-    services: ["Сайты", "MCP", "Мобильные приложения", "Telegram- & Max- боты", "Telegram Mini apps"],
-    price: { from: "75 000", avg: "250 000" },
-  },
-  {
-    title: "3D & Motion",
-    description: "Сделаем видео любой сложности",
-    icon: Gem,
-    color: "#f59e0b",
-    services: ["CGI-графика", "Рекламные ролики", "3D", "Монтаж", "Скейка", "Анимация"],
-    price: { from: "45 000", avg: "100 000" },
-  },
-  {
-    title: "Продвижение",
-    description: "Сделаем всё, чтобы о вас знали",
-    icon: ChartSpline,
-    color: "#ec4899",
-    services: ["Контекстная реклама", "Таргет", "Я.Директ", "SEO", "UX-Аудит", "SMM"],
-    price: { from: "40 000", avg: "70 000" },
-  },
-  {
-    title: "Брендинг",
-    description: "Сделаем бренд, который будут узнавать",
-    icon: Signature,
-    color: "#a855f7",
-    services: ["Логотипы", "Брендбук", "Фирменный стиль", "Айдентика"],
-    price: { from: "75 000", avg: "150 000" },
-  },
-];
-
-// Получение последнего проекта для услуги
 function getLatestProjectForService(serviceTitle: string): Project {
   const slugs = serviceToProjectSlugs[serviceTitle] || [];
   const candidates = slugs
@@ -66,6 +30,42 @@ function getLatestProjectForService(serviceTitle: string): Project {
 }
 
 export default function ServicesSection() {
+  const { t } = useLanguage();
+  const services = [
+    {
+      title: t("services.development"),
+      description: t("services.dev_description"),
+      icon: Box,
+      color: "#3b82f6",
+      services: [t("services.dev_sub1"), t("services.dev_sub2"), t("services.dev_sub3"), t("services.dev_sub4"), t("services.dev_sub5")],
+      price: { from: "75 000", avg: "250 000" },
+    },
+    {
+      title: t("services.motion"),
+      description: t("services.motion_description"),
+      icon: Gem,
+      color: "#f59e0b",
+      services: [t("services.motion_sub1"), t("services.motion_sub2"), t("services.motion_sub3"), t("services.motion_sub4"), t("services.motion_sub5")],
+      price: { from: "45 000", avg: "100 000" },
+    },
+    {
+      title: t("services.promotion"),
+      description: t("services.promotion_description"),
+      icon: ChartSpline,
+      color: "#ec4899",
+      services: [t("services.promotion_sub1"), t("services.promotion_sub2"), t("services.promotion_sub3"), t("services.promotion_sub4"), t("services.promotion_sub5"), t("services.promotion_sub6")],
+      price: { from: "40 000", avg: "70 000" },
+    },
+    {
+      title: t("services.branding"),
+      description: t("services.branding_description"),
+      icon: Signature,
+      color: "#a855f7",
+      services: [t("services.branding_sub1"), t("services.branding_sub2"), t("services.branding_sub3"), t("services.branding_sub4")],
+      price: { from: "75 000", avg: "150 000" },
+    },
+  ];
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start", containScroll: "trimSnaps" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -76,12 +76,10 @@ export default function ServicesSection() {
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
   const onSelect = useCallback((api: any) => {
     setSelectedIndex(api.selectedScrollSnap());
     setCanScrollPrev(api.canScrollPrev());
     setCanScrollNext(api.canScrollNext());
-    // Reset progress on slide change
     setProgress(0);
   }, []);
 
@@ -95,7 +93,6 @@ export default function ServicesSection() {
     };
   }, [emblaApi, onSelect]);
 
-  // Autoplay logic
   useEffect(() => {
     if (hasInteracted.current) return;
     const startAutoplay = () => {
@@ -107,7 +104,7 @@ export default function ServicesSection() {
           }
           return prev + 1;
         });
-      }, 60); // ~6 seconds total (100 * 60ms = 6000ms)
+      }, 60);
     };
     startAutoplay();
     return () => {
@@ -126,16 +123,6 @@ export default function ServicesSection() {
 
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">
-      {/* <Link
-        href={`/projects/${currentProject.slug}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-colors"
-      >
-        <span className="text-sm font-medium text-white">Открыть кейс</span>
-        <ArrowUpRight className="size-4 text-white" />
-      </Link> */}
-
       <div className="relative z-10 flex flex-col justify-between min-h-full">
         <Container className="h-full">
           <div className="h-full grid grid-cols-1 sm:grid-cols-2 gap-10">
@@ -143,15 +130,11 @@ export default function ServicesSection() {
               <div className="flex flex-col justify-between">
                 <div>
                   <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-4">
-                    Мы делаем...
+                    {t("services.we_do")}
                   </p>
                   <h1 className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6">
                     {currentService.title}
                   </h1>
-                  {/* <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-6">
-                    {currentService.description}
-                  </p> */}
-
                   <div className="mb-6 overflow-x-scroll no-scrollbar">
                     <div className="flex flex-nowrap gap-2 marquee-badges">
                       {currentService.services.map((s) => (
@@ -162,31 +145,19 @@ export default function ServicesSection() {
                           {s}
                         </span>
                       ))}
-                      {/* Дублируем для бесшовного цикла на мобильном */}
-                      {currentService.services.map((s) => (
-                        <span
-                          key={`${s}-dup`}
-                          className="hidden md:hidden text-sm px-4 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-md text-white/80 whitespace-nowrap"
-                          aria-hidden="true"
-                        >
-                          {s}
-                        </span>
-                      ))}
                     </div>
                   </div>
-                  {/* Цены – колонкой на мобильном, в ряд на десктопе */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
                     <div className="flex flex-col">
-                      <span className="text-xs uppercase text-white/40">от</span>
+                      <span className="text-xs uppercase text-white/40">{t("services.from")}</span>
                       <span className="text-3xl font-semibold text-white">{currentService.price.from} ₽</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-xs uppercase text-white/40">Rovno от:</span>
+                      <span className="text-xs uppercase text-white/40">{t("services.avg_label")}</span>
                       <span className="text-3xl font-semibold text-white">{currentService.price.avg} ₽</span>
                     </div>
                   </div>
                 </div>
-                {/* Карусель внизу – маленькие превью услуг */}
                 <div className="w-full mt-auto">
                   <div className="overflow-hidden" ref={emblaRef}>
                     <div className="flex gap-4">
@@ -240,7 +211,6 @@ export default function ServicesSection() {
                   </div>
                 </div>
               </div>
-
             </div>
             <div className="hidden sm:flex">
               <Image
@@ -254,7 +224,7 @@ export default function ServicesSection() {
             </div>
           </div>
         </Container>
-      </div >
-    </section >
+      </div>
+    </section>
   );
 }

@@ -1,5 +1,4 @@
 "use client"
-
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
 import { Button } from "../../ui/button";
@@ -10,38 +9,40 @@ import { ThemeSwitcher } from "../theme-switcher";
 import Link from "next/link";
 import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-icon";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/providers/language-provider";
 
 export default function Footer() {
+  const { t } = useLanguage();
   const sections = [
     {
-      title: "Агентство",
+      title: t("footer.agency"),
       links: [
-        { title: "Проекты", href: ROUTES.projects.href },
-        { title: "О нас", href: ROUTES.about.href },
-        { title: "Карьера в Rovno.dev", href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
+        { title: t("footer.projects"), href: ROUTES.projects.href },
+        { title: t("footer.about"), href: ROUTES.about.href },
+        { title: t("footer.careers"), href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
       ],
     },
     {
-      title: "Услуги",
+      title: t("footer.services"),
       links: [
-        { title: "Веб-разработка", href: ROUTES.order.href },
-        { title: "UX/UI Дизайн", href: ROUTES.order.href },
-        { title: "Айдентика", href: ROUTES.order.href },
-        { title: "3D & Motion", href: ROUTES.order.href },
-        { title: "Другое", href: ROUTES.order.href },
+        { title: t("footer.webdev"), href: ROUTES.order.href },
+        { title: t("footer.uxui"), href: ROUTES.order.href },
+        { title: t("footer.branding"), href: ROUTES.order.href },
+        { title: t("footer.motion"), href: ROUTES.order.href },
+        { title: t("footer.other"), href: ROUTES.order.href },
       ],
     },
     {
-      title: "Медиа",
+      title: t("footer.media"),
       links: [
-        { title: "Журнал «Ровня»", href: ROUTES.blog.href },
-        { title: "Предложить статью", href: "https://t.me/rovno_dev?direct" },
-        // { title: "База знаний", href: "" },
+        { title: t("footer.journal"), href: ROUTES.blog.href },
+        { title: t("footer.suggest"), href: "https://t.me/rovno_dev?direct" },
       ],
     },
   ];
   const pathname = usePathname();
   const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
+  const year = new Date().getFullYear();
 
   return (
     <footer className="bg-(--bg) pt-20 pb-32 border-t border-(--outline)">
@@ -53,7 +54,7 @@ export default function Footer() {
               <RovnoLogotypeWordmark className="h-8! w-auto" />
             </Link>
             <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
-              Проектируем и разрабатываем ровные, высоконагруженные цифровые продукты для решения сложных задач
+              {t("about.subtitle")}
             </p>
             <div className="flex items-center gap-1 mt-2">
               <SocialButton href="https://t.me/rovno_dev" icon={<TelegramLogotypeMonoIcon />} />
@@ -62,7 +63,6 @@ export default function Footer() {
               <SocialButton href="https://dprofile.ru/rovno_dev" icon={<DprofileLogotypeMonoIcon />} />
             </div>
           </div>
-
           {/* Links Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
             {sections.map((section) => (
@@ -86,18 +86,13 @@ export default function Footer() {
             ))}
           </div>
         </div>
-
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <span className="text-body-5 text-(--on-bg-low)">
-              © 2023–{new Date().getFullYear()} Цифровое агентство полного цикла Rovno.dev, все права защищены
+              {t("footer.copyright").replace("{year}", String(year))}
             </span>
-            {/* <Link href="i.rovno.dev/docs/pd-policy" className="text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors">
-              Политика конфиденциальности
-            </Link> */}
           </div>
-
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
               <ThemeSwitcher />

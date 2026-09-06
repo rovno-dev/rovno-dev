@@ -1,11 +1,12 @@
-/* LLM context: Single card with equal-sized divide-x socials */
 import { DprofileLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon, GithubLogotypeMonoIcon } from "@/components/icons";
 import { servicesIconsStyles } from "@/components/layout/showcase-card";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
+import { useLanguage } from "@/providers/language-provider";
 
 export default function SocialsSection() {
+  const { t } = useLanguage();
   const socials = [
     {
       name: "Telegram",
@@ -28,12 +29,11 @@ export default function SocialsSection() {
       href: "https://github.com/rovno-dev",
     },
   ];
-
   return (
     <Container className="py-12 md:py-20">
       <div className="space-y-8">
         <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) text-center animate-reveal">
-          Наши залипательные медиа
+          {t("home.socials_title")}
         </h2>
         <div className="animate-reveal delay-100 fill-mode-both">
           <Card className="gap-0! p-0! flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-(--outline) rounded-3xl overflow-hidden border-(--outline) bg-(--card) shadow-md">

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils";
 import localFont from 'next/font/local'
 import { ThemeProvider } from "@/providers/theme-provider";
+import { LanguageProvider } from "@/providers/language-provider";
 import BottomAppBar from "@/components/layout/nav/bottom-app-bar";
 import Header from "@/components/layout/nav/header";
 import Footer from "@/components/layout/nav/footer";
@@ -17,10 +18,12 @@ export const Geist = localFont({
   src: '../public/fonts/Geist-VariableFont_wght.woff2',
   variable: '--font-sans',
 });
+
 export const metadata: Metadata = {
   title: "Цифровое агентство полного цикла Rovno.dev",
   description: "Digital-агентство полного цикла Rovno.dev - дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D",
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,14 +56,16 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          <UserProvider>
-            <TooltipProvider>
-              <ClientRootLayout>
-                {children}
-              </ClientRootLayout>
-              <CookieConsent />
-            </TooltipProvider>
-          </UserProvider>
+          <LanguageProvider>
+            <UserProvider>
+              <TooltipProvider>
+                <ClientRootLayout>
+                  {children}
+                </ClientRootLayout>
+                <CookieConsent />
+              </TooltipProvider>
+            </UserProvider>
+          </LanguageProvider>
         </ThemeProvider>
         <YandexMetrika />
       </body>

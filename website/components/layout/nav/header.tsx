@@ -1,5 +1,4 @@
 "use client";
-
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
@@ -19,9 +18,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/providers/language-provider";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
+  const { t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
@@ -30,13 +32,9 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
   const pathname = usePathname();
-
-  // Check if current route is admin or app/profile
   const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
-
   return (
     <header
       className={cn(
@@ -56,18 +54,19 @@ export default function Header() {
             <Logo className="!h-[30px] sm:h-[40px]" />
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
-            <NavLink href={ROUTES.projects.href}>Проекты</NavLink>
-            <NavLink href={ROUTES.about.href}>О нас</NavLink>
-            <NavLink href={ROUTES.blog.href}>{'Журнал "Ровня"'}</NavLink>
+            <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
+            <NavLink href={ROUTES.about.href}>{t("nav.about")}</NavLink>
+            <NavLink href={ROUTES.blog.href}>{t("nav.blog")}</NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-1">
           <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
               <Lightbulb />
-              Оформить заказ
+              {t("nav.order")}
             </Link>
           </Button>
+          <LanguageSwitcher />
           {isLoading ? (
             <div className="ml-2 flex items-center">
               <Skeleton className="size-8 rounded-full" />
@@ -82,20 +81,20 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href="/app/profile">Профиль</Link>
+                    <Link href="/app/profile">{t("nav.profile")}</Link>
                   </DropdownMenuItem>
                   {(user?.role === 'admin' || user?.role === 'root') && (
                     <>
                       {adminSecret ? (
                         <DropdownMenuItem asChild>
-                          <Link href={`/admin/${adminSecret}`}>Админ-панель</Link>
+                          <Link href={`/admin/${adminSecret}`}>{t("nav.admin")}</Link>
                         </DropdownMenuItem>
                       ) : (
                         ""
                       )}
                     </>
                   )}
-                  <DropdownMenuItem onClick={logout}>Выйти</DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>{t("nav.logout")}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : null

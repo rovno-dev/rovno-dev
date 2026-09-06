@@ -2,12 +2,12 @@
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import SpeedIllustration from "@/components/layout/fancy/rocket-blueprint";
+import { useLanguage } from "@/providers/language-provider";
 
 export default function CtaSection() {
+  const { t } = useLanguage();
   const PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE;
   const TELEGRAM = process.env.NEXT_PUBLIC_CONTACT_TELEGRAM;
-
   return (
     <section className="relative overflow-hidden py-24 md:py-32 bg-[rgba(29,77,122)]/50">
       {/* Blueprint grid background */}
@@ -22,28 +22,22 @@ export default function CtaSection() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0f2b46]/80" />
       </div>
-
-      {/* Blueprint Rocket SVG */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 pointer-events-none w-full px-4 aspect-[400/500] blur-[1px]">
-        {/* <SpeedIllustration /> */}
-      </div>
-
       <Container className="relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-5xl md:text-7xl font-heading font-bold leading-tight tracking-tight text-white mb-6">
-            Найдём решение<br />
+            {t("home.cta.title")}<br />
           </h2>
           <p className="text-xl md:text-2xl text-white/80 leading-relaxed max-w-2xl mx-auto">
-            Напишите нам в личку — ответим в течение 3х часов*
+            {t("home.cta.subtitle")}
             <br />
-            <span className="text-sm text-white/50">*с 8 до 22 по мск</span>
+            <span className="text-sm text-white/50">{t("home.cta.note")}</span>
           </p>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mx-auto sm:max-w-md">
             <Button size="xlarge" variant={'filled'} asChild>
-              <Link href={`https://max.ru/${PHONE}`}>Написать в Max</Link>
+              <Link href={`https://max.ru/${PHONE}`}>{t("home.cta.max")}</Link>
             </Button>
             <Button size="xlarge" variant={'filled'} asChild>
-              <Link href={`https://t.me/${TELEGRAM}`}>Написать в ТГ</Link>
+              <Link href={`https://t.me/${TELEGRAM}`}>{t("home.cta.telegram")}</Link>
             </Button>
           </div>
         </div>

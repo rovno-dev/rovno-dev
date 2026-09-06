@@ -4,44 +4,45 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-
-const stats = [
-  {
-    number: "4.5 года",
-    description: "средний опыт среди всех участников Rovno.dev в 2026 году",
-    buttonText: "Наша команда",
-    href: "/team",
-    color: "#3b82f6", // blue
-  },
-  {
-    number: "42",
-    description: "проекта выполнено",
-    buttonText: "Наши проекты",
-    href: "/projects",
-    color: "#f59e0b", // amber
-  },
-  {
-    number: "18",
-    description: "довольных клиентов",
-    buttonText: "Отзывы клиентов",
-    href: "/reviews",
-    color: "#ec4899", // pink
-  },
-  {
-    number: "1 день",
-    description: "в среднем занимает подготовка ТЗ и документации",
-    buttonText: "Убедиться в этом самому",
-    href: "/order",
-    color: "#a855f7", // purple
-  },
-];
+import { useLanguage } from "@/providers/language-provider";
 
 export default function NumbersSection() {
+  const { t } = useLanguage();
+  const stats = [
+    {
+      number: "4.5 года",
+      description: t("home.stats_team_experience"),
+      buttonText: t("home.stats_team_btn"),
+      href: "/team",
+      color: "#3b82f6",
+    },
+    {
+      number: "42",
+      description: t("home.stats_projects_done"),
+      buttonText: t("home.stats_projects_btn"),
+      href: "/projects",
+      color: "#f59e0b",
+    },
+    {
+      number: "18",
+      description: t("home.stats_happy_clients"),
+      buttonText: t("home.stats_clients_btn"),
+      href: "/reviews",
+      color: "#ec4899",
+    },
+    {
+      number: "1 день",
+      description: t("home.stats_spec_prep"),
+      buttonText: t("home.stats_spec_btn"),
+      href: "/order",
+      color: "#a855f7",
+    },
+  ];
   return (
     <section className="pt-6 sm:pt-12 pb-8 sm:pb-18">
       <Container>
         <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-center">
-          Ровные значения
+          {t("home.numbers_title")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 [&>*:not(:first-child)]:pt-8 [&>*:not(:last-child)]:pb-8">
           {stats.map((stat, idx) => (
