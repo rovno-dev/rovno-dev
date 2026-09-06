@@ -21,9 +21,9 @@ const serviceToProjectSlugs: Record<string, string[]> = {
 
 // Create a mapping for your 3D assets matching the service key
 const serviceToModelPaths: Record<string, string> = {
-  "Разработка": "/models/cube.glb",       // Place your .glb files in your public folder
-  "3D & Motion": "/models/gem.glb",
-  "Брендинг": "/models/signature.glb",
+  "Разработка": "/3d/code.glb",       // Place your .glb files in your public folder
+  "3D & Motion": "/3d/gem.glb",
+  "Брендинг": "/3d/signature.glb",
 };
 
 function getLatestProjectForService(serviceTitle: string): Project {
@@ -141,7 +141,7 @@ export default function ServicesSection() {
   const Icon = currentService.icon;
 
   // 3. Extract the right model based on the active slide layout
-  const currentModelPath = serviceToModelPaths[currentService.title] || "/models/cube.glb";
+  const currentModelPath = serviceToModelPaths[currentService.title] || "/3d/code.glb";
 
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">

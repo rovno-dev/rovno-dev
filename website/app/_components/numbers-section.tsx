@@ -39,9 +39,9 @@ export default function NumbersSection() {
     },
   ];
   return (
-    <section className="pt-6 sm:pt-12 pb-8 sm:pb-18">
+    <section className="pt-12 sm:pt-18 pb-8 sm:pb-18">
       <Container>
-        <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-center">
+        <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-left sm:text-center">
           {t("home.numbers_title")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 [&>*:not(:first-child)]:pt-8 [&>*:not(:last-child)]:pb-8">
