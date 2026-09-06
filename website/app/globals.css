@@ -605,3 +605,52 @@
     scrollbar-width: none;
   }
 }
+
+/* marker highlight utility */
+@utility marker-highlight {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: -0.05em;
+    right: -0.05em;
+    bottom: 0.05em;
+    height: 0.3em;
+    background: var(--primary, #ffff50);
+    z-index: -1;
+    transform: skewX(-10deg) scaleX(0);
+    transform-origin: left;
+    border-radius: 0.1em;
+    animation: marker-draw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.5s;
+  }
+}
+
+/* marquee utility */
+@utility animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Keyframes can sit globally outside layers */
+@keyframes marker-draw {
+  from {
+    transform: skewX(-10deg) scaleX(0);
+  }
+
+  to {
+    transform: skewX(-10deg) scaleX(1);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
