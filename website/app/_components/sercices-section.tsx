@@ -3,8 +3,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { CodeIcon, DiamondIcon, SignatureIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
@@ -77,52 +76,31 @@ export default function ServicesSection() {
       price: { from: "75 000", avg: "150 000" },
     },
   ];
-
-  // Carousel state
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start",
-    containScroll: "trimSnaps",
-    dragFree: true,
-  });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
-  const hasInteracted = useRef(false);
 
   const ModelViewerElement = 'model-viewer' as any;
 
-  // Update selected index
+  // Autoplay logic - rotate services every 6 seconds
   useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi]);
-
-  // Autoplay logic - scroll next every 6 seconds
-  useEffect(() => {
-    if (hasInteracted.current) return;
-    const startAutoplay = () => {
+    if (!autoPlayTimer.current) {
       autoPlayTimer.current = setInterval(() => {
-        if (emblaApi) {
-          emblaApi.scrollNext();
-        }
+        setSelectedIndex((prev) => (prev + 1) % services.length);
       }, 6000);
-    };
-    startAutoplay();
+    }
     return () => {
       if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+      autoPlayTimer.current = null;
     };
-  }, [emblaApi]);
+  }, []);
 
-  // Stop autoplay on interaction
+  // Reset autoplay on interaction (so it continues after manual switch)
   const handleInteraction = () => {
-    hasInteracted.current = true;
     if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+    autoPlayTimer.current = setInterval(() => {
+      setSelectedIndex((prev) => (prev + 1) % services.length);
+    }, 6000);
   };
 
   const currentService = services[selectedIndex];
@@ -185,13 +163,11 @@ export default function ServicesSection() {
                     >
                       <div className={`absolute inset-y-0 left-0 bg-[var(--primary-glass)] transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ width: '0%', animationDuration: '6000ms' }} />
                       <div className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
-                        <div className="w-12 h-12 relative overflow-hidden pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                        <div className="w-12 h-12 relative overflow-hidden pointer-events-none" onPointerDown={(e) => e.stopPropagation()}>
                           {modelViewerLoaded ? (
                             <ModelViewerElement
                               key={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
                               src={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
-                              auto-rotate
-                              camera-controls
                               interaction-prompt="none"
                               style={{ width: '100%', height: '100%', '--poster-color': 'transparent' } as React.CSSProperties}
                             />
@@ -217,7 +193,7 @@ export default function ServicesSection() {
                   auto-rotate
                   camera-controls
                   interaction-prompt="none"
-                  rotation-per-second="15deg"
+                  rotation-per-second="20deg"
                   style={{ width: '100%', height: '100%', minHeight: '400px', '--poster-color': 'transparent' } as React.CSSProperties}
                 >
                 </ModelViewerElement>
