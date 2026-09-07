@@ -29,3 +29,5 @@ openapi.json
 letsencrypt/*
 
 skills-lock.json
+
+*.glb

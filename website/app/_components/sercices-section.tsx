@@ -86,23 +86,11 @@ export default function ServicesSection() {
     dragFree: true,
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
+
   const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
   const hasInteracted = useRef(false);
 
   const ModelViewerElement = 'model-viewer' as any;
-
-  // Update progress bar based on embla scroll progress
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onScroll = () => {
-      setProgress(emblaApi.scrollProgress());
-    };
-    emblaApi.on("scroll", onScroll);
-    return () => {
-      emblaApi.off("scroll", onScroll);
-    };
-  }, [emblaApi]);
 
   // Update selected index
   useEffect(() => {
@@ -180,14 +168,14 @@ export default function ServicesSection() {
                 </div>
               </div>
 
-              <div className="flex gap-2 w-full">
+              <div className="flex flex-wrap gap-2 w-full">
                 {services.map((service, index) => {
                   const ServiceIcon = service.icon;
                   const isActive = index === selectedIndex;
                   return (
                     <Button
                       variant={'outlined'}
-                      className="flex-col h-[64px] w-full p-1!"
+                      className="flex-col h-[64px] w-full flex-1 p-2!"
                       key={service.title}
                       onClick={() => {
                         emblaApi?.scrollTo(index);
@@ -195,16 +183,25 @@ export default function ServicesSection() {
                       }}
                       onPointerDown={handleInteraction}
                     >
-                      <div className="flex gap-2 items-center justify-center text-xs sm:text-sm">
-                        <ServiceIcon className="w-4 h-4" />
+                      <div className="h-full flex gap-2 items-center justify-center text-xs sm:text-sm">
+                         { modelViewerLoaded ? (
+                          <ModelViewerElement
+                            key={currentModelPath}
+                            src={currentModelPath}
+                            alt={`3D representative for ${currentService.title}`}
+                            auto-rotate
+                            camera-controls
+                            interaction-prompt="none"
+                            rotation-per-second="15deg"
+                            style={{ width: '100%', height: '100%', minHeight: '400px', '--poster-color': 'transparent' } as React.CSSProperties}
+                          >
+                          </ModelViewerElement>
+                        ) : (
+                          <ServiceIcon className="h-full! aspect-square! w-auto!" />
+                        )}
                         {service.title}
                       </div>
-                      <div className={`mt-2 h-1 w-full bg-white/10 rounded-full overflow-hidden ${isActive ? "" : "invisible"}`}>
-                        <div
-                          className="h-full bg-white/50 transition-all duration-100"
-                          style={{ width: `${progress * 100}%` }}
-                        />
-                      </div>
+                      {/* Add progress bar here */}
                     </Button>
                   );
                 })}
@@ -215,6 +212,7 @@ export default function ServicesSection() {
             <div className="flex items-center justify-center min-h-[300px] sm:min-h-[450px] relative w-full h-full rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden">
               {modelViewerLoaded ? (
                 <ModelViewerElement
+                  key={currentModelPath}
                   src={currentModelPath}
                   alt={`3D representative for ${currentService.title}`}
                   auto-rotate

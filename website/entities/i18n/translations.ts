@@ -126,7 +126,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "services.branding_sub2": "Brandbook",
     "services.branding_sub3": "Corporate Identity",
     "services.branding_sub4": "Identity",
-    "services.from": "from",
+    "services.from": "From",
     "services.avg_label": "Rovno from:",
 
     // Order page extra
@@ -217,6 +217,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "blog.title": "Блог",
     "blog.subtitle": "Статьи о дизайне, разработке, кейсах и инсайтах нашей команды.",
     "blog.read_more": "Читать в Telegram",
+
+    "services.from": "От",
+    "services.avg_label": "Ровно от:",
 
     // Страница Заказ
     "order.title": "Сделать заказ",
