@@ -124,7 +124,7 @@ export default function ServicesSection() {
             {/* LEFT COLUMN: Texts & Navigation */}
             <div className="h-full flex flex-col justify-between">
               <div>
-                <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-4">
+                <p className="text-xl md:text-2xl text-(--on-bg-low) max-w-2xl mb-4">
                   {lang === 'ru' ? 'Мы делаем...' : 'We do...'}
                 </p>
                 <h1 key={currentService.title} className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6 animate-slide-in">
@@ -140,14 +140,14 @@ export default function ServicesSection() {
                     </Badge>
                   ))}
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-white/60 mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
                   <div className="flex flex-col">
-                    <span className="text-xs uppercase text-white/40">{t("services.from")}</span>
-                    <span className="text-3xl font-semibold text-white">{currentService.price.from} ₽</span>
+                    <span className="text-xs text-(--on-bg-medium)">{t("services.from")}</span>
+                    <span className="text-3xl font-semibold">{currentService.price.from} ₽</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs uppercase text-white/40">{t("services.avg_label")}</span>
-                    <span className="text-3xl font-semibold text-white">{currentService.price.avg} ₽</span>
+                    <span className="text-xs text-(--on-bg-medium)">{t("services.avg_label")}</span>
+                    <span className="text-3xl font-semibold">{currentService.price.avg} ₽</span>
                   </div>
                 </div>
               </div>
@@ -200,7 +200,15 @@ export default function ServicesSection() {
                   camera-controls
                   interaction-prompt="none"
                   rotation-per-second="20deg"
-                  style={{ width: '100%', height: '100%', minHeight: '400px', '--poster-color': 'transparent' } as React.CSSProperties}
+                  style={{
+                    background: 'var(--dark-4)',
+                    backgroundSize: '40px 40px',
+                    backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '400px',
+                    '--poster-color': 'transparent',
+                  } as React.CSSProperties}
                 >
                 </ModelViewerElement>
               ) : (

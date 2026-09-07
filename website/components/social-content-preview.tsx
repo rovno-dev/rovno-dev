@@ -33,7 +33,7 @@ export function SocialContentPreview({
       )}
     >
       {/* Media area (video thumbnail or article cover) */}
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-[4/3] sm:aspect-video overflow-hidden">
         {thumbnail ? (
           <Image
             src={thumbnail}
@@ -42,7 +42,7 @@ export function SocialContentPreview({
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-(--primary-card) to-(--bg-disabled) flex items-center justify-center">
+          <div className="absolute inset-0 bg-(--bg-disabled) flex items-center justify-center">
             {type === "video" ? (
               <Play className="w-14 h-14 text-(--primary) fill-(--primary)" />
             ) : (

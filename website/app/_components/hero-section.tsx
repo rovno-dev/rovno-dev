@@ -98,7 +98,7 @@ export default function HeroSection() {
 
       <Container className="relative z-10 w-full">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-center text-[2rem] sm:text-[4rem] lg:text-[5.5rem] font-heading font-bold leading-[1.05] tracking-tighter mb-6 select-none px-4">
+          <h1 className="text-center text-white text-[2rem] sm:text-[4rem] lg:text-[5.5rem] font-heading font-bold leading-[1.05] tracking-tighter mb-6 select-none px-4">
             {t("hero.title.part1")} <span className="marker-highlight">{t("hero.title.part2")}</span>
           </h1>
 

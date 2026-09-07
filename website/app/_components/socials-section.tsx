@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
@@ -110,6 +111,7 @@ const mediaTypes = [
 
 export default function SocialsSection() {
   const { t } = useLanguage();
+  const [selectedType, setSelectedType] = useState<"video" | "article">("video");
 
   // Example preview data (could be dynamic)
   const previewData = {
@@ -129,6 +131,8 @@ export default function SocialsSection() {
     },
   };
 
+  const activePreview = previewData[selectedType];
+
   return (
     <Container className="py-12 md:py-20">
       <div className="space-y-8">
@@ -138,7 +142,29 @@ export default function SocialsSection() {
 
         {/* Mobile: preview at top + horizontal scroll badges */}
         <div className="sm:hidden space-y-6">
-          <SocialContentPreview {...previewData.video} />
+          <div className="flex justify-center gap-2 mb-2">
+            <button
+              onClick={() => setSelectedType("video")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedType === "video"
+                  ? "bg-(--on-bg-high) text-(--bg)"
+                  : "bg-(--bg-disabled) text-(--on-bg-medium)"
+              }`}
+            >
+              Videos
+            </button>
+            <button
+              onClick={() => setSelectedType("article")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedType === "article"
+                  ? "bg-(--on-bg-high) text-(--bg)"
+                  : "bg-(--bg-disabled) text-(--on-bg-medium)"
+              }`}
+            >
+              Articles
+            </button>
+          </div>
+          <SocialContentPreview {...activePreview} />
           <div className="-mx-4 px-4 overflow-x-auto no-scrollbar">
             <div className="flex gap-3 pb-2">
               {mediaTypes.map((type) => (
@@ -172,9 +198,30 @@ export default function SocialsSection() {
         {/* Desktop: preview + media types list */}
         <div className="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Content preview area (max-width 550px) */}
-          <div className="w-full max-w-[550px] mx-auto">
-            <SocialContentPreview {...previewData.video} />
-            {/* You can switch to article by using {...previewData.article} */}
+          <div className="w-full max-w-[550px] mx-auto space-y-4">
+            <div className="flex justify-center gap-2">
+              <button
+                onClick={() => setSelectedType("video")}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedType === "video"
+                    ? "bg-(--on-bg-high) text-(--bg)"
+                    : "bg-(--bg-disabled) text-(--on-bg-medium) hover:bg-(--outline)"
+                }`}
+              >
+                Videos
+              </button>
+              <button
+                onClick={() => setSelectedType("article")}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedType === "article"
+                    ? "bg-(--on-bg-high) text-(--bg)"
+                    : "bg-(--bg-disabled) text-(--on-bg-medium) hover:bg-(--outline)"
+                }`}
+              >
+                Articles
+              </button>
+            </div>
+            <SocialContentPreview {...activePreview} />
           </div>
 
           {/* Media types list */}

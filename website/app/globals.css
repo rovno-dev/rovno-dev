@@ -11,7 +11,7 @@
   --primary: var(--brand-9);
   --primary-gradient: linear-gradient(180deg, var(--brand-8), var(--brand-9));
   --on-primary: var(--white);
-  --primary-card: var(--brand-0);
+  --primary-card: color-mix(in srgb, var(--primary), transparent 92%);
   --on-primary-card: var(--gray-9);
 
   --outline: var(--gray-3);
@@ -215,7 +215,7 @@
   --primary: var(--brand-9);
   --primary-gradient: linear-gradient(135deg, var(--brand-8), var(--brand-9));
   --on-primary: var(--white);
-  --primary-card: var(--brand-3);
+  --primary-card: color-mix(in srgb, var(--primary), transparent 84%);
   --on-primary-card: var(--dark-9);
   --outline: var(--dark-6);
   --bg: var(--dark-8);
