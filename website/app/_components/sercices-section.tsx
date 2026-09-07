@@ -22,9 +22,9 @@ const serviceToProjectSlugs: Record<string, string[]> = {
 
 // Create a mapping for your 3D assets matching the service key
 const serviceToModelPaths: Record<string, string> = {
-  "Разработка": "/3d/code.glb",       // Place your .glb files in your public folder
-  "3D & Motion": "/3d/gem.glb",
-  "Брендинг": "/3d/signature.glb",
+  "Разработка": "/3d/code_icon.glb",       // Place your .glb files in your public folder
+  "3D & Motion": "/3d/code_icon.glb",
+  "Брендинг": "/3d/code_icon.glb",
 };
 
 function getLatestProjectForService(serviceTitle: string): Project {
@@ -130,7 +130,7 @@ export default function ServicesSection() {
   const Icon = currentService.icon;
 
   // 3. Extract the right model based on the active slide layout
-  const currentModelPath = serviceToModelPaths[currentService.title] || "/3d/code.glb";
+  const currentModelPath = serviceToModelPaths[currentService.title] || "/3d/code_icon.glb";
 
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">
@@ -175,7 +175,7 @@ export default function ServicesSection() {
                   return (
                     <Button
                       variant={'outlined'}
-                      className="flex-col h-[64px] w-full flex-1 p-2!"
+                      className="flex-row h-[64px] w-full flex-1 p-2!"
                       key={service.title}
                       onClick={() => {
                         emblaApi?.scrollTo(index);
@@ -183,25 +183,24 @@ export default function ServicesSection() {
                       }}
                       onPointerDown={handleInteraction}
                     >
-                      <div className="h-full flex gap-2 items-center justify-center text-xs sm:text-sm">
-                         { modelViewerLoaded ? (
-                          <ModelViewerElement
-                            key={currentModelPath}
-                            src={currentModelPath}
-                            alt={`3D representative for ${currentService.title}`}
-                            auto-rotate
-                            camera-controls
-                            interaction-prompt="none"
-                            rotation-per-second="15deg"
-                            style={{ width: '100%', height: '100%', minHeight: '400px', '--poster-color': 'transparent' } as React.CSSProperties}
-                          >
-                          </ModelViewerElement>
-                        ) : (
-                          <ServiceIcon className="h-full! aspect-square! w-auto!" />
-                        )}
-                        {service.title}
+                      <div className="flex items-center justify-center gap-2 w-full h-full">
+                        <div className="w-12 h-12 relative overflow-hidden pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                          {modelViewerLoaded ? (
+                            <ModelViewerElement
+                              key={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
+                              src={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
+                              auto-rotate
+                              camera-controls
+                              interaction-prompt="none"
+                              style={{ width: '100%', height: '100%', '--poster-color': 'transparent' } as React.CSSProperties}
+                            />
+                          ) : (
+                            <ServiceIcon className="w-4 h-4" />
+                          )}
+                        </div>
+                        <span>{service.title}</span>
+                        <div className={`top-0 left-0 absolute h-full bg-[var(--primary-glass)] transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ animationDuration: '6000ms' }} />
                       </div>
-                      {/* Add progress bar here */}
                     </Button>
                   );
                 })}
