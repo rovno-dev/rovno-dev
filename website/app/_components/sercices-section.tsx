@@ -79,6 +79,7 @@ export default function ServicesSection() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
+  const autoPlayTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const ModelViewerElement = 'model-viewer' as any;
 
@@ -91,16 +92,21 @@ export default function ServicesSection() {
     }
     return () => {
       if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
+      if (autoPlayTimeout.current) clearTimeout(autoPlayTimeout.current);
       autoPlayTimer.current = null;
+      autoPlayTimeout.current = null;
     };
   }, []);
 
-  // Reset autoplay on interaction (so it continues after manual switch)
+  // Stop autoplay on interaction, resume after 5 seconds of inactivity
   const handleInteraction = () => {
     if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
-    autoPlayTimer.current = setInterval(() => {
-      setSelectedIndex((prev) => (prev + 1) % services.length);
-    }, 6000);
+    if (autoPlayTimeout.current) clearTimeout(autoPlayTimeout.current);
+    autoPlayTimeout.current = setTimeout(() => {
+      autoPlayTimer.current = setInterval(() => {
+        setSelectedIndex((prev) => (prev + 1) % services.length);
+      }, 6000);
+    }, 5000);
   };
 
   const currentService = services[selectedIndex];
@@ -121,7 +127,7 @@ export default function ServicesSection() {
                 <p className="text-xl md:text-2xl text-white/70 max-w-2xl mb-4">
                   {lang === 'ru' ? 'Мы делаем...' : 'We do...'}
                 </p>
-                <h1 className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6">
+                <h1 key={currentService.title} className="text-display-1 text-[2rem] sm:text-[2.75rem] lg:text-[4rem] mb-6 animate-slide-in">
                   {currentService.title}
                 </h1>
                 <div className="mb-6 flex flex-wrap gap-2 marquee-badges">
