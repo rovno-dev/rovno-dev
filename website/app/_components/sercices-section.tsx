@@ -167,7 +167,7 @@ export default function ServicesSection() {
                       }}
                       onPointerDown={handleInteraction}
                     >
-                      <div className={`absolute inset-y-0 left-0 bg-[var(--primary-glass)] transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ width: '0%', animationDuration: '6000ms' }} />
+                      <div className={`absolute inset-y-0 left-0 bg-(--primary)/20 transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ width: '0%', animationDuration: '6000ms' }} />
                       <div className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
                         <div className="w-12 h-12 relative overflow-hidden pointer-events-none" onPointerDown={(e) => e.stopPropagation()}>
                           {modelViewerLoaded ? (
