@@ -10,6 +10,7 @@ import {
   DprofileLogotypeMonoIcon,
 } from "@/components/icons";
 import { ArrowUpRight } from "lucide-react";
+import { SocialContentPreview } from "@/components/social-content-preview";
 
 // Helper to create a simple square icon with a letter
 function LetterIcon({ letter, bg = "bg-current" }: { letter: string; bg?: string }) {
@@ -110,6 +111,24 @@ const mediaTypes = [
 export default function SocialsSection() {
   const { t } = useLanguage();
 
+  // Example preview data (could be dynamic)
+  const previewData = {
+    video: {
+      type: "video" as const,
+      title: "Latest reel: our process behind 3D animation",
+      description: "Watch how we built the latest case study in 30 seconds.",
+      thumbnail: "/_static/projects/alx/alx-cover.png",
+      link: "https://vk.com/video",
+    },
+    article: {
+      type: "article" as const,
+      title: "Why we chose Next.js for our new platform",
+      description: "A deep dive into our tech stack decisions.",
+      thumbnail: "/images/projects/alx.png",
+      link: "https://vc.ru",
+    },
+  };
+
   return (
     <Container className="py-12 md:py-20">
       <div className="space-y-8">
@@ -117,61 +136,45 @@ export default function SocialsSection() {
           {t("home.socials_title")}
         </h2>
 
-        {/* Mobile: horizontal scroll badges */}
-        <div className="sm:hidden -mx-4 px-4 overflow-x-auto no-scrollbar">
-          <div className="flex gap-3 pb-2">
-            {mediaTypes.map((type) => (
-              <div
-                key={type.name}
-                className="flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border border-(--outline) bg-(--card) min-w-[140px]"
-              >
-                <span className="text-xs font-bold uppercase tracking-wide text-(--on-bg-medium)">
-                  {type.name}
-                </span>
-                <div className="flex items-center gap-2">
-                  {type.icons.map((icon) => (
-                    <Link
-                      key={icon.label}
-                      href={icon.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-(--bg-disabled) text-(--on-bg-medium) hover:text-(--primary) hover:bg-(--primary-card) transition-all"
-                      aria-label={icon.label}
-                    >
-                      {icon.icon}
-                    </Link>
-                  ))}
+        {/* Mobile: preview at top + horizontal scroll badges */}
+        <div className="sm:hidden space-y-6">
+          <SocialContentPreview {...previewData.video} />
+          <div className="-mx-4 px-4 overflow-x-auto no-scrollbar">
+            <div className="flex gap-3 pb-2">
+              {mediaTypes.map((type) => (
+                <div
+                  key={type.name}
+                  className="flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border border-(--outline) bg-(--card) min-w-[140px]"
+                >
+                  <span className="text-xs font-bold uppercase tracking-wide text-(--on-bg-medium)">
+                    {type.name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {type.icons.map((icon) => (
+                      <Link
+                        key={icon.label}
+                        href={icon.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center w-10 h-10 rounded-xl bg-(--bg-disabled) text-(--on-bg-medium) hover:text-(--primary) hover:bg-(--primary-card) transition-all"
+                        aria-label={icon.label}
+                      >
+                        {icon.icon}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Desktop: content + list */}
-        <div className="hidden sm:grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 items-center">
-          {/* Content square */}
-          <div className="relative overflow-hidden rounded-3xl border border-(--outline) bg-gradient-to-br from-(--primary-card) to-(--card) p-8 text-center shadow-sm">
-            <div className="absolute inset-0 bg-grid-white opacity-20" />
-            <div className="relative z-10">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-(--primary) text-(--on-primary) mb-4">
-                <ArrowUpRight className="w-8 h-8" />
-              </div>
-              <h3 className="text-display-4 font-heading font-semibold text-(--on-bg-high) mb-2">
-                Follow us
-              </h3>
-              <p className="text-body-3 text-(--on-bg-medium) mb-6">
-                We post fresh content daily
-              </p>
-              <Link
-                href={mediaTypes[0].icons[0].link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-(--primary) text-(--on-primary) text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                Open socials
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
-            </div>
+        {/* Desktop: preview + media types list */}
+        <div className="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Content preview area (max-width 550px) */}
+          <div className="w-full max-w-[550px] mx-auto">
+            <SocialContentPreview {...previewData.video} />
+            {/* You can switch to article by using {...previewData.article} */}
           </div>
 
           {/* Media types list */}
