@@ -175,15 +175,16 @@ export default function ServicesSection() {
                   return (
                     <Button
                       variant={'outlined'}
-                      className="flex-row h-[64px] w-full flex-1 p-2!"
+                      className="flex-row h-[64px] w-full flex-1 p-2! relative overflow-hidden"
                       key={service.title}
                       onClick={() => {
-                        emblaApi?.scrollTo(index);
+                        setSelectedIndex(index);
                         handleInteraction();
                       }}
                       onPointerDown={handleInteraction}
                     >
-                      <div className="flex items-center justify-center gap-2 w-full h-full">
+                      <div className={`absolute inset-y-0 left-0 bg-[var(--primary-glass)] transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ width: '0%', animationDuration: '6000ms' }} />
+                      <div className="relative z-10 flex items-center justify-center gap-2 w-full h-full">
                         <div className="w-12 h-12 relative overflow-hidden pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
                           {modelViewerLoaded ? (
                             <ModelViewerElement
@@ -199,7 +200,6 @@ export default function ServicesSection() {
                           )}
                         </div>
                         <span>{service.title}</span>
-                        <div className={`top-0 left-0 absolute h-full bg-[var(--primary-glass)] transition-all duration-100 ${isActive ? "animate-service-progress" : ""}`} style={{ animationDuration: '6000ms' }} />
                       </div>
                     </Button>
                   );
