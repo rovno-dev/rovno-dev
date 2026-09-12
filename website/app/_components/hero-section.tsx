@@ -9,15 +9,15 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 
 const BADGES = [
-  { label: { ru: "Сайты", en: "Websites" }, video: "/videos/websites.webm" },
-  { label: { ru: "Приложения", en: "Apps" }, video: "/videos/apps.webm" },
-  { label: { ru: "Дизайны", en: "Designs" }, video: "/videos/designs.webm" },
-  { label: { ru: "Рекламы", en: "ADs" }, video: "/videos/ads.webm" },
-  { label: { ru: "Видео", en: "Videos" }, video: "/videos/videos.webm" },
-  { label: { ru: "3D-модели", en: "3D models" }, video: "/videos/3d-models.webm" },
-  { label: { ru: "Логотипы", en: "Logos" }, video: "/videos/logos.webm" },
-  { label: { ru: "Брендинги", en: "Brandings" }, video: "/videos/brandings.webm" },
-  { label: { ru: "Решения", en: "Solutions" }, video: "/videos/solutions.webm" }
+  { label: { ru: "Сайты", en: "Websites" }, video: "/videos/hero/websites.webm" },
+  { label: { ru: "Приложения", en: "Apps" }, video: "/videos/hero/apps.webm" },
+  { label: { ru: "Дизайны", en: "Designs" }, video: "/videos/hero/designs.webm" },
+  { label: { ru: "Рекламы", en: "ADs" }, video: "/videos/hero/ads.webm" },
+  { label: { ru: "Видео", en: "Videos" }, video: "/videos/hero/videos.webm" },
+  { label: { ru: "3D-модели", en: "3D models" }, video: "/videos/hero/3d-models.webm" },
+  { label: { ru: "Логотипы", en: "Logos" }, video: "/videos/hero/logos.webm" },
+  { label: { ru: "Брендинги", en: "Brandings" }, video: "/videos/hero/brandings.webm" },
+  { label: { ru: "Решения", en: "Solutions" }, video: "/videos/hero/solutions.webm" }
 ];
 
 export default function HeroSection() {

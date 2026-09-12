@@ -22,8 +22,8 @@ const serviceToProjectSlugs: Record<string, string[]> = {
 // Create a mapping for your 3D assets matching the service key
 const serviceToModelPaths: Record<string, string> = {
   "Разработка": "/3d/code_icon.glb",       // Place your .glb files in your public folder
-  "3D & Motion": "/3d/code_icon.glb",
-  "Брендинг": "/3d/code_icon.glb",
+  "3D & Motion": "/3d/3d_icon.glb",
+  "Брендинг": "/3d/design_icon.glb",
 };
 
 function getLatestProjectForService(serviceTitle: string): Project {
