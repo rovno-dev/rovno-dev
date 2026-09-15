@@ -20,8 +20,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { ListIcon } from "@phosphor-icons/react";
-
+import { FloatingMenu } from "./floating-menu";
 export default function Header() {
   const { user, isLoading, logout } = useUser();
   const { t } = useLanguage();
@@ -100,14 +99,10 @@ export default function Header() {
               </DropdownMenu>
             ) : null
           )}
-          <Button
-            variant={'text'}
-            shape={'square'}
-            size="icon-small"
-            className="hidden sm:flex md:hidden"
-          >
-            <ListIcon />
-          </Button>
+          <FloatingMenu
+            position="top"
+            triggerClassName="hidden sm:flex md:hidden"
+          />
         </div>
       </Container>
     </header>

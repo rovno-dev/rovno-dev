@@ -1,17 +1,15 @@
 "use client"
-
 import { ROUTES } from "@/utils/constants/routes";
 import { Container } from "../../ui/container";
 import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../../ui/button";
-import { PackageIcon, NewspaperIcon, LightbulbIcon, ListIcon } from "@phosphor-icons/react"
+import { PackageIcon, NewspaperIcon, LightbulbIcon } from "@phosphor-icons/react"
 import Link from "next/link";
 import RovnoLogotypeIconEmpty from "../logo/logo-icon-empty";
-
+import { FloatingMenu } from "./floating-menu";
 export default function BottomAppBar() {
   const [open, setOpen] = useState(false);
-
   const links = [
     // Pass the COMPONENT, not <Component />
     { ...ROUTES.projects, icon: PackageIcon },
@@ -19,7 +17,6 @@ export default function BottomAppBar() {
     { href: ROUTES.blog.href, title: "Журнал", icon: NewspaperIcon },
     // { ...ROUTES.job, icon: BriefcaseBusiness  },
   ]
-
   return (
     <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
       <Container aria-label="Bottom app bar">
@@ -44,7 +41,6 @@ export default function BottomAppBar() {
               );
             })}
           </div> */}
-
           <Button
             asChild
             shape={'round'}
@@ -56,14 +52,12 @@ export default function BottomAppBar() {
               <span className="text-heading-5">Оформить заказ</span>
             </Link>
           </Button>
-          <Button
-            variant={'text'}
-            shape={'square'}
-            className="w-[60px]! h-[60px]! gap-2 sm:hidden"
-            size="icon-medium"
-          >
-            <ListIcon className="size-12!" />
-          </Button>
+          <FloatingMenu
+            position="bottom"
+            triggerSize="icon-medium"
+            triggerClassName="w-[60px]! h-[60px]! sm:hidden"
+            triggerIconClassName="size-12!"
+          />
         </div>
       </Container>
     </nav>

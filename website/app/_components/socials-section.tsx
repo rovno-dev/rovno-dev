@@ -19,11 +19,10 @@ import { Button } from "@/components/ui/button";
 import { HabrLogotypeMonoIcon } from "@/components/icons/logotypes/habr-logo-mono";
 import { VCRULogotypeMonoIcon } from "@/components/icons/logotypes/vc-ru-logo-mono";
 import { MediumLogotypeMonoIcon } from "@/components/icons/logotypes/medium-logo-mono";
-
-// Media types data
+// Media types data – icons only; display labels come from i18n
 const mediaTypes = [
   {
-    name: "Shorts",
+    id: "shorts",
     icons: [
       { label: "VK Video", icon: <VKLogotypeMonoIcon />, link: "https://vkvideo.ru/rovno_dev" },
       { label: "TikTok", icon: <TiktokLogoMono />, link: "https://tiktok.com/rovno_dev" },
@@ -31,28 +30,28 @@ const mediaTypes = [
     ],
   },
   {
-    name: "Videos",
+    id: "videos",
     icons: [
       { label: "YouTube", icon: <YoutubeLogoMono />, link: "https://youtube.com/rovno_dev" },
       { label: "VK Video", icon: <VKLogotypeMonoIcon />, link: "https://vkvideo.ru/rovno_dev" },
     ],
   },
   {
-    name: "Design",
+    id: "design",
     icons: [
       { label: "Dprofile", icon: <DprofileLogotypeMonoIcon />, link: "https://dprofile.ru/rovno_dev" },
       { label: "Behance", icon: <BehanceLogoMono />, link: "https://behance.net/rovno_dev" },
     ],
   },
   {
-    name: "Pro notes",
+    id: "pro_notes",
     icons: [
       { label: "Telegram", icon: <TelegramLogotypeMonoIcon />, link: "https://t.me/rovno_dev" },
       { label: "VK", icon: <VKLogotypeMonoIcon />, link: "https://vk.com/rovno_dev" },
     ],
   },
   {
-    name: "Articles",
+    id: "articles",
     icons: [
       { label: "VC", icon: <VCRULogotypeMonoIcon />, link: "https://vc.ru/rovno_dev" },
       { label: "Habr", icon: <HabrLogotypeMonoIcon />, link: "https://habr.com/rovno_dev" },
@@ -60,73 +59,67 @@ const mediaTypes = [
     ],
   },
   {
-    name: "Dev",
+    id: "dev",
     icons: [
       { label: "GitHub", icon: <GithubLogotypeMonoIcon />, link: "https://github.com/rovno-dev" },
     ],
   },
 ];
-
 export default function SocialsSection() {
   const { t } = useLanguage();
-  const [selectedMediaType, setSelectedMediaType] = useState<string>(mediaTypes[0].name);
-
-  // Example preview data (could be dynamic)
-  // Map media type name to preview content
+  const [selectedMediaType, setSelectedMediaType] = useState<string>(mediaTypes[0].id);
+  // Preview content per media type – labels/descriptions resolved via i18n
   const previewMap: Record<string, SocialContentPreviewProps> = {
-    "Shorts": {
+    shorts: {
       type: "short-video",
-      title: "Latest reel: 3D animation process",
-      description: "Watch how we built the latest case study in 30 seconds.",
+      title: t("home.socials.preview.shorts.title"),
+      description: t("home.socials.preview.shorts.description"),
       thumbnail: "/_static/projects/alx/alx-cover.png",
       link: "https://youtube.com/rovno_dev",
     },
-    "Videos": {
+    videos: {
       type: "video",
-      title: "Our full portfolio showcase",
-      description: "A compilation of our best video projects.",
+      title: t("home.socials.preview.videos.title"),
+      description: t("home.socials.preview.videos.description"),
       thumbnail: "/_static/projects/bread/bread-cover.png",
       link: "https://youtube.com/rovno_dev",
     },
-    "Design": {
+    design: {
       type: "article",
-      title: "Design case: ALX-9 identity",
-      description: "How we created the brand identity for the AI exhibition.",
+      title: t("home.socials.preview.design.title"),
+      description: t("home.socials.preview.design.description"),
       thumbnail: "/_static/projects/alx/alx-cover.png",
       link: "https://dprofile.ru/rovno_dev",
     },
-    "Pro notes": {
+    pro_notes: {
       type: "post",
-      title: "Pro notes: 5 tips for faster development",
-      description: "Our team shares practical advice.",
+      title: t("home.socials.preview.pro_notes.title"),
+      description: t("home.socials.preview.pro_notes.description"),
       thumbnail: "/images/article.jpeg",
       link: "https://t.me/rovno_dev",
     },
-    "Articles": {
+    articles: {
       type: "article",
-      title: "Why we chose Next.js for our new platform",
-      description: "A deep dive into our tech stack decisions.",
+      title: t("home.socials.preview.articles.title"),
+      description: t("home.socials.preview.articles.description"),
       thumbnail: "/images/infra-blue.png",
       link: "https://vc.ru/rovno_dev",
     },
-    "Dev": {
+    dev: {
       type: "repo",
-      title: "Open source: Amorfa UI",
-      description: "Explore our design system on GitHub.",
+      title: t("home.socials.preview.dev.title"),
+      description: t("home.socials.preview.dev.description"),
       thumbnail: "/images/projects/sadovod.png",
       link: "https://github.com/rovno-dev",
     },
   };
-
   const activePreview = previewMap[selectedMediaType];
-
   return (
     <Container variant="full-screen" className="py-12 md:py-20">
       <div className="space-y-8">
         <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) text-center animate-reveal">
           {t("home.socials_title")}
         </h2>
-
         {/* Mobile: preview at top + horizontal scroll badges */}
         <div className="sm:hidden space-y-6">
           <SocialContentPreview key={selectedMediaType} className="animate-media-swap" {...activePreview} />
@@ -135,27 +128,25 @@ export default function SocialsSection() {
               {mediaTypes.map((type) => (
                 <Button
                   variant={'text'}
-                  key={type.name}
-                  onClick={() => setSelectedMediaType(type.name)}
-                  className={`transition-colors ${selectedMediaType === type.name
+                  key={type.id}
+                  onClick={() => setSelectedMediaType(type.id)}
+                  className={`transition-colors ${selectedMediaType === type.id
                     ? "border-(--primary) bg-(--primary-card)"
                     : "border-(--outline) bg-(--card)"
                     }`}
                 >
                   <span className="text-xs font-bold uppercase tracking-wide text-(--on-bg-medium)">
-                    {type.name}
+                    {t(`home.socials.type.${type.id}`)}
                   </span>
                   <div className="flex items-center gap-2 pointer-events-none">
                     {type.icons.map((icon) => (
-                      <Button
+                      <div
                         key={icon.label}
                         aria-label={icon.label}
-                        variant={'text'}
-                        size={'chip-small'}
                         className="*:fill-(--on-bg-low)!"
                       >
                         {icon.icon}
-                      </Button>
+                      </div>
                     ))}
                   </div>
                 </Button>
@@ -163,26 +154,24 @@ export default function SocialsSection() {
             </div>
           </div>
         </div>
-
         {/* Desktop: preview + media types list */}
         <div className="hidden sm:grid grid-cols-1 sm:grid-cols-[500px_1fr] lg:grid-cols-[750px_1fr] xl:grid-cols-[1000px_1fr] 2xl:grid-cols-[1200px_1fr] items-center h-[60vh] 2xl:h-[80vh]">
           <div className="w-full h-[60vh] 2xl:h-[80vh] flex justify-center items-center aspect-video">
             <SocialContentPreview key={selectedMediaType} className="animate-media-swap" {...activePreview} />
           </div>
-
           {/* Media types list */}
           <div className="flex flex-col divide-y h-full divide-(--outline) border-y border-(--outline)">
             {mediaTypes.map((type) => (
               <button
-                key={type.name}
-                onClick={() => setSelectedMediaType(type.name)}
-                className={`h-full flex items-center justify-between p-4 group transition-colors cursor-pointer ${selectedMediaType === type.name
+                key={type.id}
+                onClick={() => setSelectedMediaType(type.id)}
+                className={`h-full flex items-center justify-between p-4 group transition-colors cursor-pointer ${selectedMediaType === type.id
                   ? "bg-(--primary-card)"
                   : "hover:bg-(--state-hover)"
                   }`}
               >
                 <span className="text-body-3 font-semibold text-(--on-bg-low) group-hover:text-(--on-bg-high) transition-colors">
-                  {type.name}
+                  {t(`home.socials.type.${type.id}`)}
                 </span>
                 <div className="flex items-center gap-1 pointer-events-none">
                   {type.icons.map((icon) => (

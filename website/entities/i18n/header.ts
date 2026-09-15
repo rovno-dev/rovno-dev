@@ -1,5 +1,4 @@
 import type { Language } from './translations';
-
 export const headerTranslations: Record<Language, Record<string, string>> = {
   en: {
     'nav.about': 'About',
@@ -8,6 +7,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.language': 'Language',
     'nav.login': 'Login',
     'nav.logout': 'Logout',
+    'nav.menu': 'Open menu',
     'nav.order': 'Make an Order',
     'nav.profile': 'Profile',
     'nav.projects': 'Projects',
@@ -19,6 +19,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.language': 'Язык',
     'nav.login': 'Войти',
     'nav.logout': 'Выйти',
+    'nav.menu': 'Открыть меню',
     'nav.order': 'Оформить заказ',
     'nav.profile': 'Профиль',
     'nav.projects': 'Проекты',
