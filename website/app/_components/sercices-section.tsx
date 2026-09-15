@@ -152,14 +152,14 @@ export default function ServicesSection() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 w-full">
+              <div className="no-scrollbar overflow-x-scroll flex gap-2 w-full">
                 {services.map((service, index) => {
                   const ServiceIcon = service.icon;
                   const isActive = index === selectedIndex;
                   return (
                     <Button
                       variant={'outlined'}
-                      className="flex-row h-[64px] w-full flex-1 p-2! relative overflow-hidden"
+                      className="h-[64px] w-[200px]! p-2! relative overflow-hidden"
                       key={service.title}
                       onClick={() => {
                         setSelectedIndex(index);
