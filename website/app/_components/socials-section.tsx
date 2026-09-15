@@ -129,7 +129,7 @@ export default function SocialsSection() {
 
         {/* Mobile: preview at top + horizontal scroll badges */}
         <div className="sm:hidden space-y-6">
-          <SocialContentPreview {...activePreview} />
+          <SocialContentPreview key={selectedMediaType} className="animate-media-swap" {...activePreview} />
           <div className=" px-4 overflow-x-auto no-scrollbar">
             <div className="flex gap-3 pb-2">
               {mediaTypes.map((type) => (
@@ -167,7 +167,7 @@ export default function SocialsSection() {
         {/* Desktop: preview + media types list */}
         <div className="hidden sm:grid grid-cols-1 sm:grid-cols-[500px_1fr] lg:grid-cols-[750px_1fr] xl:grid-cols-[1000px_1fr] 2xl:grid-cols-[1200px_1fr] items-center h-[60vh] 2xl:h-[80vh]">
           <div className="w-full h-[60vh] 2xl:h-[80vh] flex justify-center items-center aspect-video">
-            <SocialContentPreview {...activePreview} />
+            <SocialContentPreview key={selectedMediaType} className="animate-media-swap" {...activePreview} />
           </div>
 
           {/* Media types list */}
