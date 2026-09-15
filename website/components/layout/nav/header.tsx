@@ -20,6 +20,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { ListIcon } from "@phosphor-icons/react";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
@@ -49,9 +50,9 @@ export default function Header() {
         rounded-full mx-4 sm:px-6 sm:mx-0 mt-2 h-[55px] sm:h-[80px] px-6
         "
       >
-        <div className={cn((isLoading || user) ? "justify-between" : "justify-center sm:justify-between", "w-full flex items-center gap-6")}>
+        <div className={cn((isLoading || user) ? "sm:justify-between" : "justify-between", "w-full flex items-center gap-6")}>
           <Link href={'/'}>
-            <Logo className="!h-[30px] sm:h-[40px]" />
+            <Logo className="!h-[24px] sm:h-[40px]" />
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
@@ -99,6 +100,14 @@ export default function Header() {
               </DropdownMenu>
             ) : null
           )}
+          <Button
+            variant={'text'}
+            shape={'square'}
+            size="icon-small"
+            className="hidden sm:flex md:hidden"
+          >
+            <ListIcon />
+          </Button>
         </div>
       </Container>
     </header>

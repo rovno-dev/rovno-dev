@@ -53,9 +53,6 @@ export default function Footer() {
             <Link href="/" className="w-fit">
               <RovnoLogotypeWordmark className="h-8! w-auto" />
             </Link>
-            <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
-              {t("about.subtitle")}
-            </p>
             <div className="flex items-center gap-1 mt-2">
               <SocialButton href="https://t.me/rovno_dev" icon={<TelegramLogotypeMonoIcon />} />
               <SocialButton href="https://vk.com/rovno_dev" icon={<VKLogotypeMonoIcon />} />

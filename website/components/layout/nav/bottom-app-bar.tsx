@@ -5,7 +5,7 @@ import { Container } from "../../ui/container";
 import { useState } from "react";
 // import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../../ui/button";
-import { Box, Newspaper, Lightbulb, ListIcon } from "lucide-react"
+import { PackageIcon, NewspaperIcon, LightbulbIcon, ListIcon } from "@phosphor-icons/react"
 import Link from "next/link";
 import RovnoLogotypeIconEmpty from "../logo/logo-icon-empty";
 
@@ -14,14 +14,14 @@ export default function BottomAppBar() {
 
   const links = [
     // Pass the COMPONENT, not <Component />
-    { ...ROUTES.projects, icon: Box },
+    { ...ROUTES.projects, icon: PackageIcon },
     // { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
-    { href: ROUTES.blog.href, title: "Журнал", icon: Newspaper },
+    { href: ROUTES.blog.href, title: "Журнал", icon: NewspaperIcon },
     // { ...ROUTES.job, icon: BriefcaseBusiness  },
   ]
 
   return (
-    <nav className="md:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
+    <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
       <Container aria-label="Bottom app bar">
         <div className="p-4 grid grid-cols-[1fr_60px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
           {/* <div className="w-full h-full grid grid-cols-2 items-center">
@@ -48,18 +48,18 @@ export default function BottomAppBar() {
           <Button
             asChild
             shape={'round'}
-            className="w-full h-[60px] gap-2"
+            className="flex w-full h-[60px] gap-2"
             size="medium"
           >
             <Link href={ROUTES.order.href}>
-              <Lightbulb className="size-[26px]!" />
-              <span className="text-display-4">Заказ</span>
+              {/* <LightbulbIcon className="size-[26px]!" /> */}
+              <span className="text-heading-5">Оформить заказ</span>
             </Link>
           </Button>
           <Button
             variant={'text'}
             shape={'square'}
-            className="w-[60px]! h-[60px]! gap-2"
+            className="w-[60px]! h-[60px]! gap-2 sm:hidden"
             size="icon-medium"
           >
             <ListIcon className="size-12!" />

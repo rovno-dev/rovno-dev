@@ -16,56 +16,9 @@ import { BehanceLogoMono } from "@/components/icons/logotypes/behance-logo-mono"
 import { YoutubeLogoMono } from "@/components/icons/logotypes/youtube-logo-mono";
 import { TiktokLogoMono } from "@/components/icons/logotypes/tiktok-logo-mono";
 import { Button } from "@/components/ui/button";
-
-// Helper to create a simple square icon with a letter
-function LetterIcon({ letter, bg = "bg-current" }: { letter: string; bg?: string }) {
-  return (
-    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${bg}`}>
-      {letter}
-    </div>
-  );
-}
-
-// Brand icons for platforms without custom icons
-function TiktokIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-    </svg>
-  );
-}
-
-function YoutubeIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.5A3.02 3.02 0 0 0 .5 6.19C0 8.07 0 12 0 12s0 3.93.5 5.81a3.02 3.02 0 0 0 2.12 2.14c1.88.5 9.38.5 9.38.5s7.5 0 9.38-.5a3.02 3.02 0 0 0 2.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.81zM9.55 15.57V8.43L15.82 12l-6.27 3.57z" />
-    </svg>
-  );
-}
-
-function BehanceIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M7.5 8.5c1.2 0 2.1.3 2.7.9.6.6.9 1.4.9 2.4 0 1.1-.5 2-1.5 2.6 1.3.4 2.2 1.4 2.2 2.9 0 2.4-1.8 3.7-4.4 3.7H2V8.5h5.5zm-.4 4.9c.8 0 1.4-.2 1.8-.6.4-.4.6-.9.6-1.6 0-.6-.2-1.1-.6-1.5-.4-.4-1-.5-1.8-.5H5.1v4.2H7.1zm.3 5.2c.8 0 1.4-.2 1.9-.6.5-.4.7-1 .7-1.8 0-.7-.2-1.3-.7-1.7-.4-.4-1.1-.6-1.9-.6H5.1v4.7H7.4zM15.7 10.9c1.5 0 2.6.4 3.4 1.2.8.8 1.2 1.9 1.2 3.3v1h-6.9c.1.9.4 1.6 1 2.1.6.5 1.3.7 2.2.7.6 0 1.2-.1 1.7-.4.5-.2.9-.6 1.1-1h2.2c-.3 1.1-.9 2-1.9 2.6-.9.6-2 .9-3.3.9-1.1 0-2-.2-2.9-.6-.8-.4-1.5-1-1.9-1.8-.4-.8-.7-1.7-.7-2.7s.2-1.9.7-2.7c.5-.8 1.1-1.4 1.9-1.8.8-.5 1.7-.8 2.9-.8zm2.4 4c-.1-.8-.4-1.4-.9-1.8-.5-.4-1.2-.6-2.1-.6-.8 0-1.5.2-2 .7-.5.5-.8 1.1-.9 1.7h5.9zM15.3 6.5h5.5v1.3h-5.5V6.5z" />
-    </svg>
-  );
-}
-
-function VCIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 1.5L22.5 20H1.5L12 1.5z" />
-    </svg>
-  );
-}
-
-function HabrIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2L22 12L12 22L2 12L12 2z" />
-    </svg>
-  );
-}
+import { HabrLogotypeMonoIcon } from "@/components/icons/logotypes/habr-logo-mono";
+import { VCRULogotypeMonoIcon } from "@/components/icons/logotypes/vc-ru-logo-mono";
+import { MediumLogotypeMonoIcon } from "@/components/icons/logotypes/medium-logo-mono";
 
 // Media types data
 const mediaTypes = [
@@ -101,8 +54,9 @@ const mediaTypes = [
   {
     name: "Articles",
     icons: [
-      { label: "VC", icon: <VCIcon />, link: "https://vc.ru/rovno_dev" },
-      { label: "Habr", icon: <HabrIcon />, link: "https://habr.com/rovno_dev" },
+      { label: "VC", icon: <VCRULogotypeMonoIcon />, link: "https://vc.ru/rovno_dev" },
+      { label: "Habr", icon: <HabrLogotypeMonoIcon />, link: "https://habr.com/rovno_dev" },
+      { label: "Medium", icon: <MediumLogotypeMonoIcon />, link: "https:/ / habr.com / rovno_dev" },
     ],
   },
   {
@@ -179,10 +133,11 @@ export default function SocialsSection() {
           <div className=" px-4 overflow-x-auto no-scrollbar">
             <div className="flex gap-3 pb-2">
               {mediaTypes.map((type) => (
-                <button
+                <Button
+                  variant={'text'}
                   key={type.name}
                   onClick={() => setSelectedMediaType(type.name)}
-                  className={`flex flex-col items-center gap-2 px-4 py-3 rounded-2xl border transition-colors min-w-[140px] ${selectedMediaType === type.name
+                  className={`transition-colors ${selectedMediaType === type.name
                     ? "border-(--primary) bg-(--primary-card)"
                     : "border-(--outline) bg-(--card)"
                     }`}
@@ -196,13 +151,14 @@ export default function SocialsSection() {
                         key={icon.label}
                         aria-label={icon.label}
                         variant={'text'}
-                        size={'chip-medium'}
+                        size={'chip-small'}
+                        className="*:fill-(--on-bg-low)!"
                       >
                         {icon.icon}
                       </Button>
                     ))}
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -228,13 +184,13 @@ export default function SocialsSection() {
                 <span className="text-body-3 font-semibold text-(--on-bg-low) group-hover:text-(--on-bg-high) transition-colors">
                   {type.name}
                 </span>
-                <div className="flex items-center gap-4 pointer-events-none">
+                <div className="flex items-center gap-1 pointer-events-none">
                   {type.icons.map((icon) => (
                     <Button
                       key={icon.label}
                       aria-label={icon.label}
                       variant={'text'}
-                      className="p-0 [&>svg]:size-8 [&>svg>path]:fill-(--on-bg-low)! [&>svg>path]:group-hover:fill-(--on-bg-high)!"
+                      className="p-1 [&>svg]:size-8 [&>svg>path]:fill-(--on-bg-low)! [&>svg>path]:group-hover:fill-(--on-bg-high)!"
                       size={'chip-medium'}
                     >
                       {icon.icon}
