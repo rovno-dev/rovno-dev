@@ -1,11 +1,191 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Lock, RefreshCw } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "./ui/card";
 import { TerminalStyledInline } from "./layout/fancy/terminal-styled-inline";
+
+const REPO_README_URL = "https://raw.githubusercontent.com/unidoka/amorfa/main/README.md";
+
+const FALLBACK_README = `# Amorfa
+
+AI-optimized fullstack framework. Build an any app in hours
+
+## Files structure
+
+\`\`\`text
+/
+├── backend/
+│   ├── ...
+│   ├── env.example (.env vars especially for this repo)
+│   ├── Dockerfile (Dockerfile for service)
+│   └── docker-compose (separated logic if you want to make microservices)
+├── website/
+│   ├── ...
+│   ├── env.example (.env vars especially for this repo)
+│   ├── Dockerfile (Dockerfile for service)
+│   └── docker-compose (separated logic if you want to make microservices)
+├── env.example (common .env vars)
+├── .gitignore
+├── .repomixignore
+├── docker-compose
+└── README.md
+\`\`\`
+`;
+
+// ponytail: minimal inline markdown → JSX. Handles headings, fenced code, lists,
+// paragraphs, bold, inline code. Enough for README previews — no deps needed.
+function inlineMd(text: string, k: { n: number }): ReactNode[] {
+  const out: ReactNode[] = [];
+  const re = /(`[^`]+`|\*\*[^*]+\*\*)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("`")) {
+      out.push(
+        <code key={k.n++} className="rounded bg-(--bg-disabled) px-1 py-0.5 text-[11px] font-mono">
+          {t.slice(1, -1)}
+        </code>
+      );
+    } else {
+      out.push(
+        <strong key={k.n++} className="font-semibold text-(--on-bg-high)">
+          {t.slice(2, -2)}
+        </strong>
+      );
+    }
+    last = m.index + t.length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+function renderMd(md: string): ReactNode[] {
+  const lines = md.split("\n");
+  const out: ReactNode[] = [];
+  const k = { n: 0 };
+  const hSizes = ["text-lg", "text-base", "text-sm", "text-sm", "text-xs", "text-xs"];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // fenced code block
+    const fence = line.match(/^```(\w*)\s*$/);
+    if (fence) {
+      const buf: string[] = [];
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i])) {
+        buf.push(lines[i]);
+        i++;
+      }
+      i++;
+      out.push(
+        <pre
+          key={k.n++}
+          className="my-2 rounded-lg bg-(--bg-disabled) p-3 overflow-x-auto text-[11px] font-mono leading-relaxed"
+        >
+          <code>{buf.join("\n")}</code>
+        </pre>
+      );
+      continue;
+    }
+
+    // heading
+    const h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h) {
+      const lvl = h[1].length;
+      out.push(
+        <p key={k.n++} className={cn("font-bold text-(--on-bg-high) mt-3 mb-1", hSizes[lvl - 1])}>
+          {h[2]}
+        </p>
+      );
+      i++;
+      continue;
+    }
+
+    // unordered list
+    if (/^\s*[-*]\s+/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^\s*[-*]\s+/, ""));
+        i++;
+      }
+      out.push(
+        <ul key={k.n++} className="list-disc pl-5 my-2 space-y-0.5 text-(--on-bg-medium)">
+          {items.map((it, idx) => (
+            <li key={idx}>{inlineMd(it, k)}</li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // blank
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
+
+    // paragraph
+    const buf: string[] = [line];
+    i++;
+    while (
+      i < lines.length &&
+      lines[i].trim() !== "" &&
+      !/^(#{1,6})\s|^```|^\s*[-*]\s/.test(lines[i])
+    ) {
+      buf.push(lines[i]);
+      i++;
+    }
+    out.push(
+      <p key={k.n++} className="my-2 leading-relaxed text-(--on-bg-medium)">
+        {inlineMd(buf.join(" "), k)}
+      </p>
+    );
+  }
+  return out;
+}
+
+function RepoReadme() {
+  const [content, setContent] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(REPO_README_URL)
+      .then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
+      .then((text) => {
+        if (!cancelled) setContent(text);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (failed) return <>{renderMd(FALLBACK_README)}</>;
+  if (content === null)
+    return <p className="text-xs text-(--on-bg-low) animate-pulse">Loading README...</p>;
+  return <>{renderMd(content)}</>;
+}
+
+function ClickHint() {
+  return (
+    <div className="flex items-center gap-1.5 pt-3 mt-2 border-t border-border text-[11px] font-medium text-(--on-bg-low) group-hover:text-primary transition-colors">
+      <span>Click and see more</span>
+      <ArrowUpRight
+        size={12}
+        className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+      />
+    </div>
+  );
+}
 
 export interface ShortVideoProps {
   video: {
@@ -44,7 +224,6 @@ export function ShortVideo({ video, title, description, className }: ShortVideoP
 
 export function FakeAddressBar({ url }: { url: string }) {
   const displayUrl = url.replace(/(^\w+:|^)\/\//, "");
-
   return (
     <div className="w-full bg-muted/60 border-b border-border px-4 py-2 flex items-center gap-2 text-xs text-muted-foreground select-none shrink-0">
       <div className="flex gap-1.5 opacity-60">
@@ -100,10 +279,8 @@ export function SocialContentPreview({
       )}
     >
       <FakeAddressBar url={link} />
-
       {/* Главная рабочая область контента */}
       <div className="w-full flex-1 flex items-center justify-center p-6 overflow-hidden min-h-0 relative bg-neutral-950/5 dark:bg-transparent">
-
         {/* Short Videos (Исправлено выравнивание и пропорции 9:16) */}
         {type === "short-video" && (
           <article className="flex items-center justify-center gap-6 w-full h-full max-h-full py-2">
@@ -133,7 +310,6 @@ export function SocialContentPreview({
             />
           </article>
         )}
-
         {/* Long Video (Исправлено под формат 16:9 с сохранением пропорций) */}
         {type === "video" && (
           <article className="w-full h-full max-w-full max-h-full flex items-center justify-center bg-black rounded-lg overflow-hidden border border-border/40 relative aspect-[16/9]">
@@ -153,14 +329,13 @@ export function SocialContentPreview({
             </div>
           </article>
         )}
-
         {/* Article */}
         {type === "article" && (
           <Card className="mx-auto w-full max-w-xl lg:max-w-2xl shadow-lg border-border flex flex-col max-h-full overflow-hidden">
             <div className="px-4 py-2 border-b border-border bg-muted/30">
               <p className="text-xs font-medium text-muted-foreground">Articles</p>
             </div>
-            <div className="p-5 space-y-3 overflow-y-auto min-h-0">
+            <div className="p-5 space-y-3 overflow-y-auto min-h-0 flex-1">
               <h3 className="text-xl font-bold tracking-tight">{title}</h3>
               {description && <p className="text-sm text-muted-foreground">{description}</p>}
               {thumbnail && (
@@ -177,24 +352,27 @@ export function SocialContentPreview({
                 </div>
               )}
             </div>
+            <div className="px-5 pb-4 pt-0 shrink-0">
+              <ClickHint />
+            </div>
           </Card>
         )}
-
         {/* Repository */}
         {type === "repo" && (
           <Card className="mx-auto w-full max-w-xl lg:max-w-2xl shadow-lg border-border flex flex-col max-h-full overflow-hidden">
             <div className="px-4 py-2 border-b border-border bg-muted/30">
               <p className="text-xs font-medium text-muted-foreground">Dev</p>
             </div>
-            <div className="p-5 space-y-3 overflow-y-auto min-h-0">
-              <h3 className="text-display-3 font-bold font-mono">{title}</h3>
+            <div className="p-5 space-y-3 overflow-y-auto min-h-0 flex-1">
               <TerminalStyledInline className="w-full!" />
-              <h4 className="text-display-4 font-bold font-mono">File Structure</h4>
-
+              <h3 className="text-display-3 font-bold font-mono">{title}</h3>
+              <RepoReadme />
+            </div>
+            <div className="px-5 pb-4 pt-0 shrink-0">
+              <ClickHint />
             </div>
           </Card>
         )}
-
         {/* Telegram Post */}
         {type === "post" && (
           <Card className="mx-auto w-full max-w-xl lg:max-w-2xl shadow-lg border-border bg-background flex flex-col max-h-full overflow-hidden">
@@ -220,7 +398,7 @@ export function SocialContentPreview({
                 <ArrowUpRight size={16} />
               </div>
             </div>
-            <div className="p-4 space-y-2.5 overflow-y-auto min-h-0">
+            <div className="p-4 space-y-2.5 overflow-y-auto min-h-0 flex-1">
               <h3 className="text-sm font-semibold">{title}</h3>
               {description && <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>}
               {thumbnail && (
@@ -235,9 +413,11 @@ export function SocialContentPreview({
                 </div>
               )}
             </div>
+            <div className="px-4 pb-3 pt-0 shrink-0">
+              <ClickHint />
+            </div>
           </Card>
         )}
-
       </div>
     </Link>
   );
