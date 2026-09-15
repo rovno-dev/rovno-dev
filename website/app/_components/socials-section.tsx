@@ -99,14 +99,14 @@ export default function SocialsSection() {
       type: "post",
       title: "Pro notes: 5 tips for faster development",
       description: "Our team shares practical advice.",
-      thumbnail: "/images/projects/sadovod.png",
+      thumbnail: "/images/article.jpeg",
       link: "https://t.me/rovno_dev",
     },
     "Articles": {
       type: "article",
       title: "Why we chose Next.js for our new platform",
       description: "A deep dive into our tech stack decisions.",
-      thumbnail: "/images/projects/alx.png",
+      thumbnail: "/images/infra-blue.png",
       link: "https://vc.ru/rovno_dev",
     },
     "Dev": {

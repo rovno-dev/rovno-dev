@@ -263,9 +263,9 @@ export function SocialContentPreview({
   thumbnail,
   link,
   className,
-  authorAvatar = "/default-avatar.png",
-  authorName = "Author",
-  date = "now",
+  authorAvatar = "/images/logotype-icon.png",
+  authorName = "Rovno.dev",
+  date = "",
   isVerified = false,
 }: SocialContentPreviewProps) {
   return (
