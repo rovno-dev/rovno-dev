@@ -3,7 +3,9 @@ import { getAllProjects } from "@/app/_data/projects/parser";
 import { PROJECTS } from "@/app/_data/projects";
 import PageHeadingSection from "@/components/layout/page/page-heading-section";
 import { FilterBar } from "./filter-bar";
-import { fetchProjectCategories } from "@/utils/api/categories";
+import { PROJECT_CATEGORIES } from "@/app/_data/categories";
+// import { fetchProjectCategories } from "@/utils/api/categories";
+
 export default async function ProjectsPage() {
   // 1. Projects from MDX files in _data/projects/content/
   const mdxProjects = getAllProjects();
@@ -16,8 +18,17 @@ export default async function ProjectsPage() {
     seen.add(p.slug);
     return true;
   });
-  const categories = await fetchProjectCategories();
-  const categoryMap = Object.fromEntries(categories.map(c => [c.code, c.label]));
+
+  // TODO: swap back to backend-provided categories once the API is ready
+  // const categories = await fetchProjectCategories();
+  const categories = PROJECT_CATEGORIES.map((c) => ({
+    id: c.code,
+    code: c.code,
+    label: c.label,
+  }));
+
+  const categoryMap = Object.fromEntries(categories.map((c) => [c.code, c.label]));
+
   return (
     <main className="min-h-screen bg-(--bg)">
       <PageHeadingSection title="Проекты" description="Высокопроизводительные цифровые решения." />

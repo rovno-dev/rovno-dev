@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/container";
 import { Project, PROJECTS } from "@/app/_data/projects";
 import { getAllProjects } from "@/app/_data/projects/parser";
 import { CLIENTS } from "@/app/_data/clients";
+import { PROJECT_CATEGORIES } from "@/app/_data/categories";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -28,8 +29,10 @@ import {
   MDXTd,
   MDXCard,
 } from "@/components/mdx";
-import { fetchProjectCategories } from "@/utils/api/categories";
+// import { fetchProjectCategories } from "@/utils/api/categories";
+
 export const dynamic = "force-static";
+
 export async function generateStaticParams() {
   const mdxProjects = getAllProjects();
   const dataProjects = Object.values(PROJECTS);
@@ -41,6 +44,7 @@ export async function generateStaticParams() {
   });
   return all.map((project) => ({ slug: project.slug }));
 }
+
 const components = {
   h1: (props: any) => <MDXHeading level={1} {...props} />,
   h2: (props: any) => <MDXHeading level={2} {...props} />,
@@ -66,6 +70,7 @@ const components = {
   Gallery,
   MetricCard,
 };
+
 const getCompiledMDX = cache(async (content: string, slug: string) => {
   const { content: compiled } = await compileMDX({
     source: content,
@@ -74,15 +79,20 @@ const getCompiledMDX = cache(async (content: string, slug: string) => {
   });
   return compiled;
 });
+
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+
   // 1. Try MDX-based projects from _data/projects/content/
   const mdxProjects = getAllProjects();
   const mdxProject = mdxProjects.find((p) => p.slug === slug);
+
   // 2. Fallback to PROJECTS object from _data/projects/index.tsx
   const fallbackProject = PROJECTS[slug] as Project | undefined;
+
   const projectData = mdxProject || fallbackProject;
   if (!projectData) notFound();
+
   // Try to load MDX content (only for MDX-based projects)
   let mdxContent = null;
   if (mdxProject) {
@@ -96,14 +106,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       mdxContent = await getCompiledMDX(content, slug);
     }
   }
+
   const client = projectData.clientId ? CLIENTS[projectData.clientId] : null;
-  // Fetch category label from backend (kept for future backend integration)
+
+  // TODO: swap back to backend-provided categories once the API is ready
+  // let categoryLabel = projectData.category || "";
+  // if (projectData.category) {
+  //   const categories = await fetchProjectCategories();
+  //   const found = categories.find((c) => c.code === projectData.category);
+  //   if (found) categoryLabel = found.label;
+  // }
   let categoryLabel = projectData.category || "";
   if (projectData.category) {
-    const categories = await fetchProjectCategories();
-    const found = categories.find(c => c.code === projectData.category);
+    const found = PROJECT_CATEGORIES.find((c) => c.code === projectData.category);
     if (found) categoryLabel = found.label;
   }
+
   return (
     <>
       <ProjectHero
