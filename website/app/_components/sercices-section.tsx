@@ -143,11 +143,11 @@ export default function ServicesSection() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 mb-8">
                   <div className="flex flex-col">
                     <span className="text-xs text-(--on-bg-medium)">{t("services.from")}</span>
-                    <span className="text-3xl font-semibold">{currentService.price.from} ₽</span>
+                    <span className="text-2xl font-semibold">{currentService.price.from} ₽</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-(--on-bg-medium)">{t("services.avg_label")}</span>
-                    <span className="text-3xl font-semibold">{currentService.price.avg} ₽</span>
+                    <span className="text-2xl font-semibold">{currentService.price.avg} ₽</span>
                   </div>
                 </div>
               </div>

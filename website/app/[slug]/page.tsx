@@ -89,7 +89,7 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
       </Container>
 
       {/* ───────── About + Tags ───────── */}
-      <Container variant="full-width" className="pt-10 md:pt-20">
+      <Container variant="full-width" className="pt-10 md:pt-14">
         <div
           className={`${CONTENT_MAX} grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 lg:gap-16 items-start`}
         >
@@ -130,7 +130,7 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {expert.projects.map((project, idx) => (
               <ProjectCard key={project.id || idx} project={project} index={idx} />
             ))}

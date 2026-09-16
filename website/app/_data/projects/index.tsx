@@ -34,7 +34,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Редизайн интернет-магазина электроники с ростом конверсии +45%.",
     cover: {
       videoSrc: 'https://kinescope.io/74B6UBPTKLNKGBTunQ5bH8',
-      imageSrc: '/_static/projects/vanguard/vanguard-cover.png',
+      imageSrc: '/static-images/projects/vanguard/vanguard-cover.png',
     },
     href: "https://dprofile.ru/case/116595/vanguard-internet-magazin-elektroniki",
     category: "e-commerce",
@@ -50,7 +50,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Разработка айдентики и веб-сайта для технологической компании ALX.",
     cover: {
       videoSrc: 'https://kinescope.io/kbb8cwdAPa5tuNS7NDuDJm',
-      imageSrc: '/_static/projects/alx/alx-cover.png',
+      imageSrc: '/static-images/projects/alx/alx-cover.png',
     },
     href: "https://dprofile.ru/case/124174/cuzoi-alx-9-ii-vystavka",
     category: "identity",
@@ -67,7 +67,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Интернет-магазин для крупнейшего рынка садовых товаров с удобным каталогом.",
     cover: {
       videoSrc: '',
-      imageSrc: '/_static/projects/sadovod/sadovod-cover.png',
+      imageSrc: '/static-images/projects/sadovod/sadovod-cover.png',
     },
     href: "https://dprofile.ru/case/162985/sadovod-internet-magazin",
     category: "e-commerce",
@@ -83,7 +83,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Сайт премиального теннисного клуба в Техасе, США.",
     cover: {
       videoSrc: '',
-      imageSrc: '/_static/projects/courtElegance/courtElegance-cover.png',
+      imageSrc: '/static-images/projects/courtElegance/courtElegance-cover.png',
     },
     href: "https://dprofile.ru/case/160100/the-court-elegance-tennisnyi-klub",
     category: "e-commerce",
@@ -99,7 +99,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Айдентика и промо-ролик для продуктовой серии «Хлебная Страна».",
     cover: {
       videoSrc: 'https://kinescope.io/7Y5P3U8JHseTQB8n6CgLjq',
-      imageSrc: '/_static/projects/bread/bread-cover.png',
+      imageSrc: '/static-images/projects/bread/bread-cover.png',
     },
     href: "https://dprofile.ru/case/168046/xlebnaia-strana-promo-rolik",
     category: "identity",
@@ -115,7 +115,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Дизайн сайта и айдентика для строительной компании Concord Construction.",
     cover: {
       videoSrc: 'https://kinescope.io/3s92BgDF6MgamUYs3TtqJC',
-      imageSrc: '/_static/projects/concord/concord-cover.png',
+      imageSrc: '/static-images/projects/concord/concord-cover.png',
     },
     href: "https://dprofile.ru/case/185165/concord-construction-stroitelnaia-kompaniia",
     category: "corporative",
@@ -131,7 +131,7 @@ export const PROJECTS: Record<string, Project> = {
     shortDescription: "Дизайн сайта и айдентика для строительной компании Concord Construction.",
     cover: {
       videoSrc: '',
-      imageSrc: '/_static/projects/lostPlay/lostPlay-cover.png',
+      imageSrc: '/static-images/projects/lostPlay/lostPlay-cover.png',
     },
     href: "https://dprofile.ru/case/185165/concord-construction-stroitelnaia-kompaniia",
     category: "corporative",

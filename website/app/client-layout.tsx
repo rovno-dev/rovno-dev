@@ -20,7 +20,7 @@ export default function ClientRootLayout({
     <>
       <Header />
       <div className="relative" key={lang}>
-        <main className={cn(pathname == '/' ? "mt-0" : "mt-[46px] md:mt-[88px]", "mb-[100px]")}>
+        <main className={cn(pathname == '/' ? "mt-0" : "mt-[46px] md:mt-[88px]", "mb-0")}>
           {children}
         </main>
         <Footer />

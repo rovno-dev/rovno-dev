@@ -74,21 +74,21 @@ export default function SocialsSection() {
       type: "short-video",
       title: t("home.socials.preview.shorts.title"),
       description: t("home.socials.preview.shorts.description"),
-      thumbnail: "/_static/projects/alx/alx-cover.png",
+      thumbnail: "/static-images/projects/alx/alx-cover.png",
       link: "https://youtube.com/rovno_dev",
     },
     videos: {
       type: "video",
       title: t("home.socials.preview.videos.title"),
       description: t("home.socials.preview.videos.description"),
-      thumbnail: "/_static/projects/bread/bread-cover.png",
+      thumbnail: "/static-images/projects/bread/bread-cover.png",
       link: "https://youtube.com/rovno_dev",
     },
     design: {
       type: "article",
       title: t("home.socials.preview.design.title"),
       description: t("home.socials.preview.design.description"),
-      thumbnail: "/_static/projects/alx/alx-cover.png",
+      thumbnail: "/static-images/projects/alx/alx-cover.png",
       link: "https://dprofile.ru/rovno_dev",
     },
     pro_notes: {
@@ -175,15 +175,13 @@ export default function SocialsSection() {
                 </span>
                 <div className="flex items-center gap-1 pointer-events-none">
                   {type.icons.map((icon) => (
-                    <Button
+                    <div
                       key={icon.label}
                       aria-label={icon.label}
-                      variant={'text'}
                       className="p-1 [&>svg]:size-8 [&>svg>path]:fill-(--on-bg-low)! [&>svg>path]:group-hover:fill-(--on-bg-high)!"
-                      size={'chip-medium'}
                     >
                       {icon.icon}
-                    </Button>
+                    </div>
                   ))}
                 </div>
               </button>
