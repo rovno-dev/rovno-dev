@@ -13,15 +13,43 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { FileIcon, ImageIcon, FileText, Download, Phone, Mail } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  FileText,
+  Download,
+  Phone,
+  Mail,
+  ImageIcon,
+  X,
+} from "lucide-react";
 import { $fetch } from "@/utils/fetch";
 import Link from "next/link";
 import { TelegramLogotypeMonoIcon } from "@/components/icons";
+import { cn } from "@/lib/utils";
+
 interface OrderFile {
   id: string;
   filename: string;
   file_path: string;
 }
+
+type OrderStatus = "new" | "negotiating" | "work" | "done" | "canceled";
+
 interface Order {
   id: string;
   contact_id: string;
@@ -30,6 +58,8 @@ interface Order {
   estimate_deadline: string;
   estimate_budget: string;
   naming_help: string;
+  status: OrderStatus;
+  cancellation_reason: string | null;
   created_at: string;
   files: OrderFile[];
   contact?: {
@@ -40,15 +70,53 @@ interface Order {
     telegram_username?: string;
   };
 }
+
+const STATUS_META: Record<OrderStatus, { label: string; className: string }> = {
+  new: {
+    label: "Новая",
+    className: "bg-blue-500/15 text-blue-500 border-blue-500/30",
+  },
+  negotiating: {
+    label: "Обсуждение",
+    className: "bg-amber-500/15 text-amber-500 border-amber-500/30",
+  },
+  work: {
+    label: "В работе",
+    className: "bg-violet-500/15 text-violet-500 border-violet-500/30",
+  },
+  done: {
+    label: "Готово",
+    className: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
+  },
+  canceled: {
+    label: "Отменена",
+    className: "bg-rose-500/15 text-rose-500 border-rose-500/30",
+  },
+};
+
+const STATUS_ORDER: OrderStatus[] = ["new", "negotiating", "work", "done", "canceled"];
+
+const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
+
 export default function AdminOrdersPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // cancel dialog state
+  const [cancelFor, setCancelFor] = useState<Order | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  // lightbox for the big image view
+  const [lightbox, setLightbox] = useState<{ src: string; name: string } | null>(null);
+
   useEffect(() => {
     if (!user) return;
     fetchOrders();
   }, [user]);
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -64,42 +132,89 @@ export default function AdminOrdersPage() {
       setLoading(false);
     }
   };
+
   if (userLoading || !user) return null;
   if (user.role !== "admin" && user.role !== "root") {
     router.push("/");
     return null;
   }
+
+  const applyStatus = async (
+    order: Order,
+    status: OrderStatus,
+    reason?: string
+  ) => {
+    setSavingId(order.id);
+    try {
+      const res = await $fetch(`/api/v1/admin/order-requests/${order.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status, cancellation_reason: reason ?? null }),
+        headers: { "Content-Type": "application/json" },
+        isToast: false,
+      });
+      if (!res.response?.ok) {
+        toast.error(res.json?.detail || "Не удалось обновить статус");
+        return;
+      }
+      const updated = res.json as Order;
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === order.id
+            ? { ...o, status: updated.status, cancellation_reason: updated.cancellation_reason }
+            : o
+        )
+      );
+    } catch {
+      toast.error("Ошибка соединения");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const handleStatusChange = (order: Order, next: OrderStatus) => {
+    if (next === "canceled") {
+      setCancelFor(order);
+      setCancelReason("");
+      return;
+    }
+    applyStatus(order, next);
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelFor) return;
+    await applyStatus(cancelFor, "canceled", cancelReason.trim() || undefined);
+    setCancelFor(null);
+    setCancelReason("");
+  };
+
   const exportToCSV = () => {
-    // Build CSV rows
-    const headers = ["ID", "Описание", "Услуги", "Срок", "Бюджет", "Нейминг", "Дата"];
-    const rows = orders.map(o => [
+    const headers = ["ID", "Статус", "Описание", "Услуги", "Срок", "Бюджет", "Нейминг", "Причина отмены", "Дата"];
+    const rows = orders.map((o) => [
       o.id,
+      STATUS_META[o.status]?.label ?? o.status,
       o.about || "",
       (o.service_types_json || []).join(", "),
       o.estimate_deadline || "",
       o.estimate_budget || "",
       o.naming_help || "",
+      o.cancellation_reason || "",
       new Date(o.created_at).toLocaleDateString(),
     ]);
-    // Escape fields that contain commas or quotes
     const escape = (field: string) => {
       if (field.includes(",") || field.includes('"') || field.includes("\n")) {
         return `"${field.replace(/"/g, '""')}"`;
       }
       return field;
     };
-    const csvRows = [
-      headers.join(","),
-      ...rows.map(row => row.map(escape).join(","))
-    ];
-    const csv = csvRows.join("\n");
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); // BOM for Excel
+    const csvRows = [headers.join(","), ...rows.map((row) => row.map(escape).join(","))];
+    const blob = new Blob(["\uFEFF" + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "orders.csv";
     link.click();
     URL.revokeObjectURL(link.href);
   };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -111,6 +226,7 @@ export default function AdminOrdersPage() {
           Экспорт CSV
         </Button>
       </div>
+
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
@@ -118,115 +234,227 @@ export default function AdminOrdersPage() {
           ))}
         </div>
       )}
+
       {!loading && orders.length === 0 && (
         <p className="text-muted-foreground text-center py-8">Нет заявок</p>
       )}
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        {orders.map((order) => (
-          <Card key={order.id} className="p-6 shadow-sm border-(--outline) rounded-3xl flex flex-col h-full">
-            <div className="space-y-3">
-              <div className="flex justify-between items-start">
-                <h3 className="text-heading-4 truncate">#{order.id.slice(0, 8)}</h3>
-                <span className="text-xs text-muted-foreground">
-                  Заказ от: {new Date(order.created_at).toLocaleDateString()}
-                </span>
-              </div>
-              {order.about &&
+        {orders.map((order) => {
+          const meta = STATUS_META[order.status] ?? STATUS_META.new;
+          const isSaving = savingId === order.id;
+          return (
+            <Card key={order.id} className="p-6 shadow-sm border-(--outline) rounded-3xl flex flex-col h-full">
+              <div className="space-y-3">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h3 className="text-heading-4 truncate">#{order.id.slice(0, 8)}</h3>
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap",
+                        meta.className
+                      )}
+                    >
+                      {meta.label}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(order.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {/* Status control */}
+                <div className="flex items-center gap-2">
+                  <span className="text-body-5 text-muted-foreground">Статус:</span>
+                  <Select
+                    value={order.status}
+                    onValueChange={(v) => handleStatusChange(order, v as OrderStatus)}
+                    disabled={isSaving}
+                  >
+                    <SelectTrigger size="sm" className="w-[160px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_ORDER.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {STATUS_META[s].label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {order.status === "canceled" && order.cancellation_reason && (
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2">
+                    <p className="text-[11px] uppercase tracking-wider text-rose-500/80 mb-0.5">
+                      Причина отмены
+                    </p>
+                    <p className="text-body-4 text-(--on-bg-high)">{order.cancellation_reason}</p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="font-medium text-body-3">О проекте:</span>
                     <p className="text-muted-foreground line-clamp-2">
-                      {order.about}
+                      {order.about || "—"}
                     </p>
                   </div>
                   <div>
-                    <span className="font-medium text-body-3">О проекте:</span>
+                    <span className="font-medium text-body-3">Услуги:</span>
                     <p className="text-muted-foreground line-clamp-2">
                       {order.service_types_json?.join(", ") || "—"}
                     </p>
                   </div>
                 </div>
-              }
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-body-5 space-y-1">
-                  <p><span className="font-medium">Срок:</span> {order.estimate_deadline || "—"}</p>
-                  <p><span className="font-medium">Бюджет:</span> {order.estimate_budget || "—"}</p>
-                  <p><span className="font-medium">Нейминг:</span> {order.naming_help || "—"}</p>
-                </div>
-                <div className="text-body-5 space-y-1">
-                  <p><span className="font-medium">Имя:</span> {order.contact?.name || "—"}</p>
-                  <div className="flex gap-1 items-center">
-                    <Phone className="size-3" />
-                    <p>{order.contact?.phone || "—"}</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-body-5 space-y-1">
+                    <p><span className="font-medium">Срок:</span> {order.estimate_deadline || "—"}</p>
+                    <p><span className="font-medium">Бюджет:</span> {order.estimate_budget || "—"}</p>
+                    <p><span className="font-medium">Нейминг:</span> {order.naming_help || "—"}</p>
                   </div>
-                  <div className="flex gap-1 items-center">
-                    <Mail className="size-3" />
-                    <p> {order.contact?.email || "—"}</p>
-                  </div>
-                  <div className="flex gap-1 items-center">
-                    <TelegramLogotypeMonoIcon className="size-3! [&>path]:fill-(--on-bg-high)" />
-                    <p>{order.contact?.telegram_username || "—"}</p>
+                  <div className="text-body-5 space-y-1">
+                    <p><span className="font-medium">Имя:</span> {order.contact?.name || "—"}</p>
+                    <div className="flex gap-1 items-center">
+                      <Phone className="size-3" />
+                      <p>{order.contact?.phone || "—"}</p>
+                    </div>
+                    <div className="flex gap-1 items-center">
+                      <Mail className="size-3" />
+                      <p>{order.contact?.email || "—"}</p>
+                    </div>
+                    <div className="flex gap-1 items-center">
+                      <TelegramLogotypeMonoIcon className="size-3! [&>path]:fill-(--on-bg-high)" />
+                      <p>{order.contact?.telegram_username || "—"}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            {
-              order.files && order.files.length > 0 && (
+
+              {order.files && order.files.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-heading-5 mb-3">Файлы</h4>
                   <Carousel className="w-full mx-auto">
                     <CarouselContent>
-                      {order.files.map((file, idx) => (
-                        <CarouselItem key={file.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3">
-                          <div className="flex flex-col items-center p-2 border rounded-lg h-24 justify-center bg-muted/20">
-                            {file.filename.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? (
-                              <ImageIcon className="size-8 aspect-square! text-muted-foreground" />
-                            ) : (
-                              <FileText className="size-8 aspect-square! text-muted-foreground" />
-                            )}
-                            <span className="text-[10px] truncate w-full text-center">{file.filename}</span>
-                            <a href={file.file_path} target="_blank" className="mt-1">
-                              <Download className="size-3 text-primary" />
-                            </a>
-                          </div>
-                        </CarouselItem>
-                      ))}
+                      {order.files.map((file) => {
+                        const isImage = IMAGE_EXT.test(file.filename);
+                        return (
+                          <CarouselItem key={file.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/3">
+                            <div className="relative flex flex-col items-center border rounded-lg h-28 overflow-hidden bg-muted/20">
+                              {isImage ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setLightbox({ src: file.file_path, name: file.filename })}
+                                  className="relative w-full h-full group"
+                                >
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={file.file_path}
+                                    alt={file.filename}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                  <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] truncate px-1 py-0.5">
+                                    {file.filename}
+                                  </span>
+                                </button>
+                              ) : (
+                                <>
+                                  <FileText className="size-8 aspect-square! text-muted-foreground mt-3" />
+                                  <span className="text-[10px] truncate w-full text-center px-1 mt-1">{file.filename}</span>
+                                  <a href={file.file_path} target="_blank" rel="noreferrer" className="mt-1">
+                                    <Download className="size-3 text-primary" />
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          </CarouselItem>
+                        );
+                      })}
                     </CarouselContent>
                     <CarouselPrevious className="-left-4" />
                     <CarouselNext className="-right-4" />
                   </Carousel>
                 </div>
-              )
-            }
-            {
-              (order.contact?.telegram_username && order.contact?.phone) ? (
-                <div aria-label="order-buttons" className="mt-2 grid gap-2 grid-cols-2">
-                  <Button
-                    variant={'filled'}
-                    asChild
-                  >
-                    <Link href={`https://t.me/${order.contact?.telegram_username || ""}`}>
-                      <TelegramLogotypeMonoIcon className="[&>path]:fill-white!" />
-                      Telegram
-                    </Link>
-                  </Button>
-                  <Button
-                    variant={'filled'}
-                    asChild
-                  >
-                    <Link href={`tel:${order.contact?.phone || ""}`}>
-                      <Phone />
-                      Позвонить
-                    </Link>
-                  </Button>
+              )}
+
+              {(order.contact?.telegram_username || order.contact?.phone) ? (
+                <div aria-label="order-buttons" className="mt-4 grid gap-2 grid-cols-2">
+                  {order.contact?.telegram_username && (
+                    <Button variant="filled" asChild>
+                      <Link href={`https://t.me/${order.contact.telegram_username.replace(/^@/, "")}`}>
+                        <TelegramLogotypeMonoIcon className="[&>path]:fill-white!" />
+                        Telegram
+                      </Link>
+                    </Button>
+                  )}
+                  {order.contact?.phone && (
+                    <Button variant="filled" asChild>
+                      <Link href={`tel:${order.contact.phone}`}>
+                        <Phone />
+                        Позвонить
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               ) : (
-                <p className="mt-2">Контакты отсутсвуют</p>
-              )
-            }
-          </Card>
-        ))}
+                <p className="mt-4 text-muted-foreground text-body-5">Контакты отсутствуют</p>
+              )}
+            </Card>
+          );
+        })}
       </div>
-    </div >
+
+      {/* Cancel-reason dialog */}
+      <Dialog open={!!cancelFor} onOpenChange={(open) => { if (!open) { setCancelFor(null); setCancelReason(""); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Отменить заявку #{cancelFor?.id.slice(0, 8)}</DialogTitle>
+          </DialogHeader>
+          <Field>
+            <FieldLabel>Причина отмены (опционально)</FieldLabel>
+            <Textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Например: клиент не отвечает"
+              className="min-h-[90px]"
+            />
+          </Field>
+          <DialogFooter>
+            <Button variant="outlined" onClick={() => { setCancelFor(null); setCancelReason(""); }}>
+              Назад
+            </Button>
+            <Button onClick={confirmCancel} disabled={savingId === cancelFor?.id}>
+              Отменить заявку
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image lightbox */}
+      <Dialog open={!!lightbox} onOpenChange={(open) => { if (!open) setLightbox(null); }}>
+        <DialogContent
+          showCloseButton={false}
+          className="!fixed !inset-0 !top-0 !left-0 !translate-none !max-w-none !max-h-none !w-screen !h-screen !p-0 !border-0 !rounded-none !bg-black/95 flex items-center justify-center"
+        >
+          <Button
+            variant="glass"
+            size="icon-medium"
+            className="absolute top-4 right-4 z-50 rounded-full border-white/20"
+            onClick={() => setLightbox(null)}
+          >
+            <X className="size-6! text-white" />
+          </Button>
+          {lightbox && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={lightbox.src}
+              alt={lightbox.name}
+              className="max-w-[92vw] max-h-[92vh] object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, case
 from typing import List, Optional
 from datetime import datetime, timedelta
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from app.shared.auth import get_current_user, hash_password
 from app.models.user import User, UserRole, UserStatus
-from app.models.order_request import OrderRequest
+from app.models.order_request import OrderRequest, OrderStatus
 from app.models.company import Company
 from app.models.article import Article
 from app.models.project import Project
@@ -250,16 +250,65 @@ class OrderRequestWithFiles(BaseModel):
     estimate_deadline: Optional[str]
     estimate_budget: Optional[str]
     naming_help: Optional[str]
+    status: OrderStatus
+    cancellation_reason: Optional[str] = None
     created_at: datetime
     files: List[OrderRequestFileResponse]
     contact: Optional[ContactResponse]
     class Config:
         from_attributes = True
 
+# ponytail: pipeline ordering — new leads on top, dead deals at the bottom.
+# Within a bucket, newest first so today's submissions surface immediately.
+STATUS_PRIORITY = case(
+    (OrderRequest.status == OrderStatus.new, 0),
+    (OrderRequest.status == OrderStatus.negotiating, 1),
+    (OrderRequest.status == OrderStatus.work, 2),
+    (OrderRequest.status == OrderStatus.done, 3),
+    (OrderRequest.status == OrderStatus.canceled, 4),
+    else_=5,
+)
+
+
 @router.get("/order-requests", response_model=List[OrderRequestWithFiles])
-async def list_order_requests(skip: int = 0, limit: int = 50, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    orders = db.query(OrderRequest).options(
-        joinedload(OrderRequest.files),
-        joinedload(OrderRequest.contact)
-    ).offset(skip).limit(limit).all()
-    return orders
+async def list_order_requests(
+    skip: int = 0,
+    limit: int = 200,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    return (
+        db.query(OrderRequest)
+        .options(joinedload(OrderRequest.files), joinedload(OrderRequest.contact))
+        .order_by(STATUS_PRIORITY, OrderRequest.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+class OrderStatusUpdate(BaseModel):
+    status: OrderStatus
+    cancellation_reason: Optional[str] = None
+
+
+@router.patch("/order-requests/{order_id}", response_model=OrderRequestWithFiles)
+async def update_order_status(
+    order_id: UUID,
+    data: OrderStatusUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    order = db.get(OrderRequest, order_id)
+    if not order:
+        raise HTTPException(404, "Order not found")
+    order.status = data.status
+    # ponytail: cancellation_reason only means something for canceled orders;
+    # clear it whenever the order moves to any other status so the UI never
+    # shows a stale "why did we kill this" line on a live deal.
+    order.cancellation_reason = (
+        data.cancellation_reason if data.status == OrderStatus.canceled else None
+    )
+    db.commit()
+    db.refresh(order)
+    return order

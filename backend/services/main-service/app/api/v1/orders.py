@@ -21,6 +21,7 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 # ponytail: Restricted regions for international lead gen
 ALLOWED_REGIONS = ["RU", "US", "BY", "KZ", "UZ", "TJ", "KG", "AE", "CN"]
 
+
 class OrderValidation(BaseModel):
     user_name: str = Field(..., min_length=2)
     user_phone: str = Field(..., min_length=1)
@@ -33,24 +34,29 @@ class OrderValidation(BaseModel):
     budget: Optional[str] = None
     services: List[str]
 
-    @field_validator('user_phone')
+    @field_validator("user_phone")
     @classmethod
     def validate_phone(cls, v):
         try:
             cleaned = v.strip()
-            if cleaned.startswith('8') and len(cleaned) == 11:
-                cleaned = '+7' + cleaned[1:]
-            elif not cleaned.startswith('+'):
-                cleaned = '+' + cleaned
+            if cleaned.startswith("8") and len(cleaned) == 11:
+                cleaned = "+7" + cleaned[1:]
+            elif not cleaned.startswith("+"):
+                cleaned = "+" + cleaned
             parsed = phonenumbers.parse(cleaned, None)
             if not phonenumbers.is_valid_number(parsed):
                 raise ValueError("Invalid phone number format")
             region = phonenumbers.region_code_for_number(parsed)
             if region not in ALLOWED_REGIONS:
-                raise ValueError(f"Region {region} not supported. Use: {', '.join(ALLOWED_REGIONS)}")
-            return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+                raise ValueError(
+                    f"Region {region} not supported. Use: {', '.join(ALLOWED_REGIONS)}"
+                )
+            return phonenumbers.format_number(
+                parsed, phonenumbers.PhoneNumberFormat.E164
+            )
         except Exception as e:
             raise ValueError(str(e))
+
 
 async def notify_telegram(order_data: dict, order_id: str):
     """Send a Telegram notification about the new order."""
@@ -69,10 +75,11 @@ async def notify_telegram(order_data: dict, order_id: str):
         try:
             await client.post(
                 f"https://api.telegram.org/bot{token}/sendMessage",
-                json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
+                json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"},
             )
         except Exception:
             pass
+
 
 @router.post("/create")
 async def create_order(
@@ -87,7 +94,7 @@ async def create_order(
     user_telegram: Optional[str] = Form(None),
     user_email: Optional[str] = Form(None),
     files: List[UploadFile] = File([]),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     # 1. Validate input
     try:
@@ -103,7 +110,7 @@ async def create_order(
             user_name=user_name,
             user_phone=user_phone,
             user_telegram=user_telegram,
-            user_email=email
+            user_email=email,
         )
     except ValidationError as e:
         errors = [{"loc": err["loc"], "msg": str(err["msg"])} for err in e.errors()]
@@ -113,8 +120,7 @@ async def create_order(
     company = None
     if valid_data.company_name:
         company = Company(
-            name=valid_data.company_name,
-            lifecycle_stage=LifecycleStage.lead
+            name=valid_data.company_name, lifecycle_stage=LifecycleStage.lead
         )
         db.add(company)
         db.flush()
@@ -170,25 +176,29 @@ async def create_order(
         about=valid_data.description or "",
         estimate_deadline=valid_data.deadline if valid_data.deadline else None,
         estimate_budget=valid_data.budget if valid_data.budget else None,
-        naming_help=valid_data.naming_help
+        naming_help=valid_data.naming_help,
     )
     db.add(order_request)
     db.commit()
     db.refresh(order_request)
 
     # 5. Save uploaded files
-    storage_path = os.getenv("STORAGE_PATH", "./storage/order_files")
-    os.makedirs(storage_path, exist_ok=True)
+    # ponytail: the filesystem path is a shared volume bind-mounted into the
+    # website container at public/order_files. The DB stores the web-accessible
+    # URL (/order_files/xxx), never the on-disk path, so the frontend can <img> it.
+    storage_dir = os.getenv("ORDER_FILES_DIR", "/app/storage/public/order_files")
+    os.makedirs(storage_dir, exist_ok=True)
     for file in files:
         if file.filename:
-            file_path = os.path.join(storage_path, f"{uuid.uuid4()}_{file.filename}")
+            unique_name = f"{uuid.uuid4()}_{file.filename}"
+            disk_path = os.path.join(storage_dir, unique_name)
             content = await file.read()
-            with open(file_path, "wb") as f:
+            with open(disk_path, "wb") as f:
                 f.write(content)
             order_file = OrderRequestFile(
                 order_request_id=order_request.id,
-                file_path=file_path,
-                filename=file.filename
+                file_path=f"/public/order_files/{unique_name}",
+                filename=file.filename,
             )
             db.add(order_file)
     db.commit()

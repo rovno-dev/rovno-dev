@@ -8,6 +8,10 @@ services:
       target: prod
     profiles:
       - prod
+    volumes:
+      # ponytail: same host dir the backend writes uploads to — served by Next.js
+      # as static assets from /public, so the admin UI can <img src="/order_files/..">
+      - ../backend/services/main-service/storage/order_files:/app/public/order_files
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"

@@ -12,6 +12,14 @@ class EstimateDeadline(str, enum.Enum):
     under_3_month = "1_3_months"
     flexible = "flexible"
 
+
+class OrderStatus(str, enum.Enum):
+    new = "new"
+    negotiating = "negotiating"
+    work = "work"
+    done = "done"
+    canceled = "canceled"
+
 class EstimateBudget(str, enum.Enum):
     budget_30k_75k = "30k_75k"
     budget_75k_150k = "75k_150k"
@@ -30,6 +38,9 @@ class OrderRequest(Base):
     estimate_deadline = Column(Enum(EstimateDeadline, name="estimate_deadline"), nullable=True)
     estimate_budget = Column(Enum(EstimateBudget, name="estimate_budget"), nullable=True)
     naming_help = Column(String, nullable=True)  # NEW: stores the naming preference
+    # ponytail: pipeline status drives admin ordering — active work floats up.
+    status = Column(Enum(OrderStatus, name="order_status"), default=OrderStatus.new, nullable=False)
+    cancellation_reason = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
