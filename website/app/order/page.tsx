@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import * as mammoth from "mammoth";
 import { z } from "zod";
 import { Container } from "@/components/ui/container";
@@ -60,9 +61,11 @@ export default function OrderPage() {
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof OrderFormValues, string>>>({});
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // Phone number state
   const [phone, setPhone] = useState<string>("");
@@ -129,9 +132,12 @@ export default function OrderPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // ponytail: capture the form element synchronously — event.currentTarget is
+    // nulled by React once the handler returns, and we call .reset() after await.
+    const form = e.currentTarget;
     setLoading(true);
     setErrors({});
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const rawData = {
       services: selectedServices,
       description: formData.get("description"),
@@ -154,7 +160,7 @@ export default function OrderPage() {
       toast.error("Проверьте правильность заполнения полей");
       return;
     }
-    const finalFormData = new FormData(e.currentTarget);
+    const finalFormData = new FormData(form);
     finalFormData.set("services", JSON.stringify(selectedServices));
     finalFormData.set("user_phone", phone);
     // remove the old "user_contact" if present
@@ -166,11 +172,32 @@ export default function OrderPage() {
         body: finalFormData,
       });
       if (res.ok) {
-        toast.success("Заявка принята!", { description: "Мы скоро свяжемся с вами." });
-        e.currentTarget.reset();
+        form.reset();
         setSelectedServices([]);
         setAttachments([]);
         setPhone("");
+        setSuccessOpen(true);
+        // fire-and-forget confetti; dynamic import keeps SSR happy
+        import("canvas-confetti")
+          .then(({ default: confetti }) => {
+            confetti({
+              particleCount: 140,
+              spread: 90,
+              origin: { y: 0.35 },
+              scalar: 1.1,
+              ticks: 220,
+              colors: ["#336dff", "#99b6ff", "#ffffff", "#0d0d11"],
+            });
+            confetti({
+              particleCount: 60,
+              spread: 60,
+              origin: { y: 0.4 },
+              startVelocity: 45,
+              scalar: 0.9,
+              colors: ["#336dff", "#99b6ff"],
+            });
+          })
+          .catch(() => { /* confetti is decoration — never block success on it */ });
       } else {
         const data = await res.json();
         toast.error("Ошибка сервера", { description: data.detail?.[0]?.msg || "Попробуйте позже" });
@@ -275,6 +302,65 @@ export default function OrderPage() {
             </CarouselContent>
             {attachments.length > 1 && (<><CarouselPrevious className="left-6 z-50 bg-white/5 text-white size-12!" /><CarouselNext className="right-6 z-50 bg-white/5 text-white size-12!" /></>)}
           </Carousel>
+        </DialogContent>
+      </Dialog>
+
+      {/* ───────── Success dialog ───────── */}
+      <Dialog open={successOpen} onOpenChange={(open) => {
+        setSuccessOpen(open);
+        if (!open) router.push("/");
+      }}>
+        <DialogContent
+          showCloseButton={false}
+          className="sm:max-w-md text-center overflow-hidden"
+        >
+          <div className="flex flex-col items-center gap-5 pt-4 pb-2">
+            {/* Animated check */}
+            <div className="relative flex size-20 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-(--primary)/15 animate-ping" />
+              <span className="relative flex size-20 items-center justify-center rounded-full bg-(--primary) text-white shadow-lg shadow-(--primary)/30 animate-reveal">
+                <svg viewBox="0 0 24 24" fill="none" className="size-10">
+                  <path
+                    d="M4 12.5L10 18.5L20 7"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
+
+            <div className="space-y-2 px-2">
+              <h2 className="text-display-4 tracking-tight">Заявка принята!</h2>
+              <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
+                Спасибо! Мы свяжемся с вами в течение <b className="text-(--on-bg-high)">1 рабочего дня</b>.
+              </p>
+            </div>
+
+            <div className="w-full flex flex-col gap-2 pt-2">
+              <Button
+                type="button"
+                size="large"
+                className="w-full"
+                onClick={() => {
+                  setSuccessOpen(false);
+                  router.push("/");
+                }}
+              >
+                На главную
+              </Button>
+              <Button
+                type="button"
+                variant="text"
+                size="medium"
+                className="w-full"
+                onClick={() => setSuccessOpen(false)}
+              >
+                Остаться на странице
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
