@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { compileMDX } from "next-mdx-remote/rsc";
+import { ArrowLeft } from "lucide-react";
 import {
   LEGAL_DOCS,
   LEGAL_DOC_ORDER,
-  type LegalSection,
   type LegalDocSlug,
 } from "@/app/_data/legal";
-import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { slugify } from "@/utils/slugify";
+import { DocsTOC } from "../_components/docs-toc";
 
 export function generateStaticParams() {
   return LEGAL_DOC_ORDER.map((slug) => ({ slug }));
@@ -28,51 +29,71 @@ export async function generateMetadata({
   };
 }
 
-/**
- * Minimal inline markdown: **bold** → <strong>. Anything else stays plain text.
- * Legal docs don't need a full markdown parser.
- */
-function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={i} className="font-semibold text-(--on-bg-high)">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    return <span key={i}>{part}</span>;
-  });
+/** Extract plain text from a React children tree (for slugifying headings). */
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    return extractText((node as { props: { children: React.ReactNode } }).props.children);
+  }
+  return "";
 }
 
-function Section({ section, depth = 0 }: { section: LegalSection; depth?: number }) {
-  const HeadingTag = depth === 0 ? "h2" : "h3";
-  const headingClass =
-    depth === 0
-      ? "text-display-4 text-(--on-bg-high) mt-12 mb-4 tracking-tight"
-      : "text-heading-3 text-(--on-bg-high) mt-8 mb-3";
-  return (
-    <section id={section.id} className="scroll-mt-32">
-      <HeadingTag className={headingClass}>{section.title}</HeadingTag>
-      {section.paragraphs?.map((p, i) => (
-        <p key={i} className="text-body-3 text-(--on-bg-medium) leading-[1.75] mb-4">
-          {renderInline(p)}
-        </p>
-      ))}
-      {section.list && (
-        <ul className="list-disc pl-6 mb-4 space-y-2 text-body-3 text-(--on-bg-medium) leading-[1.75]">
-          {section.list.map((item, i) => (
-            <li key={i}>{renderInline(item)}</li>
-          ))}
-        </ul>
-      )}
-      {section.subsections?.map((sub) => (
-        <Section key={sub.id} section={sub} depth={depth + 1} />
-      ))}
-    </section>
-  );
-}
+/** Heading components — identical slugify() logic to the TOC extractor. */
+const mdxComponents = {
+  h2: ({ children }: { children: React.ReactNode }) => {
+    const id = slugify(extractText(children));
+    return (
+      <h2
+        id={id}
+        className="text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28"
+      >
+        {children}
+      </h2>
+    );
+  },
+  h3: ({ children }: { children: React.ReactNode }) => {
+    const id = slugify(extractText(children));
+    return (
+      <h3
+        id={id}
+        className="text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
+      >
+        {children}
+      </h3>
+    );
+  },
+  p: ({ children }: { children: React.ReactNode }) => (
+    <p className="text-body-3 text-(--on-bg-medium) leading-[1.75] mb-4">
+      {children}
+    </p>
+  ),
+  ul: ({ children }: { children: React.ReactNode }) => (
+    <ul className="list-disc pl-6 mb-4 space-y-2 text-body-3 text-(--on-bg-medium) leading-[1.75]">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }: { children: React.ReactNode }) => (
+    <ol className="list-decimal pl-6 mb-4 space-y-2 text-body-3 text-(--on-bg-medium) leading-[1.75]">
+      {children}
+    </ol>
+  ),
+  li: ({ children }: { children: React.ReactNode }) => (
+    <li className="pl-1">{children}</li>
+  ),
+  strong: ({ children }: { children: React.ReactNode }) => (
+    <strong className="font-semibold text-(--on-bg-high)">{children}</strong>
+  ),
+  a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
+    <a
+      href={href}
+      className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+    >
+      {children}
+    </a>
+  ),
+};
 
 export default async function LegalDocPage({
   params,
@@ -82,6 +103,12 @@ export default async function LegalDocPage({
   const { slug } = await params;
   const doc = LEGAL_DOCS[slug];
   if (!doc) notFound();
+
+  const { content } = await compileMDX({
+    source: doc.body,
+    components: mdxComponents,
+    options: { parseFrontmatter: false },
+  });
 
   const otherDocs = LEGAL_DOC_ORDER.filter((s) => s !== slug);
 
@@ -113,50 +140,19 @@ export default async function LegalDocPage({
         </Container>
       </section>
 
-      {/* Body */}
+      {/* Body + TOC */}
       <section className="py-12 md:py-16">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-            <article className="max-w-[760px]">
-              {doc.sections.map((section) => (
-                <Section key={section.id} section={section} />
-              ))}
+            <article className="max-w-[760px]">{content}</article>
 
-              <div className="mt-16 pt-8 border-t border-(--outline)">
-                <p className="text-body-5 text-(--on-bg-low)">
-                  Если у вас есть вопросы по этому документу, напишите на{" "}
-                  <a
-                    href="mailto:rovno.dev@mail.ru"
-                    className="text-(--primary) underline underline-offset-2"
-                  >
-                    rovno.dev@mail.ru
-                  </a>
-                  .
-                </p>
-              </div>
-            </article>
+            <div className="space-y-8">
+              <DocsTOC headings={doc.headings} />
 
-            {/* Sidebar: TOC + cross-links to other docs */}
-            <aside className="lg:sticky lg:top-32 h-fit space-y-8">
-              <nav aria-label="Содержание документа">
-                <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">
-                  Содержание
-                </p>
-                <ul className="space-y-2 text-body-4">
-                  {doc.sections.map((section) => (
-                    <li key={section.id}>
-                      <a
-                        href={`#${section.id}`}
-                        className="text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
-                      >
-                        {section.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              <nav aria-label="Другие документы" className="pt-6 border-t border-(--outline)">
+              <nav
+                aria-label="Другие документы"
+                className="hidden lg:block pt-6 border-t border-(--outline)"
+              >
                 <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">
                   Другие документы
                 </p>
@@ -168,9 +164,7 @@ export default async function LegalDocPage({
                       <li key={s}>
                         <Link
                           href={`/docs/${s}`}
-                          className={cn(
-                            "text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
-                          )}
+                          className="text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
                         >
                           {d.shortTitle}
                         </Link>
@@ -179,7 +173,7 @@ export default async function LegalDocPage({
                   })}
                 </ul>
               </nav>
-            </aside>
+            </div>
           </div>
         </Container>
       </section>

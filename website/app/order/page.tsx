@@ -260,8 +260,29 @@ export default function OrderPage() {
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Checkbox id="agreement" name="agreement" />
-              <Label htmlFor="agreement" className="text-body-4 text-(--on-bg-medium) leading-tight cursor-pointer">
-                Даю согласие на обработку моих Персональных Данных
+              <Label
+                htmlFor="agreement"
+                className="text-body-4 text-(--on-bg-medium) leading-snug cursor-pointer"
+              >
+                Даю согласие на обработку моих персональных данных в соответствии с{" "}
+                <Link
+                  href="/docs/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                >
+                  Политикой конфиденциальности
+                </Link>{" "}
+                и принимаю условия{" "}
+                <Link
+                  href="/docs/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                >
+                  Пользовательского соглашения
+                </Link>
+                .
               </Label>
             </div>
             {errors.agreement && <p className="text-sm text-destructive font-medium">{errors.agreement}</p>}
