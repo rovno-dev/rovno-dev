@@ -1,20 +1,19 @@
 import uuid
 import os
 import json
-import secrets
 import asyncio
 import html
 from typing import List, Optional
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field, ValidationError, field_validator
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 import phonenumbers
-from app.models.user import User, UserRole, UserStatus
 from app.models.company import Company, LifecycleStage
 from app.models.contact import Contact
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
 from app.models.order_request_file import OrderRequestFile
-from app.shared.auth import hash_password
 from database.database import get_db
 
 router = APIRouter(prefix="/orders", tags=["orders"])
@@ -110,29 +109,7 @@ async def create_order(
         errors = [{"loc": err["loc"], "msg": str(err["msg"])} for err in e.errors()]
         raise HTTPException(status_code=422, detail=errors)
 
-    # 2. Find or create User
-    user = None
-    if valid_data.user_email:
-        user = db.query(User).filter(User.email == valid_data.user_email).first()
-    if not user:
-        # Create a new user with a random password
-        random_pass = secrets.token_urlsafe(16)
-        hashed = hash_password(random_pass)
-        user = User(
-            email=valid_data.user_email or "",
-            password=hashed,
-            name=valid_data.user_name,
-            surname="",
-            user_role=UserRole.client,
-            user_status=UserStatus.pending_verification,
-            verified=False,
-            blocked=False,
-            phone=valid_data.user_phone  # store phone on user too
-        )
-        db.add(user)
-        db.flush()  # get user.id
-
-    # 3. Create Company (if company_name provided)
+    # 2. Company (optional, only if company_name provided)
     company = None
     if valid_data.company_name:
         company = Company(
@@ -142,20 +119,51 @@ async def create_order(
         db.add(company)
         db.flush()
 
-    # 4. Create Contact with phone and telegram fields
-    contact = Contact(
-        user_id=user.id,
-        company_id=company.id if company else None,
-        role_title="Order contact",
-        phone=valid_data.user_phone,
-        telegram_username=valid_data.user_telegram,
-        email=valid_data.user_email,  # store email on contact as well
-        name=valid_data.user_name
-    )
-    db.add(contact)
-    db.flush()
+    # 3. Find or create Contact — order clients are contacts, NOT users.
+    # ponytail: unique constraints on phone/telegram/email mean a returning client
+    # must reuse their existing contact row. Lookup-or-create across all three so
+    # any match wins, and the order still records against the existing contact.
+    lookup_conditions = []
+    if valid_data.user_telegram:
+        lookup_conditions.append(Contact.telegram_username == valid_data.user_telegram)
+    if valid_data.user_phone:
+        lookup_conditions.append(Contact.phone == valid_data.user_phone)
+    if valid_data.user_email:
+        lookup_conditions.append(Contact.email == valid_data.user_email)
 
-    # 5. Create OrderRequest
+    contact = None
+    if lookup_conditions:
+        contact = db.query(Contact).filter(or_(*lookup_conditions)).first()
+
+    if contact:
+        # fill in any fields the existing contact was missing, don't overwrite
+        if company and not contact.company_id:
+            contact.company_id = company.id
+        contact.name = contact.name or valid_data.user_name
+        contact.role_title = contact.role_title or "Order contact"
+    else:
+        contact = Contact(
+            company_id=company.id if company else None,
+            role_title="Order contact",
+            phone=valid_data.user_phone,
+            telegram_username=valid_data.user_telegram,
+            email=valid_data.user_email,
+            name=valid_data.user_name,
+        )
+        db.add(contact)
+
+    # Backstop: if two concurrent requests race to create two different contacts
+    # that collide on a unique field, surface a 422 instead of a 500 traceback.
+    try:
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=422,
+            detail="Contact with this phone, email or telegram already exists",
+        )
+
+    # 4. Create OrderRequest
     order_request = OrderRequest(
         contact_id=contact.id,
         service_types_json=valid_data.services,
@@ -168,7 +176,7 @@ async def create_order(
     db.commit()
     db.refresh(order_request)
 
-    # 6. Save uploaded files
+    # 5. Save uploaded files
     storage_path = os.getenv("STORAGE_PATH", "./storage/order_files")
     os.makedirs(storage_path, exist_ok=True)
     for file in files:

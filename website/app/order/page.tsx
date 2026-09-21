@@ -185,7 +185,7 @@ export default function OrderPage() {
         <h1 className="text-display-2 mb-3 uppercase tracking-tighter leading-none">Сделать заказ</h1>
         <p className="text-body-1 text-(--on-bg-low) leading-relaxed font-medium">Опишите вашу задачу и мы подготовим предложение.</p>
       </Container>
-      <Container>
+      <Container className="pb-24">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
           <ServiceSelection selectedServices={selectedServices} setSelectedServices={setSelectedServices} error={errors.services} />
           <div className="space-y-6">

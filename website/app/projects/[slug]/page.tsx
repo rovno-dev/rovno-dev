@@ -10,6 +10,7 @@ import path from "path";
 import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { ProjectHero } from "@/app/projects/[slug]/_components/project-hero";
+import { AlxProjectPage } from "@/app/projects/[slug]/_components/alx-project-page";
 import {
   Gallery,
   MetricCard,
@@ -92,6 +93,22 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   const projectData = mdxProject || fallbackProject;
   if (!projectData) notFound();
+
+  // ---- Custom cinematic page for the ALX-9 case ----
+  if (slug === "alx") {
+    return (
+      <AlxProjectPage
+        project={{
+          title: projectData.title,
+          description: projectData.description,
+          cover: projectData.cover,
+          href: projectData.href,
+          period: projectData.period,
+          techStack: projectData.techStack,
+        }}
+      />
+    );
+  }
 
   // Try to load MDX content (only for MDX-based projects)
   let mdxContent = null;
