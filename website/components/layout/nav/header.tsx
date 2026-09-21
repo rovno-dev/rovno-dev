@@ -16,14 +16,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { useRootHref } from "@/hooks/use-root-href";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { FloatingMenu } from "./floating-menu";
+
 export default function Header() {
   const { user, isLoading, logout } = useUser();
   const { t } = useLanguage();
+  const logoHref = useRootHref();
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
@@ -35,6 +38,15 @@ export default function Header() {
   const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
   const pathname = usePathname();
   const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
+
+  // Admin link goes to admin.<root> when the root domain is configured;
+  // falls back to /admin/<secret> otherwise (local dev on plain paths).
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "").trim();
+  const adminHref = adminSecret
+    ? (rootDomain ? `https://admin.${rootDomain}/${adminSecret}` : `/admin/${adminSecret}`)
+    : null;
+  const profileHref = rootDomain ? `https://app.${rootDomain}/profile` : "/app/profile";
+
   return (
     <header
       className={cn(
@@ -50,7 +62,7 @@ export default function Header() {
         "
       >
         <div className={cn((isLoading || user) ? "sm:justify-between" : "justify-between", "w-full flex items-center gap-6")}>
-          <Link href={'/'}>
+          <Link href={logoHref}>
             <Logo className="!h-[24px] sm:h-[40px]" />
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
@@ -81,18 +93,12 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href="/app/profile">{t("nav.profile")}</Link>
+                    <Link href={profileHref}>{t("nav.profile")}</Link>
                   </DropdownMenuItem>
-                  {(user?.role === 'admin' || user?.role === 'root') && (
-                    <>
-                      {adminSecret ? (
-                        <DropdownMenuItem asChild>
-                          <Link href={`/admin/${adminSecret}`}>{t("nav.admin")}</Link>
-                        </DropdownMenuItem>
-                      ) : (
-                        ""
-                      )}
-                    </>
+                  {(user?.role === 'admin' || user?.role === 'root') && adminHref && (
+                    <DropdownMenuItem asChild>
+                      <Link href={adminHref}>{t("nav.admin")}</Link>
+                    </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={logout}>{t("nav.logout")}</DropdownMenuItem>
                 </DropdownMenuContent>

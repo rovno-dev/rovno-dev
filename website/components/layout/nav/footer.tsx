@@ -10,9 +10,11 @@ import Link from "next/link";
 import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-icon";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/language-provider";
+import { useRootHref } from "@/hooks/use-root-href";
 
 export default function Footer() {
   const { t } = useLanguage();
+  const logoHref = useRootHref();
   const sections = [
     {
       title: t("footer.agency"),
@@ -39,18 +41,26 @@ export default function Footer() {
         { title: t("footer.suggest"), href: "https://t.me/rovno_dev?direct" },
       ],
     },
+    {
+      title: t("footer.legal"),
+      links: [
+        { title: t("footer.legal.privacy"), href: "/docs/privacy" },
+        { title: t("footer.legal.cookies"), href: "/docs/cookies" },
+        { title: t("footer.legal.terms"), href: "/docs/terms" },
+        { title: t("footer.legal.reviews"), href: "/docs/reviews-consent" },
+      ],
+    },
   ];
   const pathname = usePathname();
   const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
   const year = new Date().getFullYear();
-
   return (
     <footer className="bg-(--bg) pt-20 pb-32 border-t border-(--outline)">
       <Container variant={isFullWidth ? 'full-width' : 'default'}>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
           {/* Brand Column */}
           <div className="flex flex-col gap-6 max-w-sm">
-            <Link href="/" className="w-fit">
+            <Link href={logoHref} className="w-fit">
               <RovnoLogotypeWordmark className="h-8! w-auto" />
             </Link>
             <div className="flex items-center gap-1 mt-2">
@@ -61,7 +71,7 @@ export default function Footer() {
             </div>
           </div>
           {/* Links Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12 sm:gap-16">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-12 sm:gap-10">
             {sections.map((section) => (
               <div key={section.title} className="flex flex-col gap-4">
                 <h4 className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">

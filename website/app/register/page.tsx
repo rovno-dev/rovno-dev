@@ -81,14 +81,18 @@ export default function RegisterPage() {
       }
 
       if (!response?.response?.ok) {
-        // ponytail: FastAPI HTTPException returns `detail`; `message` is only
-        // set by the login endpoint's JSONResponse. Check both.
         const detail = response?.json?.detail || response?.json?.message || "Ошибка регистрации"
         toast.error(detail)
         setIsLoading(false); return
       }
 
-      toast.success("Verification code sent to your email")
+      // Two stacked toasts: the good news, then the "check Spam" pointer.
+      // Sonner shows them as a stack; the info one lingers a bit longer.
+      toast.success("Код отправлен на вашу почту", { duration: 5000 })
+      toast.info("Не нашли письмо? Проверьте папку «Спам»", {
+        duration: 8000,
+        description: "Если код оказался в спаме — отметьте письмо как «Не спам».",
+      })
       router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (err) {
       toast.error("Ошибка соединения. Проверьте интернет.")

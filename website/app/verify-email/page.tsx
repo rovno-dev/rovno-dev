@@ -11,6 +11,7 @@ import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { useLanguage } from "@/providers/language-provider"
+import { Mail } from "lucide-react"
 
 const verifySchema = z.object({
   code: z.string().length(6, "Код должен состоять из 6 цифр"),
@@ -34,10 +35,6 @@ export default function VerifyEmailPage() {
       router.push("/register")
     }
   }, [searchParams, router])
-
-  // ponytail: previously auto-fired a resend 500ms after mount, which raced the
-  // register-time email and overwrote the code the user was about to read. Now
-  // the user clicks "resend" explicitly if nothing arrived.
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
@@ -125,10 +122,31 @@ export default function VerifyEmailPage() {
     <CheckNotUser>
       <div className="flex items-center justify-center min-h-[80vh]">
         <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
+          <div className="mb-6 text-center">
             <h1 className="serif-header text-4xl mb-2">Подтверждение email</h1>
-            <p className="text-[var(--text-secondary)] text-sm">Введите код, отправленный на вашу почту</p>
+            <p className="text-[var(--text-secondary)] text-sm">
+              Введите код, отправленный на вашу почту
+            </p>
+            {formData.email && (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-(--outline) bg-(--card) px-3 py-1.5 text-xs font-medium text-(--on-bg-high)">
+                <Mail className="size-3.5" />
+                {formData.email}
+              </p>
+            )}
           </div>
+
+          {/* Spam hint — persistent, sits above the form so it's impossible to miss. */}
+          <div className="mb-6 flex gap-3 rounded-2xl border border-(--outline) bg-(--card) p-4">
+            <span className="text-lg leading-none" aria-hidden>📬</span>
+            <div className="space-y-1">
+              <p className="text-body-4 font-medium text-(--on-bg-high)">Не видите письмо?</p>
+              <p className="text-body-5 text-(--on-bg-medium) leading-relaxed">
+                Проверьте папки <b>«Спам»</b> и <b>«Промоакции»</b>. Если письмо попало туда —
+                отметьте его как «Не спам», чтобы следующий код дошёл сразу.
+              </p>
+            </div>
+          </div>
+
           <form className="space-y-5" onSubmit={handleVerify}>
             <input type="hidden" name="email" value={formData.email} />
             <Field>
