@@ -10,12 +10,15 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 import phonenumbers
+import httpx
+import logging
 from app.models.company import Company, LifecycleStage
 from app.models.contact import Contact
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
 from app.models.order_request_file import OrderRequestFile
 from database.database import get_db
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 # ponytail: Restricted regions for international lead gen
@@ -186,22 +189,63 @@ async def create_order(
     # ponytail: the filesystem path is a shared volume bind-mounted into the
     # website container at public/order_files. The DB stores the web-accessible
     # URL (/order_files/xxx), never the on-disk path, so the frontend can <img> it.
-    storage_dir = os.getenv("ORDER_FILES_DIR", "/app/storage/public/order_files")
+    storage_dir = os.getenv("ORDER_FILES_DIR", "/app/storage/order_files")
     os.makedirs(storage_dir, exist_ok=True)
+    logger.info(
+        "Order %s: received %d file(s), storage_dir=%s",
+        order_request.id, len(files), storage_dir,
+    )
+    saved = 0
     for file in files:
-        if file.filename:
-            unique_name = f"{uuid.uuid4()}_{file.filename}"
-            disk_path = os.path.join(storage_dir, unique_name)
-            content = await file.read()
-            with open(disk_path, "wb") as f:
-                f.write(content)
-            order_file = OrderRequestFile(
-                order_request_id=order_request.id,
-                file_path=f"/public/order_files/{unique_name}",
-                filename=file.filename,
+        if not file.filename:
+            logger.warning(
+                "Order %s: skipping file with empty filename",
+                order_request.id,
             )
-            db.add(order_file)
+            continue
+        unique_name = f"{uuid.uuid4()}_{file.filename}"
+        disk_path = os.path.join(storage_dir, unique_name)
+        content = await file.read()
+        with open(disk_path, "wb") as f:
+            f.write(content)
+        db.add(OrderRequestFile(
+            order_request_id=order_request.id,
+            file_path=f"/order_files/{unique_name}",
+            filename=file.filename,
+        ))
+        saved += 1
+        logger.info(
+            "Order %s: queued %s -> %s (%d bytes)",
+            order_request.id, file.filename, disk_path, len(content),
+        )
     db.commit()
+    logger.info(
+        "Order %s: committed %d file row(s) to order_request_files",
+        order_request.id, saved,
+    )
 
     asyncio.create_task(notify_telegram(valid_data.model_dump(), str(order_request.id)))
     return {"status": "ok", "order_id": str(order_request.id)}
+
+# ponytail: serve uploaded order files. Backend wrote them, so it can read them
+# back. Frontend hits this through the Next.js proxy at /order_files/<name>.
+from fastapi.responses import FileResponse
+import mimetypes as _mimetypes
+
+@router.get("/files/{filename}")
+async def get_order_file(filename: str):
+    storage_dir = os.getenv("ORDER_FILES_DIR", "/app/storage/order_files")
+    # ponytail: basename() strips any path separators — blocks traversal.
+    safe = os.path.basename(filename)
+    if not safe or safe != filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    full = os.path.join(storage_dir, safe)
+    if not os.path.isfile(full):
+        logger.warning("order file miss: %s (looked in %s)", safe, storage_dir)
+        raise HTTPException(status_code=404, detail="File not found")
+    media_type, _ = _mimetypes.guess_type(safe)
+    return FileResponse(
+        full,
+        media_type=media_type or "application/octet-stream",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
