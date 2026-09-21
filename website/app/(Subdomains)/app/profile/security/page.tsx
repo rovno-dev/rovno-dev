@@ -1,22 +1,30 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/entities/user/model/user-context";
-import { CheckUser } from "@/entities/user/model/check-user";
-import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { changePassword } from "@/utils/api/user";
-import { ProfileSidebar } from "@/app/(Subdomains)/app/_components/profile-sidebar";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { changePassword, deleteAccount } from "@/utils/api/user";
+import { Field, FieldLabel } from "@/components/ui/field";
 
 export default function SecurityPage() {
-  const { user, isLoading } = useUser();
+  const { user, isLoading, logout } = useUser();
+  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (isLoading || !user) return null;
 
@@ -44,16 +52,34 @@ export default function SecurityPage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteAccount();
+      toast.success("Аккаунт удалён");
+      // Clear auth state locally then leave the app area. We intentionally
+      // skip the /logout call — the account no longer exists server-side.
+      try {
+        await logout();
+      } catch {
+        // logout may 401 now; ignore and continue the redirect
+      }
+      router.push("/");
+    } catch {
+      toast.error("Не удалось удалить аккаунт");
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <>
       <div>
-        <h1 className="text-display-2 mb-1">
-          Безопасность
-        </h1>
+        <h1 className="text-display-2 mb-1">Безопасность</h1>
         <p className="text-body-2 text-(--on-bg-medium)">
           Управление безопасностью аккаунта
         </p>
       </div>
+
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
         <h2 className="text-heading-3 mb-4">Смена пароля</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,18 +115,60 @@ export default function SecurityPage() {
           </Button>
         </form>
       </Card>
+
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
         <h2 className="text-heading-3 mb-2">Активные сессии</h2>
         <p className="text-body-3 text-(--on-bg-medium)">
           Здесь будет отображаться информация о текущих сессиях (в разработке).
         </p>
       </Card>
+
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
         <h2 className="text-heading-3 mb-2">Двухфакторная аутентификация</h2>
         <p className="text-body-3 text-(--on-bg-medium)">
           Здесь можно будет включить 2FA для дополнительной защиты (в разработке).
         </p>
       </Card>
+
+      {/* Danger zone */}
+      <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6 shadow-sm">
+        <h2 className="text-heading-3 mb-2 text-(--error)">Опасная зона</h2>
+        <p className="text-body-3 text-(--on-bg-medium) mb-5">
+          Удаление аккаунта — необратимое действие. Все ваши данные будут утеряны
+          без возможности восстановления.
+        </p>
+        <Button variant="glass-red" size="large" onClick={() => setDeleteOpen(true)}>
+          Удалить аккаунт
+        </Button>
+      </Card>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Удалить аккаунт?</DialogTitle>
+          </DialogHeader>
+          <p className="text-body-3 text-(--on-bg-medium) leading-relaxed">
+            Это действие нельзя отменить. Аккаунт <b>{user.email}</b> будет
+            удалён навсегда.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="outlined"
+              onClick={() => setDeleteOpen(false)}
+              disabled={isDeleting}
+            >
+              Отмена
+            </Button>
+            <Button
+              variant="glass-red"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Удаление..." : "Удалить навсегда"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

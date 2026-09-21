@@ -12,6 +12,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import {
   Select,
@@ -109,8 +110,37 @@ export default function AdminOrdersPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
 
-  // lightbox for the big image view
-  const [lightbox, setLightbox] = useState<{ src: string; name: string } | null>(null);
+  // lightbox for the big image view — carousel of every image on that order
+  const [lightbox, setLightbox] = useState<{ files: OrderFile[]; index: number } | null>(null);
+  const [lightboxApi, setLightboxApi] = useState<CarouselApi>();
+  const [lightboxCurrent, setLightboxCurrent] = useState(0);
+
+  // keyboard nav inside lightbox (Radix handles Escape)
+  useEffect(() => {
+    if (!lightboxApi || !lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") lightboxApi.scrollPrev();
+      if (e.key === "ArrowRight") lightboxApi.scrollNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxApi, lightbox]);
+
+  // track current slide for dots
+  useEffect(() => {
+    if (!lightboxApi) return;
+    const onSelect = () => setLightboxCurrent(lightboxApi.selectedScrollSnap());
+    lightboxApi.on("select", onSelect);
+    onSelect();
+    return () => { lightboxApi.off("select", onSelect); };
+  }, [lightboxApi]);
+
+  // jump to the clicked thumbnail on open
+  useEffect(() => {
+    if (!lightboxApi || !lightbox) return;
+    const t = setTimeout(() => lightboxApi.scrollTo(lightbox.index, true), 50);
+    return () => clearTimeout(t);
+  }, [lightboxApi, lightbox]);
 
   useEffect(() => {
     if (!user) return;
@@ -345,7 +375,11 @@ export default function AdminOrdersPage() {
                               {isImage ? (
                                 <button
                                   type="button"
-                                  onClick={() => setLightbox({ src: file.file_path, name: file.filename })}
+                                  onClick={() => {
+                                    const imageFiles = order.files.filter((f) => IMAGE_EXT.test(f.filename));
+                                    const idx = imageFiles.findIndex((f) => f.id === file.id);
+                                    setLightbox({ files: imageFiles, index: Math.max(0, idx) });
+                                  }}
                                   className="relative w-full h-full group"
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -431,7 +465,7 @@ export default function AdminOrdersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Image lightbox */}
+      {/* Image lightbox — carousel mirrors the ordering flow */}
       <Dialog open={!!lightbox} onOpenChange={(open) => { if (!open) setLightbox(null); }}>
         <DialogContent
           showCloseButton={false}
@@ -440,18 +474,48 @@ export default function AdminOrdersPage() {
           <Button
             variant="glass"
             size="icon-medium"
-            className="absolute top-4 right-4 z-50 rounded-full border-white/20"
+            className="absolute top-4 right-4 z-[60] rounded-full border-white/20"
             onClick={() => setLightbox(null)}
           >
             <X className="size-6! text-white" />
           </Button>
-          {lightbox && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={lightbox.src}
-              alt={lightbox.name}
-              className="max-w-[92vw] max-h-[92vh] object-contain"
-            />
+          {lightbox && lightbox.files.length > 0 && (
+            <Carousel setApi={setLightboxApi} className="w-full h-full">
+              <CarouselContent className="h-[100dvh] ml-0">
+                {lightbox.files.map((file) => (
+                  <CarouselItem key={file.id} className="h-full flex items-center justify-center p-0">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={file.file_path}
+                        alt={file.filename}
+                        className="max-w-[92vw] max-h-[92vh] object-contain select-none"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {lightbox.files.length > 1 && (
+                <>
+                  <CarouselPrevious className="left-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0" />
+                  <CarouselNext className="right-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0" />
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2">
+                    {lightbox.files.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => lightboxApi?.scrollTo(idx)}
+                        aria-label={`Slide ${idx + 1}`}
+                        className={
+                          "h-2 rounded-full transition-all " +
+                          (lightboxCurrent === idx ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/50")
+                        }
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </Carousel>
           )}
         </DialogContent>
       </Dialog>

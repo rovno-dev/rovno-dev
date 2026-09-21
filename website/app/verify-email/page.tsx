@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { $fetch } from "@/utils/fetch"
 import { toast } from "sonner"
 import { safeCookieStorage } from "@/utils/safe-cookie-storage"
@@ -10,6 +10,7 @@ import { useUser } from "@/entities/user/model/user-context"
 import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { useLanguage } from "@/providers/language-provider"
 
 const verifySchema = z.object({
   code: z.string().length(6, "Код должен состоять из 6 цифр"),
@@ -17,13 +18,13 @@ const verifySchema = z.object({
 
 export default function VerifyEmailPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
   const searchParams = useSearchParams()
   const [errors, setErrors] = useState<Record<string, any> | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isResending, setIsResending] = useState<boolean>(false)
   const [formData, setFormData] = useState({ email: "", code: "" })
   const { setToken } = useUser()
-  const autoResent = useRef(false)
 
   useEffect(() => {
     const email = searchParams.get("email")
@@ -34,15 +35,9 @@ export default function VerifyEmailPage() {
     }
   }, [searchParams, router])
 
-  // Автоматическая отправка кода при открытии страницы (один раз)
-  useEffect(() => {
-    if (!formData.email || autoResent.current) return
-    autoResent.current = true
-    const timer = setTimeout(() => {
-      handleResend()
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [formData.email])
+  // ponytail: previously auto-fired a resend 500ms after mount, which raced the
+  // register-time email and overwrote the code the user was about to read. Now
+  // the user clicks "resend" explicitly if nothing arrived.
 
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
@@ -79,10 +74,9 @@ export default function VerifyEmailPage() {
         setIsLoading(false); return
       }
       if (!response?.response?.ok) {
-        toast.error(response?.json?.message || "Ошибка верификации")
+        toast.error(response?.json?.detail || response?.json?.message || "Ошибка верификации")
         setIsLoading(false); return
       }
-      // Успех – сохраняем токены и входим
       const access_token = response?.json?.access_token
       const refresh_token = response?.json?.refresh_token
       if (refresh_token && access_token) {
@@ -109,7 +103,7 @@ export default function VerifyEmailPage() {
     try {
       const response = await $fetch("/api/v1/resend-verification", {
         method: "POST",
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({ email: formData.email, lang }),
         headers: { "Content-Type": "application/json" },
         onLoadingChange: setIsResending,
         isToast: false,
@@ -117,7 +111,7 @@ export default function VerifyEmailPage() {
       if (response?.response?.ok) {
         toast.success("Код отправлен повторно! Проверьте почту.")
       } else {
-        const message = response?.json?.message || "Не удалось отправить код"
+        const message = response?.json?.detail || response?.json?.message || "Не удалось отправить код"
         toast.error(message)
       }
     } catch (err) {

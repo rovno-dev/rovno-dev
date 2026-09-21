@@ -29,3 +29,9 @@ export async function changePassword(currentPassword: string, newPassword: strin
     headers: { "Content-Type": "application/json" },
   });
 }
+
+export async function deleteAccount(): Promise<void> {
+  await $fetch("/api/v1/me", {
+    method: "DELETE",
+  });
+}

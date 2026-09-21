@@ -3,10 +3,13 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from app.models.user import User
+from app.models.contact import Contact
+from app.models.team_member import TeamMember
 from app.shared.auth import get_current_user, hash_password, verify_password
 from database.database import get_db
 
 router = APIRouter(prefix="/me", tags=["me"])
+
 
 class UserUpdateRequest(BaseModel):
     name: Optional[str] = None
@@ -16,9 +19,11 @@ class UserUpdateRequest(BaseModel):
     description: Optional[str] = None
     avatar_url: Optional[str] = None
 
+
 class PasswordChangeRequest(BaseModel):
     current_password: str = Field(..., min_length=1)
     new_password: str = Field(..., min_length=8)
+
 
 @router.patch("")
 async def update_me(
@@ -43,6 +48,7 @@ async def update_me(
         "avatar_url": current_user.avatar_url,
     }
 
+
 @router.post("/change-password")
 async def change_password(
     data: PasswordChangeRequest,
@@ -54,3 +60,19 @@ async def change_password(
     current_user.password = hash_password(data.new_password)
     db.commit()
     return {"message": "Password updated successfully"}
+
+
+@router.delete("")
+async def delete_me(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    # ponytail: detach the user from related rows rather than cascading deletes.
+    # Contacts and team_members are referenced by order_requests / articles, so
+    # nulling user_id preserves the historical records (anonymized) and dodges
+    # FK violations. The user row itself is safe to remove.
+    db.query(Contact).filter(Contact.user_id == current_user.id).update({"user_id": None})
+    db.query(TeamMember).filter(TeamMember.user_id == current_user.id).update({"user_id": None})
+    db.delete(current_user)
+    db.commit()
+    return {"message": "Account deleted"}

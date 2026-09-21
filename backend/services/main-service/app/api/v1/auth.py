@@ -28,6 +28,7 @@ from uuid import UUID
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+
 @router.post("/register/email")
 async def register_email(
     request: Request,
@@ -40,15 +41,21 @@ async def register_email(
         raise HTTPException(status_code=422, detail="Email already registered")
     user = create_user(db, payload.email, payload.password, verified=False)
     logger.info(f"User created: {user.id} with email {user.email}")
+
     code = generate_otp()
     if not save_otp(payload.email, code):
+        logger.error(f"OTP storage failed for {payload.email}")
         raise HTTPException(status_code=503, detail="OTP storage unavailable")
-    sent = await send_email(
-        payload.email,
-        "Verification code",
-        f"Your verification code is: {code}"
-    )
-    return EmailSendCodeResponse(sent=sent)
+
+    sent = await send_email(payload.email, code, lang=payload.lang)
+    if not sent:
+        logger.error(f"Verification email failed to send for {payload.email}")
+        raise HTTPException(
+            status_code=502,
+            detail="Could not send verification email. Check server logs.",
+        )
+    return EmailSendCodeResponse(sent=True)
+
 
 @router.post("/verify-email")
 async def verify_email(
@@ -66,6 +73,7 @@ async def verify_email(
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
 
 @router.post("/login/email")
 async def login_email_password(
@@ -103,6 +111,7 @@ async def login_email_password(
     logger.info(f"Successful login for user: {payload.email}")
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
+
 @router.post("/refresh", response_model=AccessTokenResponse)
 async def refresh_access_token(
     payload: RefreshTokenRequest,
@@ -121,6 +130,7 @@ async def refresh_access_token(
     new_access = create_access_token({"sub": str(user.id)})
     return AccessTokenResponse(access_token=new_access)
 
+
 @router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
     return {
@@ -132,6 +142,8 @@ async def get_me(current_user: User = Depends(get_current_user)):
         "verified": current_user.verified,
         "blocked": current_user.blocked,
     }
+
+
 @router.post("/logout")
 async def logout(
     payload: RefreshTokenRequest,
@@ -141,6 +153,7 @@ async def logout(
     if not token_data or token_data.get("type") != "refresh" or token_data.get("sub") != str(current_user.id):
         return JSONResponse(status_code=400, content={"message": "Invalid refresh token"})
     return JSONResponse(status_code=200, content={"message": "Logged out"})
+
 
 @router.post("/resend-verification")
 async def resend_verification(
@@ -154,8 +167,17 @@ async def resend_verification(
         raise HTTPException(status_code=404, detail="User not found")
     if user.verified:
         raise HTTPException(status_code=400, detail="User already verified")
+
     code = generate_otp()
     if not save_otp(payload.email, code):
+        logger.error(f"OTP storage failed for {payload.email}")
         raise HTTPException(status_code=503, detail="OTP storage unavailable")
-    sent = await send_email(payload.email, "Verification code", f"Your verification code is: {code}. Please, don't reply to this message.")
-    return EmailSendCodeResponse(sent=sent)
+
+    sent = await send_email(payload.email, code, lang=payload.lang)
+    if not sent:
+        logger.error(f"Verification email failed to send for {payload.email}")
+        raise HTTPException(
+            status_code=502,
+            detail="Could not send verification email. Check server logs.",
+        )
+    return EmailSendCodeResponse(sent=True)

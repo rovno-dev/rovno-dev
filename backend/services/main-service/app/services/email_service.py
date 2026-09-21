@@ -1,11 +1,75 @@
 import smtplib
-from email.message import EmailMessage
 import os
 import logging
+from datetime import datetime
+from email.message import EmailMessage
 
 logger = logging.getLogger(__name__)
 
-async def send_email(email: str, subject: str, code: str) -> bool:
+STRINGS = {
+    "ru": {
+        "subject": "Код подтверждения · Rovno.dev",
+        "kicker": "Rovno.dev · Безопасность",
+        "tag": "2FA",
+        "heading": "Подтвердите ваш email",
+        "subtitle": "Введите этот код, чтобы завершить регистрацию:",
+        "expiry": "Код действителен 5 минут.",
+        "ignore": "Если вы не запрашивали этот код, просто проигнорируйте это письмо.",
+        "footer": "© {year} Rovno.dev — цифровое агентство полного цикла",
+        "text": "Ваш код подтверждения: {code}\n\nКод действителен 5 минут.\nЕсли вы не запрашивали этот код, проигнорируйте письмо.",
+    },
+    "en": {
+        "subject": "Verification code · Rovno.dev",
+        "kicker": "Rovno.dev · Security",
+        "tag": "2FA",
+        "heading": "Confirm your email",
+        "subtitle": "Enter this code to finish creating your account:",
+        "expiry": "This code is valid for 5 minutes.",
+        "ignore": "If you didn't request this code, you can safely ignore this email.",
+        "footer": "© {year} Rovno.dev — full-cycle digital agency",
+        "text": "Your verification code: {code}\n\nThis code is valid for 5 minutes.\nIf you didn't request this code, you can safely ignore this email.",
+    },
+}
+
+
+def _render_html(code: str, lang: str) -> str:
+    s = STRINGS[lang]
+    year = datetime.utcnow().year
+    return f"""<!doctype html>
+<html lang="{lang}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>{s["subject"]}</title>
+</head>
+<body style="margin:0;padding:0;background:#0d0d11;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#e2e2e6;">
+<div style="display:none;font-size:1px;color:#0d0d11;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">{s["subtitle"]} {code}</div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#0d0d11;padding:40px 16px;">
+<tr><td align="center">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:520px;">
+<tr><td style="padding-bottom:24px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tr>
+<td style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#72727e;">{s["kicker"]}</td>
+<td align="right" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#72727e;">{s["tag"]}</td>
+</tr></table></td></tr>
+<tr><td style="background:#141419;border:1px solid #22222a;border-radius:20px;padding:40px 32px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr><td style="font-size:22px;font-weight:600;line-height:1.25;color:#ffffff;padding-bottom:8px;">{s["heading"]}</td></tr>
+<tr><td style="font-size:14px;line-height:1.5;color:#a9a9b2;padding-bottom:28px;">{s["subtitle"]}</td></tr>
+<tr><td align="center" style="padding:4px 0 24px 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="background:#0d0d11;border:1px solid #2b2b35;border-radius:14px;"><tr>
+<td style="padding:22px 32px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:34px;font-weight:700;letter-spacing:0.28em;color:#336dff;text-align:center;">{code}</td>
+</tr></table></td></tr>
+<tr><td style="font-size:12px;line-height:1.6;color:#72727e;padding-bottom:8px;">{s["expiry"]}</td></tr>
+<tr><td style="font-size:12px;line-height:1.6;color:#72727e;">{s["ignore"]}</td></tr>
+</table></td></tr>
+<tr><td style="padding-top:24px;text-align:center;font-size:11px;letter-spacing:0.08em;color:#4d4d58;">{s["footer"].format(year=year)}</td></tr>
+</table></td></tr></table>
+</body>
+</html>"""
+
+
+async def send_email(email: str, code: str, lang: str = "ru") -> bool:
     sender_email = os.getenv("MAIL_SENDER")
     sender_password = os.getenv("MAIL_PASSWORD")
     mail_server = os.getenv("MAIL_SERVER")
@@ -16,55 +80,33 @@ async def send_email(email: str, subject: str, code: str) -> bool:
         return False
 
     sender_password = sender_password.strip()
+    if lang not in STRINGS:
+        lang = "ru"
+    s = STRINGS[lang]
 
-    logger.info(f"Attempting to send email to {email} via {mail_server}:{mail_port}")
-
-    # Тестовое подключение
     try:
         with smtplib.SMTP(mail_server, mail_port) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
             server.login(sender_email, sender_password)
-            logger.info("SMTP login successful")
     except Exception as e:
         logger.error(f"SMTP connection/login failed: {e}")
         return False
 
-    # Формируем письмо с HTML
     msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = sender_email
-    msg['To'] = email
-
-    # Текстовое содержимое (fallback)
-    msg.set_content(f"Ваш код подтверждения: {code}\n\nЕсли вы не запрашивали этот код, проигнорируйте письмо.")
-
-    # HTML-версия (красивое оформление)
-    html_content = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <h2 style="color: #333;">Подтверждение регистрации</h2>
-                <p style="font-size: 16px; color: #555;">Ваш код подтверждения:</p>
-                <div style="font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 4px; padding: 15px 0; text-align: center; background: #f8f9fa; border-radius: 6px;">
-                    {code}
-                </div>
-                <p style="font-size: 14px; color: #888; margin-top: 20px;">
-                    Если вы не запрашивали этот код, проигнорируйте данное письмо.
-                </p>
-            </div>
-        </body>
-    </html>
-    """
-    msg.add_alternative(html_content, subtype='html')
+    msg["Subject"] = s["subject"]
+    msg["From"] = f"Rovno.dev <{sender_email}>"
+    msg["To"] = email
+    msg.set_content(s["text"].format(code=code))
+    msg.add_alternative(_render_html(code, lang), subtype="html")
 
     try:
         with smtplib.SMTP(mail_server, mail_port) as server:
             server.starttls()
             server.login(sender_email, sender_password)
             server.send_message(msg)
-        logger.info(f"Email sent successfully to {email}")
+        logger.info(f"Email sent to {email} (lang={lang})")
         return True
     except Exception as e:
         logger.error(f"Email send error: {e}")
