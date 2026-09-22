@@ -1,4 +1,5 @@
 import type { Language } from './translations';
+
 export const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
     'home.numbers_title': 'Sharp Numbers',
@@ -14,8 +15,9 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.view_all_projects': 'All projects',
     'home.socials_title': 'Our Addictive Media',
     'home.cta.title': "We'll find a solution",
-    'home.cta.subtitle': "Write to us in DM — we'll reply within 3 hours*",
-    'home.cta.note': '*from 8 to 22 MSK',
+    'home.cta.subtitle': "Write to us — we'll reply within 3 hours.",
+    'home.cta.note': '8 AM — 10 PM MSK',
+    'home.cta.or': 'or',
     'home.cta.max': 'Message in Max',
     'home.cta.telegram': 'Message in TG',
     'home.socials.type.shorts': 'Shorts',
@@ -38,7 +40,7 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.socials.preview.dev.description': 'Explore our design system on GitHub.',
   },
   ru: {
-    'home.numbers_title': 'Острые цифры',
+    'home.numbers_title': 'Ровные цифры',
     'home.stats_team_experience': 'средний опыт всех участников Rovno.dev в 2026 году',
     'home.stats_projects_done': 'проектов завершено',
     'home.stats_happy_clients': 'довольных клиентов',
@@ -51,8 +53,9 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.view_all_projects': 'Все проекты',
     'home.socials_title': 'Наши залипательные медиа',
     'home.cta.title': 'Мы найдем решение',
-    'home.cta.subtitle': 'Напишите нам в директ — ответим в течение 3 часов*',
-    'home.cta.note': '*с 8 до 22 мск',
+    'home.cta.subtitle': 'Напишите нам — ответим в течение 3 часов.',
+    'home.cta.note': '8 — 22 МСК',
+    'home.cta.or': 'или',
     'home.cta.max': 'Написать в Max',
     'home.cta.telegram': 'Написать в TG',
     'home.socials.type.shorts': 'Shorts',
