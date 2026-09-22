@@ -6,11 +6,13 @@ from database.database import Base, DATABASE_URL
 # import all models so they are registered with Base.metadata
 from app.models import *
 config = context.config
-# LLM context: ConfigParser interprets % as interpolation syntax, so a
-# DATABASE_URL containing % (e.g. a URL-encoded password) blows up
-# set_main_option with "invalid interpolation syntax". Escape % -> %% so the
-# value stays literal inside the ini config.
-config.set_main_option("sqlalchemy.url", DATABASE_URL.replace("%", "%%"))
+# LLM context: DATABASE_URL is a SQLAlchemy URL object. render_as_string()
+# produces a URL-encoded string (so @, :, / in the password are already safe),
+# then we double-% because ConfigParser treats % as interpolation syntax.
+config.set_main_option(
+    "sqlalchemy.url",
+    DATABASE_URL.render_as_string(hide_password=False).replace("%", "%%"),
+)
 target_metadata = Base.metadata
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
