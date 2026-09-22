@@ -19,11 +19,16 @@ services:
     networks:
       - main-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.main-service.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/health`)"
       - "traefik.http.services.main-service.loadbalancer.server.port=8000"
-
   main-db:
     image: postgres:15-alpine
     container_name: main-db
@@ -42,7 +47,6 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
   valkey:
     image: valkey/valkey:7-alpine
     container_name: valkey
@@ -55,12 +59,10 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
 networks:
   main-network:
     name: main-network
     external: false
   default:
-
 volumes:
   main_db_data:

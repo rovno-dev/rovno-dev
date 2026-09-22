@@ -3,20 +3,20 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from database.database import Base, DATABASE_URL
-
 # import all models so they are registered with Base.metadata
 from app.models import *
-
 config = context.config
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+# LLM context: ConfigParser interprets % as interpolation syntax, so a
+# DATABASE_URL containing % (e.g. a URL-encoded password) blows up
+# set_main_option with "invalid interpolation syntax". Escape % -> %% so the
+# value stays literal inside the ini config.
+config.set_main_option("sqlalchemy.url", DATABASE_URL.replace("%", "%%"))
 target_metadata = Base.metadata
-
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True, dialect_opts={"paramstyle": "named"})
     with context.begin_transaction():
         context.run_migrations()
-
 def run_migrations_online():
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
@@ -27,7 +27,6 @@ def run_migrations_online():
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
-
 if context.is_offline_mode():
     run_migrations_offline()
 else:
