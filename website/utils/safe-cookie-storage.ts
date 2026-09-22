@@ -18,7 +18,7 @@ export const safeCookieStorage = {
                 expires: expiresDays,
                 domain: COOKIE_DOMAIN,
                 path: '/',
-                sameSite: 'Lax'
+                sameSite: 'lax'
             })
         } catch {}
     },

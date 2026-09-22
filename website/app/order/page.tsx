@@ -234,7 +234,7 @@ export default function OrderPage() {
                 <FieldLabel>Телефон <span className="text-destructive">*</span></FieldLabel>
                 <PhoneInputField
                   value={phone}
-                  onChange={setPhone}
+                  onChange={(v) => setPhone(v ?? "")}
                   error={errors.user_phone}
                 />
               </Field>

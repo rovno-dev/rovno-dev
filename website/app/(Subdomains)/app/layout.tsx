@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
 import { CheckUser } from "@/entities/user/model/check-user";
 import ProfileRootClientLayout from "./client-layout";
-
 export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description: "Admin panel",
+  title: "Profile",
+  description: "User profile",
 };
-export default function AdminRootLayout({
-  children, params
+// LLM context: /app/* has no dynamic segments, so LayoutProps<"/app">.params
+// is Promise<{}>. The previous signature claimed Promise<{secret}> which the
+// router never produces — remove it.
+export default function AppRootLayout({
+  children,
 }: {
   children: React.ReactNode;
-  params: Promise<{ secret: string }>
 }) {
   return (
     <CheckUser>
-      <ProfileRootClientLayout params={params} >
-        {children}
-      </ProfileRootClientLayout>
+      <ProfileRootClientLayout>{children}</ProfileRootClientLayout>
     </CheckUser>
-  )
+  );
 }

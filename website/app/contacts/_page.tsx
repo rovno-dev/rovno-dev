@@ -1,15 +1,12 @@
 "use client";
-
 import React from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SquareArrowRight, Newspaper, Gem, PublicIcon, Signature } from "lucide-react";
-import { Box } from "lucide-react/unidoka-icons/deployed-code-icon";
+import { SquareArrowRight, Newspaper, Gem, Globe, Signature, Box } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 /* ---------- Hero Section ---------- */
 function HeroSection() {
   return (
@@ -27,7 +24,6 @@ function HeroSection() {
     </section>
   );
 }
-
 /* ---------- Company Details Card ---------- */
 const companyDetails = [
   { label: "Полное наименование", value: "ООО «Ровно.дев»" },
@@ -35,7 +31,6 @@ const companyDetails = [
   { label: "ОГРН", value: "1234567890123" },
   { label: "Юридический адрес", value: "123000, г. Москва, ул. Тестовая, д. 1, офис 1" },
 ];
-
 function CompanyDetailsCard() {
   return (
     <Card className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both">
@@ -45,7 +40,6 @@ function CompanyDetailsCard() {
         </div>
         <h2 className="text-display-4 text-(--on-bg-high)">Реквизиты компании</h2>
       </div>
-
       <div className="space-y-4">
         {companyDetails.map((item, idx) => (
           <div
@@ -63,14 +57,12 @@ function CompanyDetailsCard() {
     </Card>
   );
 }
-
 /* ---------- Documents Card ---------- */
 const documents = [
   { title: "Политика конфиденциальности", href: "#" },
   { title: "Пользовательское соглашение", href: "#" },
   { title: "Использование файлов Cookie", href: "#" },
 ];
-
 function DocumentsCard() {
   return (
     <Card className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both delay-100">
@@ -80,7 +72,6 @@ function DocumentsCard() {
         </div>
         <h2 className="text-display-4 text-(--on-bg-high)">Документы</h2>
       </div>
-
       <div className="space-y-3">
         {documents.map((doc, idx) => (
           <Link
@@ -96,7 +87,6 @@ function DocumentsCard() {
     </Card>
   );
 }
-
 /* ---------- Certificates & Awards Section ---------- */
 const certificates = [
   {
@@ -107,7 +97,7 @@ const certificates = [
   {
     title: "Сертификат ISO 27001",
     subtitle: "Информационная безопасность",
-    icon: <PublicIcon className="size-8 text-(--primary)" />,
+    icon: <Globe className="size-8 text-(--primary)" />,
   },
   {
     title: "Партнер 1С-Битрикс",
@@ -120,7 +110,6 @@ const certificates = [
     icon: <Signature className="size-8 text-(--primary)" />,
   },
 ];
-
 function CertificatesSection() {
   return (
     <section className="py-16 md:py-24">
@@ -128,7 +117,6 @@ function CertificatesSection() {
         <h2 className="text-display-2 text-(--on-bg-high) mb-10 animate-reveal">
           Сертификаты и лицензии
         </h2>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {certificates.map((cert, idx) => (
             <Card
@@ -150,13 +138,11 @@ function CertificatesSection() {
     </section>
   );
 }
-
 /* ---------- Main Page ---------- */
 export default function ContactsPage() {
   return (
     <main className="min-h-screen bg-(--bg)">
       <HeroSection />
-
       <section className="py-16 md:py-24">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -165,7 +151,6 @@ export default function ContactsPage() {
           </div>
         </Container>
       </section>
-
       <CertificatesSection />
     </main>
   );

@@ -11,7 +11,6 @@ import {
   BicepsFlexed,
   ChartSpline,
 } from "lucide-react";
-
 const navItems: SidebarItem[] = [
   { label: "Дашборд", href: "", icon: ChartSpline },
   { label: "Пользователи", href: "/users", icon: Users },
@@ -22,9 +21,11 @@ const navItems: SidebarItem[] = [
   { label: "Статьи", href: "/articles", icon: Newspaper },
   { label: "Команда", href: "/team", icon: BicepsFlexed },
 ];
-
-export function AdminSidebar({ secret }: { secret: string }) {
-  const { secret: adminSecret, loading: adminSecretLoading } = useAdminSecret();
+export function AdminSidebar() {
+  // LLM context: the secret comes from the API (only admins get it back),
+  // never from route params — the [secret] segment lives below this component's
+  // parent layout, so params would be empty here.
+  const { secret: adminSecret } = useAdminSecret();
   return (
     <Sidebar
       items={navItems}

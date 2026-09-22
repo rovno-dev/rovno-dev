@@ -10,7 +10,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
-import { KeyboardArrowLeftIcon, SquareArrowRight, SquareArrowDown } from "lucide-react"
+import { ChevronLeft, SquareArrowRight, SquareArrowDown } from "lucide-react"
 
 function Calendar({
   className,
@@ -147,7 +147,7 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <KeyboardArrowLeftIcon className={cn("size-4", className)} {...props} />
+              <ChevronLeft className={cn("size-4", className)} {...props} />
             )
           }
 

@@ -1,25 +1,22 @@
 import type { Metadata } from "next";
 import { CheckUser } from "@/entities/user/model/check-user";
 import AdminRootClientLayout from "./client-layout";
-
 export const metadata: Metadata = {
   title: "Admin Dashboard",
   description: "Admin panel",
 };
-
-export default async function AdminRootLayout({
+// LLM context: this layout matches /admin/*. The [secret] segment is BELOW
+// this layout, so LayoutProps<"/admin">.params is Promise<{}> — declaring
+// Promise<{ secret: string }> here is a type error. The secret reaches the
+// sidebar via useAdminSecret() (fetched from /api/admin-secret), not params.
+export default function AdminRootLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ secret: string }>;
 }) {
-  const { secret } = await params;
   return (
     <CheckUser>
-      <AdminRootClientLayout secret={secret}>
-        {children}
-      </AdminRootClientLayout>
+      <AdminRootClientLayout>{children}</AdminRootClientLayout>
     </CheckUser>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, ElementType } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,10 +11,8 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  useCarousel,
 } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-
 // -------- Heading --------
 export function MDXHeading({
   level,
@@ -25,7 +23,11 @@ export function MDXHeading({
   children: ReactNode;
   className?: string;
 }) {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  // LLM context: React 19 removed the global JSX namespace, so
+  // `keyof JSX.IntrinsicElements` no longer exists. Build the tag as a
+  // template literal cast to ElementType — it resolves at runtime to
+  // "h1".."h6" which are all valid intrinsic elements.
+  const Tag = `h${level}` as ElementType;
   const classes = {
     1: "text-display-2 md:text-display-1 mb-6 mt-12",
     2: "text-display-3 md:text-display-2 mb-4 mt-8",
@@ -36,7 +38,6 @@ export function MDXHeading({
   };
   return <Tag className={cn(classes[level], className)}>{children}</Tag>;
 }
-
 // -------- Image --------
 export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) {
   return (
@@ -52,7 +53,6 @@ export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) 
     </div>
   );
 }
-
 // -------- Blockquote --------
 export function MDXBlockquote({ children }: { children: ReactNode }) {
   return (
@@ -61,7 +61,6 @@ export function MDXBlockquote({ children }: { children: ReactNode }) {
     </blockquote>
   );
 }
-
 // -------- Code (inline) --------
 export function MDXCode({ children }: { children: ReactNode }) {
   return (
@@ -70,7 +69,6 @@ export function MDXCode({ children }: { children: ReactNode }) {
     </code>
   );
 }
-
 // -------- Pre (code block) --------
 export function MDXPre({ children }: { children: ReactNode }) {
   return (
@@ -79,7 +77,6 @@ export function MDXPre({ children }: { children: ReactNode }) {
     </pre>
   );
 }
-
 // -------- List (ul / ol) --------
 export function MDXList({
   children,
@@ -88,28 +85,24 @@ export function MDXList({
   children: ReactNode;
   ordered?: boolean;
 }) {
-  const Tag = ordered ? "ol" : "ul";
+  const Tag: ElementType = ordered ? "ol" : "ul";
   return (
     <Tag className={cn("my-4 ml-6 space-y-1", ordered ? "list-decimal" : "list-disc")}>
       {children}
     </Tag>
   );
 }
-
 export function MDXListItem({ children }: { children: ReactNode }) {
   return <li className="pl-1">{children}</li>;
 }
-
 // -------- Paragraph --------
 export function MDXParagraph({ children }: { children: ReactNode }) {
   return <p className="my-4 leading-relaxed text-(--on-bg-medium)">{children}</p>;
 }
-
 // -------- Horizontal Rule --------
 export function MDXHr() {
   return <hr className="my-8 border-(--outline)" />;
 }
-
 // -------- Link --------
 export function MDXLink({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -118,7 +111,6 @@ export function MDXLink({ href, children }: { href: string; children: ReactNode 
     </a>
   );
 }
-
 // -------- Table --------
 export function MDXTable({ children }: { children: ReactNode }) {
   return (
@@ -127,19 +119,15 @@ export function MDXTable({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
 export function MDXThead({ children }: { children: ReactNode }) {
   return <thead className="bg-(--bg-disabled)">{children}</thead>;
 }
-
 export function MDXTh({ children }: { children: ReactNode }) {
   return <th className="px-4 py-2 text-left font-medium">{children}</th>;
 }
-
 export function MDXTd({ children }: { children: ReactNode }) {
   return <td className="px-4 py-2 border-t border-(--outline)">{children}</td>;
 }
-
 // -------- Card (generic) --------
 export function MDXCard({ children, className }: { children: ReactNode; className?: string }) {
   return (
@@ -148,15 +136,12 @@ export function MDXCard({ children, className }: { children: ReactNode; classNam
     </Card>
   );
 }
-
 // -------- Gallery (image/video carousel) --------
 export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src: string }> }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselApi, setCarouselApi] = useState<any>(null);
-
   if (!media || media.length === 0) return null;
-
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -241,7 +226,6 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
     </>
   );
 }
-
 // -------- Metric Card --------
 export function MetricCard({
   label,
@@ -260,7 +244,6 @@ export function MetricCard({
     </div>
   );
 }
-
 // -------- Default export for mapping --------
 export const defaultMDXComponents = {
   h1: (props: any) => <MDXHeading level={1} {...props} />,
