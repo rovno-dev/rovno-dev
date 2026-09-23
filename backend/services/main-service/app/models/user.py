@@ -26,6 +26,10 @@ class User(Base):
     phone = Column(String, unique=True, nullable=True)
     password = Column(String, nullable=False)
     description = Column(Text, nullable=True)
+    # Short bio shown next to author bylines (blog cards, article page).
+    # 64-char ceiling keeps the layout stable; longer prose belongs in
+    # team_members.bio which renders on the expert page.
+    bio = Column(String(64), nullable=True)
     avatar_url = Column(String, nullable=True)
     telegram_username = Column(String, unique=True, nullable=True)
     linkedin_username = Column(String, unique=True, nullable=True)

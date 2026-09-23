@@ -1,6 +1,7 @@
 "use client";
+
 import { useRouter } from "next/navigation";
-import { Sidebar, SidebarItem } from "@/components/layout/nav/sidebar";
+import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useUser } from "@/entities/user/model/user-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,14 +12,14 @@ import {
   Newspaper,
 } from "lucide-react";
 
-// Profile routes live under app/(Subdomains)/app/*, which resolve to
-// /app/* on the URL (the route group contributes nothing). basePath is
-// therefore "/app" and each item.href is the suffix.
+// Profile routes resolve to /app/* (the (Subdomains) folder is a route
+// group and contributes nothing to the URL), so basePath is "/app" and
+// each item.href is a suffix.
 const NAV_ITEMS: SidebarItem[] = [
-  { label: "Профиль",      href: "/profile",           icon: User,              exact: true },
-  { label: "Статьи",       href: "/profile/articles",  icon: Newspaper },
-  { label: "Настройки",    href: "/profile/settings",  icon: Settings,          exact: true },
-  { label: "Безопасность", href: "/profile/security",  icon: BriefcaseBusiness, exact: true },
+  { label: "Профиль",      href: "/profile",            icon: User,              exact: true },
+  { label: "Статьи",       href: "/profile/articles",   icon: Newspaper },
+  { label: "Настройки",    href: "/profile/settings",   icon: Settings,          exact: true },
+  { label: "Безопасность", href: "/profile/security",   icon: BriefcaseBusiness, exact: true },
 ];
 
 export function ProfileSidebar() {
@@ -35,6 +36,7 @@ export function ProfileSidebar() {
       items={NAV_ITEMS}
       basePath="/app"
       title="Личный кабинет"
+      storageKey="profile-sidebar-collapsed"
       className="mb-6"
       footer={
         <Button

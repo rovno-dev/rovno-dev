@@ -4,7 +4,7 @@ from uuid import UUID
 import re
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
 from app.models.article import Article
@@ -14,12 +14,12 @@ from app.models.project import PublicationStatus
 from app.schemas.article.requests import ArticleCreate, ArticleUpdate
 from app.schemas.article.responses import ArticleListItem, ArticleResponse
 from app.services.tag_service import resolve_tags
+from app.services.team_service import is_team_member
 from app.shared.auth import get_current_user, get_optional_user
 from database.database import get_db
 
 router = APIRouter(prefix="/articles", tags=["articles"])
 
-# Consistent with the frontend's utils/slugify.ts for article slugs.
 _SLUG_RE = re.compile(r"[^\w\s-]+", re.UNICODE)
 _SLUG_WS = re.compile(r"[\s_]+", re.UNICODE)
 
@@ -58,6 +58,19 @@ def _unique_slug(db: Session, base: str, exclude_id: Optional[UUID] = None) -> s
         suffix += 1
 
 
+def _resolve_publish_status(
+    db: Session,
+    requested: str,
+    user: User,
+) -> PublicationStatus:
+    """Team members publish immediately. Everyone else goes into review."""
+    if requested == "published":
+        if is_team_member(db, user):
+            return PublicationStatus.published
+        return PublicationStatus.pending_review
+    return PublicationStatus(requested)
+
+
 # ---------- Public list ----------
 @router.get("", response_model=List[ArticleListItem])
 def list_published_articles(
@@ -67,21 +80,18 @@ def list_published_articles(
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Article).filter(Article.publication_status == PublicationStatus.published)
-
+    query = db.query(Article).filter(
+        Article.publication_status == PublicationStatus.published
+    )
     if tag:
-        # `tag` is the tag's URL-safe slug, so a rename of the display name
-        # does not break existing links.
         query = query.join(Article.tags).filter(Tag.slug == tag)
-
     if q:
-        like = f"%{q}%"
-        query = query.filter(or_(Article.title.ilike(like), Article.description.ilike(like)))
-
+        like = f"%{q.strip()}%"
+        query = query.filter(Article.title.ilike(like))
     return query.order_by(Article.date.desc()).offset(offset).limit(limit).all()
 
 
-# ---------- My articles (auth) ----------
+# ---------- My articles ----------
 @router.get("/me", response_model=List[ArticleListItem])
 def list_my_articles(
     db: Session = Depends(get_db),
@@ -109,9 +119,6 @@ def get_article(
     if article.publication_status == PublicationStatus.published:
         return article
 
-    # Draft / unpublished: hide existence from strangers, but signal 401 to
-    # the author's client so it can refresh a stale token and retry, rather
-    # than showing a misleading "Article not found".
     if current_user is None:
         raise HTTPException(401, "Authentication required")
     if article.author_id != current_user.id and not _is_admin(current_user):
@@ -129,9 +136,11 @@ def create_article(
     base_slug = slugify(payload.slug or payload.title)
     slug = _unique_slug(db, base_slug)
 
-    status_val = payload.publication_status or "draft"
-    if status_val not in {"draft", "published"}:
+    requested = payload.publication_status or "draft"
+    if requested not in {"draft", "published"}:
         raise HTTPException(422, "publication_status must be 'draft' or 'published'")
+
+    final_status = _resolve_publish_status(db, requested, current_user)
 
     article = Article(
         slug=slug,
@@ -143,7 +152,7 @@ def create_article(
         raw_json=payload.raw_json,
         seo_title=payload.seo_title,
         meta_description=payload.meta_description,
-        publication_status=PublicationStatus(status_val),
+        publication_status=final_status,
         author_id=current_user.id,
     )
     article.tags = resolve_tags(db, payload.tags)
@@ -173,11 +182,17 @@ def update_article(
         update["slug"] = _unique_slug(db, slugify(update["slug"]), exclude_id=article.id)
 
     if "publication_status" in update and update["publication_status"] is not None:
-        if update["publication_status"] not in {"draft", "published"}:
+        requested = update["publication_status"]
+        if requested not in {"draft", "published"}:
             raise HTTPException(422, "publication_status must be 'draft' or 'published'")
-        update["publication_status"] = PublicationStatus(update["publication_status"])
+        update["publication_status"] = _resolve_publish_status(db, requested, current_user)
+        # Re-submitting a rejected article clears the old review note —
+        # otherwise the author sees a stale rejection on a pending article.
+        if update["publication_status"] == PublicationStatus.pending_review:
+            article.review_note = None
+            article.reviewed_by_id = None
+            article.reviewed_at = None
 
-    # Tags need a special path — resolve to Tag rows, not setattr.
     tag_names = update.pop("tags", None)
     if tag_names is not None:
         article.tags = resolve_tags(db, tag_names)
@@ -190,18 +205,25 @@ def update_article(
     return article
 
 
-# ---------- Publish / unpublish ----------
+# ---------- Submit / withdraw ----------
 @router.post("/{slug}/publish", response_model=ArticleResponse)
 def publish_article(
     slug: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Team members publish; everyone else lands in pending_review."""
     article = db.query(Article).filter(Article.slug == slug).first()
     if not article:
         raise HTTPException(404, "Article not found")
     _ensure_owner_or_admin(article, current_user)
-    article.publication_status = PublicationStatus.published
+
+    article.publication_status = _resolve_publish_status(db, "published", current_user)
+    if article.publication_status == PublicationStatus.pending_review:
+        article.review_note = None
+        article.reviewed_by_id = None
+        article.reviewed_at = None
+
     db.commit()
     db.refresh(article)
     return article

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import Image from "next/image";
 import { compileMDX } from "next-mdx-remote/rsc";
+import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,7 +28,6 @@ import {
   MDXCard,
 } from "@/components/mdx";
 
-// Same base resolution the other server fetchers use.
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -63,30 +63,20 @@ async function fetchArticleForPreview(
       `${API_BASE}/api/v1/articles/${encodeURIComponent(slug)}`,
       {
         headers: { Authorization: `Bearer ${token}` },
-        // Never cache a preview — the author expects to see the latest save.
         cache: "no-store",
       }
     );
     if (res.status === 401 || res.status === 403) {
       return { ok: false, reason: "unauthorized" };
     }
-    if (res.status === 404) {
-      return { ok: false, reason: "not-found" };
-    }
-    if (!res.ok) {
-      return { ok: false, reason: "server" };
-    }
-    const article = (await res.json()) as PreviewArticle;
-    return { ok: true, article };
+    if (res.status === 404) return { ok: false, reason: "not-found" };
+    if (!res.ok) return { ok: false, reason: "server" };
+    return { ok: true, article: (await res.json()) as PreviewArticle };
   } catch {
-    // Network failure, DNS, timeout — treat as a server problem, not "not
-    // found". The user gets a "reload" path instead of a wrong 404.
     return { ok: false, reason: "server" };
   }
 }
 
-// Same shape as the public blog page, so a preview renders identically to
-// the published article.
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return String(node);
@@ -158,11 +148,6 @@ function SessionExpired() {
           <p className="text-body-4 text-(--on-bg-medium) mb-4">
             Обновите страницу — токен обновится автоматически.
           </p>
-          {/*
-            href="" navigates to the current URL, which is a full reload.
-            This is what we want: the Server Component re-runs and reads the
-            freshly-refreshed cookie that useUser wrote on the client.
-          */}
           <Button variant="outlined" size="small" asChild>
             <a href="">
               <RefreshCw className="size-4" />
@@ -207,10 +192,8 @@ export default async function PreviewArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  // Server Components can read the auth cookie directly. Same token the
-  // client-side $fetch helper uses — forwarded to the backend verbatim.
   const token = (await cookies()).get("access_token")?.value;
+
   if (!token) {
     return (
       <div className="space-y-6">
@@ -233,8 +216,6 @@ export default async function PreviewArticlePage({
   const article = result.article;
   const isPublished = article.publication_status === "published";
 
-  // Compile MDX once on the server. No client-side fetch, no loading state,
-  // no recompile loop — the HTML is fully formed when this renders.
   const { content } = await compileMDX({
     source: article.mdx_content || "",
     components: mdxComponents,
@@ -243,27 +224,25 @@ export default async function PreviewArticlePage({
 
   return (
     <div className="space-y-6">
-      {/* Status + actions */}
+      {/* Admin header — the meta strip that tells you you're in preview
+          mode, distinct from the public article page. */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="tonal-card-static" size="chip-small" className="gap-1">
-              <Eye className="size-3" />
-              Предпросмотр
-            </Badge>
-            <Badge
-              variant="tonal-card-static"
-              size="chip-small"
-              className={
-                isPublished
-                  ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
-                  : "bg-amber-500/15 text-amber-500 border-amber-500/30"
-              }
-            >
-              {isPublished ? "Опубликовано" : "Черновик"}
-            </Badge>
-          </div>
-          <h1 className="text-display-3 truncate">{article.title}</h1>
+        <div className="flex items-center gap-2">
+          <Badge variant="tonal-card-static" size="chip-small" className="gap-1">
+            <Eye className="size-3" />
+            Предпросмотр
+          </Badge>
+          <Badge
+            variant="tonal-card-static"
+            size="chip-small"
+            className={
+              isPublished
+                ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
+                : "bg-amber-500/15 text-amber-500 border-amber-500/30"
+            }
+          >
+            {isPublished ? "Опубликовано" : "Черновик"}
+          </Badge>
         </div>
         <div className="flex gap-2 shrink-0">
           <Button variant="outlined" asChild>
@@ -281,32 +260,54 @@ export default async function PreviewArticlePage({
         </div>
       </div>
 
-      {/* Cover */}
-      {article.image_url && (
-        <div className="relative aspect-[16/8] w-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card)">
+      {/* Same hero pattern as the public article — cover as full-bleed
+          background, gradient overlay, title/description/badges layered
+          on top. What you see here is what readers see. */}
+      <div className="relative w-full h-[420px] md:h-[520px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline)">
+        {article.image_url ? (
           <Image
             src={article.image_url}
             alt={article.title}
             fill
-            sizes="(max-width: 1200px) 100vw, 1200px"
-            className="object-cover"
             priority
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            quality={90}
+            className="object-cover object-center"
           />
-        </div>
-      )}
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-      {/* Tags */}
-      {article.tags && article.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {article.tags.map((t) => (
-            <Badge key={t.id} variant="tonal-card-static" size="chip-small">
-              {t.name}
-            </Badge>
-          ))}
-        </div>
-      )}
+        {/* Tags, top-right — same treatment as the public page */}
+        {article.tags && article.tags.length > 0 && (
+          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
+            {article.tags.slice(0, 4).map((tag) => (
+              <Badge
+                key={tag.id}
+                variant="glass-static"
+                size="chip-small"
+                className="text-white border-white/20"
+              >
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
+        )}
 
-      {/* Body — pre-compiled on the server, no client work */}
+        <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
+          <h1 className="text-display-3 md:text-display-1 text-white leading-[1.05] tracking-tight mb-4 max-w-4xl">
+            {article.title}
+          </h1>
+          {article.description && (
+            <p className="text-body-3 md:text-body-1 text-white/80 leading-relaxed max-w-2xl">
+              {article.description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Body */}
       <article className="rounded-3xl border border-(--outline) bg-(--card) p-6 md:p-10">
         {article.mdx_content ? (
           content

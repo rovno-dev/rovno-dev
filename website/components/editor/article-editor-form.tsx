@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { ChevronDown, ChevronUp, Sparkles, Save, Rocket, Trash2, Undo2 } from "lucide-react";
 import { useLanguage } from "@/providers/language-provider";
+import { useUser } from "@/entities/user/model/user-context";
 import { ArticleEditor } from "./article-editor";
 import { TagsAutocomplete } from "./tags-autocomplete";
 import { ImageUploadField } from "./image-upload-field";
@@ -75,9 +76,13 @@ function toFormState(article?: Article | null): FormState {
 
 export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
   const { t } = useLanguage();
+  const { user } = useUser();
   const router = useRouter();
   const isEdit = !!initial;
+  const isTeam = !!user?.is_team_member;
   const isPublished = initial?.publication_status === "published";
+  const isPending = initial?.publication_status === "pending_review";
+  const isRejected = initial?.publication_status === "rejected";
 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
@@ -160,7 +165,13 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
       const saved = isEdit && initial
         ? await updateArticle(initial.slug, payload)
         : await createArticle(payload);
-      toast.success(status === "published" ? t("editor.published") : t("editor.saved"));
+      // Different toast depending on where it went: team members publish
+      // immediately, everyone else lands in the review queue.
+      if (status === "published" && !isTeam) {
+        toast.success("Статья отправлена на проверку");
+      } else {
+        toast.success(status === "published" ? t("editor.published") : t("editor.saved"));
+      }
       if (!isEdit) {
         router.replace(`/app/profile/articles/${saved.slug}/edit`);
       } else {
@@ -267,7 +278,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
               </Button>
               <Button onClick={() => handleSave("published")} disabled={saving}>
                 <Rocket className="size-4" />
-                {t("editor.publish")}
+                {isTeam ? t("editor.publish") : "Отправить на проверку"}
               </Button>
             </>
           )}
@@ -280,12 +291,41 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
               </Button>
               <Button onClick={() => handleSave("published")} disabled={saving}>
                 <Rocket className="size-4" />
-                {t("editor.publish")}
+                {isTeam ? t("editor.publish") : "Отправить на проверку"}
               </Button>
             </>
           )}
         </div>
       </div>
+
+      {/* Review status banner */}
+      {isEdit && isPending && (
+        <Card className="rounded-3xl border border-blue-500/30 bg-blue-500/5 p-5 flex items-start gap-4">
+          <Clock className="size-5 text-blue-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-heading-5 text-(--on-bg-high) mb-1">На проверке</p>
+            <p className="text-body-4 text-(--on-bg-medium)">
+              Статья отправлена на модерацию. Администратор её рассмотрит в ближайшее время.
+            </p>
+          </div>
+        </Card>
+      )}
+
+      {isEdit && isRejected && initial?.review_note && (
+        <Card className="rounded-3xl border border-rose-500/30 bg-rose-500/5 p-5 flex items-start gap-4">
+          <XCircle className="size-5 text-rose-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-heading-5 text-(--on-bg-high) mb-1">Статья отклонена</p>
+            <p className="text-body-3 text-(--on-bg-medium) mb-2">
+              Причина от администратора:
+            </p>
+            <p className="text-body-3 text-(--on-bg-high)">{initial.review_note}</p>
+            <p className="text-body-5 text-(--on-bg-low) mt-3">
+              Отредактируйте и нажмите «Отправить на проверку», чтобы отправить повторно.
+            </p>
+          </div>
+        </Card>
+      )}
 
       {/* Metadata */}
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-4">

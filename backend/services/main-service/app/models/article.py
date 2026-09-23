@@ -34,7 +34,14 @@ class Article(Base):
     # the existing article_categories table; the API does not surface it.
     category_id = Column(UUID(as_uuid=True), ForeignKey("article_categories.id"), nullable=True)
 
-    author = relationship("User", lazy="joined")
+    # Review workflow (non-team authors).
+    review_note = Column(Text, nullable=True)
+    reviewed_by_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
+
+    # Two FKs to users — must disambiguate explicitly.
+    author = relationship("User", foreign_keys=[author_id], lazy="joined")
+    reviewed_by = relationship("User", foreign_keys=[reviewed_by_id], lazy="joined")
     category = relationship("ArticleCategory", lazy="joined")
     # selectin avoids N+1 on list endpoints. order_by keeps the render order
     # deterministic between requests (alphabetical by name).

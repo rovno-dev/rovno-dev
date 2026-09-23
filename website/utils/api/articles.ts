@@ -56,7 +56,10 @@ export interface ArticleListItem {
   image_url: string;
   date: string;
   tags?: TagRef[] | null;
-  publication_status: "draft" | "published" | string;
+  publication_status: "draft" | "pending_review" | "published" | "rejected" | string;
+  review_note?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by?: { id: string; name?: string | null; username?: string | null } | null;
   author_id?: string | null;
   author?: ArticleAuthor | null;
   created_at: string;
@@ -69,6 +72,10 @@ export interface Article extends ArticleListItem {
   seo_title?: string | null;
   meta_description?: string | null;
 }
+
+// Review workflow fields are already part of the backend response; the
+// frontend picks them up here. publication_status may be any of:
+//   draft | pending_review | published | rejected
 
 export interface ArticlePayload {
   slug?: string;

@@ -9,7 +9,10 @@ import { ArrowLeft } from "lucide-react";
 import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
 import { extractMdxHeadings } from "@/utils/mdx-headings";
-import { fetchArticleServer, fetchPublishedArticlesServer } from "@/utils/api/articles";
+import {
+  fetchArticleServer,
+  fetchPublishedArticlesServer,
+} from "@/utils/api/articles";
 import {
   Gallery,
   MetricCard,
@@ -28,23 +31,31 @@ import {
   MDXTd,
   MDXCard,
 } from "@/components/mdx";
+
 export const revalidate = 60;
-// LLM context: extractText + the h2/h3 components mirror the docs page so
-// anchors work identically and the TOC slugs match.
+
+// extractText + the h2/h3 components mirror the docs page so anchors work
+// identically and the TOC slugs match.
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(extractText).join("");
   if (node && typeof node === "object" && "props" in node) {
-    return extractText((node as { props: { children: React.ReactNode } }).props.children);
+    return extractText(
+      (node as { props: { children: React.ReactNode } }).props.children
+    );
   }
   return "";
 }
+
 const mdxComponents = {
   h2: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));
     return (
-      <h2 id={id} className="text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28">
+      <h2
+        id={id}
+        className="text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28"
+      >
         {children}
       </h2>
     );
@@ -52,7 +63,10 @@ const mdxComponents = {
   h3: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));
     return (
-      <h3 id={id} className="text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28">
+      <h3
+        id={id}
+        className="text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
+      >
         {children}
       </h3>
     );
@@ -78,7 +92,12 @@ const mdxComponents = {
   Gallery,
   MetricCard,
 };
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
   if (!article) return { title: "Article not found · Rovno.dev" };
@@ -92,6 +111,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
   };
 }
+
 function formatDate(iso: string) {
   try {
     return new Date(iso).toLocaleDateString("ru-RU", {
@@ -103,83 +123,124 @@ function formatDate(iso: string) {
     return iso;
   }
 }
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
   if (!article) notFound();
+
   const headings = extractMdxHeadings(article.mdx_content || "");
   const { content } = await compileMDX({
     source: article.mdx_content || "",
     components: mdxComponents,
     options: { parseFrontmatter: false },
   });
-  // Related — a handful of recent articles excluding this one.
+
   const recent = await fetchPublishedArticlesServer({ limit: 6 });
   const others = recent.filter((a) => a.slug !== article.slug).slice(0, 3);
+
   const authorName =
     article.author?.name || article.author?.username || "Rovno.dev";
+
   return (
-    <main className="min-h-screen bg-(--bg)">
-      {/* Header */}
-      <section className="border-b border-(--outline) pt-12 md:pt-20 pb-10">
-        <Container>
-          <div className="max-w-[900px]">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-6"
-            >
-              <ArrowLeft className="size-4" />
-              Все статьи
-            </Link>
-            {article.tags && article.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-5">
-                {article.tags.map((tag) => (
-                  <Badge key={tag.id} variant="glass-static" size="chip-small">
-                    {tag.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
-            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) leading-[1.1] mb-4">
-              {article.title}
-            </h1>
-            {article.description && (
-              <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed mb-6">
-                {article.description}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-4 text-body-4 text-(--on-bg-low)">
-              <span>{authorName}</span>
-              <span aria-hidden>·</span>
-              <time dateTime={article.date}>{formatDate(article.date)}</time>
-            </div>
-          </div>
-        </Container>
-      </section>
-      {/* Cover */}
-      {article.image_url && (
-        <Container className="pt-8 md:pt-12">
-          <div className="relative aspect-[16/8] w-full overflow-hidden rounded-4xl border border-(--outline) bg-(--card)">
+    <main className="min-h-screen bg-(--bg) pb-24">
+      {/* =========================================================
+          HERO — cover as full-bleed background, same pattern as the
+          expert profile. Fixed height, rounded card, dark gradient at
+          the bottom so the title/description stay readable no matter
+          how light the cover is.
+      ========================================================= */}
+      <Container variant="full-width" className="pt-4 md:pt-8">
+        <div className="relative w-full h-[480px] md:h-[600px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
+          {/* z-0 — cover image, or gradient fallback if none is set */}
+          {article.image_url ? (
             <Image
               src={article.image_url}
               alt={article.title}
               fill
               priority
-              sizes="(max-width: 1200px) 100vw, 1200px"
+              sizes="(max-width: 1200px) 100vw, 1400px"
               quality={90}
-              className="object-cover"
+              className="object-cover object-center"
             />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+          )}
+
+          {/* z-1 — bottom fade for text legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
+
+          {/* z-1 — top fade so the back button has a readable surface */}
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
+          {/* z-10 — back button, top-left glass chip */}
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+            <Button variant="glass" size="icon-medium" shape="round" asChild>
+              <Link href="/blog" aria-label="Все статьи">
+                <ArrowLeft className="size-5" />
+              </Link>
+            </Button>
           </div>
-        </Container>
-      )}
-      {/* Body + TOC */}
+
+          {/* z-10 — tags, top-right. Glass pills, readable over any cover. */}
+          {article.tags && article.tags.length > 0 && (
+            <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
+              {article.tags.slice(0, 4).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="glass-static"
+                  size="chip-small"
+                  className="text-white border-white/20"
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* z-10 — title + description + byline, anchored at the bottom */}
+          <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
+            <h1 className="text-display-3 md:text-display-1 text-white leading-[1.05] tracking-tight mb-4 max-w-4xl animate-reveal">
+              {article.title}
+            </h1>
+            {article.description && (
+              <p className="text-body-3 md:text-body-1 text-white/80 leading-relaxed mb-6 max-w-2xl animate-reveal [animation-delay:120ms] fill-mode-both">
+                {article.description}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-4 text-white/60 animate-reveal [animation-delay:200ms] fill-mode-both">
+              <span className="font-medium text-white/85">{authorName}</span>
+              <span aria-hidden>·</span>
+              <time dateTime={article.date}>{formatDate(article.date)}</time>
+              {headings.length > 0 && (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>{headings.length} разделов</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </Container>
+
+      {/* =========================================================
+          BODY + TOC
+      ========================================================= */}
       <section className="py-12 md:py-16">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
             <article className="max-w-[760px]">{content}</article>
             <div className="space-y-8">
               {headings.length > 0 && (
-                <Toc headings={headings} label="Содержание" ariaLabel="Содержание статьи" />
+                <Toc
+                  headings={headings}
+                  label="Содержание"
+                  ariaLabel="Содержание статьи"
+                />
               )}
               {others.length > 0 && (
                 <nav
@@ -207,7 +268,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </div>
         </Container>
       </section>
-      {/* Footer nav */}
+
+      {/* =========================================================
+          FOOTER NAV
+      ========================================================= */}
       <section className="pb-24">
         <Container>
           <Button variant="outlined" size="medium" shape="round" asChild>

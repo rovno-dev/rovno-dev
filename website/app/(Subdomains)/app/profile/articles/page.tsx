@@ -32,6 +32,14 @@ const STATUS_STYLES: Record<string, { label: string; className: string }> = {
     label: "Опубликовано",
     className: "bg-emerald-500/30 text-emerald-100 border-emerald-300/40",
   },
+  pending_review: {
+    label: "На проверке",
+    className: "bg-blue-500/30 text-blue-100 border-blue-300/40",
+  },
+  rejected: {
+    label: "Отклонено",
+    className: "bg-rose-500/30 text-rose-100 border-rose-300/40",
+  },
   draft: {
     label: "Черновик",
     className: "bg-amber-500/30 text-amber-100 border-amber-300/40",
@@ -178,10 +186,8 @@ export default function MyArticlesPage() {
         {state.kind === "ready" && state.articles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {state.articles.map((a) => {
+              const status = STATUS_STYLES[a.publication_status] ?? STATUS_STYLES.draft;
               const isPublished = a.publication_status === "published";
-              const status = isPublished
-                ? STATUS_STYLES.published
-                : STATUS_STYLES.draft;
 
               return (
                 <Card

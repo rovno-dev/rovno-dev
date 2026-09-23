@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AdminTable } from "../../_components/admin-table";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -14,7 +14,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { $fetch } from "@/utils/fetch";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Users, UserX } from "lucide-react";
+import { makeTeamMember, removeTeamMember, fetchTeamMembers } from "@/utils/api/team";
+import { Textarea } from "@/components/ui/textarea";
 
 interface User {
   id: string;
@@ -53,16 +55,30 @@ export default function AdminUsersPage() {
     blocked: false,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  // Map of user_id -> team member role, for the "Team" column
+  const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
+  // Make-team-member dialog
+  const [teamDialogUserId, setTeamDialogUserId] = useState<string | null>(null);
+  const [teamDialogRole, setTeamDialogRole] = useState("");
+  const [teamDialogBio, setTeamDialogBio] = useState("");
+  const [teamDialogSaving, setTeamDialogSaving] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await $fetch("/api/v1/admin/users", { isToast: false });
-      if (res.response?.ok) {
-        setUsers(res.json);
+      const [usersRes, team] = await Promise.all([
+        $fetch("/api/v1/admin/users", { isToast: false }),
+        fetchTeamMembers().catch(() => []),
+      ]);
+      if (usersRes.response?.ok) {
+        setUsers(usersRes.json);
       } else {
         toast.error("Не удалось загрузить пользователей");
       }
+      // Build a lookup of user_id -> role so the table can render a Team badge.
+      const lookup: Record<string, string> = {};
+      for (const m of team) lookup[m.user_id] = m.role;
+      setTeamRoles(lookup);
     } catch {
       toast.error("Ошибка загрузки пользователей");
     } finally {
@@ -202,6 +218,37 @@ export default function AdminUsersPage() {
     return user.role !== "admin";
   };
 
+  const handleMakeTeamMember = async () => {
+    if (!teamDialogUserId || !teamDialogRole.trim()) return;
+    setTeamDialogSaving(true);
+    try {
+      await makeTeamMember(teamDialogUserId, {
+        role: teamDialogRole.trim(),
+        bio: teamDialogBio.trim() || undefined,
+      });
+      toast.success("Пользователь добавлен в команду");
+      setTeamDialogUserId(null);
+      setTeamDialogRole("");
+      setTeamDialogBio("");
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message || "Ошибка");
+    } finally {
+      setTeamDialogSaving(false);
+    }
+  };
+
+  const handleRemoveTeamMember = async (userId: string) => {
+    if (!confirm("Убрать пользователя из команды? Он потеряет возможность публиковать статьи без модерации.")) return;
+    try {
+      await removeTeamMember(userId);
+      toast.success("Пользователь убран из команды");
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.message || "Ошибка");
+    }
+  };
+
   const columns = [
     { key: "email", header: "Email" },
     { key: "name", header: "Имя" },
@@ -209,6 +256,21 @@ export default function AdminUsersPage() {
     { key: "role", header: "Роль" },
     { key: "verified", header: "Подтверждён", render: (u: User) => (u.verified ? "✅" : "❌") },
     { key: "blocked", header: "Заблокирован", render: (u: User) => (u.blocked ? "🚫" : "—") },
+    {
+      key: "team",
+      header: "Команда",
+      render: (u: User) => {
+        const role = teamRoles[u.id];
+        if (role) {
+          return (
+            <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+              <Users className="size-3" /> {role}
+            </span>
+          );
+        }
+        return <span className="text-(--on-bg-low) text-xs">—</span>;
+      },
+    },
     {
       key: "actions",
       header: "Действия",
@@ -234,6 +296,25 @@ export default function AdminUsersPage() {
             >
               <Trash2 className="size-4" />
             </Button>
+            {teamRoles[u.id] ? (
+              <Button
+                size="icon-small"
+                variant="text"
+                onClick={() => handleRemoveTeamMember(u.id)}
+                title="Убрать из команды"
+              >
+                <UserX className="size-4" />
+              </Button>
+            ) : (
+              <Button
+                size="icon-small"
+                variant="text"
+                onClick={() => { setTeamDialogUserId(u.id); setTeamDialogRole(""); setTeamDialogBio(""); }}
+                title="Сделать участником команды"
+              >
+                <Users className="size-4" />
+              </Button>
+            )}
           </div>
         );
       },
@@ -363,6 +444,42 @@ export default function AdminUsersPage() {
             <Button variant="outlined" onClick={() => setIsDialogOpen(false)}>Отмена</Button>
             <Button onClick={handleSave}>Сохранить</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+      {/* Make team member dialog */}
+      <Dialog open={!!teamDialogUserId} onOpenChange={(open) => { if (!open) setTeamDialogUserId(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Сделать участником команды</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <Field>
+              <FieldLabel>Роль <span className="text-destructive">*</span></FieldLabel>
+              <Input
+                value={teamDialogRole}
+                onChange={(e) => setTeamDialogRole(e.target.value)}
+                placeholder="Со-основатель и CTO"
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Профессиональное био (опционально)</FieldLabel>
+              <Textarea
+                value={teamDialogBio}
+                onChange={(e) => setTeamDialogBio(e.target.value)}
+                placeholder="Опишите опыт и специализацию"
+                className="min-h-[100px]"
+              />
+            </Field>
+          </div>
+          <DialogFooter>
+            <Button variant="outlined" onClick={() => setTeamDialogUserId(null)}>Отмена</Button>
+            <Button
+              onClick={handleMakeTeamMember}
+              disabled={!teamDialogRole.trim() || teamDialogSaving}
+            >
+              Добавить в команду
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </CheckUser>

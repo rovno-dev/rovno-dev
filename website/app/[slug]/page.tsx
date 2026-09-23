@@ -1,5 +1,5 @@
 "use client";
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { EXPERTS_DATA } from "@/app/_data/experts";
 import ProjectCard from "@/components/layout/projects/project-card";
 import TatarstanIcon from "@/components/icons/experts-icons/Tatarstan-icon";
+import { fetchTeamMemberByUsername, type TeamMemberPublic } from "@/utils/api/team";
 
 const CONTENT_MAX = "max-w-[1200px] mx-auto";
 
@@ -17,6 +18,21 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
   const { slug } = use(params);
   const expert = EXPERTS_DATA[slug];
   if (!expert) notFound();
+
+  // Overlay the DB-backed team record (cover_url + long bio) on top of the
+  // hardcoded EXPERTS_DATA. Anyone in the admin list who's been made a team
+  // member gets their /uploads/images/… cover and full bio rendered here.
+  const [teamInfo, setTeamInfo] = useState<TeamMemberPublic | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetchTeamMemberByUsername(slug)
+      .then((t) => { if (!cancelled) setTeamInfo(t); })
+      .catch(() => { /* no DB record → fall back to hardcoded */ });
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  const heroImage = teamInfo?.cover_url || expert.avatar;
+  const longBio = teamInfo?.bio || null;
 
   const projectCount = expert.projects.length;
   const projectWord =
@@ -29,7 +45,7 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
         <div className={CONTENT_MAX}>
           <div className="relative w-full h-[480px] md:h-[600px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
             <Image
-              src={expert.avatar}
+              src={heroImage}
               fill
               sizes="(max-width: 768px) 100vw, 1200px"
               className="object-cover object-center"
@@ -93,9 +109,16 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
         <div
           className={`${CONTENT_MAX} grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 lg:gap-16 items-start`}
         >
-          <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed animate-reveal">
-            {expert.description}
-          </p>
+          <div className="space-y-4 animate-reveal">
+            <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed">
+              {expert.description}
+            </p>
+            {longBio && (
+              <p className="text-body-2 text-(--on-bg-medium) leading-relaxed whitespace-pre-line">
+                {longBio}
+              </p>
+            )}
+          </div>
 
           <div className="flex flex-wrap gap-2 lg:justify-end">
             {expert.tags.map((tag, idx) => (

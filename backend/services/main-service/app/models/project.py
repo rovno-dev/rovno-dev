@@ -9,6 +9,9 @@ import enum
 
 class PublicationStatus(str, enum.Enum):
     draft = "draft"
+    # Submitted by the author, awaiting admin review. Only non-team authors
+    # land here — team members publish directly.
+    pending_review = "pending_review"
     published = "published"
     rejected = "rejected"
     deleted = "deleted"
