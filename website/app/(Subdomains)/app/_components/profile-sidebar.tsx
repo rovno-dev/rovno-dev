@@ -1,59 +1,51 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useUser } from "@/entities/user/model/user-context";
 import { useRouter } from "next/navigation";
-import { LogOut, User, Settings, BriefcaseBusiness, Newspaper } from "lucide-react";
+import { Sidebar, SidebarItem } from "@/components/layout/nav/sidebar";
+import { useUser } from "@/entities/user/model/user-context";
+import { Button } from "@/components/ui/button";
+import {
+  LogOut,
+  User,
+  Settings,
+  BriefcaseBusiness,
+  Newspaper,
+} from "lucide-react";
+
+// Profile routes live under app/(Subdomains)/app/*, which resolve to
+// /app/* on the URL (the route group contributes nothing). basePath is
+// therefore "/app" and each item.href is the suffix.
+const NAV_ITEMS: SidebarItem[] = [
+  { label: "Профиль",      href: "/profile",           icon: User,              exact: true },
+  { label: "Статьи",       href: "/profile/articles",  icon: Newspaper },
+  { label: "Настройки",    href: "/profile/settings",  icon: Settings,          exact: true },
+  { label: "Безопасность", href: "/profile/security",  icon: BriefcaseBusiness, exact: true },
+];
+
 export function ProfileSidebar() {
-  const pathname = usePathname();
-  const { logout } = useUser();
   const router = useRouter();
-  const navItems = [
-    { label: "Профиль", href: `/app/profile`, icon: User },
-    { label: "Статьи", href: `/app/profile/articles`, icon: Newspaper },
-    { label: "Настройки", href: `/app/profile/settings`, icon: Settings },
-    { label: "Безопасность", href: `/app/profile/security`, icon: BriefcaseBusiness },
-  ];
+  const { logout } = useUser();
+
   const handleLogout = async () => {
     await logout();
     router.push("/");
   };
+
   return (
-    <aside className="w-full md:w-64 shrink-0 h-fit rounded-3xl border border-(--outline) bg-(--card) p-6 shadow-md transition-all">
-      <div className="mb-6 pb-6 border-b border-(--outline)">
-        <h2 className="text-heading-3">Личный кабинет</h2>
-      </div>
-      <nav className="flex flex-col space-y-1">
-        {navItems.map((item) => {
-          // LLM context: startsWith so /app/profile/articles/<slug>/edit keeps
-          // the parent "Articles" entry highlighted.
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                isActive
-                  ? "bg-(--primary-glass) text-(--primary) font-medium"
-                  : "text-(--on-bg-medium) hover:bg-(--state-hover)"
-              )}
-            >
-              <Icon className="size-5 shrink-0" />
-              <span className="text-body-4">{item.label}</span>
-            </Link>
-          );
-        })}
-        <button
+    <Sidebar
+      items={NAV_ITEMS}
+      basePath="/app"
+      title="Личный кабинет"
+      className="mb-6"
+      footer={
+        <Button
+          variant="text"
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-(--on-bg-medium) hover:bg-(--state-hover)"
+          className="w-full justify-start gap-3 p-3"
         >
           <LogOut className="size-5 shrink-0" />
           <span className="text-sm">Выйти</span>
-        </button>
-      </nav>
-    </aside>
+        </Button>
+      }
+    />
   );
 }

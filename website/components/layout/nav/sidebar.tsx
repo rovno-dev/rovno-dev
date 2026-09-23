@@ -12,6 +12,13 @@ export interface SidebarItem {
   label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  /**
+   * `exact` items highlight only on an exact pathname match. Required for
+   * any link whose href is a prefix of a sibling link's href — otherwise
+   * `/app/profile` stays lit while you're on `/app/profile/articles` and
+   * both rows look selected.
+   */
+  exact?: boolean;
 }
 
 interface SidebarProps {
@@ -35,6 +42,14 @@ export function Sidebar({
   const isMobile = useIsMobile();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Normalize the pathname so trailing slashes don't create a spurious miss.
+  const path = pathname.replace(/\/+$/, "") || "/";
+
+  const isItemActive = (href: string, item: SidebarItem): boolean => {
+    if (item.exact) return path === href;
+    return path === href || path.startsWith(href + "/");
+  };
+
   // On mobile: render a horizontal scrollable menu (scrollbar hidden)
   if (isMobile) {
     return (
@@ -42,7 +57,7 @@ export function Sidebar({
         <div className="flex gap-1 px-4 whitespace-nowrap">
           {items.map((item) => {
             const href = `${basePath}${item.href}`;
-            const isActive = pathname === href || (item.href !== "" && pathname.startsWith(href));
+            const isActive = isItemActive(href, item);
             const Icon = item.icon;
             return (
               <Link
@@ -83,29 +98,27 @@ export function Sidebar({
             size="icon-small"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={cn(isCollapsed ? "mx-auto" : "ml-4")}
+            aria-label={isCollapsed ? "Развернуть" : "Свернуть"}
           >
             {isCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
           </Button>
         )}
       </div>
-
       <nav className={cn("flex flex-col", "gap-1")}>
         {items.map((item) => {
           const href = `${basePath}${item.href}`;
-          const isActive = pathname === href || (item.href !== "" && pathname.startsWith(href));
+          const isActive = isItemActive(href, item);
           const Icon = item.icon;
           return (
             <Tooltip key={item.href} delayDuration={0} disableHoverableContent={!isCollapsed}>
               <TooltipTrigger asChild>
                 <Button
-                  variant={isActive ? 'glass' : 'text'}
-                  className={cn(isCollapsed ? "justify-center" : "justify-start", 'p-3 duration-100 transition-all')}
+                  variant={isActive ? "glass" : "text"}
+                  className={cn(isCollapsed ? "justify-center" : "justify-start", "p-3 duration-100 transition-all")}
                   asChild
                 >
-                  <Link
-                    href={href}
-                  >
-                    <Icon className={cn("size-5 shrink-0", isCollapsed ? "size-5" : "size-5")} />
+                  <Link href={href}>
+                    <Icon className={cn("size-5 shrink-0")} />
                     {!isCollapsed && <span className="text-sm">{item.label}</span>}
                   </Link>
                 </Button>
@@ -119,7 +132,6 @@ export function Sidebar({
           );
         })}
       </nav>
-
       {footer && !isCollapsed && (
         <div className="mt-4 pt-3 border-t border-(--outline)">{footer}</div>
       )}

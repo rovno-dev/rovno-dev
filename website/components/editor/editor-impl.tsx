@@ -27,15 +27,17 @@ import {
   DiffSourceToggleWrapper,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
+// Local override file — must be imported AFTER the base style so our vars win.
+import "@/app/mdx-editor-theme.css";
+import { $fetch } from "@/utils/fetch";
+import { toast } from "sonner";
+
 interface EditorImplProps {
   markdown: string;
   onChange: (markdown: string) => void;
   placeholder?: string;
 }
-// LLM context: MDXEditor is CodeMirror-based and cannot run on the server.
-// This file is client-only and loaded via dynamic(() => import(...), { ssr: false })
-// in article-editor.tsx. The CSS import must live here, not in globals.css —
-// pulling MDXEditor styles into the global stylesheet slows every route.
+
 export default function EditorImpl({ markdown, onChange, placeholder }: EditorImplProps) {
   const codeBlockLanguages: Record<string, string> = {
     js: "JavaScript",
@@ -48,6 +50,23 @@ export default function EditorImpl({ markdown, onChange, placeholder }: EditorIm
     md: "Markdown",
     text: "Plain text",
   };
+
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await $fetch("/api/v1/uploads/images", {
+      method: "POST",
+      body: fd,
+      isToast: false,
+    });
+    if (!res?.response?.ok || !res.json?.url) {
+      const msg = res?.json?.detail || "Image upload failed";
+      toast.error(msg);
+      throw new Error(msg);
+    }
+    return res.json.url as string;
+  };
+
   return (
     <div className="mdx-editor-wrapper rounded-xl border border-(--outline) overflow-hidden bg-(--card)">
       <MDXEditor
@@ -62,7 +81,7 @@ export default function EditorImpl({ markdown, onChange, placeholder }: EditorIm
           thematicBreakPlugin(),
           linkPlugin(),
           linkDialogPlugin(),
-          imagePlugin(),
+          imagePlugin({ imageUploadHandler: handleImageUpload }),
           tablePlugin(),
           codeBlockPlugin({ defaultCodeBlockLanguage: "ts" }),
           codeMirrorPlugin({ codeBlockLanguages }),

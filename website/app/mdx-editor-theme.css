@@ -1,0 +1,126 @@
+/* Scoped theming for MDXEditor. Loaded from editor-impl.tsx so it only
+   ships on the article editor route, not globally.
+   The `!important` flags are load-bearing: MDXEditor's own theme CSS sets
+   the same variables under `.mdxeditor[data-theme=...]` with higher
+   specificity than a plain rule on `.mdx-editor-wrapper`. */
+
+.mdx-editor-wrapper,
+.mdx-editor-wrapper .mdxeditor {
+  /* Backgrounds */
+  --baseBg: var(--card) !important;
+  --baseBgSubtle: var(--bg) !important;
+  --baseBgHover: var(--state-hover) !important;
+  --baseBgActive: var(--primary-card) !important;
+  --basePageBg: var(--card) !important;
+
+  /* Text */
+  --baseText: var(--on-bg-high) !important;
+  --baseTextContrast: var(--on-bg-high) !important;
+  --baseTextSubtle: var(--on-bg-medium) !important;
+
+  /* Borders / lines */
+  --baseBorder: var(--outline) !important;
+  --baseBorderHover: var(--primary) !important;
+  --baseLine: var(--outline) !important;
+  --baseLineSubtle: color-mix(in srgb, var(--outline), transparent 50%) !important;
+
+  /* Solids (buttons, chips) */
+  --baseSolid: var(--on-bg-medium) !important;
+  --baseSolidHover: var(--on-bg-high) !important;
+
+  /* Accents */
+  --baseBase: var(--primary) !important;
+  --baseAccent: var(--primary) !important;
+
+  /* Popovers / toolbars */
+  --basePopover: var(--card) !important;
+  --basePopoverBorder: var(--outline) !important;
+
+  /* Selection */
+  --baseSelection: var(--primary-card) !important;
+
+  color: var(--on-bg-high) !important;
+  background: var(--card) !important;
+}
+
+/* Toolbar */
+.mdx-editor-wrapper [class*="_toolbarRoot"] {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--outline) !important;
+  color: var(--on-bg-medium) !important;
+}
+.mdx-editor-wrapper [class*="_toolbarButton"],
+.mdx-editor-wrapper [class*="_iconButton"] {
+  color: var(--on-bg-medium) !important;
+}
+.mdx-editor-wrapper [class*="_toolbarButton"]:hover,
+.mdx-editor-wrapper [class*="_iconButton"]:hover {
+  background: var(--state-hover) !important;
+  color: var(--on-bg-high) !important;
+}
+.mdx-editor-wrapper [class*="_toolbarButton"][data-state="on"] {
+  background: var(--primary-card) !important;
+  color: var(--primary) !important;
+}
+
+/* Popovers, dropdowns, toolbars inside the editor */
+.mdx-editor-wrapper [class*="_popoverContent"],
+.mdx-editor-wrapper [class*="_dialogContent"],
+.mdx-editor-wrapper [class*="_selectTrigger"],
+.mdx-editor-wrapper [class*="_selectItem"] {
+  background: var(--card) !important;
+  color: var(--on-bg-high) !important;
+  border-color: var(--outline) !important;
+}
+
+/* The editable area itself */
+.mdx-editor-wrapper .prose-mdx {
+  color: var(--on-bg-high) !important;
+  background: var(--card) !important;
+}
+.mdx-editor-wrapper .prose-mdx h1,
+.mdx-editor-wrapper .prose-mdx h2,
+.mdx-editor-wrapper .prose-mdx h3,
+.mdx-editor-wrapper .prose-mdx h4,
+.mdx-editor-wrapper .prose-mdx h5,
+.mdx-editor-wrapper .prose-mdx h6 {
+  color: var(--on-bg-high) !important;
+}
+.mdx-editor-wrapper .prose-mdx p,
+.mdx-editor-wrapper .prose-mdx li {
+  color: var(--on-bg-high) !important;
+}
+.mdx-editor-wrapper .prose-mdx blockquote {
+  border-left: 3px solid var(--primary) !important;
+  color: var(--on-bg-medium) !important;
+}
+.mdx-editor-wrapper .prose-mdx a {
+  color: var(--primary) !important;
+}
+.mdx-editor-wrapper .prose-mdx code {
+  background: var(--bg-disabled) !important;
+  color: var(--on-bg-high) !important;
+}
+.mdx-editor-wrapper .prose-mdx pre {
+  background: var(--bg-disabled) !important;
+  color: var(--on-bg-high) !important;
+}
+
+/* CodeMirror (code blocks, source view) */
+.mdx-editor-wrapper .cm-editor,
+.mdx-editor-wrapper .cm-scroller,
+.mdx-editor-wrapper .cm-gutters {
+  background: var(--bg-disabled) !important;
+  color: var(--on-bg-high) !important;
+  border-color: var(--outline) !important;
+}
+.mdx-editor-wrapper .cm-gutters {
+  border-right: 1px solid var(--outline) !important;
+}
+.mdx-editor-wrapper .cm-activeLine,
+.mdx-editor-wrapper .cm-activeLineGutter {
+  background: var(--state-hover) !important;
+}
+.mdx-editor-wrapper .cm-cursor {
+  border-left-color: var(--on-bg-high) !important;
+}
