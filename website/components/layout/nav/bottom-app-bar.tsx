@@ -1,46 +1,16 @@
 "use client"
 import { ROUTES } from "@/utils/constants/routes";
 import { Container } from "../../ui/container";
-import { useState } from "react";
-// import MakeOrderModal from "./make-order-modal/make-order-modal";
 import { Button } from "../../ui/button";
-import { PackageIcon, NewspaperIcon, LightbulbIcon } from "@phosphor-icons/react"
 import Link from "next/link";
-import RovnoLogotypeIconEmpty from "../logo/logo-icon-empty";
 import { FloatingMenu } from "./floating-menu";
+import { useLanguage } from "@/providers/language-provider";
 export default function BottomAppBar() {
-  const [open, setOpen] = useState(false);
-  const links = [
-    // Pass the COMPONENT, not <Component />
-    { ...ROUTES.projects, icon: PackageIcon },
-    // { ...ROUTES.about, icon: RovnoLogotypeIconEmpty },
-    { href: ROUTES.blog.href, title: "Журнал", icon: NewspaperIcon },
-    // { ...ROUTES.job, icon: BriefcaseBusiness  },
-  ]
+  const { t } = useLanguage();
   return (
     <nav className="sm:hidden bg-(--g-dark) pt-[32px] fixed bottom-0 left-0 pb-[12px] justify-center w-full z-50">
       <Container aria-label="Bottom app bar">
         <div className="p-4 grid grid-cols-[1fr_60px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
-          {/* <div className="w-full h-full grid grid-cols-2 items-center">
-            {links.map((link, key) => {
-              const Icon = link.icon;
-              return (
-                <Button
-                  asChild
-                  className="rounded-none w-full h-[60px]! p-0 my-auto"
-                  variant={'text'}
-                  shape={'round'}
-                  size="icon-medium"
-                  key={key}
-                >
-                  <Link href={link.href} className="flex items-center justify-center flex-col! gap-2 w-full h-full">
-                    <Icon className="size-6" />
-                    <p className="text-body-5">{link.title}</p>
-                  </Link>
-                </Button>
-              );
-            })}
-          </div> */}
           <Button
             asChild
             shape={'round'}
@@ -48,8 +18,7 @@ export default function BottomAppBar() {
             size="medium"
           >
             <Link href={ROUTES.order.href}>
-              {/* <LightbulbIcon className="size-[26px]!" /> */}
-              <span className="text-heading-5">Оформить заказ</span>
+              <span className="text-heading-5">{t("nav.order")}</span>
             </Link>
           </Button>
           <FloatingMenu

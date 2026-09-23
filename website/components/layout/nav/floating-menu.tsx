@@ -25,11 +25,9 @@ export function FloatingMenu({
   const { t } = useLanguage();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  // Close when route changes
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -38,7 +36,6 @@ export function FloatingMenu({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
-  // Close on click outside (trigger + panel both live inside wrapperRef)
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent | TouchEvent) => {
@@ -76,12 +73,16 @@ export function FloatingMenu({
         <div
           id="floating-menu-panel"
           className={cn(
-            "fixed left-4 right-4 sm:left-auto sm:right-6 sm:w-80 z-[60]",
+            // LLM context: on mobile, use 8px side gutters (was 16px) so the
+            // panel reads as a full-width sheet. `sm:` restores the anchored
+            // desktop dropdown. bottom-32 (128px) sits just above the bottom
+            // app bar (~136px tall) with a hair of overlap the shadow absorbs.
+            "fixed left-2 right-2 sm:left-auto sm:right-6 sm:w-96 z-[60]",
             "rounded-3xl border border-(--outline)",
-            "bg-(--card) shadow-2xl p-3",
+            "bg-(--card) shadow-2xl p-2",
             "animate-in fade-in duration-200",
             position === "bottom"
-              ? "bottom-36 slide-in-from-bottom-4"
+              ? "bottom-32 slide-in-from-bottom-4"
               : "top-24 slide-in-from-top-4"
           )}
         >
@@ -94,7 +95,7 @@ export function FloatingMenu({
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "px-4 py-3 rounded-2xl text-body-2 font-medium transition-colors",
+                    "px-4 py-2.5 rounded-2xl text-body-2 font-medium transition-colors",
                     isActive
                       ? "bg-(--primary-glass) text-(--primary)"
                       : "text-(--on-bg-high) hover:bg-(--state-hover)"
@@ -105,7 +106,7 @@ export function FloatingMenu({
               );
             })}
           </nav>
-          <div className="mt-2 pt-3 border-t border-(--outline)">
+          <div className="mt-1.5 pt-2 border-t border-(--outline)">
             <Button className="w-full" size="large" asChild>
               <Link href={ROUTES.order.href} onClick={() => setOpen(false)}>
                 {t("nav.order")}

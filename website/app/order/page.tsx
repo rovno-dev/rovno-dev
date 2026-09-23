@@ -259,30 +259,32 @@ export default function OrderPage() {
           <FileUpload attachments={attachments} onRemoveFile={removeFile} onOpenLightbox={(i) => { setActiveIndex(i); setLightboxOpen(true); }} fileInputRef={fileInputRef} onFileChange={handleFileChange} />
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <Checkbox id="agreement" name="agreement" />
+              <Checkbox id="agreement" name="agreement" className="mt-0.5 shrink-0" />
               <Label
                 htmlFor="agreement"
-                className="text-body-4 text-(--on-bg-medium) leading-snug cursor-pointer"
+                className="flex-1 text-body-4 font-normal text-(--on-bg-medium) leading-snug cursor-pointer items-start"
               >
-                Даю согласие на обработку моих персональных данных в соответствии с{" "}
-                <Link
-                  href="/docs/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
-                >
-                  Политикой конфиденциальности
-                </Link>{" "}
-                и принимаю условия{" "}
-                <Link
-                  href="/docs/terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
-                >
-                  Пользовательского соглашения
-                </Link>
-                .
+                <span>
+                  Даю согласие на обработку моих персональных данных в соответствии с{" "}
+                  <Link
+                    href="/docs/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                  >
+                    Политикой конфиденциальности
+                  </Link>{" "}
+                  и принимаю условия{" "}
+                  <Link
+                    href="/docs/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                  >
+                    Пользовательского соглашения
+                  </Link>
+                  .
+                </span>
               </Label>
             </div>
             {errors.agreement && <p className="text-sm text-destructive font-medium">{errors.agreement}</p>}

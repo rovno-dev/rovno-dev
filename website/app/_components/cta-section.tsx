@@ -98,7 +98,7 @@ export default function CtaSection() {
               filled treatment; Max is deliberately quieter so the eye has a
               single primary path. */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:min-w-[440px] mb-14">
-            <Button size="xlarge" variant="filled" asChild className="flex-1">
+            <Button size="xlarge" variant="filled" asChild >
               <Link
                 href={`https://t.me/${TELEGRAM}`}
                 target="_blank"
@@ -108,7 +108,7 @@ export default function CtaSection() {
                 {t("home.cta.telegram")}
               </Link>
             </Button>
-            <Button size="xlarge" variant="outlined" asChild className="flex-1">
+            <Button size="xlarge" variant="outlined" asChild >
               <Link
                 href={`https://max.ru/${PHONE}`}
                 target="_blank"
