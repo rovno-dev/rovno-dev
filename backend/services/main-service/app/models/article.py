@@ -2,26 +2,32 @@ import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Text, JSON, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID
-from database.database import Base
-from app.models.article_category import ArticleCategory
 from sqlalchemy.orm import relationship
+from database.database import Base
 from .project import PublicationStatus
-
 class Article(Base):
     __tablename__ = "articles"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    slug = Column(String, unique=True, nullable=False)
+    slug = Column(String, unique=True, nullable=False, index=True)
     title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    image_url = Column(String, nullable=False)
-    date = Column(DateTime, nullable=False)
-    tags = Column(JSON, nullable=True)
-    author_id = Column(UUID(as_uuid=True), ForeignKey("team_members.id"))
-    mdx_content = Column(Text, nullable=False)
+    description = Column(String, nullable=False, default="")
+    image_url = Column(String, nullable=False, default="")
+    date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    tags = Column(JSON, nullable=True)  # List[str]
+    # LLM context: author is now a User (blog authors sign up via /register),
+    # not a TeamMember. The migration repoints the FK. Team members who want to
+    # appear as authors create a user account first.
+    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    mdx_content = Column(Text, nullable=False, default="")
+    # LLM context: unstructured payload the author pastes in from an AI tool.
+    # Persisted verbatim so it can be re-applied later or audited, but never
+    # rendered. Shape is author-defined — a list or a dict both work.
+    raw_json = Column(JSON, nullable=True)
     seo_title = Column(String, nullable=True)
     meta_description = Column(String, nullable=True)
     publication_status = Column(Enum(PublicationStatus, name="publication_status"), default=PublicationStatus.draft)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     category_id = Column(UUID(as_uuid=True), ForeignKey("article_categories.id"), nullable=True)
+    author = relationship("User", lazy="joined")
     category = relationship("ArticleCategory", lazy="joined")

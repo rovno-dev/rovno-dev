@@ -17,6 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { useRootHref } from "@/hooks/use-root-href";
+import { crossSubdomainUrl } from "@/utils/root-domain";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
@@ -39,13 +40,15 @@ export default function Header() {
   const pathname = usePathname();
   const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
 
-  // Admin link goes to admin.<root> when the root domain is configured;
-  // falls back to /admin/<secret> otherwise (local dev on plain paths).
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "").trim();
+  // LLM context: admin.* and app.* links. Protocol comes from
+  // NEXT_PUBLIC_PROTOCOL when set (prod: https, dev: http); otherwise it's
+  // inferred from the current page. Port is taken from window.location so
+  // http://app.localhost:3000 keeps :3000. Falls back to plain relative paths
+  // when NEXT_PUBLIC_ROOT_DOMAIN isn't configured.
   const adminHref = adminSecret
-    ? (rootDomain ? `https://admin.${rootDomain}/${adminSecret}` : `/admin/${adminSecret}`)
+    ? crossSubdomainUrl("admin", `/${adminSecret}`)
     : null;
-  const profileHref = rootDomain ? `https://app.${rootDomain}/profile` : "/app/profile";
+  const profileHref = crossSubdomainUrl("app", "/profile");
 
   return (
     <header
@@ -93,7 +96,7 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href={profileHref}>{t("nav.profile")}</Link>
+                    <Link href={profileHref} prefetch={false}>{t("nav.profile")}</Link>
                   </DropdownMenuItem>
                   {(user?.role === 'admin' || user?.role === 'root') && adminHref && (
                     <DropdownMenuItem asChild>

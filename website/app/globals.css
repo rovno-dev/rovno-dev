@@ -691,3 +691,147 @@
     animation: none;
   }
 }
+
+/* ───────── MDXEditor theming ─────────
+   The wrapper class (.mdx-editor-wrapper) is applied by editor-impl.tsx.
+   Everything here is scoped so it can't leak into the rest of the app. */
+.mdx-editor-wrapper {
+  --baseBg: var(--card);
+  --baseBgSubtle: var(--bg);
+  --baseText: var(--on-bg-high);
+  --baseBorder: var(--outline);
+}
+.mdx-editor-wrapper [class*="_toolbarRoot"] {
+  background: var(--bg);
+  border-bottom: 1px solid var(--outline);
+  border-radius: 0;
+}
+.mdx-editor-wrapper [class*="_toolbarButton"] {
+  color: var(--on-bg-medium);
+}
+.mdx-editor-wrapper [class*="_toolbarButton"]:hover {
+  background: var(--state-hover);
+  color: var(--on-bg-high);
+}
+.mdx-editor-wrapper [class*="_iconButton"] {
+  color: var(--on-bg-medium);
+}
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] {
+  border-radius: var(--radius-2);
+}
+.prose-mdx h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+}
+.prose-mdx h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+}
+.prose-mdx h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+.prose-mdx p {
+  margin: 0.75rem 0;
+  line-height: 1.7;
+}
+.prose-mdx ul,
+.prose-mdx ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+.prose-mdx blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--on-bg-medium);
+  font-style: italic;
+}
+.prose-mdx code {
+  background: var(--bg-disabled);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.prose-mdx pre {
+  background: var(--bg-disabled);
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+/* ───────── MDXEditor theming ─────────
+   The wrapper class (.mdx-editor-wrapper) is applied by editor-impl.tsx.
+   Everything here is scoped so it can't leak into the rest of the app. */
+.mdx-editor-wrapper {
+  --baseBg: var(--card);
+  --baseBgSubtle: var(--bg);
+  --baseText: var(--on-bg-high);
+  --baseBorder: var(--outline);
+}
+.mdx-editor-wrapper [class*="_toolbarRoot"] {
+  background: var(--bg);
+  border-bottom: 1px solid var(--outline);
+  border-radius: 0;
+}
+.mdx-editor-wrapper [class*="_toolbarButton"] {
+  color: var(--on-bg-medium);
+}
+.mdx-editor-wrapper [class*="_toolbarButton"]:hover {
+  background: var(--state-hover);
+  color: var(--on-bg-high);
+}
+.mdx-editor-wrapper [class*="_iconButton"] {
+  color: var(--on-bg-medium);
+}
+.mdx-editor-wrapper [class*="_codeMirrorWrapper"] {
+  border-radius: var(--radius-2);
+}
+.prose-mdx h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+}
+.prose-mdx h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+}
+.prose-mdx h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+.prose-mdx p {
+  margin: 0.75rem 0;
+  line-height: 1.7;
+}
+.prose-mdx ul,
+.prose-mdx ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+.prose-mdx blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--on-bg-medium);
+  font-style: italic;
+}
+.prose-mdx code {
+  background: var(--bg-disabled);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.prose-mdx pre {
+  background: var(--bg-disabled);
+  padding: 1rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1rem 0;
+}

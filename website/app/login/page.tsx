@@ -91,7 +91,14 @@ export default function LoginPage() {
         safeCookieStorage.setItem("refresh_token", refresh_token)
         setToken(access_token)
         toast.success("Welcome back!")
-        router.push("/")
+        // LLM context: CheckUser forwards a `next` param so a subdomain
+        // (app.*) request can return the user to where they were headed.
+        const nextParam = new URLSearchParams(window.location.search).get("next")
+        if (nextParam && /^https?:\/\//i.test(nextParam)) {
+          window.location.replace(nextParam)
+        } else {
+          router.push(nextParam || "/")
+        }
       } else {
         toast.error("Не удалось получить токены")
       }

@@ -6,11 +6,17 @@ services:
     build:
       context: .
       target: prod
+      args:
+        # Next.js inlines NEXT_PUBLIC_* at BUILD time. These must be present
+        # during `npm run build` — setting them at runtime has no effect.
+        NEXT_PUBLIC_ROOT_DOMAIN: ${NEXT_PUBLIC_ROOT_DOMAIN}
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_PROTOCOL: ${NEXT_PUBLIC_PROTOCOL:-https}
     profiles:
       - prod
     volumes:
-      # ponytail: same host dir the backend writes uploads to — served by Next.js
-      # as static assets from /public, so the admin UI can <img src="/order_files/..">
+      # ponytail: same host dir the backend writes uploads to — served by
+      # Next.js as static assets from /public.
       - ../backend/services/main-service/storage/order_files:/app/public/order_files
     labels:
       - "traefik.enable=true"

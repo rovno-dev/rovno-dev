@@ -1,22 +1,35 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const ROOT_DOMAIN = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "").trim().toLowerCase();
+function normalizeRootDomain(raw?: string): string {
+  if (!raw) return "";
+  let v = raw.trim().toLowerCase();
+  v = v.replace(/^[a-z][a-z0-9+.-]*:\/\//, "");
+  v = v.split("/")[0];
+  v = v.split(":")[0];
+  return v;
+}
+
+const ROOT_DOMAIN = normalizeRootDomain(process.env.NEXT_PUBLIC_ROOT_DOMAIN);
+const PROTOCOL = (process.env.NEXT_PUBLIC_PROTOCOL || "").trim().toLowerCase() || "https";
 
 /**
- * Returns the href a logo click should navigate to.
- * - On the root domain (or in dev without NEXT_PUBLIC_ROOT_DOMAIN set): "/"
- * - On any subdomain (app.*, admin.*, i.*): absolute URL to the root domain
+ * Returns the href the logo click should navigate to.
+ * - Root domain, or any localhost host, or no NEXT_PUBLIC_ROOT_DOMAIN set:
+ *   "/" — stay on the current origin.
+ * - Prod subdomains (app.*, admin.*, i.*): absolute URL to the root domain.
  *
- * Starts as "/" to keep SSR output hydration-safe; upgrades on the client.
+ * Starts as "/" for SSR hydration safety; upgrades on the client.
  */
 export function useRootHref(): string {
   const [href, setHref] = useState("/");
   useEffect(() => {
     if (!ROOT_DOMAIN) return;
+    if (ROOT_DOMAIN === "localhost") return;
     const host = window.location.hostname.toLowerCase();
+    if (host === "localhost" || host.endsWith(".localhost") || host === "127.0.0.1") return;
     if (host !== ROOT_DOMAIN && host.endsWith(`.${ROOT_DOMAIN}`)) {
-      setHref(`https://${ROOT_DOMAIN}`);
+      setHref(`${PROTOCOL}://${ROOT_DOMAIN}`);
     }
   }, []);
   return href;

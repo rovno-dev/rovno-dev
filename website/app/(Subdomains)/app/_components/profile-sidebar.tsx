@@ -1,37 +1,24 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/entities/user/model/user-context";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { LogOut, User, Settings, BriefcaseBusiness } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
+import { LogOut, User, Settings, BriefcaseBusiness, Newspaper } from "lucide-react";
 export function ProfileSidebar() {
   const pathname = usePathname();
   const { logout } = useUser();
   const router = useRouter();
-  const [domain, setDomain] = useState('');
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setDomain(window.location.hostname);
-    }
-  }, []);
-
-  // TODO: move to the app. subdomain
   const navItems = [
     { label: "Профиль", href: `/app/profile`, icon: User },
+    { label: "Статьи", href: `/app/profile/articles`, icon: Newspaper },
     { label: "Настройки", href: `/app/profile/settings`, icon: Settings },
     { label: "Безопасность", href: `/app/profile/security`, icon: BriefcaseBusiness },
   ];
-
   const handleLogout = async () => {
     await logout();
     router.push("/");
   };
-
   return (
     <aside className="w-full md:w-64 shrink-0 h-fit rounded-3xl border border-(--outline) bg-(--card) p-6 shadow-md transition-all">
       <div className="mb-6 pb-6 border-b border-(--outline)">
@@ -39,7 +26,9 @@ export function ProfileSidebar() {
       </div>
       <nav className="flex flex-col space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          // LLM context: startsWith so /app/profile/articles/<slug>/edit keeps
+          // the parent "Articles" entry highlighted.
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (
             <Link
