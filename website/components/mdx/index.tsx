@@ -13,6 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+
 // -------- Heading --------
 export function MDXHeading({
   level,
@@ -23,10 +24,8 @@ export function MDXHeading({
   children: ReactNode;
   className?: string;
 }) {
-  // LLM context: React 19 removed the global JSX namespace, so
-  // `keyof JSX.IntrinsicElements` no longer exists. Build the tag as a
-  // template literal cast to ElementType — it resolves at runtime to
-  // "h1".."h6" which are all valid intrinsic elements.
+  // React 19 removed the global JSX namespace; build the tag as a template
+  // literal cast to ElementType. Resolves to "h1".."h6" at runtime.
   const Tag = `h${level}` as ElementType;
   const classes = {
     1: "text-display-2 md:text-display-1 mb-6 mt-12",
@@ -38,10 +37,16 @@ export function MDXHeading({
   };
   return <Tag className={cn(classes[level], className)}>{children}</Tag>;
 }
+
 // -------- Image --------
+// Rendered as <span style="display:block"> rather than <div> because markdown
+// wraps standalone `![alt](src)` images inside a <p>. A <div> inside a <p> is
+// invalid HTML — the browser hoists it out, the server and client trees
+// diverge, and React throws a hydration error. A block-display span is
+// phrasing content (legal inside <p>) but renders identically to a div.
 export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) {
   return (
-    <div className="my-6 rounded-2xl overflow-hidden border border-(--outline) bg-(--card)">
+    <span className="my-6 block rounded-2xl overflow-hidden border border-(--outline) bg-(--card)">
       <Image
         src={src}
         alt={alt || ""}
@@ -50,9 +55,10 @@ export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) 
         className="w-full h-auto object-cover"
         {...props}
       />
-    </div>
+    </span>
   );
 }
+
 // -------- Blockquote --------
 export function MDXBlockquote({ children }: { children: ReactNode }) {
   return (
@@ -61,6 +67,7 @@ export function MDXBlockquote({ children }: { children: ReactNode }) {
     </blockquote>
   );
 }
+
 // -------- Code (inline) --------
 export function MDXCode({ children }: { children: ReactNode }) {
   return (
@@ -69,6 +76,7 @@ export function MDXCode({ children }: { children: ReactNode }) {
     </code>
   );
 }
+
 // -------- Pre (code block) --------
 export function MDXPre({ children }: { children: ReactNode }) {
   return (
@@ -77,6 +85,7 @@ export function MDXPre({ children }: { children: ReactNode }) {
     </pre>
   );
 }
+
 // -------- List (ul / ol) --------
 export function MDXList({
   children,
@@ -92,25 +101,66 @@ export function MDXList({
     </Tag>
   );
 }
+
 export function MDXListItem({ children }: { children: ReactNode }) {
   return <li className="pl-1">{children}</li>;
 }
+
 // -------- Paragraph --------
-export function MDXParagraph({ children }: { children: ReactNode }) {
-  return <p className="my-4 leading-relaxed text-(--on-bg-medium)">{children}</p>;
+// Defensive: if a child renders as a block-level element (a custom component
+// without a phrasing root, a third-party MDX widget), wrap in a fragment to
+// avoid the same hydration error. Cheap check, catches future regressions.
+function hasBlockChild(children: ReactNode): boolean {
+  if (!children) return false;
+  const arr = Array.isArray(children) ? children : [children];
+  for (const child of arr) {
+    if (
+      typeof child === "object" &&
+      child !== null &&
+      "type" in child &&
+      typeof (child as { type: unknown }).type === "string" &&
+      ["div", "section", "article", "figure", "form", "header", "footer"].includes(
+        (child as { type: string }).type
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
+
+export function MDXParagraph({ children }: { children: ReactNode }) {
+  if (hasBlockChild(children)) {
+    // Cannot legally nest a block element inside <p>; fall through to a
+    // plain block wrapper. Visually identical to <p>, no hydration warning.
+    return (
+      <span className="my-4 block leading-relaxed text-(--on-bg-medium)">
+        {children}
+      </span>
+    );
+  }
+  return (
+    <p className="my-4 leading-relaxed text-(--on-bg-medium)">{children}</p>
+  );
+}
+
 // -------- Horizontal Rule --------
 export function MDXHr() {
   return <hr className="my-8 border-(--outline)" />;
 }
+
 // -------- Link --------
 export function MDXLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} className="text-(--primary) underline underline-offset-2 hover:opacity-80">
+    <a
+      href={href}
+      className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+    >
       {children}
     </a>
   );
 }
+
 // -------- Table --------
 export function MDXTable({ children }: { children: ReactNode }) {
   return (
@@ -119,29 +169,42 @@ export function MDXTable({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
 export function MDXThead({ children }: { children: ReactNode }) {
   return <thead className="bg-(--bg-disabled)">{children}</thead>;
 }
+
 export function MDXTh({ children }: { children: ReactNode }) {
   return <th className="px-4 py-2 text-left font-medium">{children}</th>;
 }
+
 export function MDXTd({ children }: { children: ReactNode }) {
   return <td className="px-4 py-2 border-t border-(--outline)">{children}</td>;
 }
+
 // -------- Card (generic) --------
-export function MDXCard({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <Card className={cn("p-6", className)}>
-      {children}
-    </Card>
-  );
+export function MDXCard({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <Card className={cn("p-6", className)}>{children}</Card>;
 }
+
 // -------- Gallery (image/video carousel) --------
-export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src: string }> }) {
+export function Gallery({
+  media,
+}: {
+  media: Array<{ type: "image" | "video"; src: string }>;
+}) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [carouselApi, setCarouselApi] = useState<any>(null);
+
   if (!media || media.length === 0) return null;
+
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -154,8 +217,13 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
               setLightboxOpen(true);
             }}
           >
-            {item.type === 'image' ? (
-              <Image src={item.src} alt={`Media ${idx + 1}`} fill className="object-cover" />
+            {item.type === "image" ? (
+              <Image
+                src={item.src}
+                alt={`Media ${idx + 1}`}
+                fill
+                className="object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-muted">
                 <span className="text-body-2 text-(--on-bg-medium)">▶ Видео</span>
@@ -164,6 +232,7 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
           </div>
         ))}
       </div>
+
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent
           showCloseButton={false}
@@ -180,9 +249,12 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
           <Carousel setApi={setCarouselApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">
               {media.map((item, idx) => (
-                <CarouselItem key={idx} className="h-full flex items-center justify-center p-0">
+                <CarouselItem
+                  key={idx}
+                  className="h-full flex items-center justify-center p-0"
+                >
                   <div className="relative w-full h-full flex items-center justify-center">
-                    {item.type === 'image' ? (
+                    {item.type === "image" ? (
                       <Image
                         src={item.src}
                         alt={`Media ${idx + 1}`}
@@ -215,8 +287,11 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
                 <button
                   key={idx}
                   onClick={() => carouselApi?.scrollTo(idx)}
-                  className={`h-2 rounded-full transition-all ${carouselApi?.selectedScrollSnap() === idx ? "w-6 bg-white" : "w-2 bg-white/30"
-                    }`}
+                  className={`h-2 rounded-full transition-all ${
+                    carouselApi?.selectedScrollSnap() === idx
+                      ? "w-6 bg-white"
+                      : "w-2 bg-white/30"
+                  }`}
                 />
               ))}
             </div>
@@ -226,6 +301,7 @@ export function Gallery({ media }: { media: Array<{ type: 'image' | 'video'; src
     </>
   );
 }
+
 // -------- Metric Card --------
 export function MetricCard({
   label,
@@ -238,12 +314,15 @@ export function MetricCard({
 }) {
   return (
     <div className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0">
-      <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">{label}</p>
+      <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">
+        {label}
+      </p>
       <p className="text-display-1 text-(--on-bg-high) mb-2">{value}</p>
       <p className="text-body-3 text-(--on-bg-medium)">{description}</p>
     </div>
   );
 }
+
 // -------- Default export for mapping --------
 export const defaultMDXComponents = {
   h1: (props: any) => <MDXHeading level={1} {...props} />,

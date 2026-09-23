@@ -1,22 +1,54 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, ExternalLink, RefreshCw, Newspaper } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  RefreshCw,
+  Newspaper,
+  ArrowUpRight,
+} from "lucide-react";
 import { useLanguage } from "@/providers/language-provider";
+import { cn } from "@/lib/utils";
 import {
   ArticleListItem,
   fetchMyArticles,
   deleteArticle,
 } from "@/utils/api/articles";
 
-const STATUS_STYLES: Record<string, string> = {
-  published: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
-  draft: "bg-amber-500/15 text-amber-500 border-amber-500/30",
+// Status colors tuned for a dark image backdrop: bright enough to read
+// against the gradient, tinted to signal meaning. Both are on the same
+// row as the date now, so they don't need to be shouty.
+const STATUS_STYLES: Record<string, { label: string; className: string }> = {
+  published: {
+    label: "Опубликовано",
+    className: "bg-emerald-500/30 text-emerald-100 border-emerald-300/40",
+  },
+  draft: {
+    label: "Черновик",
+    className: "bg-amber-500/30 text-amber-100 border-amber-300/40",
+  },
 };
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString("ru-RU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
 
 type LoadState =
   | { kind: "loading" }
@@ -33,12 +65,12 @@ export default function MyArticlesPage() {
       const articles = await fetchMyArticles();
       setState({ kind: "ready", articles });
     } catch (err: any) {
-      // Surface the real reason instead of a generic toast. Empty state
-      // and error state are now mutually exclusive — no more "no articles"
-      // showing on top of a failed fetch.
       // eslint-disable-next-line no-console
       console.error("[my-articles] load failed:", err);
-      setState({ kind: "error", message: err?.message || "Не удалось загрузить статьи." });
+      setState({
+        kind: "error",
+        message: err?.message || "Не удалось загрузить статьи.",
+      });
     }
   }, []);
 
@@ -46,8 +78,8 @@ export default function MyArticlesPage() {
     load();
   }, [load]);
 
-  const handleDelete = async (slug: string) => {
-    if (!confirm(t("editor.delete_confirm"))) return;
+  const handleDelete = async (slug: string, title: string) => {
+    if (!confirm(`Удалить статью «${title}»? Это действие нельзя отменить.`)) return;
     try {
       await deleteArticle(slug);
       toast.success(t("editor.deleted"));
@@ -65,26 +97,34 @@ export default function MyArticlesPage() {
     <CheckUser>
       <div className="space-y-6">
         <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-display-2 mb-1">{t("editor.my_articles")}</h1>
-            <p className="text-body-3 text-(--on-bg-medium)">{t("editor.my_articles_subtitle")}</p>
+          <div className="min-w-0">
+            <h1 className="text-display-2 mb-1 truncate">{t("editor.my_articles")}</h1>
+            <p className="text-body-3 text-(--on-bg-medium)">
+              {t("editor.my_articles_subtitle")}
+            </p>
           </div>
-          <Button asChild>
+          <Button asChild className="shrink-0">
             <Link href="/app/profile/articles/new">
               <Plus className="size-4" />
-              {t("editor.new_article")}
+              <span className="hidden sm:inline">{t("editor.new_article")}</span>
+              <span className="sm:hidden">Новая</span>
             </Link>
           </Button>
         </div>
 
+        {/* -------- Loading skeletons -------- */}
         {state.kind === "loading" && (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i} className="h-20 rounded-3xl border-(--outline) bg-muted/30 animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Card
+                key={i}
+                className="rounded-4xl border-(--outline) bg-muted/30 animate-pulse aspect-[600/450]"
+              />
             ))}
           </div>
         )}
 
+        {/* -------- Error state -------- */}
         {state.kind === "error" && (
           <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6">
             <div className="flex items-start gap-4">
@@ -112,9 +152,12 @@ export default function MyArticlesPage() {
           </Card>
         )}
 
+        {/* -------- Empty state -------- */}
         {state.kind === "ready" && state.articles.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
-            <p className="text-body-3 text-(--on-bg-medium) mb-4">{t("editor.empty")}</p>
+            <p className="text-body-3 text-(--on-bg-medium) mb-4">
+              {t("editor.empty")}
+            </p>
             <Button asChild>
               <Link href="/app/profile/articles/new">
                 <Plus className="size-4" />
@@ -124,52 +167,133 @@ export default function MyArticlesPage() {
           </Card>
         )}
 
+        {/* -------- Article grid --------
+            Five-layer stack, explicit z-index on every sibling:
+              z-0   cover image / gradient fallback
+              z-1   full-card link (click target for preview)
+              z-2   bottom gradient (visual only)
+              z-3   text overlay (pointer-events-none, clicks fall through)
+              z-20  action buttons (top-right, interactive)
+            Nothing overlaps by accident at any card width. */}
         {state.kind === "ready" && state.articles.length > 0 && (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {state.articles.map((a) => {
-              const statusClass = STATUS_STYLES[a.publication_status] || STATUS_STYLES.draft;
-              const statusLabel =
-                a.publication_status === "published"
-                  ? t("editor.status_published")
-                  : t("editor.status_draft");
+              const isPublished = a.publication_status === "published";
+              const status = isPublished
+                ? STATUS_STYLES.published
+                : STATUS_STYLES.draft;
+
               return (
                 <Card
                   key={a.id}
-                  className="rounded-3xl border-(--outline) p-5 flex items-center gap-4"
+                  className="group relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 aspect-[600/450]"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${statusClass}`}
-                      >
-                        {statusLabel}
-                      </span>
-                      <span className="text-body-5 text-(--on-bg-low)">
-                        {new Date(a.updated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <h3 className="text-heading-4 truncate">{a.title}</h3>
+                  {/* z-0 — cover or gradient fallback */}
+                  {a.image_url ? (
+                    <Image
+                      fill
+                      src={a.image_url}
+                      alt={a.title}
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      quality={90}
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+                  )}
+
+                  {/* z-1 — full-card click target */}
+                  <Link
+                    href={`/app/profile/articles/${a.slug}/preview`}
+                    className="absolute inset-0 z-[1] rounded-4xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-inset"
+                    aria-label={`Открыть предпросмотр: ${a.title}`}
+                  />
+
+                  {/* z-2 — bottom gradient overlay */}
+                  <div className="absolute inset-x-0 bottom-0 h-3/4 z-[2] bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none" />
+
+                  {/* z-3 — text, non-interactive so clicks pass to the link */}
+                  <div className="absolute inset-x-0 bottom-0 z-[3] p-5 pointer-events-none">
+                    {a.tags && a.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {a.tags.slice(0, 3).map((tag) => (
+                          <Badge
+                            key={tag.id}
+                            variant="glass-static"
+                            size="chip-small"
+                            className="text-white border-white/20"
+                          >
+                            {tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    <h3 className="text-display-4 md:text-display-3 text-white leading-tight line-clamp-2 transition-transform duration-300 group-hover:-translate-y-0.5">
+                      {a.title}
+                    </h3>
+
                     {a.description && (
-                      <p className="text-body-4 text-(--on-bg-medium) line-clamp-1">
+                      <p className="mt-1.5 text-body-4 text-white/75 line-clamp-2">
                         {a.description}
                       </p>
                     )}
+
+                    {/* Status + date now live here, on the same row — no
+                        more top-left pill colliding with top-right actions. */}
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm",
+                          status.className
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                      <span className="text-body-5 text-white/60">
+                        {formatDate(a.updated_at)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex gap-1 shrink-0">
-                    <Button variant="text" size="icon-small" asChild title="Предпросмотр">
+
+                  {/* z-20 — actions, hover-reveal on desktop, always on
+                      touch. Three buttons only: preview, edit, delete.
+                      The external-link button was dropped because at narrow
+                      card widths four buttons crowded the corner, and the
+                      preview page already links to the public URL. */}
+                  <div
+                    className={cn(
+                      "absolute top-3 right-3 z-20 flex gap-1",
+                      "opacity-0 translate-y-1 transition-all duration-300",
+                      "group-hover:opacity-100 group-hover:translate-y-0",
+                      "group-focus-within:opacity-100 group-focus-within:translate-y-0",
+                      "max-md:opacity-100 max-md:translate-y-0"
+                    )}
+                  >
+                    <Button
+                      variant="glass"
+                      size="icon-small"
+                      asChild
+                      title="Предпросмотр"
+                    >
                       <Link href={`/app/profile/articles/${a.slug}/preview`}>
-                        <ExternalLink className="size-4" />
+                        <ArrowUpRight className="size-4" />
                       </Link>
                     </Button>
-                    <Button variant="text" size="icon-small" asChild title={t("editor.edit")}>
+                    <Button
+                      variant="glass"
+                      size="icon-small"
+                      asChild
+                      title={t("editor.edit")}
+                    >
                       <Link href={`/app/profile/articles/${a.slug}/edit`}>
                         <Pencil className="size-4" />
                       </Link>
                     </Button>
                     <Button
-                      variant="text"
+                      variant="glass"
                       size="icon-small"
-                      onClick={() => handleDelete(a.slug)}
+                      onClick={() => handleDelete(a.slug, a.title)}
                       title={t("editor.delete")}
                     >
                       <Trash2 className="size-4" />
