@@ -13,8 +13,10 @@ export function TerminalStyledInline({
   className = ""
 }: TerminalStyledInlineProps) {
   return (
-    <div className={cn("mb-4 text-left bg-card border border-outline rounded-lg p-4 relative", className)}>
-      <pre className="text-(--green-4) font-mono text-sm whitespace-pre-wrap">{command}</pre>
+    <div className={cn("relative mb-4 text-left bg-card border border-outline rounded-lg p-4 relative", className)}>
+      <div className="overflow-x-scroll">
+        <pre className="text-(--green-4) font-mono text-sm whitespace-no-wrap"><span className="text-(--on-bg-high)">$ </span>{command}</pre>
+      </div>
       <CopyButton
         text={command}
         className="absolute top-2 right-2"
