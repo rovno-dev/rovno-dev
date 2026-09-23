@@ -48,8 +48,8 @@ export function ArticleCard({
           {article.tags && article.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {article.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="glass-static" size="chip-small" className="text-white border-white/20">
-                  {tag}
+                <Badge key={tag.id} variant="glass-static" size="chip-small" className="text-white border-white/20">
+                  {tag.name}
                 </Badge>
               ))}
             </div>

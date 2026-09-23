@@ -19,7 +19,7 @@ import {
 import { ChevronDown, ChevronUp, Sparkles, Save, Rocket, Trash2, Undo2 } from "lucide-react";
 import { useLanguage } from "@/providers/language-provider";
 import { ArticleEditor } from "./article-editor";
-import { TagsInput } from "./tags-input";
+import { TagsAutocomplete } from "./tags-autocomplete";
 import { ImageUploadField } from "./image-upload-field";
 import {
   Article,
@@ -30,7 +30,6 @@ import {
   publishArticle,
   unpublishArticle,
 } from "@/utils/api/articles";
-import { fetchArticleCategories, type ArticleCategory } from "@/utils/api/categories";
 
 interface FormState {
   title: string;
@@ -39,7 +38,6 @@ interface FormState {
   image_url: string;
   date: string;
   tags: string[];
-  category_id: string;
   mdx_content: string;
   seo_title: string;
   meta_description: string;
@@ -55,7 +53,6 @@ function toFormState(article?: Article | null): FormState {
       image_url: "",
       date: new Date().toISOString().slice(0, 10),
       tags: [],
-      category_id: "",
       mdx_content: "",
       seo_title: "",
       meta_description: "",
@@ -69,7 +66,6 @@ function toFormState(article?: Article | null): FormState {
     image_url: article.image_url || "",
     date: (article.date || new Date().toISOString()).slice(0, 10),
     tags: article.tags || [],
-    category_id: article.category_id || "",
     mdx_content: article.mdx_content || "",
     seo_title: article.seo_title || "",
     meta_description: article.meta_description || "",
@@ -84,14 +80,9 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
   const isPublished = initial?.publication_status === "published";
 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
-  const [categories, setCategories] = useState<ArticleCategory[]>([]);
   const [saving, setSaving] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
-
-  useEffect(() => {
-    fetchArticleCategories().then(setCategories).catch(() => setCategories([]));
-  }, []);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -154,7 +145,6 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
       raw_json: rawJson,
       seo_title: form.seo_title.trim() || null,
       meta_description: form.meta_description.trim() || null,
-      category_id: form.category_id || null,
       publication_status: status,
     };
   };
@@ -344,30 +334,11 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>{t("editor.field_tags")}</FieldLabel>
-            <TagsInput
+            <TagsAutocomplete
               value={form.tags}
               onChange={(v) => update("tags", v)}
               placeholder={t("editor.field_tags_ph")}
             />
-          </Field>
-          <Field>
-            <FieldLabel>{t("editor.field_category")}</FieldLabel>
-            <Select
-              value={form.category_id || "none"}
-              onValueChange={(v) => update("category_id", v === "none" ? "" : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("editor.field_category_ph")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">—</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </Field>
         </div>
       </Card>

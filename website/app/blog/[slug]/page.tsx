@@ -134,8 +134,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.tags && article.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-5">
                 {article.tags.map((tag) => (
-                  <Badge key={tag} variant="glass-static" size="chip-small">
-                    {tag}
+                  <Badge key={tag.id} variant="glass-static" size="chip-small">
+                    {tag.name}
                   </Badge>
                 ))}
               </div>

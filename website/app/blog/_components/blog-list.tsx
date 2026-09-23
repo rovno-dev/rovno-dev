@@ -3,21 +3,33 @@ import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/providers/language-provider";
-import type { ArticleListItem } from "@/utils/api/articles";
+import type { ArticleListItem, TagRef } from "@/utils/api/articles";
 import { ArticleCard } from "./article-card";
+
 export function BlogList({ articles }: { articles: ArticleListItem[] }) {
   const { t, lang } = useLanguage();
-  // Unique tag list built from the actual articles, sorted alphabetically.
+
+  // Unique tag set built from every article, keyed by slug so a rename of the
+  // display name doesn't fork the filter. Sorted alphabetically.
   const allTags = useMemo(() => {
-    const set = new Set<string>();
-    articles.forEach((a) => (a.tags || []).forEach((tag) => set.add(tag)));
-    return Array.from(set).sort();
+    const map = new Map<string, TagRef>();
+    articles.forEach((a) =>
+      (a.tags || []).forEach((tag) => {
+        if (!map.has(tag.slug)) map.set(tag.slug, tag);
+      })
+    );
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [articles]);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  const [activeTag, setActiveTag] = useState<string | null>(null); // slug
+
   const filtered = useMemo(() => {
     if (!activeTag) return articles;
-    return articles.filter((a) => (a.tags || []).includes(activeTag));
+    return articles.filter((a) =>
+      (a.tags || []).some((tag) => tag.slug === activeTag)
+    );
   }, [articles, activeTag]);
+
   return (
     <section className="pb-24 md:pb-32">
       <Container>
@@ -33,13 +45,13 @@ export function BlogList({ articles }: { articles: ArticleListItem[] }) {
             </Button>
             {allTags.map((tag) => (
               <Button
-                key={tag}
-                variant={activeTag === tag ? "filled" : "tonal-card"}
+                key={tag.slug}
+                variant={activeTag === tag.slug ? "filled" : "tonal-card"}
                 size="chip-medium"
                 shape="round"
-                onClick={() => setActiveTag(tag)}
+                onClick={() => setActiveTag(tag.slug)}
               >
-                {tag}
+                {tag.name}
               </Button>
             ))}
           </div>

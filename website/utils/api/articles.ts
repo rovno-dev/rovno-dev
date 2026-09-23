@@ -7,11 +7,47 @@ export interface ArticleAuthor {
   username?: string | null;
   avatar_url?: string | null;
 }
-export interface ArticleCategoryRef {
+
+export interface TagRef {
   id: string;
-  code: string;
-  label: string;
+  name: string;
+  slug: string;
 }
+
+/**
+ * Legacy compatibility shim.
+ *
+ * Before the tags migration the backend sent `tags: string[]`. After it,
+ * `tags: {id, name, slug}[]`. Anything fetched during the transition (or if
+ * the backend hasn't been rebuilt yet) can be either shape. Normalize at
+ * the boundary so the rest of the app has one contract to rely on.
+ *
+ * The synthetic id/slug for legacy strings is deterministic, so React keys
+ * stay stable across re-renders and the tag filter still functions.
+ */
+function normalizeTag(raw: unknown): TagRef {
+  if (typeof raw === "string") {
+    const name = raw.trim();
+    return {
+      id: `legacy:${name.toLowerCase()}`,
+      name,
+      slug: name.toLowerCase().replace(/\s+/g, "-"),
+    };
+  }
+  const obj = (raw ?? {}) as Partial<TagRef> & { name?: string; id?: string };
+  const name = String(obj.name ?? "").trim();
+  return {
+    id: String(obj.id ?? `legacy:${name.toLowerCase()}`),
+    name,
+    slug: String(obj.slug ?? name.toLowerCase().replace(/\s+/g, "-")),
+  };
+}
+
+function normalizeTags(list: unknown): TagRef[] {
+  if (!Array.isArray(list)) return [];
+  return list.map(normalizeTag).filter((t) => t.name.length > 0);
+}
+
 export interface ArticleListItem {
   id: string;
   slug: string;
@@ -19,33 +55,33 @@ export interface ArticleListItem {
   description: string;
   image_url: string;
   date: string;
-  tags?: string[] | null;
+  tags?: TagRef[] | null;
   publication_status: "draft" | "published" | string;
-  category_id?: string | null;
-  category?: ArticleCategoryRef | null;
   author_id?: string | null;
   author?: ArticleAuthor | null;
   created_at: string;
   updated_at: string;
 }
+
 export interface Article extends ArticleListItem {
   mdx_content: string;
   raw_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
 }
+
 export interface ArticlePayload {
   slug?: string;
   title: string;
   description?: string;
   image_url?: string;
   date?: string;
+  /** Tag names — backend upserts into the tags table. */
   tags?: string[];
   mdx_content: string;
   raw_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
-  category_id?: string | null;
   publication_status?: "draft" | "published";
 }
 
@@ -54,24 +90,23 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:8000";
 
-// LLM context: server-side fetchers used by RSC pages. They bypass the auth
-// cookie and hit the internal API directly. `revalidate: 60` gives the blog
+// Server-side fetchers used by RSC pages. `revalidate: 60` gives the blog
 // a one-minute ISR window — good enough for a low-frequency blog, and the
 // pages remain statically rendered for SEO.
 export async function fetchPublishedArticlesServer(params?: {
-  category?: string;
   tag?: string;
   limit?: number;
 }): Promise<ArticleListItem[]> {
   const qs = new URLSearchParams();
-  if (params?.category) qs.set("category", params.category);
   if (params?.tag) qs.set("tag", params.tag);
   if (params?.limit) qs.set("limit", String(params.limit));
   const url = `${API_BASE}/api/v1/articles${qs.toString() ? `?${qs}` : ""}`;
   try {
     const res = await fetch(url, { next: { revalidate: 60 } } as any);
     if (!res.ok) return [];
-    return (await res.json()) as ArticleListItem[];
+    const body = await res.json();
+    if (!Array.isArray(body)) return [];
+    return (body as ArticleListItem[]).map((a) => ({ ...a, tags: normalizeTags(a.tags) }));
   } catch {
     return [];
   }
@@ -82,7 +117,8 @@ export async function fetchArticleServer(slug: string): Promise<Article | null> 
   try {
     const res = await fetch(url, { next: { revalidate: 60 } } as any);
     if (!res.ok) return null;
-    return (await res.json()) as Article;
+    const data = (await res.json()) as Article;
+    return { ...data, tags: normalizeTags(data.tags) };
   } catch {
     return null;
   }
@@ -91,13 +127,36 @@ export async function fetchArticleServer(slug: string): Promise<Article | null> 
 // ---------- Client-side (auth'd) ----------
 export async function fetchMyArticles(): Promise<ArticleListItem[]> {
   const res = await $fetch("/api/v1/articles/me", { isToast: false });
-  return res?.json || [];
+  const status = res?.response?.status;
+  const body = res?.json;
+
+  // Surface auth failures distinctly so the UI can say "log in again"
+  // rather than "you have no articles".
+  if (status === 401) {
+    throw new Error("Session expired. Please sign in again.");
+  }
+  if (!res?.response?.ok) {
+    const detail =
+      (typeof body === "object" && (body?.detail || body?.message)) ||
+      `Request failed (${status ?? "network error"})`;
+    throw new Error(String(detail));
+  }
+  if (!Array.isArray(body)) {
+    throw new Error("Unexpected response from server — expected a list.");
+  }
+  return (body as ArticleListItem[]).map((a) => ({ ...a, tags: normalizeTags(a.tags) }));
 }
 
 export async function fetchArticleClient(slug: string): Promise<Article | null> {
   const res = await $fetch(`/api/v1/articles/${encodeURIComponent(slug)}`, { isToast: false });
+  // 401 after the $fetch refresh attempt → session is dead; the caller
+  // should show "log in" rather than a fake "not found".
+  if (res?.response?.status === 401) {
+    throw new Error("Session expired. Please sign in again.");
+  }
   if (!res?.response?.ok) return null;
-  return res.json as Article;
+  const data = res.json as Article;
+  return { ...data, tags: normalizeTags(data.tags) };
 }
 
 export async function createArticle(payload: ArticlePayload): Promise<Article> {

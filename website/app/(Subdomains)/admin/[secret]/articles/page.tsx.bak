@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminTable } from "../../_components/admin-table";
 import { CheckUser } from "@/entities/user/model/check-user";
-import { useUser } from "@/entities/user/model/user-context";
+import { useUser } from "@/entities/user/model/user-model-context-placeholder";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, RefreshCw } from "lucide-react";
 import type { ArticleListItem } from "@/utils/api/articles";
