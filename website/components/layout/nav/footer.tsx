@@ -71,7 +71,7 @@ export default function Footer() {
             </div>
           </div>
           {/* Links Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-12 sm:gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 sm:gap-10">
             {sections.map((section) => (
               <div key={section.title} className="flex flex-col gap-4">
                 <h4 className="text-body-4 font-bold uppercase tracking-widest text-(--on-bg-low)">
