@@ -188,6 +188,8 @@ def create_project(
     )
     _apply_tags(db, project, payload.tags)
     _apply_media(db, project, payload.media)
+    from app.services.stack_service import resolve_stack
+    project.stack_items = resolve_stack(db, payload.stack)
 
     db.add(project)
     db.commit()
@@ -218,9 +220,14 @@ def update_project(
 
     tags_in = update.pop("tags", None)
     media_in = update.pop("media", None)
+    stack_in = update.pop("stack", None)
 
     for key, value in update.items():
         setattr(p, key, value)
+
+    if stack_in is not None:
+        from app.services.stack_service import resolve_stack
+        p.stack_items = resolve_stack(db, stack_in)
 
     if tags_in is not None:
         _apply_tags(db, p, [type("T", (), {**t}) for t in tags_in] if False else [_wrap_tag(t) for t in tags_in])

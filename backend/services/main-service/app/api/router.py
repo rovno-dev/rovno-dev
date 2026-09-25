@@ -13,6 +13,7 @@ from app.api.v1 import articles
 from app.api.v1 import projects
 from app.api.v1 import uploads
 from app.api.v1 import tags
+from app.api.v1 import stack
 from app.api.v1 import team
 
 router = APIRouter(prefix="/v1")
@@ -30,4 +31,5 @@ router.include_router(articles.router)
 router.include_router(projects.router)
 router.include_router(uploads.router)
 router.include_router(tags.router)
+router.include_router(stack.router)
 router.include_router(team.router)

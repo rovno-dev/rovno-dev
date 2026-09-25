@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   CircleNotch, CloudArrowUp, X, Play, DotsSixVertical,
-  ArrowUp, ArrowDown,
+  ArrowUp, ArrowDown, PencilSimple,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { $fetch } from "@/utils/fetch";
+import { ImageEditorDialog } from "./image-editor/image-editor-dialog";
+import { readFileAsDataURL } from "./image-editor/canvas-utils";
 import type { ProjectMedia } from "@/utils/api/projects";
 
 interface Props {
@@ -25,10 +27,26 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorSrc, setEditorSrc] = useState<string | null>(null);
+  const [editorReplaceIdx, setEditorReplaceIdx] = useState<number | null>(null);
 
+  // Videos upload directly (there's nothing to crop). Images route through
+  // the editor first so the admin can crop before the file ever hits the
+  // server — that's the whole point of the "Telegram-style" flow.
   const uploadOne = async (file: File): Promise<ProjectMedia | null> => {
     if (file.size > MAX_BYTES) {
       toast.error(`${file.name}: файл больше ${MAX_BYTES / 1024 / 1024} МБ`);
+      return null;
+    }
+    const isVideo = file.type.startsWith("video/");
+    if (!isVideo) {
+      // Open the editor with the picked file. Return null — the caller
+      // will need to await the user's apply action separately.
+      const dataUrl = await readFileAsDataURL(file);
+      setEditorSrc(dataUrl);
+      setEditorReplaceIdx(null); // insert mode
+      setEditorOpen(true);
       return null;
     }
     const fd = new FormData();
@@ -49,6 +67,50 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
       thumbnail_url: null,
       sort_order: 0,
     };
+  };
+
+  const uploadBlobAsMedia = async (blob: Blob, filename: string) => {
+    const fd = new FormData();
+    fd.append("file", new File([blob], filename, { type: blob.type }));
+    const res = await $fetch("/api/v1/uploads/media", {
+      method: "POST",
+      body: fd,
+      isToast: false,
+    });
+    if (!res?.response?.ok) {
+      throw new Error(res?.json?.detail || "Upload failed");
+    }
+    return {
+      type: res.json.kind as "image" | "video",
+      url: res.json.url as string,
+      caption: null,
+      thumbnail_url: null,
+      sort_order: 0,
+    } satisfies ProjectMedia;
+  };
+
+  const openEditorForIndex = (idx: number) => {
+    const m = value[idx];
+    if (!m || m.type !== "image") return;
+    setEditorSrc(m.url);
+    setEditorReplaceIdx(idx);
+    setEditorOpen(true);
+  };
+
+  const handleEditorApply = async (blob: Blob, filename: string) => {
+    const item = await uploadBlobAsMedia(blob, filename);
+    if (editorReplaceIdx !== null) {
+      const next = [...value];
+      next[editorReplaceIdx] = {
+        ...item,
+        caption: value[editorReplaceIdx].caption,
+        sort_order: editorReplaceIdx,
+      };
+      onChange(next.map((m, i) => ({ ...m, sort_order: i })));
+    } else {
+      onChange([...value, item].map((m, i) => ({ ...m, sort_order: i })));
+    }
+    setEditorReplaceIdx(null);
   };
 
   const handleFiles = async (files: FileList | null) => {
@@ -144,6 +206,21 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                   <X className="size-3.5" />
                 </Button>
                 <DotsSixVertical className="absolute top-2 left-2 size-4 text-white/60" />
+                {m.type === "image" && (
+                  <Button
+                    type="button"
+                    variant="glass"
+                    size="icon-small"
+                    className="absolute bottom-2 right-2 size-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditorForIndex(idx);
+                    }}
+                    title="Редактировать"
+                  >
+                    <PencilSimple className="size-3.5" />
+                  </Button>
+                )}
               </div>
               <div className="p-2 space-y-1.5">
                 <Input
@@ -210,6 +287,13 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
           </>
         )}
       </button>
+
+      <ImageEditorDialog
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        src={editorSrc}
+        onApply={handleEditorApply}
+      />
     </div>
   );
 }

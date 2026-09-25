@@ -31,7 +31,7 @@ class ProjectCreate(BaseModel):
     client_id: Optional[UUID] = None
     platform: Optional[str] = None
     period: Optional[str] = None
-    tech_stack: Optional[List[str]] = None
+    stack: Optional[List[str]] = None
     mdx_content: Optional[str] = ""
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
@@ -53,7 +53,7 @@ class ProjectUpdate(BaseModel):
     client_id: Optional[UUID] = None
     platform: Optional[str] = None
     period: Optional[str] = None
-    tech_stack: Optional[List[str]] = None
+    stack: Optional[List[str]] = None
     mdx_content: Optional[str] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None

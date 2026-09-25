@@ -31,7 +31,6 @@ class Project(Base):
     href = Column(String, nullable=True)
     seo_title = Column(String, nullable=True)
     meta_description = Column(String, nullable=True)
-    tech_stack = Column(JSON, nullable=True)
     mdx_content = Column(Text, nullable=True)
     is_featured = Column(Boolean, default=False)
     publication_status = Column(Enum(PublicationStatus, name="publication_status"), default=PublicationStatus.draft)
@@ -42,6 +41,12 @@ class Project(Base):
     # Eager-loaded so ProjectDetail can return the client inline
     # without an N+1 on list endpoints.
     client = relationship("Company", lazy="joined")
+    stack_items = relationship(
+        "StackItem",
+        secondary="project_stack_items",
+        lazy="selectin",
+        order_by="StackItem.name",
+    )
     tag_records = relationship(
         "ProjectTag",
         back_populates="project",

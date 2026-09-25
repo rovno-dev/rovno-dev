@@ -12,7 +12,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
 import { ImageUploadField } from "./image-upload-field";
 import { EntityPicker, type PickerItem } from "./entity-picker";
-import { StringChipsInput } from "./string-chips-input";
+import { EntityMultiPicker, type MultiPickerItem } from "./entity-multi-picker";
 import { ProjectTagsEditor } from "./project-tags-editor";
 import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
@@ -34,6 +34,7 @@ import {
   createCompany,
   type ClientListItem,
 } from "@/utils/api/clients";
+import { fetchStack, createStackItem, type StackItem } from "@/utils/api/stack";
 
 interface FormState {
   slug: string;
@@ -112,8 +113,10 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [companies, setCompanies] = useState<ClientListItem[]>([]);
+  const [stackPool, setStackPool] = useState<StackItem[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [companiesLoading, setCompaniesLoading] = useState(true);
+  const [stackLoading, setStackLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -121,18 +124,19 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     // categories endpoint would filter nothing, but admin gives us a
     // consistent shape and a write-capable pairing.
     Promise.all([
-      fetchProjectCategoriesAdmin()
-        .catch(() => [] as ProjectCategory[]),
-      fetchCompanies()
-        .catch(() => [] as ClientListItem[]),
+      fetchProjectCategoriesAdmin().catch(() => [] as ProjectCategory[]),
+      fetchCompanies().catch(() => [] as ClientListItem[]),
+      fetchStack().catch(() => [] as StackItem[]),
     ])
-      .then(([cats, comps]) => {
+      .then(([cats, comps, stk]) => {
         setCategories(cats);
         setCompanies(comps);
+        setStackPool(stk);
       })
       .finally(() => {
         setCategoriesLoading(false);
         setCompaniesLoading(false);
+        setStackLoading(false);
       });
   }, []);
 
@@ -147,6 +151,22 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     label: c.name,
     meta: c.industry || null,
   }));
+  const stackItems: MultiPickerItem[] = stackPool.map((s) => ({
+    id: s.id,
+    label: s.name,
+    meta: s.usage_count > 0 ? String(s.usage_count) : null,
+  }));
+  // The form stores stack as names (backend resolves names -> rows). The
+  // picker needs id-based items; we bridge by looking up the row for each
+  // name in the current pool. A name not in the pool renders as a synthetic
+  // id "name:<name>" — the picker still shows it, and creating it on save
+  // resolves the collision on the server side.
+  const selectedStack: MultiPickerItem[] = form.tech_stack.map((name) => {
+    const found = stackPool.find((s) => s.name.toLowerCase() === name.toLowerCase());
+    return found
+      ? { id: found.id, label: found.name }
+      : { id: `name:${name}`, label: name };
+  });
 
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((prev) => ({ ...prev, [k]: v }));
@@ -373,12 +393,24 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-3">
         <h2 className="text-heading-3">Стек</h2>
         <p className="text-body-4 text-(--on-bg-medium)">
-          Технологии и инструменты проекта. Space или Enter добавляет чип.
+          Технологии и инструменты проекта. Выбирайте из списка или создавайте новые.
         </p>
-        <StringChipsInput
-          value={form.tech_stack}
-          onChange={(v) => update("tech_stack", v)}
+        <EntityMultiPicker
+          value={selectedStack}
+          onChange={(next) => {
+            // Persist names, not ids — the backend resolves names to rows
+            // and creates any that don't exist yet.
+            update("tech_stack", next.map((n) => n.label));
+          }}
+          items={stackItems}
+          loading={stackLoading}
           placeholder="Figma, Blender, Next.js…"
+          createNoun="Добавить в стек"
+          onCreate={async (name) => {
+            const created = await createStackItem(name);
+            setStackPool((prev) => [...prev, created]);
+            return { id: created.id, label: created.name };
+          }}
         />
       </Card>
 

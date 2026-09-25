@@ -20,6 +20,14 @@ class ProjectCategoryRef(BaseModel):
     label: str
 
 
+class StackRef(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    name: str
+    slug: str
+    icon_url: Optional[str] = None
+
+
 class ProjectTagOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
@@ -62,8 +70,8 @@ class ProjectDetail(ProjectListItem):
     client_id: Optional[UUID] = None
     client: Optional[CompanyRef] = None
     platform: Optional[str] = None
-    tech_stack: Optional[List[str]] = None
     mdx_content: Optional[str] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     media: List[ProjectMediaOut] = []
+    stack: List[StackRef] = []
