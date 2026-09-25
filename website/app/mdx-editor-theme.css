@@ -1,42 +1,37 @@
 /* Scoped theming for MDXEditor. Loaded from editor-impl.tsx so it only
-   ships on the article editor route, not globally.
-   The `!important` flags are load-bearing: MDXEditor's own theme CSS sets
-   the same variables under `.mdxeditor[data-theme=...]` with higher
-   specificity than a plain rule on `.mdx-editor-wrapper`. */
+   ships on the article editor route.
+
+   Everything is `!important` and scoped under `.mdx-editor-wrapper` — that
+   combination is what beats MDXEditor's own bundled theme, which sets the
+   same variables under `.mdxeditor[data-theme=...]` with higher
+   specificity than a bare `.prose-mdx` rule. */
 
 .mdx-editor-wrapper,
 .mdx-editor-wrapper .mdxeditor {
-  /* Backgrounds */
   --baseBg: var(--card) !important;
   --baseBgSubtle: var(--bg) !important;
   --baseBgHover: var(--state-hover) !important;
   --baseBgActive: var(--primary-card) !important;
   --basePageBg: var(--card) !important;
 
-  /* Text */
   --baseText: var(--on-bg-high) !important;
   --baseTextContrast: var(--on-bg-high) !important;
   --baseTextSubtle: var(--on-bg-medium) !important;
 
-  /* Borders / lines */
   --baseBorder: var(--outline) !important;
   --baseBorderHover: var(--primary) !important;
   --baseLine: var(--outline) !important;
   --baseLineSubtle: color-mix(in srgb, var(--outline), transparent 50%) !important;
 
-  /* Solids (buttons, chips) */
   --baseSolid: var(--on-bg-medium) !important;
   --baseSolidHover: var(--on-bg-high) !important;
 
-  /* Accents */
   --baseBase: var(--primary) !important;
   --baseAccent: var(--primary) !important;
 
-  /* Popovers / toolbars */
   --basePopover: var(--card) !important;
   --basePopoverBorder: var(--outline) !important;
 
-  /* Selection */
   --baseSelection: var(--primary-card) !important;
 
   color: var(--on-bg-high) !important;
@@ -58,7 +53,8 @@
   background: var(--state-hover) !important;
   color: var(--on-bg-high) !important;
 }
-.mdx-editor-wrapper [class*="_toolbarButton"][data-state="on"] {
+.mdx-editor-wrapper [class*="_toolbarButton"][data-state="on"],
+.mdx-editor-wrapper [class*="_toolbarButton"][aria-pressed="true"] {
   background: var(--primary-card) !important;
   color: var(--primary) !important;
 }
@@ -73,11 +69,18 @@
   border-color: var(--outline) !important;
 }
 
-/* The editable area itself */
+/* ---- Editable content area -------------------------------------------- */
+
+/* Force the contenteditable box to adopt a proper prose scale.
+   The current heading/paragraph sizing inside .prose-mdx was too timid
+   and MDXEditor's own reset was overriding it. */
 .mdx-editor-wrapper .prose-mdx {
   color: var(--on-bg-high) !important;
   background: var(--card) !important;
+  font-size: 15px !important;
+  line-height: 1.75 !important;
 }
+
 .mdx-editor-wrapper .prose-mdx h1,
 .mdx-editor-wrapper .prose-mdx h2,
 .mdx-editor-wrapper .prose-mdx h3,
@@ -85,28 +88,111 @@
 .mdx-editor-wrapper .prose-mdx h5,
 .mdx-editor-wrapper .prose-mdx h6 {
   color: var(--on-bg-high) !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
 }
-.mdx-editor-wrapper .prose-mdx p,
-.mdx-editor-wrapper .prose-mdx li {
+.mdx-editor-wrapper .prose-mdx h1 { font-size: 2rem   !important; letter-spacing: -0.02em !important; }
+.mdx-editor-wrapper .prose-mdx h2 { font-size: 1.5rem !important; letter-spacing: -0.015em !important; }
+.mdx-editor-wrapper .prose-mdx h3 { font-size: 1.25rem !important; }
+.mdx-editor-wrapper .prose-mdx h4 { font-size: 1.1rem  !important; }
+.mdx-editor-wrapper .prose-mdx h5 { font-size: 1rem    !important; }
+.mdx-editor-wrapper .prose-mdx h6 { font-size: 0.9rem  !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; }
+
+.mdx-editor-wrapper .prose-mdx p {
+  margin: 0.75em 0 !important;
   color: var(--on-bg-high) !important;
 }
+
+.mdx-editor-wrapper .prose-mdx li {
+  color: var(--on-bg-high) !important;
+  margin: 0.25em 0 !important;
+}
+.mdx-editor-wrapper .prose-mdx ul,
+.mdx-editor-wrapper .prose-mdx ol {
+  padding-left: 1.5em !important;
+  margin: 0.75em 0 !important;
+}
+.mdx-editor-wrapper .prose-mdx ul { list-style: disc !important; }
+.mdx-editor-wrapper .prose-mdx ol { list-style: decimal !important; }
+
 .mdx-editor-wrapper .prose-mdx blockquote {
   border-left: 3px solid var(--primary) !important;
+  padding-left: 1em !important;
+  margin: 1em 0 !important;
   color: var(--on-bg-medium) !important;
+  font-style: italic !important;
 }
+
 .mdx-editor-wrapper .prose-mdx a {
   color: var(--primary) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px !important;
 }
+
+.mdx-editor-wrapper .prose-mdx strong,
+.mdx-editor-wrapper .prose-mdx b {
+  font-weight: 600 !important;
+  color: var(--on-bg-high) !important;
+}
+.mdx-editor-wrapper .prose-mdx em,
+.mdx-editor-wrapper .prose-mdx i {
+  font-style: italic !important;
+}
+.mdx-editor-wrapper .prose-mdx u { text-decoration: underline !important; }
+
 .mdx-editor-wrapper .prose-mdx code {
   background: var(--bg-disabled) !important;
   color: var(--on-bg-high) !important;
+  padding: 0.15em 0.35em !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
+  font-family: var(--font-mono, ui-monospace, monospace) !important;
 }
 .mdx-editor-wrapper .prose-mdx pre {
   background: var(--bg-disabled) !important;
   color: var(--on-bg-high) !important;
+  padding: 1em !important;
+  border-radius: 12px !important;
+  overflow-x: auto !important;
+  margin: 1em 0 !important;
+}
+.mdx-editor-wrapper .prose-mdx pre code {
+  background: transparent !important;
+  padding: 0 !important;
 }
 
-/* CodeMirror (code blocks, source view) */
+.mdx-editor-wrapper .prose-mdx hr {
+  border: none !important;
+  border-top: 1px solid var(--outline) !important;
+  margin: 2em 0 !important;
+}
+
+.mdx-editor-wrapper .prose-mdx table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 1em 0 !important;
+}
+.mdx-editor-wrapper .prose-mdx th,
+.mdx-editor-wrapper .prose-mdx td {
+  border: 1px solid var(--outline) !important;
+  padding: 0.5em 0.75em !important;
+  text-align: left !important;
+}
+.mdx-editor-wrapper .prose-mdx th {
+  background: var(--bg) !important;
+  font-weight: 600 !important;
+}
+
+.mdx-editor-wrapper .prose-mdx img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 12px !important;
+  margin: 1em 0 !important;
+}
+
+/* ---- CodeMirror (source view, code blocks) ---------------------------- */
 .mdx-editor-wrapper .cm-editor,
 .mdx-editor-wrapper .cm-scroller,
 .mdx-editor-wrapper .cm-gutters {
@@ -116,6 +202,7 @@
 }
 .mdx-editor-wrapper .cm-gutters {
   border-right: 1px solid var(--outline) !important;
+  color: var(--on-bg-low) !important;
 }
 .mdx-editor-wrapper .cm-activeLine,
 .mdx-editor-wrapper .cm-activeLineGutter {

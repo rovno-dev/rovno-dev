@@ -69,6 +69,7 @@ export interface ArticleListItem {
 export interface Article extends ArticleListItem {
   mdx_content: string;
   raw_json?: any;
+  attachments?: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[] | null;
   seo_title?: string | null;
   meta_description?: string | null;
 }
@@ -85,8 +86,11 @@ export interface ArticlePayload {
   date?: string;
   /** Tag names — backend upserts into the tags table. */
   tags?: string[];
+  categories?: string[];
+  brands?: string[];
   mdx_content: string;
   raw_json?: any;
+  attachments?: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[];
   seo_title?: string | null;
   meta_description?: string | null;
   publication_status?: "draft" | "published";

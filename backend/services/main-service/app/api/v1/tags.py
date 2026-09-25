@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.tag import Tag, article_tags
+from app.models.tag import Tag, TagKind, article_tags
 from app.models.user import User
 from app.services.tag_service import slugify_tag
 from app.shared.auth import get_current_user
@@ -20,24 +20,31 @@ class TagListItem(BaseModel):
     id: UUID
     name: str
     slug: str
+    kind: str
     usage_count: int = 0
 
 
 class TagCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=60)
+    kind: str = "tag"
+
+
+def _normalize_kind(raw: Optional[str]) -> TagKind:
+    if not raw:
+        return TagKind.tag
+    try:
+        return TagKind(raw)
+    except ValueError:
+        raise HTTPException(422, f"Unknown tag kind: {raw}")
 
 
 @router.get("", response_model=List[TagListItem])
 def list_tags(
     q: Optional[str] = None,
+    kind: Optional[str] = None,
     limit: int = Query(200, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
-    """Public endpoint. Sorted by usage count descending, then name.
-
-    `usage_count` is computed with a LEFT JOIN so zero-usage tags (created
-    via the editor but not yet linked to an article) still appear.
-    """
     usage = func.count(article_tags.c.article_id).label("usage_count")
 
     query = (
@@ -46,13 +53,20 @@ def list_tags(
         .group_by(Tag.id)
         .order_by(usage.desc(), Tag.name.asc())
     )
+    if kind:
+        query = query.filter(Tag.kind == _normalize_kind(kind))
     if q:
-        like = f"%{q.strip()}%"
-        query = query.filter(Tag.name.ilike(like))
+        query = query.filter(Tag.name.ilike(f"%{q.strip()}%"))
 
     rows = query.limit(limit).all()
     return [
-        TagListItem(id=t.id, name=t.name, slug=t.slug, usage_count=int(c or 0))
+        TagListItem(
+            id=t.id,
+            name=t.name,
+            slug=t.slug,
+            kind=t.kind.value,
+            usage_count=int(c or 0),
+        )
         for t, c in rows
     ]
 
@@ -63,13 +77,18 @@ def create_tag(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
+    kind = _normalize_kind(payload.kind)
     name = payload.name.strip()
     if not name:
         raise HTTPException(422, "Tag name cannot be empty")
 
-    existing = db.query(Tag).filter(func.lower(Tag.name) == name.lower()).first()
+    existing = (
+        db.query(Tag)
+        .filter(Tag.kind == kind, func.lower(Tag.name) == name.lower())
+        .first()
+    )
     if existing:
-        raise HTTPException(409, f"Tag '{existing.name}' already exists")
+        raise HTTPException(409, f"'{existing.name}' уже существует в этой категории")
 
     base_slug = slugify_tag(name)
     slug, n = base_slug, 2
@@ -77,8 +96,10 @@ def create_tag(
         slug = f"{base_slug}-{n}"
         n += 1
 
-    tag = Tag(name=name, slug=slug)
+    tag = Tag(name=name, slug=slug, kind=kind)
     db.add(tag)
     db.commit()
     db.refresh(tag)
-    return TagListItem(id=tag.id, name=tag.name, slug=tag.slug, usage_count=0)
+    return TagListItem(
+        id=tag.id, name=tag.name, slug=tag.slug, kind=tag.kind.value, usage_count=0
+    )

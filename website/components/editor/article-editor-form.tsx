@@ -22,6 +22,7 @@ import { useUser } from "@/entities/user/model/user-context";
 import { ArticleEditor } from "./article-editor";
 import { TagsAutocomplete } from "./tags-autocomplete";
 import { ImageUploadField } from "./image-upload-field";
+import { ProjectMediaUploader } from "./media-uploader";
 import {
   Article,
   ArticlePayload,
@@ -381,6 +382,18 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
             />
           </Field>
         </div>
+      </Card>
+
+      {/* Attachments gallery */}
+      <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
+        <h2 className="text-heading-3">Медиа</h2>
+        <p className="text-body-4 text-(--on-bg-medium)">
+          Изображения и короткие видео до 10 МБ. Рендерятся галереей в конце статьи.
+        </p>
+        <ProjectMediaUploader
+          value={form.attachments}
+          onChange={(v) => update("attachments", v)}
+        />
       </Card>
 
       {/* AI payload */}

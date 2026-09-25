@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Any, List, Optional
 from uuid import UUID
-
 from pydantic import BaseModel, Field
 
 
@@ -11,11 +10,14 @@ class ArticleCreate(BaseModel):
     description: str = Field("", max_length=1000)
     image_url: Optional[str] = ""
     date: Optional[datetime] = None
-    # Tag names. The backend upserts each into the `tags` table
-    # (case-insensitive) and links them via article_tags.
+    # Three taxonomies, all stored in the same tags table with a kind column.
     tags: Optional[List[str]] = None
+    categories: Optional[List[str]] = None
+    brands: Optional[List[str]] = None
     mdx_content: str = ""
     raw_json: Optional[Any] = None
+    # Article gallery. Same shape as project media: {type, url, caption?}.
+    attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     publication_status: Optional[str] = "draft"
@@ -28,8 +30,11 @@ class ArticleUpdate(BaseModel):
     image_url: Optional[str] = None
     date: Optional[datetime] = None
     tags: Optional[List[str]] = None
+    categories: Optional[List[str]] = None
+    brands: Optional[List[str]] = None
     mdx_content: Optional[str] = None
     raw_json: Optional[Any] = None
+    attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     publication_status: Optional[str] = None

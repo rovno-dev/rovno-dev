@@ -1,6 +1,5 @@
 """Admin CRUD for projects + GitHub README proxy."""
 import os
-import re
 import time
 from datetime import datetime
 from typing import List, Optional
@@ -24,16 +23,8 @@ router = APIRouter(prefix="/admin/projects", tags=["admin-projects"])
 
 
 # ---------- Slug helper --------------------------------------------------
-_SLUG_RE = re.compile(r"[^\w\s-]+", re.UNICODE)
-_SLUG_WS = re.compile(r"[\s_]+", re.UNICODE)
-
-
-def slugify(text: str) -> str:
-    text = text.strip().lower()
-    text = _SLUG_RE.sub("", text)
-    text = _SLUG_WS.sub("-", text)
-    text = re.sub(r"-+", "-", text).strip("-")
-    return text[:80] or "project"
+# Shared, transliterating, ASCII-only. See app/shared/slugify.py.
+from app.shared.slugify import slugify
 
 
 def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:

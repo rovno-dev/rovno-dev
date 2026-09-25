@@ -47,8 +47,20 @@ export function ArticleCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-6 md:p-8">
           {article.tags && article.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
-              {article.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag.id} variant="glass-static" size="chip-small" className="text-white border-white/20">
+              {article.tags.slice(0, 4).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="glass-static"
+                  size="chip-small"
+                  className={
+                    "text-white border-white/20 " +
+                    ((tag as any).kind === "category"
+                      ? "bg-violet-500/40"
+                      : (tag as any).kind === "brand"
+                      ? "bg-blue-500/40"
+                      : "")
+                  }
+                >
                   {tag.name}
                 </Badge>
               ))}

@@ -1,30 +1,21 @@
-import re
 from typing import Iterable, List
-
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.tag import Tag
-
-_SLUG_RE = re.compile(r"[^\w\s-]+", re.UNICODE)
-_SLUG_WS = re.compile(r"[\s_]+", re.UNICODE)
+from app.models.tag import Tag, TagKind
+from app.shared.slugify import slugify as _slugify_shared
 
 
 def slugify_tag(text: str) -> str:
-    text = text.strip().lower()
-    text = _SLUG_RE.sub("", text)
-    text = _SLUG_WS.sub("-", text)
-    text = re.sub(r"-+", "-", text).strip("-")
-    return text[:60] or "tag"
+    """Thin wrapper so the call sites don't have to know about max_len."""
+    return _slugify_shared(text, max_len=60, fallback="tag")
 
 
-def resolve_tags(db: Session, names: Iterable[str] | None) -> List[Tag]:
+def resolve_tags(db: Session, names: Iterable[str] | None, kind: TagKind = TagKind.tag) -> List[Tag]:
     """Upsert each name into the tags table and return the Tag objects.
 
-    - Case-insensitive dedupe within a single call.
-    - When a tag already exists we reuse its row and preserve its casing,
-      so "design" and "Design" can't fork into two tags.
-    - New tags get a unique slug (appending -2, -3, ... on collision).
+    Uniqueness is `(kind, lower(name))`, so a category called "Design" and a
+    tag called "Design" can coexist as separate rows.
     """
     if not names:
         return []
@@ -40,7 +31,11 @@ def resolve_tags(db: Session, names: Iterable[str] | None) -> List[Tag]:
             continue
         seen.add(key)
 
-        existing = db.query(Tag).filter(func.lower(Tag.name) == key).first()
+        existing = (
+            db.query(Tag)
+            .filter(Tag.kind == kind, func.lower(Tag.name) == key)
+            .first()
+        )
         if existing:
             result.append(existing)
             continue
@@ -51,7 +46,7 @@ def resolve_tags(db: Session, names: Iterable[str] | None) -> List[Tag]:
             slug = f"{base_slug}-{n}"
             n += 1
 
-        tag = Tag(name=name, slug=slug)
+        tag = Tag(name=name, slug=slug, kind=kind)
         db.add(tag)
         db.flush()
         result.append(tag)

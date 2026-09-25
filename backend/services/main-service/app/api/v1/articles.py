@@ -14,6 +14,7 @@ from app.models.project import PublicationStatus
 from app.schemas.article.requests import ArticleCreate, ArticleUpdate
 from app.schemas.article.responses import ArticleListItem, ArticleResponse
 from app.services.tag_service import resolve_tags
+from app.models.tag import TagKind, Tag
 from app.services.team_service import is_team_member
 from app.shared.auth import get_current_user, get_optional_user
 from database.database import get_db
@@ -155,7 +156,11 @@ def create_article(
         publication_status=final_status,
         author_id=current_user.id,
     )
-    article.tags = resolve_tags(db, payload.tags)
+    article.tags = (
+        resolve_tags(db, payload.tags, TagKind.tag)
+        + resolve_tags(db, payload.categories, TagKind.category)
+        + resolve_tags(db, payload.brands, TagKind.brand)
+    )
 
     db.add(article)
     db.commit()
@@ -194,8 +199,28 @@ def update_article(
             article.reviewed_at = None
 
     tag_names = update.pop("tags", None)
-    if tag_names is not None:
-        article.tags = resolve_tags(db, tag_names)
+    category_names = update.pop("categories", None)
+    brand_names = update.pop("brands", None)
+
+    # Rebuild the article's tag set preserving kinds that weren't touched.
+    existing_tags = list(article.tags)
+    existing_categories = [t for t in existing_tags if t.kind == TagKind.category]
+    existing_brands = [t for t in existing_tags if t.kind == TagKind.brand]
+    existing_plain = [t for t in existing_tags if t.kind == TagKind.tag]
+
+    new_plain = resolve_tags(db, tag_names, TagKind.tag) if tag_names is not None else existing_plain
+    new_categories = (
+        resolve_tags(db, category_names, TagKind.category)
+        if category_names is not None
+        else existing_categories
+    )
+    new_brands = (
+        resolve_tags(db, brand_names, TagKind.brand)
+        if brand_names is not None
+        else existing_brands
+    )
+    if any(x is not None for x in (tag_names, category_names, brand_names)):
+        article.tags = new_plain + new_categories + new_brands
 
     for key, value in update.items():
         setattr(article, key, value)

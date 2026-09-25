@@ -233,7 +233,47 @@ export default async function ArticlePage({
       <section className="py-12 md:py-16">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-            <article className="max-w-[760px]">{content}</article>
+            <article className="max-w-[760px]">
+              {content}
+
+              {article.attachments && article.attachments.length > 0 && (
+                <div className="mt-12 pt-8 border-t border-(--outline)">
+                  <h2 className="text-heading-3 mb-4">Галерея</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {article.attachments.map((m: any, i: number) => (
+                      <figure
+                        key={i}
+                        className="rounded-3xl border border-(--outline) overflow-hidden bg-(--card)"
+                      >
+                        {m.type === "image" ? (
+                          <div className="relative aspect-video">
+                            <Image
+                              src={m.url}
+                              alt={m.caption || ""}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 50vw"
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <video
+                            src={m.url}
+                            controls
+                            preload="metadata"
+                            className="w-full aspect-video bg-black"
+                          />
+                        )}
+                        {m.caption && (
+                          <figcaption className="px-4 py-2 text-body-5 text-(--on-bg-medium)">
+                            {m.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </article>
             <div className="space-y-8">
               {headings.length > 0 && (
                 <Toc

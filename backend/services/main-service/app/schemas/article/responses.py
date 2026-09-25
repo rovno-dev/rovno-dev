@@ -26,6 +26,7 @@ class TagRef(BaseModel):
     id: UUID
     name: str
     slug: str
+    kind: str
 
 
 class ArticleListItem(BaseModel):
@@ -36,6 +37,7 @@ class ArticleListItem(BaseModel):
     description: str
     image_url: str
     date: datetime
+    # Every tag, category, and brand. The frontend groups by `.kind`.
     tags: Optional[List[TagRef]] = None
     publication_status: str
     review_note: Optional[str] = None
@@ -50,11 +52,11 @@ class ArticleListItem(BaseModel):
 class ArticleResponse(ArticleListItem):
     mdx_content: str
     raw_json: Optional[Any] = None
+    attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
 
 
 class AdminArticleListItem(ArticleListItem):
-    """Admin list adds a couple of derived fields the reviewer needs."""
     is_team_author: bool = False
     is_pending: bool = False

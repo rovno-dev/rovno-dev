@@ -76,9 +76,22 @@ async def get_dashboard_stats(
 ):
     now = datetime.utcnow()
     month_start = datetime(now.year, now.month, 1)
-    # Projects by category
-    projects = db.query(Project.category, func.count(Project.id)).group_by(Project.category).all()
-    projects_by_category = {cat or "uncategorized": count for cat, count in projects}
+    # Projects by category.
+    # `Project.category` is a relationship to ProjectCategory now, not a
+    # column — grouping on it directly makes SQLAlchemy return odd values.
+    # Join through `category_id` and group on the label instead.
+    from app.models.project_category import ProjectCategory
+
+    rows = (
+        db.query(ProjectCategory.label, func.count(Project.id))
+        .select_from(Project)
+        .outerjoin(ProjectCategory, Project.category_id == ProjectCategory.id)
+        .group_by(ProjectCategory.label)
+        .all()
+    )
+    projects_by_category = {
+        (label or "uncategorized"): int(count) for label, count in rows
+    }
     return DashboardStats(
         total_users=db.query(User).count(),
         total_orders=db.query(OrderRequest).count(),

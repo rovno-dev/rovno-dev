@@ -132,10 +132,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-white/70">
-                    <Play className="size-8" weight="fill" />
-                    <span className="text-[10px] uppercase tracking-widest">Видео</span>
-                  </div>
+                  <VideoThumb url={m.url} />
                 )}
                 <Button
                   type="button"
@@ -214,5 +211,54 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
         )}
       </button>
     </div>
+  );
+}
+
+
+/**
+ * Telegram-style video preview: renders the first frame as an inline poster
+ * with a centered play button. Clicking swaps to a `<video controls>` for
+ * playback; click-outside or Esc (browser default) collapses it back.
+ *
+ * The `#t=0.1` fragment on the video src forces browsers to seek to a
+ * non-zero time so the poster frame actually renders. Without it, Chrome
+ * shows a black rectangle until the user interacts.
+ */
+function VideoThumb({ url }: { url: string }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (playing) {
+    return (
+      <video
+        src={url}
+        autoPlay
+        controls
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover bg-black"
+        onClick={(e) => e.stopPropagation()}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setPlaying(true)}
+      className="absolute inset-0 w-full h-full group/video"
+      aria-label="Воспроизвести видео"
+    >
+      <video
+        src={url + "#t=0.1"}
+        preload="metadata"
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <span className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover/video:bg-black/50 transition-colors">
+        <span className="flex size-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">
+          <Play className="size-5 ml-0.5" weight="fill" />
+        </span>
+      </span>
+    </button>
   );
 }

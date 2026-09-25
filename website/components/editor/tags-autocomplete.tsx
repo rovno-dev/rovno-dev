@@ -10,6 +10,8 @@ interface Props {
   placeholder?: string;
   className?: string;
   maxTags?: number;
+  /** Filters the suggestion pool — "tag" | "category" | "brand". */
+  kind?: "tag" | "category" | "brand";
 }
 
 /**
@@ -33,6 +35,7 @@ export function TagsAutocomplete({
   placeholder,
   className,
   maxTags = 20,
+  kind = "tag",
 }: Props) {
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [draft, setDraft] = useState("");
@@ -45,11 +48,11 @@ export function TagsAutocomplete({
 
   useEffect(() => {
     let cancelled = false;
-    fetchTags()
+    fetchTags(undefined, 300, kind)
       .then((tags) => { if (!cancelled) setAllTags(tags); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [kind]);
 
   const selectedLower = useMemo(
     () => new Set(value.map((v) => v.toLowerCase())),
