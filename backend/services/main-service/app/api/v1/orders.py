@@ -128,10 +128,10 @@ async def create_order(
         db.add(company)
         db.flush()
 
-    # 3. Find or create Contact — order clients are contacts, NOT users.
-    # ponytail: unique constraints on phone/telegram/email mean a returning client
-    # must reuse their existing contact row. Lookup-or-create across all three so
-    # any match wins, and the order still records against the existing contact.
+    # 3. Find or create Client — order submitters live in `clients`, NOT `users`.
+    # The uniqueness constraints on phone/telegram/email were dropped in
+    # migration 20260921163000, so "find" is best-effort: the first row matching
+    # any identifier wins. The order is still recorded against a real Client.
     lookup_conditions = []
     if valid_data.user_telegram:
         lookup_conditions.append(Client.telegram_username == valid_data.user_telegram)
@@ -142,16 +142,16 @@ async def create_order(
 
     client = None
     if lookup_conditions:
-        client = db.query(Contact).filter(or_(*lookup_conditions)).first()
+        client = db.query(Client).filter(or_(*lookup_conditions)).first()
 
-    if contact:
+    if client:
         # fill in any fields the existing contact was missing, don't overwrite
         if company and not client.company_id:
             client.company_id = company.id
         client.name = client.name or valid_data.user_name
         client.role_title = client.role_title or "Client"
     else:
-        client = Contact(
+        client = Client(
             company_id=company.id if company else None,
             role_title="Order contact",
             phone=valid_data.user_phone,
@@ -159,7 +159,7 @@ async def create_order(
             email=valid_data.user_email,
             name=valid_data.user_name,
         )
-        db.add(contact)
+        db.add(client)
 
     # Backstop: if two concurrent requests race to create two different contacts
     # that collide on a unique field, surface a 422 instead of a 500 traceback.
@@ -174,7 +174,7 @@ async def create_order(
 
     # 4. Create OrderRequest
     order_request = OrderRequest(
-        client_id=contact.id,
+        client_id=client.id,
         service_types_json=valid_data.services,
         about=valid_data.description or "",
         estimate_deadline=valid_data.deadline if valid_data.deadline else None,

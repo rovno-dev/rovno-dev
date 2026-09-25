@@ -105,32 +105,15 @@ export function CustomProjectPage({
           />
         </div>
 
-        {/* Top status strip. */}
-        <Container variant="full-width" className="relative z-10 pt-8">
-          <div className="max-w-[1400px] mx-auto flex items-center justify-between text-[10px] font-mono uppercase tracking-[0.28em] text-white/55">
-            <div className="flex items-center gap-3">
-              <span
-                className="inline-block size-2 rounded-full"
-                style={{ background: accent }}
-              />
-              <span>Rovno.dev</span>
-              <span className="text-white/20">/</span>
-              <span>Case</span>
-            </div>
-            <div className="hidden sm:flex items-center gap-3">
-              {project.categoryLabel && <span>{project.categoryLabel}</span>}
-              {project.period && (
-                <>
-                  <span className="text-white/20">/</span>
-                  <span>{project.period}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </Container>
+        {/* Top zone left intentionally empty — the fixed header floats over
+            this area on /projects/<slug>. Hero content is pushed down by the
+            hero's own top padding (pt-32 md:pt-40) so nothing collides. */}
 
         {/* Hero content — eyebrow, title, description, meta grid, CTAs. */}
-        <Container variant="full-width" className="relative z-10 py-12 md:py-16">
+        <Container
+          variant="full-width"
+          className="relative z-10 pt-32 md:pt-40 pb-12 md:pb-16"
+        >
           <div className="max-w-[1400px] mx-auto">
             <div className="flex items-center gap-4 text-[11px] font-mono uppercase tracking-[0.3em] text-white/60 mb-6">
               <span className="h-px w-12" style={{ background: accent }} />

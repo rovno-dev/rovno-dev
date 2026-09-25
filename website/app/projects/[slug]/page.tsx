@@ -39,6 +39,7 @@ import {
   MDXTd,
   MDXCard,
 } from "@/components/mdx";
+import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 
 export const revalidate = 60;
 
@@ -132,6 +133,9 @@ const components = {
   Card: MDXCard,
   Gallery,
   MetricCard,
+  Callout,
+  PullQuote,
+  StatRow,
 };
 
 const getCompiledMDX = cache(async (content: string) => {

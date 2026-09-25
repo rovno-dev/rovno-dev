@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
 import { CoverIframe } from "@/components/layout/media/cover-iframe";
+import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 import {
   ProjectTagChip,
   type ProjectTagKind,
@@ -115,28 +116,15 @@ export function BreadProjectPage({
           />
         </div>
 
-        {/* Top status strip. */}
-        <Container variant="full-width" className="relative z-10 pt-8">
-          <div className="max-w-[1400px] mx-auto flex items-center justify-between text-[10px] font-mono uppercase tracking-[0.28em] text-white/55">
-            <div className="flex items-center gap-3">
-              <span
-                className="inline-block size-2 rounded-full"
-                style={{ background: ACCENT }}
-              />
-              <span>Rovno.dev</span>
-              <span className="text-white/20">/</span>
-              <span>Case 07</span>
-            </div>
-            <div className="hidden sm:flex items-center gap-3">
-              <span>Promo</span>
-              <span className="text-white/20">/</span>
-              <span>{project.period || "2026"}</span>
-            </div>
-          </div>
-        </Container>
+        {/* Top zone left intentionally empty — the fixed header floats over
+            this area on /projects/<slug>. Hero content is pushed down by the
+            hero's own top padding (pt-32 md:pt-40) so nothing collides. */}
 
         {/* Hero content. */}
-        <Container variant="full-width" className="relative z-10 py-12 md:py-16">
+        <Container
+          variant="full-width"
+          className="relative z-10 pt-32 md:pt-40 pb-12 md:pb-16"
+        >
           <div className="max-w-[1400px] mx-auto">
             <div className="flex items-center gap-4 text-[11px] font-mono uppercase tracking-[0.3em] text-white/60 mb-6">
               <span className="h-px w-12" style={{ background: ACCENT }} />
@@ -371,15 +359,63 @@ export function BreadProjectPage({
       <ScrollReveal threshold={0.02}>
         <section
           id="case"
-          className="py-24 md:py-32 border-b border-(--outline)"
+          className="py-24 md:py-32 border-b border-(--outline) relative"
         >
-          <Container variant="full-width">
+          {/* Very subtle grid + accent bloom behind the body — keeps the
+              section from reading as flat paper without competing with the
+              prose for attention. */}
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none opacity-[0.035]"
+            style={{
+              backgroundImage: `linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)`,
+              backgroundSize: "80px 80px",
+              maskImage:
+                "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse 40% 50% at 10% 20%, ${ACCENT}10, transparent 70%)`,
+            }}
+          />
+
+          <Container variant="full-width" className="relative">
             <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+              {/* Sticky rail: section label + intro caption. */}
               <div className="lg:col-span-3">
-                <SectionLabel number="04" title="Case" accent={ACCENT} />
+                <div className="lg:sticky lg:top-32">
+                  <SectionLabel number="04" title="Case" accent={ACCENT} />
+                  <p className="mt-5 text-body-5 text-(--on-bg-low) leading-relaxed max-w-[220px]">
+                    Разбор: как собирали концепт, материалы и финальный монтаж.
+                  </p>
+                  <span
+                    className="mt-6 inline-block h-px w-12"
+                    style={{ background: ACCENT }}
+                  />
+                </div>
               </div>
-              <div className="lg:col-span-9 max-w-[860px] prose-case">
-                {content}
+
+              {/* Body. The framed panel gives the prose a physical anchor
+                  against the section's now-busier background. */}
+              <div className="lg:col-span-9">
+                <div className="relative rounded-3xl border border-(--outline) bg-(--bg) p-6 md:p-10 lg:p-12">
+                  {/* Corner ticks — the same schematic language used by the
+                      process grid, tying the case body back to the rest of
+                      the page. */}
+                  <span aria-hidden className="absolute top-3 left-3 size-3 border-t border-l border-(--on-bg-low)/40" />
+                  <span aria-hidden className="absolute top-3 right-3 size-3 border-t border-r border-(--on-bg-low)/40" />
+                  <span aria-hidden className="absolute bottom-3 left-3 size-3 border-b border-l border-(--on-bg-low)/40" />
+                  <span aria-hidden className="absolute bottom-3 right-3 size-3 border-b border-r border-(--on-bg-low)/40" />
+
+                  <div className="prose-case max-w-[720px]">
+                    {content}
+                  </div>
+                </div>
               </div>
             </div>
           </Container>
