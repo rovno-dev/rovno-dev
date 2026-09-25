@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeftIcon, ArrowUpRightIcon, GlobeIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowUpRightIcon, GlobeIcon } from "@phosphor-icons/react/dist/ssr";
 import { fetchClientServer } from "@/utils/api/companies";
 
 export const revalidate = 300;

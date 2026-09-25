@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowUpRightIcon } from "@phosphor-icons/react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr";
 import type { ArticleListItem } from "@/utils/api/articles";
 
 function formatDate(iso: string, lang: string) {

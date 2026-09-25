@@ -3,7 +3,7 @@ import { PROJECTS } from "@/app/_data/projects";
 import ProjectCard from "@/components/layout/projects/project-card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link'
-import { CaretRightIcon } from "@phosphor-icons/react";
+import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/providers/language-provider";
 
 export default function BestWorksSection() {

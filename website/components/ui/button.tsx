@@ -1,4 +1,6 @@
 /* LLM context: Forcing SVG internal paths to inherit current color in Button components to fix dark icons on primary buttons in light theme.
+"use client";
+
    outlined uses a color-mix against --on-bg-high (not --outline) — --outline is a
    subtle-divider token that is nearly invisible on dark backgrounds. --on-bg-high
    flips with the theme, so one rule works in both light and dark mode. */

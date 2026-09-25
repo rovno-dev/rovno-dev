@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeftIcon, PencilSimpleIcon, EyeIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, PencilSimpleIcon, EyeIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
 import {
   Gallery,

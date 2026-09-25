@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { CircleNotchIcon } from "@phosphor-icons/react"
+import { CircleNotchIcon } from "@phosphor-icons/react/dist/ssr"
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (
