@@ -39,6 +39,7 @@ class ProjectCreate(BaseModel):
     publication_status: Optional[str] = "draft"
     tags: Optional[List[ProjectTagIn]] = None
     media: Optional[List[ProjectMediaIn]] = None
+    custom_page: Optional[str] = None
 
 
 class ProjectUpdate(BaseModel):
@@ -61,3 +62,4 @@ class ProjectUpdate(BaseModel):
     publication_status: Optional[str] = None
     tags: Optional[List[ProjectTagIn]] = None
     media: Optional[List[ProjectMediaIn]] = None
+    custom_page: Optional[str] = None

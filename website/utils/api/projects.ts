@@ -43,6 +43,8 @@ export interface ProjectDetail {
   meta_description?: string | null;
   is_featured: boolean;
   publication_status: string;
+  /** Key of a bespoke renderer, or null for the shared layout. */
+  custom_page?: string | null;
   tags: ProjectTag[];
   media: ProjectMedia[];
   created_at: string;
@@ -73,6 +75,7 @@ export interface ProjectPayload {
   meta_description?: string | null;
   is_featured?: boolean;
   publication_status?: "draft" | "published";
+  custom_page?: string | null;
   tags?: ProjectTag[];
   media?: ProjectMedia[];
 }

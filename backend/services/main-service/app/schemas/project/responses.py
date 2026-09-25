@@ -62,6 +62,7 @@ class ProjectListItem(BaseModel):
     created_at: datetime
     updated_at: datetime
     tags: List[ProjectTagOut] = []
+    custom_page: Optional[str] = None
 
 
 class ProjectDetail(ProjectListItem):

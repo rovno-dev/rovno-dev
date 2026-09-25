@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,14 +9,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
-  PlusIcon, MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon,
-  PencilSimpleIcon, ArrowSquareOutIcon, CubeIcon,
+  Plus, MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon,
+  PencilSimple, ArrowSquareOutIcon, Cube,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchAdminProjects, type ProjectListAdmin } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { findCustomPageMeta } from "@/app/projects/[slug]/_components/custom-pages-meta";
 
 type LoadState =
   | { kind: "loading" }
@@ -28,7 +27,6 @@ export default function AdminProjectsPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
   const { secret } = useAdminSecret();
-
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -81,14 +79,13 @@ export default function AdminProjectsPage() {
             </Button>
             <Button asChild>
               <Link href={`${base}/new`}>
-                <PlusIcon className="size-4" />
+                <Plus className="size-4" />
                 Новый проект
               </Link>
             </Button>
           </div>
         </div>
 
-        {/* Search */}
         <Card className="rounded-3xl border-(--outline) p-4">
           <div className="relative">
             <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
@@ -101,7 +98,6 @@ export default function AdminProjectsPage() {
           </div>
         </Card>
 
-        {/* Loading */}
         {state.kind === "loading" && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
@@ -110,7 +106,6 @@ export default function AdminProjectsPage() {
           </div>
         )}
 
-        {/* Error */}
         {state.kind === "error" && (
           <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6">
             <p className="text-body-4 text-(--error) mb-3">{state.message}</p>
@@ -118,32 +113,40 @@ export default function AdminProjectsPage() {
           </Card>
         )}
 
-        {/* Empty */}
         {state.kind === "ready" && projects.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <CubeIcon className="size-6" />
+              <Cube className="size-6" />
             </div>
             <p className="text-body-3 text-(--on-bg-medium) mb-4">Пока нет проектов.</p>
             <Button asChild>
               <Link href={`${base}/new`}>
-                <PlusIcon className="size-4" />
+                <Plus className="size-4" />
                 Создать первый проект
               </Link>
             </Button>
           </Card>
         )}
 
-        {/* Grid */}
         {state.kind === "ready" && projects.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {projects.map((p) => (
-              <Card
-                key={p.id}
-                className="group relative rounded-3xl border-(--outline) bg-(--card) overflow-hidden transition-all hover:border-(--primary)/40"
-              >
-                <Link href={`${base}/${p.slug}/edit`} className="block">
+            {projects.map((p) => {
+              const tpl = findCustomPageMeta(p.custom_page);
+              return (
+                <Card
+                  key={p.id}
+                  className="group relative rounded-3xl border-(--outline) bg-(--card) overflow-hidden transition-all hover:border-(--primary)/40 flex flex-col"
+                >
+                  {/* Image block. The stretched <Link> underneath covers the
+                      whole area as a click target for "edit". The outer
+                      element is a plain <div> because the actions row below
+                      contains real anchors and anchors cannot nest. */}
                   <div className="relative aspect-[16/10] bg-muted overflow-hidden">
+                    <Link
+                      href={`${base}/${p.slug}/edit`}
+                      aria-label={`Редактировать ${p.title}`}
+                      className="absolute inset-0 z-[1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-inset"
+                    />
                     {p.cover_image_src ? (
                       <Image
                         src={p.cover_image_src}
@@ -156,7 +159,9 @@ export default function AdminProjectsPage() {
                       <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                    <div className="absolute top-3 left-3 flex gap-1 flex-wrap">
+
+                    {/* Badges — top-left. z-[2] sits above the stretched link. */}
+                    <div className="absolute top-3 left-3 flex gap-1 flex-wrap z-[2]">
                       <Badge
                         variant="glass-static"
                         size="chip-small"
@@ -174,15 +179,27 @@ export default function AdminProjectsPage() {
                           ★
                         </Badge>
                       )}
+                      {tpl && (
+                        <Badge
+                          variant="glass-static"
+                          size="chip-small"
+                          className="text-white border-white/20 bg-violet-500/40"
+                        >
+                          {tpl.label.split(" — ")[0]}
+                        </Badge>
+                      )}
                     </div>
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
+
+                    <div className="absolute bottom-3 left-3 right-3 text-white z-[2] pointer-events-none">
                       <h3 className="text-heading-4 truncate">{p.title}</h3>
                       {p.category?.label && (
                         <p className="text-body-5 text-white/70">{p.category.label}</p>
                       )}
                     </div>
                   </div>
-                  <div className="p-4 flex items-center justify-between gap-2">
+
+                  {/* Actions row — outside the stretched link, own anchors. */}
+                  <div className="p-4 flex items-center justify-between gap-2 relative z-[2]">
                     <div className="text-body-5 text-(--on-bg-low) flex items-center gap-3">
                       {p.period && <span>{p.period}</span>}
                       {p.media_count > 0 && <span>{p.media_count} медиа</span>}
@@ -190,17 +207,21 @@ export default function AdminProjectsPage() {
                     <div className="flex gap-1">
                       {p.publication_status === "published" && (
                         <Button variant="text" size="icon-small" asChild title="Открыть на сайте">
-                          <Link href={`/projects/${p.slug}`} target="_blank">
+                          <Link href={`/projects/${p.slug}`} target="_blank" rel="noopener noreferrer">
                             <ArrowSquareOutIcon className="size-4" />
                           </Link>
                         </Button>
                       )}
-                      <PencilSimpleIcon className="size-4 text-(--on-bg-low)" />
+                      <Button variant="text" size="icon-small" asChild title="Редактировать">
+                        <Link href={`${base}/${p.slug}/edit`}>
+                          <PencilSimple className="size-4" />
+                        </Link>
+                      </Button>
                     </div>
                   </div>
-                </Link>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

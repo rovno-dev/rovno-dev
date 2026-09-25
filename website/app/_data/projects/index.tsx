@@ -23,6 +23,8 @@ export interface Project {
   platform?: string;
   period?: string;
   techStack?: string[];
+  /** Key of a bespoke renderer (see custom-pages-meta.ts). */
+  customPage?: string;
 }
 
 export const PROJECTS: Record<string, Project> = {
@@ -43,6 +45,7 @@ export const PROJECTS: Record<string, Project> = {
     techStack: ["Figma", "Adobe Illustrator"],
   },
   alx: {
+    customPage: "alx",
     id: "2",
     slug: "alx",
     title: "Чужой | ALX-9 - ИИ выставка",
@@ -92,6 +95,7 @@ export const PROJECTS: Record<string, Project> = {
     techStack: ["Figma", "Wix"],
   },
   bread: {
+    customPage: "bread",
     id: "5",
     slug: "bread",
     title: "Хлебная Страна - Промо-ролик",

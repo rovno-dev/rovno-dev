@@ -11,7 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CircleNotchIcon, UsersIcon, UserMinusIcon, UserPlusIcon, ArrowClockwiseIcon, FolderOpenIcon, PencilSimpleIcon,
+  CircleNotchIcon, UsersIcon, UserMinusIcon, ArrowClockwiseIcon, FolderOpenIcon, PencilSimpleIcon,
+  UserPlusIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -107,7 +108,7 @@ export default function AdminTeamPage() {
             </Button>
             <Button asChild>
               <Link href={usersHref}>
-                <UserPlus className="size-4" />
+                <UserPlusIcon className="size-4" />
                 Добавить в команду
               </Link>
             </Button>
@@ -140,14 +141,14 @@ export default function AdminTeamPage() {
         {state.kind === "ready" && members.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <Users className="size-6" />
+              <UsersIcon className="size-6" />
             </div>
             <p className="text-body-3 text-(--on-bg-medium) mb-4">
               В команде пока никого нет.
             </p>
             <Button asChild>
               <Link href={usersHref}>
-                <UserPlus className="size-4" />
+                <UserPlusIcon className="size-4" />
                 Перейти к пользователям
               </Link>
             </Button>
@@ -206,7 +207,7 @@ export default function AdminTeamPage() {
                         <Image src={m.user_avatar_url} alt="" fill className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-(--on-bg-low)">
-                          <Users className="size-6" />
+                          <UsersIcon className="size-6" />
                         </div>
                       )}
                     </div>
@@ -237,7 +238,7 @@ export default function AdminTeamPage() {
                           onClick={(e) => { e.stopPropagation(); setEditing(m); }}
                           title="Редактировать"
                         >
-                          <PencilSimple className="size-4" />
+                          <PencilSimpleIcon className="size-4" />
                         </Button>
                         <Button
                           variant="text"
@@ -245,7 +246,7 @@ export default function AdminTeamPage() {
                           onClick={(e) => { e.stopPropagation(); handleRemove(m); }}
                           title="Убрать из команды"
                         >
-                          <UserMinus className="size-4" />
+                          <UserMinusIcon className="size-4" />
                         </Button>
                       </div>
                     </div>

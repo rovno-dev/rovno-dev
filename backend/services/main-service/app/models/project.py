@@ -37,6 +37,10 @@ class Project(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     category_id = Column(UUID(as_uuid=True), ForeignKey("project_categories.id"), nullable=True)
+    # Slug of a bespoke renderer to use for this project's public page.
+    # Null = the shared layout. Valid keys are declared on the frontend
+    # in app/projects/[slug]/_components/custom-pages-meta.ts.
+    custom_page = Column(String(60), nullable=True)
     category = relationship("ProjectCategory", lazy="joined")
     # Eager-loaded so ProjectDetail can return the client inline
     # without an N+1 on list endpoints.

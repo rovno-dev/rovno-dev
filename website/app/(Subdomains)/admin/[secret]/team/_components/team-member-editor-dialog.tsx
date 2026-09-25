@@ -294,7 +294,7 @@ export function TeamMemberEditorDialog({
           <div className="space-y-3 pt-4 border-t border-(--outline)">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <FolderOpen className="size-5 text-(--primary)" />
+                <FolderOpenIcon className="size-5 text-(--primary)" />
                 <h3 className="text-heading-4">Проекты</h3>
                 <span className="text-body-5 text-(--on-bg-low)">
                   {projects.length}
@@ -306,7 +306,7 @@ export function TeamMemberEditorDialog({
                 size="small"
                 onClick={() => setPickerOpen((v) => !v)}
               >
-                <Plus className="size-4" />
+                <PlusIcon className="size-4" />
                 Добавить проект
               </Button>
             </div>
@@ -386,7 +386,7 @@ export function TeamMemberEditorDialog({
                       onClick={() => removeProject(p.project_id)}
                       aria-label="Убрать"
                     >
-                      <X className="size-4" />
+                      <XIcon className="size-4" />
                     </Button>
                   </div>
                 ))}

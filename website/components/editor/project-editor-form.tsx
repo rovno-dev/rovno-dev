@@ -16,6 +16,10 @@ import { EntityMultiPicker, type MultiPickerItem } from "./entity-multi-picker";
 import { ProjectTagsEditor } from "./project-tags-editor";
 import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
+import {
+  CUSTOM_PAGES_META,
+  findCustomPageMeta,
+} from "@/app/projects/[slug]/_components/custom-pages-meta";
 import { ArticleEditor } from "./article-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -56,6 +60,7 @@ interface FormState {
   publication_status: "draft" | "published";
   tags: ProjectTag[];
   media: ProjectMedia[];
+  custom_page: string | null;
 }
 
 function toFormState(p?: ProjectDetail | null): FormState {
@@ -80,6 +85,7 @@ function toFormState(p?: ProjectDetail | null): FormState {
       publication_status: "draft",
       tags: [],
       media: [],
+      custom_page: null,
     };
   }
   return {
@@ -102,6 +108,7 @@ function toFormState(p?: ProjectDetail | null): FormState {
     publication_status: (p.publication_status as any) || "draft",
     tags: p.tags || [],
     media: p.media || [],
+    custom_page: p.custom_page ?? null,
   };
 }
 
@@ -191,6 +198,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     publication_status: status,
     tags: form.tags,
     media: form.media,
+    custom_page: form.custom_page,
   });
 
   const handleSave = async (status: "draft" | "published") => {
@@ -328,6 +336,36 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
                 return { id: c.id, label: c.label };
               }}
             />
+          </Field>
+
+          {/* Bespoke template selector. The list is code-defined on the
+              frontend — no backend call required. */}
+          <Field className="md:col-span-2">
+            <FieldLabel>Кастомная страница</FieldLabel>
+            <Select
+              value={form.custom_page || "__none__"}
+              onValueChange={(v) =>
+                update("custom_page", v === "__none__" ? null : v)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">
+                  Общий шаблон (по умолчанию)
+                </SelectItem>
+                {CUSTOM_PAGES_META.map((m) => (
+                  <SelectItem key={m.key} value={m.key}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-body-6 text-(--on-bg-low) mt-1">
+              {findCustomPageMeta(form.custom_page)?.description ||
+                "Общий премиальный шаблон кейса. Выбирайте один из готовых, если проект должен выглядеть иначе."}
+            </p>
           </Field>
 
           <Field className="md:col-span-2">

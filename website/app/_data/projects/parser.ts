@@ -18,6 +18,8 @@ export interface Project {
   platform?: string;
   period?: string;
   techStack?: string[];
+  /** Optional key of a bespoke renderer (see custom-pages-meta.ts). */
+  customPage?: string;
 }
 
 // Helper to read all MDX files and extract frontmatter
@@ -55,6 +57,7 @@ export function getAllProjects(): Project[] {
       platform: data.platform || "",
       period: data.period || "",
       techStack: data.techStack || [],
+      customPage: data.customPage || undefined,
     });
   }
   return projects;
