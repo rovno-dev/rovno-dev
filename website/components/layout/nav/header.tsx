@@ -70,6 +70,7 @@ export default function Header() {
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
+            <NavLink href={ROUTES.clients.href}>{t("nav.clients")}</NavLink>
             <NavLink href={ROUTES.about.href}>{t("nav.about")}</NavLink>
             <NavLink href={ROUTES.blog.href}>{t("nav.blog")}</NavLink>
           </nav>

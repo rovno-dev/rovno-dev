@@ -11,21 +11,29 @@ import { Card } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
 import { ImageUploadField } from "./image-upload-field";
+import { EntityPicker, type PickerItem } from "./entity-picker";
+import { StringChipsInput } from "./string-chips-input";
 import { ProjectTagsEditor } from "./project-tags-editor";
 import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
 import { ArticleEditor } from "./article-editor";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import { FloppyDisk, Rocket, Trash, Plus, X } from "@phosphor-icons/react";
+import { FloppyDisk, Rocket, Trash } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
   createProject, updateProject, deleteProject,
   type ProjectDetail, type ProjectPayload,
   type ProjectTag, type ProjectMedia,
 } from "@/utils/api/projects";
-import { fetchProjectCategories, type ProjectCategory } from "@/utils/api/categories";
+import {
+  fetchProjectCategoriesAdmin,
+  createProjectCategory,
+  type ProjectCategory,
+} from "@/utils/api/project-categories";
+import {
+  fetchCompanies,
+  createCompany,
+  type ClientListItem,
+} from "@/utils/api/clients";
 
 interface FormState {
   slug: string;
@@ -35,7 +43,8 @@ interface FormState {
   cover_image_src: string;
   cover_video_src: string;
   href: string;
-  category_id: string;
+  category: { id: string; label: string } | null;
+  client: { id: string; label: string } | null;
   platform: string;
   period: string;
   tech_stack: string[];
@@ -58,7 +67,8 @@ function toFormState(p?: ProjectDetail | null): FormState {
       cover_image_src: "",
       cover_video_src: "",
       href: "",
-      category_id: "",
+      category: null,
+      client: null,
       platform: "",
       period: String(new Date().getFullYear()),
       tech_stack: [],
@@ -79,7 +89,8 @@ function toFormState(p?: ProjectDetail | null): FormState {
     cover_image_src: p.cover_image_src || "",
     cover_video_src: p.cover_video_src || "",
     href: p.href || "",
-    category_id: p.category?.id || "",
+    category: p.category ? { id: p.category.id, label: p.category.label } : null,
+    client: (p as any).client ? { id: (p as any).client.id, label: (p as any).client.name } : null,
     platform: p.platform || "",
     period: p.period || "",
     tech_stack: p.tech_stack || [],
@@ -100,26 +111,45 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
+  const [companies, setCompanies] = useState<ClientListItem[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [companiesLoading, setCompaniesLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [techDraft, setTechDraft] = useState("");
 
   useEffect(() => {
-    fetchProjectCategories().then(setCategories).catch(() => setCategories([]));
+    // Use the admin endpoints (they return everything). The public
+    // categories endpoint would filter nothing, but admin gives us a
+    // consistent shape and a write-capable pairing.
+    Promise.all([
+      fetchProjectCategoriesAdmin()
+        .catch(() => [] as ProjectCategory[]),
+      fetchCompanies()
+        .catch(() => [] as ClientListItem[]),
+    ])
+      .then(([cats, comps]) => {
+        setCategories(cats);
+        setCompanies(comps);
+      })
+      .finally(() => {
+        setCategoriesLoading(false);
+        setCompaniesLoading(false);
+      });
   }, []);
+
+  // Picker-shaped projections of the fetched lists. Memoised shape, so
+  // EntityPicker sees a stable array across renders.
+  const categoryItems: PickerItem[] = categories.map((c) => ({
+    id: c.id,
+    label: c.label,
+  }));
+  const companyItems: PickerItem[] = companies.map((c) => ({
+    id: c.id,
+    label: c.name,
+    meta: c.industry || null,
+  }));
 
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((prev) => ({ ...prev, [k]: v }));
-
-  const addTech = () => {
-    const t = techDraft.trim();
-    if (!t) return;
-    if (form.tech_stack.includes(t)) { setTechDraft(""); return; }
-    update("tech_stack", [...form.tech_stack, t]);
-    setTechDraft("");
-  };
-
-  const removeTech = (t: string) =>
-    update("tech_stack", form.tech_stack.filter((x) => x !== t));
 
   const buildPayload = (status: "draft" | "published"): ProjectPayload => ({
     title: form.title.trim(),
@@ -129,7 +159,8 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     cover_image_src: form.cover_image_src.trim(),
     cover_video_src: form.cover_video_src.trim(),
     href: form.href.trim() || null,
-    category_id: form.category_id || null,
+    category_id: form.category?.id || null,
+    client_id: form.client?.id || null,
     platform: form.platform.trim() || null,
     period: form.period.trim() || null,
     tech_stack: form.tech_stack,
@@ -230,31 +261,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
             />
           </Field>
           <Field>
-            <FieldLabel>Клиент / бренд</FieldLabel>
-            <Input
-              value={form.platform}
-              onChange={(e) => update("platform", e.target.value)}
-              placeholder="Веб-сайт / мобильное приложение"
-            />
-          </Field>
-          <Field>
-            <FieldLabel>Категория</FieldLabel>
-            <Select
-              value={form.category_id || "none"}
-              onValueChange={(v) => update("category_id", v === "none" ? "" : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите категорию" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">—</SelectItem>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field>
             <FieldLabel>Период</FieldLabel>
             <Input
               value={form.period}
@@ -262,6 +268,57 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               placeholder="2024 или 2023 — Present"
             />
           </Field>
+
+          {/* Client — chip picker sourced from the companies table. Creating
+              a new one persists a Company row immediately, so subsequent
+              projects can pick it too. */}
+          <Field>
+            <FieldLabel>Клиент</FieldLabel>
+            <EntityPicker
+              value={form.client}
+              onChange={(v) => update("client", v as any)}
+              items={companyItems}
+              loading={companiesLoading}
+              placeholder="Найти или создать…"
+              emptyText="Нет компаний"
+              createNoun="Создать клиента"
+              onCreate={async (name) => {
+                const c = await createCompany(name);
+                setCompanies((prev) => [...prev, c]);
+                return { id: c.id, label: c.name };
+              }}
+            />
+          </Field>
+
+          {/* Category — chip picker sourced from project_categories. Same
+              create-on-the-fly behaviour. */}
+          <Field>
+            <FieldLabel>Категория</FieldLabel>
+            <EntityPicker
+              value={form.category}
+              onChange={(v) => update("category", v as any)}
+              items={categoryItems}
+              loading={categoriesLoading}
+              placeholder="Найти или создать…"
+              emptyText="Нет категорий"
+              createNoun="Создать категорию"
+              onCreate={async (label) => {
+                const c = await createProjectCategory(label);
+                setCategories((prev) => [...prev, c]);
+                return { id: c.id, label: c.label };
+              }}
+            />
+          </Field>
+
+          <Field className="md:col-span-2">
+            <FieldLabel>Платформа</FieldLabel>
+            <Input
+              value={form.platform}
+              onChange={(e) => update("platform", e.target.value)}
+              placeholder="Web · iOS · Android · Brand system · …"
+            />
+          </Field>
+
           <Field className="md:col-span-2">
             <FieldLabel>Короткое описание</FieldLabel>
             <Textarea
@@ -312,36 +369,17 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         </Field>
       </Card>
 
-      {/* Tech stack */}
+      {/* Stack */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-3">
         <h2 className="text-heading-3">Стек</h2>
-        <div className="flex flex-wrap gap-2">
-          {form.tech_stack.map((t) => (
-            <span
-              key={t}
-              className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2.5 py-1 text-xs font-medium text-(--primary)"
-            >
-              {t}
-              <button type="button" onClick={() => removeTech(t)} className="hover:opacity-70">
-                <X className="size-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Input
-            value={techDraft}
-            onChange={(e) => setTechDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTech(); }
-            }}
-            placeholder="Figma, Blender, Next.js…"
-            className="flex-1"
-          />
-          <Button type="button" variant="outlined" onClick={addTech}>
-            <Plus className="size-4" />
-          </Button>
-        </div>
+        <p className="text-body-4 text-(--on-bg-medium)">
+          Технологии и инструменты проекта. Space или Enter добавляет чип.
+        </p>
+        <StringChipsInput
+          value={form.tech_stack}
+          onChange={(v) => update("tech_stack", v)}
+          placeholder="Figma, Blender, Next.js…"
+        />
       </Card>
 
       {/* Project tags */}

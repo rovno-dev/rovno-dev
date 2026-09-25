@@ -206,7 +206,33 @@ async def get_company(company_id: UUID, db: Session = Depends(get_db), _: User =
     return company
 @router.post("/companies")
 async def create_company(data: CompanyCreate, db: Session = Depends(get_db), _: User = Depends(get_admin_user)):
-    company = Company(**data.dict())
+    from app.shared.slugify import slugify
+
+    base = slugify(data.slug or data.name, max_len=60, fallback="client")
+    slug, n = base, 2
+    while db.query(Company.id).filter(Company.slug == slug).first():
+        slug = f"{base}-{n}"
+        n += 1
+
+    # Duplicate-name guard: two companies with the same name would appear
+    # twice in the clients list and confuse the mention picker.
+    existing = (
+        db.query(Company)
+        .filter(func.lower(Company.name) == data.name.strip().lower())
+        .first()
+    )
+    if existing:
+        raise HTTPException(409, f"Клиент «{existing.name}» уже существует")
+
+    company = Company(
+        name=data.name.strip(),
+        slug=slug,
+        website=data.website,
+        logotype_url=data.logotype_url,
+        industry=data.industry,
+        description=data.description,
+        lifecycle_stage=data.lifecycle_stage or "lead",
+    )
     db.add(company)
     db.commit()
     db.refresh(company)
@@ -218,11 +244,45 @@ async def update_company(
     db: Session = Depends(get_db),
     _: User = Depends(get_admin_user),
 ):
+    from app.shared.slugify import slugify
+
     company = db.get(Company, company_id)
     if not company:
         raise HTTPException(404, "Company not found")
-    for key, value in data.dict(exclude_unset=True).items():
+
+    update = data.model_dump(exclude_unset=True)
+
+    # Slug uniqueness — only re-slugify when the caller passed a raw value.
+    if "slug" in update and update["slug"]:
+        new_base = slugify(update["slug"], max_len=60, fallback="client")
+        if new_base != company.slug:
+            candidate = new_base
+            n = 2
+            while (
+                db.query(Company.id)
+                .filter(Company.slug == candidate, Company.id != company.id)
+                .first()
+            ):
+                candidate = f"{new_base}-{n}"
+                n += 1
+            update["slug"] = candidate
+
+    # Name uniqueness on change.
+    if "name" in update and update["name"]:
+        clash = (
+            db.query(Company)
+            .filter(
+                func.lower(Company.name) == update["name"].strip().lower(),
+                Company.id != company.id,
+            )
+            .first()
+        )
+        if clash:
+            raise HTTPException(409, f"Клиент «{clash.name}» уже существует")
+
+    for key, value in update.items():
         setattr(company, key, value)
+
     db.commit()
     db.refresh(company)
     return company

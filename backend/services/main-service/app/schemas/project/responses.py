@@ -4,6 +4,15 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
+class CompanyRef(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    name: str
+    website: Optional[str] = None
+    logotype_url: Optional[str] = None
+    industry: Optional[str] = None
+
+
 class ProjectCategoryRef(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
@@ -51,6 +60,7 @@ class ProjectDetail(ProjectListItem):
     description: Optional[str] = None
     href: Optional[str] = None
     client_id: Optional[UUID] = None
+    client: Optional[CompanyRef] = None
     platform: Optional[str] = None
     tech_stack: Optional[List[str]] = None
     mdx_content: Optional[str] = None

@@ -39,6 +39,9 @@ class Project(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     category_id = Column(UUID(as_uuid=True), ForeignKey("project_categories.id"), nullable=True)
     category = relationship("ProjectCategory", lazy="joined")
+    # Eager-loaded so ProjectDetail can return the client inline
+    # without an N+1 on list endpoints.
+    client = relationship("Company", lazy="joined")
     tag_records = relationship(
         "ProjectTag",
         back_populates="project",

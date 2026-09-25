@@ -2,6 +2,7 @@ import type { Language } from './translations';
 export const headerTranslations: Record<Language, Record<string, string>> = {
   en: {
     'nav.about': 'About',
+    'nav.clients': 'Clients',
     'nav.admin': 'Admin Panel',
     'nav.blog': 'Rovnya Journal',
     'nav.language': 'Language',
@@ -14,6 +15,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
   },
   ru: {
     'nav.about': 'О нас',
+    'nav.clients': 'Клиенты',
     'nav.admin': 'Админ-панель',
     'nav.blog': 'Журнал «Ровня»',
     'nav.language': 'Язык',

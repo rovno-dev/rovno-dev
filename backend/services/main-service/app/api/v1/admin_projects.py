@@ -298,3 +298,68 @@ async def github_readme(
                 return {"readme": r.text, "source": url}
 
     raise HTTPException(404, "README.md not found on main or master")
+
+
+# ---------------------------------------------------------------------------
+# Project category creation — used by the admin project editor's category
+# picker so admins can add a new category inline without leaving the form.
+# ---------------------------------------------------------------------------
+
+from app.models.project_category import ProjectCategory
+from app.shared.slugify import slugify as _slugify_shared
+
+
+class CategoryIn(BaseModel):
+    label: str
+
+
+class CategoryOut(BaseModel):
+    model_config = {"from_attributes": True}
+    id: UUID
+    code: str
+    label: str
+
+
+@router.get("/categories", response_model=list[CategoryOut])
+def list_project_categories(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    return db.query(ProjectCategory).order_by(ProjectCategory.label.asc()).all()
+
+
+@router.post("/categories", response_model=CategoryOut, status_code=201)
+def create_project_category(
+    payload: CategoryIn,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    label = payload.label.strip()
+    if not label:
+        raise HTTPException(422, "Label cannot be empty")
+
+    code = _slugify_shared(label, max_len=60, fallback="category")
+    # Ensure unique code — codes are the stable identifier the public site
+    # filters by, so a collision has to be resolved here.
+    existing_code = db.query(ProjectCategory.id).filter(ProjectCategory.code == code).first()
+    suffix = 2
+    base = code
+    while existing_code:
+        code = f"{base}-{suffix}"
+        suffix += 1
+        existing_code = db.query(ProjectCategory.id).filter(ProjectCategory.code == code).first()
+
+    # Guard against label-level duplicates too (case-insensitive).
+    same_label = (
+        db.query(ProjectCategory)
+        .filter(func.lower(ProjectCategory.label) == label.lower())
+        .first()
+    )
+    if same_label:
+        raise HTTPException(409, f"Категория «{same_label.label}» уже существует")
+
+    cat = ProjectCategory(code=code, label=label)
+    db.add(cat)
+    db.commit()
+    db.refresh(cat)
+    return cat
