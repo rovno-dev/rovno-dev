@@ -15,7 +15,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
-import { SearchIcon, CircleCheck } from "lucide-react"
+import { SearchIcon, CheckCircleIcon } from "@phosphor-icons/react"
 
 function Command({
   className,
@@ -35,7 +35,7 @@ function Command({
 
 function CommandDialog({
   title = "Command Palette",
-  description = "Search for a command to run...",
+  description = "MagnifyingGlassIcon for a command to run...",
   children,
   className,
   showCloseButton = false,
@@ -161,7 +161,7 @@ function CommandItem({
       {...props}
     >
       {children}
-      <CircleCheck className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
+      <CheckCircleIcon className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
     </CommandPrimitive.Item>
   )
 }

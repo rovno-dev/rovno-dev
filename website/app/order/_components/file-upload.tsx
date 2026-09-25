@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { CloudIcon, X, Newspaper } from "lucide-react";
+import { CloudIcon, X, Newspaper } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

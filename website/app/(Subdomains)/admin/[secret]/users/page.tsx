@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { $fetch } from "@/utils/fetch";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Pencil, Trash2, Plus, Users, UserX } from "lucide-react";
+import { PencilSimple, Trash, Plus, Users, UserMinus } from "@phosphor-icons/react";
 import { makeTeamMember, removeTeamMember, fetchTeamMembers } from "@/utils/api/team";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
         res = await $fetch("/api/v1/admin/users", {
           method: "POST",
           body: JSON.stringify(formData),
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-TextT": "application/json" },
         });
       } else {
         // PATCH: only send changed fields (excluding password if empty)
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
         res = await $fetch(`/api/v1/admin/users/${editingUser!.id}`, {
           method: "PATCH",
           body: JSON.stringify(patchData),
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-TextT": "application/json" },
         });
       }
       if (res.response?.ok) {
@@ -285,7 +285,7 @@ export default function AdminUsersPage() {
               disabled={!canEdit}
               title={!canEdit ? "Нельзя редактировать администратора" : "Редактировать"}
             >
-              <Pencil className="size-4" />
+              <PencilSimple className="size-4" />
             </Button>
             <Button
               size="icon-small"
@@ -294,7 +294,7 @@ export default function AdminUsersPage() {
               disabled={!canEdit || u.id === currentUser.id}
               title={u.id === currentUser.id ? "Нельзя удалить себя" : !canEdit ? "Нельзя удалить администратора" : "Удалить"}
             >
-              <Trash2 className="size-4" />
+              <Trash className="size-4" />
             </Button>
             {teamRoles[u.id] ? (
               <Button
@@ -303,7 +303,7 @@ export default function AdminUsersPage() {
                 onClick={() => handleRemoveTeamMember(u.id)}
                 title="Убрать из команды"
               >
-                <UserX className="size-4" />
+                <UserMinus className="size-4" />
               </Button>
             ) : (
               <Button
@@ -345,7 +345,7 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Create/Edit Dialog */}
+      {/* Create/PencilSimple Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

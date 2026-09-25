@@ -13,7 +13,7 @@ import phonenumbers
 import httpx
 import logging
 from app.models.company import Company, LifecycleStage
-from app.models.contact import Contact
+from app.models.client import Client
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
 from app.models.order_request_file import OrderRequestFile
 from database.database import get_db
@@ -134,24 +134,24 @@ async def create_order(
     # any match wins, and the order still records against the existing contact.
     lookup_conditions = []
     if valid_data.user_telegram:
-        lookup_conditions.append(Contact.telegram_username == valid_data.user_telegram)
+        lookup_conditions.append(Client.telegram_username == valid_data.user_telegram)
     if valid_data.user_phone:
-        lookup_conditions.append(Contact.phone == valid_data.user_phone)
+        lookup_conditions.append(Client.phone == valid_data.user_phone)
     if valid_data.user_email:
-        lookup_conditions.append(Contact.email == valid_data.user_email)
+        lookup_conditions.append(Client.email == valid_data.user_email)
 
-    contact = None
+    client = None
     if lookup_conditions:
-        contact = db.query(Contact).filter(or_(*lookup_conditions)).first()
+        client = db.query(Contact).filter(or_(*lookup_conditions)).first()
 
     if contact:
         # fill in any fields the existing contact was missing, don't overwrite
-        if company and not contact.company_id:
-            contact.company_id = company.id
-        contact.name = contact.name or valid_data.user_name
-        contact.role_title = contact.role_title or "Order contact"
+        if company and not client.company_id:
+            client.company_id = company.id
+        client.name = client.name or valid_data.user_name
+        client.role_title = client.role_title or "Client"
     else:
-        contact = Contact(
+        client = Contact(
             company_id=company.id if company else None,
             role_title="Order contact",
             phone=valid_data.user_phone,
@@ -174,7 +174,7 @@ async def create_order(
 
     # 4. Create OrderRequest
     order_request = OrderRequest(
-        contact_id=contact.id,
+        client_id=contact.id,
         service_types_json=valid_data.services,
         about=valid_data.description or "",
         estimate_deadline=valid_data.deadline if valid_data.deadline else None,

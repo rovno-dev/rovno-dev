@@ -6,8 +6,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Crop, Pencil, ArrowCounterClockwise, ArrowClockwise,
-  Trash, Check, CircleNotch, Eraser, Palette,
+  Crop, Pencil, ArrowClockwiseIcon,
+  Trash, Check, CircleNotchIcon, Eraser, Palette,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -68,7 +68,7 @@ export function ImageEditorDialog({
         const preset = ASPECT_PRESETS.find((p) => p.id === aspect);
         setCrop(fitRectForAspect(im.naturalWidth, im.naturalHeight, preset?.ratio ?? null));
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [open, src]);
 
@@ -295,7 +295,7 @@ export function ImageEditorDialog({
         <div className="flex-1 overflow-y-auto bg-(--bg)">
           {loading || !img ? (
             <div className="h-[400px] flex items-center justify-center text-(--on-bg-low)">
-              <CircleNotch className="size-5 animate-spin mr-2" />
+              <CircleNotchIcon className="size-5 animate-spin mr-2" />
               Загрузка…
             </div>
           ) : tab === "crop" ? (
@@ -334,7 +334,7 @@ export function ImageEditorDialog({
             Отмена
           </Button>
           <Button onClick={handleApply} disabled={!img || applying}>
-            {applying ? <CircleNotch className="size-4 animate-spin" /> : <Check className="size-4" />}
+            {applying ? <CircleNotchIcon className="size-4 animate-spin" /> : <Check className="size-4" />}
             Применить
           </Button>
         </DialogFooter>
@@ -555,7 +555,7 @@ function DrawTab({
               )}
               title="Отменить"
             >
-              <ArrowCounterClockwise className="size-4" />
+              <ArrowCounterClockIconwise className="size-4" />
             </button>
             <button
               type="button"
@@ -569,7 +569,7 @@ function DrawTab({
               )}
               title="Повторить"
             >
-              <ArrowClockwise className="size-4" />
+              <ArrowClockwiseIcon className="size-4" />
             </button>
             <button
               type="button"

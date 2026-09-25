@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Lock, RefreshCw } from "lucide-react";
+import { ArrowUpRight, Lock, ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "./ui/card";
@@ -236,7 +236,7 @@ export function FakeAddressBar({ url }: { url: string }) {
           <Lock size={10} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="truncate tracking-wide">{displayUrl}</span>
         </div>
-        <RefreshCw size={10} className="opacity-50 shrink-0 cursor-pointer hover:opacity-100 transition-opacity" />
+        <ArrowClockwiseIcon size={10} className="opacity-50 shrink-0 cursor-pointer hover:opacity-100 transition-opacity" />
       </div>
       <div className="w-12" />
     </div>

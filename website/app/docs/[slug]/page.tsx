@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { compileMDX } from "next-mdx-remote/rsc";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import {
   LEGAL_DOCS,
   LEGAL_DOC_ORDER,

@@ -12,7 +12,7 @@ import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { useLanguage } from "@/providers/language-provider"
-import { Mail } from "lucide-react"
+import { Mail } from "@phosphor-icons/react"
 const verifySchema = z.object({
   code: z.string().length(6, "errors.code_length"),
 })
@@ -48,7 +48,7 @@ function VerifyEmailInner() {
       const response = await $fetch("/api/v1/verify-email", {
         method: "POST",
         body: JSON.stringify({ email: formData.email, code: formData.code }),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-TextT": "application/json" },
         onLoadingChange: setIsLoading,
         isToast: false,
       })
@@ -97,7 +97,7 @@ function VerifyEmailInner() {
       const response = await $fetch("/api/v1/resend-verification", {
         method: "POST",
         body: JSON.stringify({ email: formData.email, lang }),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-TextT": "application/json" },
         onLoadingChange: setIsResending,
         isToast: false,
       })

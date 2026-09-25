@@ -11,8 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Loader2, Users, UserX, UserPlus, RefreshCw, FolderOpen, Pencil,
-} from "lucide-react";
+  CircleNotchIcon, Users, UserMinus, UserPlus, ArrowClockwiseIcon, FolderOpen, PencilSimple,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
   fetchTeamMembers,
@@ -101,8 +101,8 @@ export default function AdminTeamPage() {
             </Button>
             <Button variant="outlined" size="small" onClick={load}>
               {state.kind === "loading"
-                ? <Loader2 className="size-4 animate-spin" />
-                : <RefreshCw className="size-4" />}
+                ? <CircleNotchIcon className="size-4 animate-spin" />
+                : <ArrowClockwiseIcon className="size-4" />}
               Обновить
             </Button>
             <Button asChild>
@@ -237,7 +237,7 @@ export default function AdminTeamPage() {
                           onClick={(e) => { e.stopPropagation(); setEditing(m); }}
                           title="Редактировать"
                         >
-                          <Pencil className="size-4" />
+                          <PencilSimple className="size-4" />
                         </Button>
                         <Button
                           variant="text"
@@ -245,7 +245,7 @@ export default function AdminTeamPage() {
                           onClick={(e) => { e.stopPropagation(); handleRemove(m); }}
                           title="Убрать из команды"
                         >
-                          <UserX className="size-4" />
+                          <UserMinus className="size-4" />
                         </Button>
                       </div>
                     </div>

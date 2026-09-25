@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import {
-  Plus, X, MagnifyingGlass, CircleNotch,
+  Plus, X, MagnifyingGlassIcon, CircleNotchIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
@@ -138,7 +138,7 @@ export function EntityMultiPicker({
           </span>
         ))}
         <div className="flex items-center gap-1.5 flex-1 min-w-[8ch]">
-          <MagnifyingGlass className="size-3.5 text-(--on-bg-low) shrink-0" />
+          <MagnifyingGlassIcon className="size-3.5 text-(--on-bg-low) shrink-0" />
           <input
             ref={inputRef}
             value={draft}
@@ -149,7 +149,7 @@ export function EntityMultiPicker({
             className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
           />
         </div>
-        {loading && <CircleNotch className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
+        {loading && <CircleNotchIcon className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
       </div>
 
       {open && (filtered.length > 0 || canCreate) && (
@@ -186,7 +186,7 @@ export function EntityMultiPicker({
                 filtered.length === highlight ? "bg-(--state-hover) text-(--on-bg-high)" : "text-(--on-bg-medium)"
               )}
             >
-              {creating ? <CircleNotch className="size-3.5 animate-spin" /> : <Plus className="size-3.5" />}
+              {creating ? <CircleNotchIcon className="size-3.5 animate-spin" /> : <Plus className="size-3.5" />}
               <span>{createNoun || "Создать"} «{draft.trim()}»</span>
             </button>
           )}

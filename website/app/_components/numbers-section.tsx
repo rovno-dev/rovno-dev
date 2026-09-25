@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 
 // Hacker number animation hook - starts stable (for SSR), scrambles only when active

@@ -5,7 +5,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
 import { extractMdxHeadings } from "@/utils/mdx-headings";

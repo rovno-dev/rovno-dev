@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CloudArrowUp, CircleNotch, X, PencilSimple,
+  CloudArrowUp, CircleNotchIcon, X, PencilSimple,
 } from "@phosphor-icons/react";
 import { $fetch } from "@/utils/fetch";
 import { ImageEditorDialog } from "./image-editor/image-editor-dialog";
@@ -134,7 +134,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
           disabled={uploading}
         >
           {uploading ? (
-            <CircleNotch className="size-4 animate-spin" />
+            <CircleNotchIcon className="size-4 animate-spin" />
           ) : (
             <CloudArrowUp className="size-4" />
           )}

@@ -4,7 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 
 export function MediaLightbox({ src, alt, children }: { src: string; alt: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);

@@ -13,7 +13,7 @@ import { updateProfile } from "@/utils/api/user";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
-import { Users, User as UserIcon } from "lucide-react";
+import { Users, User as UserIcon } from "@phosphor-icons/react";
 
 interface ProfileForm {
   name: string;

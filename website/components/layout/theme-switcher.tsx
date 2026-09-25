@@ -1,6 +1,6 @@
 "use client"
 import { useTheme } from "@/providers/theme-provider"
-import { SunMoon, Sun, Moon } from "lucide-react"
+import { CircleHalf, Sun, Moon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 
@@ -11,7 +11,7 @@ export function ThemeSwitcher() {
     setMounted(true)
   }, [])
   const options = [
-    { value: "system", icon: SunMoon, label: "Системная" },
+    { value: "system", icon: CircleHalf, label: "Системная" },
     { value: "light", icon: Sun, label: "Светлая" },
     { value: "dark", icon: Moon, label: "Тёмная" },
   ] as const

@@ -5,12 +5,12 @@ import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useUser } from "@/entities/user/model/user-context";
 import { Button } from "@/components/ui/button";
 import {
-  LogOut,
+  SignOut,
   User,
   Settings,
   BriefcaseBusiness,
   Newspaper,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 
 // Profile routes resolve to /app/* (the (Subdomains) folder is a route
 // group and contributes nothing to the URL), so basePath is "/app" and
@@ -44,7 +44,7 @@ export function ProfileSidebar() {
           onClick={handleLogout}
           className="w-full justify-start gap-3 p-3"
         >
-          <LogOut className="size-5 shrink-0" />
+          <SignOut className="size-5 shrink-0" />
           <span className="text-sm">Выйти</span>
         </Button>
       }

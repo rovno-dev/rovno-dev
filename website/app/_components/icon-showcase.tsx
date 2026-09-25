@@ -1,5 +1,5 @@
 "use client";
-import * as Icons from "lucide-react";
+import * as Icons from "@phosphor-icons/react";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";

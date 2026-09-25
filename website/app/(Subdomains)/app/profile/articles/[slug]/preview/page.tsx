@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Pencil, Eye, RefreshCw, TriangleAlert } from "lucide-react";
+import { ArrowLeft, PencilSimple, Eye, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
 import { slugify } from "@/utils/slugify";
 import {
   Gallery,
@@ -139,7 +139,7 @@ function SessionExpired() {
     <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--warning),transparent_70%)] bg-[color-mix(in_srgb,var(--warning),transparent_96%)] p-6 max-w-lg">
       <div className="flex items-start gap-4">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-(--warning-card) text-(--warning)">
-          <TriangleAlert className="size-5" />
+          <WarningIcon className="size-5" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-heading-4 text-(--on-bg-high) mb-1">
@@ -150,7 +150,7 @@ function SessionExpired() {
           </p>
           <Button variant="outlined" size="small" asChild>
             <a href="">
-              <RefreshCw className="size-4" />
+              <ArrowClockwiseIcon className="size-4" />
               Обновить страницу
             </a>
           </Button>
@@ -165,7 +165,7 @@ function ServerError() {
     <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6 max-w-lg">
       <div className="flex items-start gap-4">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-(--error-card) text-(--error)">
-          <TriangleAlert className="size-5" />
+          <WarningIcon className="size-5" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-heading-4 text-(--on-bg-high) mb-1">
@@ -176,7 +176,7 @@ function ServerError() {
           </p>
           <Button variant="outlined" size="small" asChild>
             <a href="">
-              <RefreshCw className="size-4" />
+              <ArrowClockwiseIcon className="size-4" />
               Повторить
             </a>
           </Button>
@@ -253,7 +253,7 @@ export default async function PreviewArticlePage({
           </Button>
           <Button asChild>
             <Link href={`/app/profile/articles/${slug}/edit`}>
-              <Pencil className="size-4" />
+              <PencilSimple className="size-4" />
               Редактировать
             </Link>
           </Button>

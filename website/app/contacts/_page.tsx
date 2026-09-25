@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SquareArrowRight, Newspaper, Gem, Globe, Signature, Box } from "lucide-react";
+import { CaretRight, Newspaper, Gem, Globe, Signature, Box } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 /* ---------- Hero Section ---------- */
 function HeroSection() {
@@ -80,7 +80,7 @@ function DocumentsCard() {
             className="group flex items-center justify-between rounded-xl border border-(--outline) bg-(--card) px-5 py-4 transition-all hover:bg-(--state-hover) active:scale-[0.98]"
           >
             <span className="text-body-3 text-(--on-bg-high)">{doc.title}</span>
-            <SquareArrowRight className="size-5 text-(--on-bg-low) transition-transform group-hover:translate-x-0.5" />
+            <CaretRight className="size-5 text-(--on-bg-low) transition-transform group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>

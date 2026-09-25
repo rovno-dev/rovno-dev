@@ -4,7 +4,7 @@ import { ReactNode, useState, ElementType } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 import {
   Carousel,
   CarouselContent,

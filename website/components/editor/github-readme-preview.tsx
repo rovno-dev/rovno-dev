@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CircleNotch, ArrowClockwise } from "@phosphor-icons/react";
+import { CircleNotchIcon, ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { GithubLogotypeMonoIcon } from "@/components/icons";
 import { fetchGithubReadme } from "@/utils/api/projects";
 
@@ -44,7 +44,7 @@ export function GithubReadmePreview({ repo, branch }: { repo: string; branch?: s
         </code>
         {state.kind === "ready" && (
           <Button variant="text" size="icon-small" onClick={load} title="Обновить">
-            <ArrowClockwise className="size-3.5" />
+            <ArrowClockwiseIcon className="size-3.5" />
           </Button>
         )}
       </div>
@@ -57,7 +57,7 @@ export function GithubReadmePreview({ repo, branch }: { repo: string; branch?: s
 
       {state.kind === "loading" && (
         <div className="flex items-center gap-2 text-xs text-(--on-bg-low) py-2">
-          <CircleNotch className="size-3.5 animate-spin" />
+          <CircleNotchIcon className="size-3.5 animate-spin" />
           Загрузка из GitHub…
         </div>
       )}

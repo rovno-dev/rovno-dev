@@ -33,7 +33,7 @@ import {
   fetchCompanies,
   createCompany,
   type ClientListItem,
-} from "@/utils/api/clients";
+} from "@/utils/api/companies";
 import { fetchStack, createStackItem, type StackItem } from "@/utils/api/stack";
 
 interface FormState {

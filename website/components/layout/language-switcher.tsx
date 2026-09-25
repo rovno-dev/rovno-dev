@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/providers/language-provider";
-import { Globe, Check, ChevronDown } from "lucide-react";
+import { Globe, Check, CaretDown } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {
@@ -39,7 +39,7 @@ export function LanguageSwitcher() {
         >
           <Globe className="size-4 text-(--on-bg-low) group-hover:text-(--primary) transition-colors" />
           {mounted && <span className="uppercase font-semibold tracking-wide">{lang}</span>}
-          <ChevronDown className="size-3 text-(--on-bg-low) transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          <CaretDown className="size-3 text-(--on-bg-low) transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44 p-1.5">

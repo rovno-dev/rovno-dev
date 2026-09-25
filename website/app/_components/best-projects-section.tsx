@@ -3,7 +3,7 @@ import { PROJECTS } from "@/app/_data/projects";
 import ProjectCard from "@/components/layout/projects/project-card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link'
-import { ChevronRight } from "lucide-react";
+import { CaretRight } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 
 export default function BestWorksSection() {
@@ -22,7 +22,7 @@ export default function BestWorksSection() {
         <Button className="w-full md:w-fit mt-8" variant="glass" size="large" asChild>
           <Link href="/projects">
             {t("home.view_all_projects")}
-            <ChevronRight className="size-4" />
+            <CaretRight className="size-4" />
           </Link>
         </Button>
       </Container>

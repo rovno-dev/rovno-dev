@@ -1,5 +1,5 @@
 from .company import Company
-from .contact import Contact
+from .client import Client
 from .order import Order, OrderFile
 from .order_request import OrderRequest
 from .order_request_file import OrderRequestFile

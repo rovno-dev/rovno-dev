@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useLanguage } from "@/providers/language-provider";
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { TelegramLogotypeMonoIcon } from "@/components/icons";
 
 /** True when the current UTC hour maps to 8:00–22:00 MSK (UTC+3). */

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import {
-  Plus, X, MagnifyingGlass, CircleNotch, Check,
+  Plus, X, MagnifyingGlassIcon, CircleNotchIcon, Check,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
@@ -169,7 +169,7 @@ export function EntityPicker({
             </button>
           </span>
         ) : (
-          <MagnifyingGlass className="size-3.5 text-(--on-bg-low) shrink-0 ml-0.5" />
+          <MagnifyingGlassIcon className="size-3.5 text-(--on-bg-low) shrink-0 ml-0.5" />
         )}
         <input
           ref={inputRef}
@@ -184,7 +184,7 @@ export function EntityPicker({
           disabled={disabled}
           className="min-w-[8ch] flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
         />
-        {loading && <CircleNotch className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
+        {loading && <CircleNotchIcon className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
       </div>
 
       {open && (
@@ -233,7 +233,7 @@ export function EntityPicker({
               )}
             >
               {creating ? (
-                <CircleNotch className="size-3.5 animate-spin" />
+                <CircleNotchIcon className="size-3.5 animate-spin" />
               ) : (
                 <Plus className="size-3.5" />
               )}

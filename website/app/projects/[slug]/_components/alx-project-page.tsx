@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDown } from "lucide-react";
+import { ArrowUpRight, ArrowDown } from "@phosphor-icons/react";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
 
 interface AlxProject {
@@ -177,7 +177,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
           <div className="absolute inset-0 bg-gradient-to-b from-[#050507]/70 via-[#050507]/80 to-[#050507]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#050507_88%)]" />
 
-          {/* Grid */}
+          {/* SquaresFour */}
           <div
             className="absolute inset-0 opacity-[0.06] pointer-events-none"
             style={{
@@ -617,7 +617,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 </div>
               </div>
 
-              {/* Quote */}
+              {/* Quotes */}
               <div className="lg:col-span-7 lg:pl-12 lg:border-l lg:border-white/15 flex flex-col justify-center">
                 <div
                   className="font-mono text-[10px] uppercase tracking-[0.35em] mb-8"

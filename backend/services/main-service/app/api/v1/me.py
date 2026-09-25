@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 
 from app.models.user import User
-from app.models.contact import Contact
+from app.models.client import Client
 from app.models.team_member import TeamMember
 from app.shared.auth import get_current_user, hash_password, verify_password
 from app.services.team_service import get_active_team_member
@@ -134,7 +134,7 @@ async def delete_me(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    db.query(Contact).filter(Contact.user_id == current_user.id).update({"user_id": None})
+    db.query(Client).filter(Client.user_id == current_user.id).update({"user_id": None})
     db.query(TeamMember).filter(TeamMember.user_id == current_user.id).update({"user_id": None})
     db.delete(current_user)
     db.commit()

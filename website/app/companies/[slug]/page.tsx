@@ -5,8 +5,8 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowUpRight, Globe } from "lucide-react";
-import { fetchClientServer } from "@/utils/api/clients";
+import { ArrowLeft, ArrowUpRight, Globe } from "@phosphor-icons/react";
+import { fetchClientServer } from "@/utils/api/companies";
 
 export const revalidate = 300;
 
@@ -17,7 +17,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const client = await fetchClientServer(slug);
-  if (!client) return { title: "Клиент не найден · Rovno.dev" };
+  if (!client) return { title: "Компания не найдена · Rovno.dev" };
   return {
     title: `${client.name} · Rovno.dev`,
     description: client.description || `Проекты для ${client.name}`,
@@ -50,11 +50,11 @@ export default async function ClientProfilePage({
       <section className="border-b border-(--outline) py-12 md:py-20">
         <Container>
           <Link
-            href="/clients"
+            href="/companies"
             className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-8"
           >
             <ArrowLeft className="size-4" />
-            Все клиенты
+            Все компании
           </Link>
 
           <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 md:gap-12 items-start">

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, ChevronUp, Sparkles, Save, Rocket, Trash2, Undo2 } from "lucide-react";
+import { CaretDown, CaretUp, Sparkle, FloppyDisk, Rocket, Trash, ArrowUUpLeft } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 import { useUser } from "@/entities/user/model/user-context";
 import { ArticleEditor } from "./article-editor";
@@ -115,15 +115,15 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
         typeof parsed.mdx_content === "string"
           ? parsed.mdx_content
           : typeof parsed.content === "string"
-          ? parsed.content
-          : typeof parsed.body === "string"
-          ? parsed.body
-          : prev.mdx_content,
+            ? parsed.content
+            : typeof parsed.body === "string"
+              ? parsed.body
+              : prev.mdx_content,
       tags: Array.isArray(parsed.tags)
         ? parsed.tags
         : typeof parsed.tags === "string"
-        ? parsed.tags.split(",").map((v: string) => v.trim()).filter(Boolean)
-        : prev.tags,
+          ? parsed.tags.split(",").map((v: string) => v.trim()).filter(Boolean)
+          : prev.tags,
       seo_title: typeof parsed.seo_title === "string" ? parsed.seo_title : prev.seo_title,
       meta_description:
         typeof parsed.meta_description === "string" ? parsed.meta_description : prev.meta_description,
@@ -235,15 +235,15 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           Action rules per state — exactly one primary (blue) and one
           secondary (outlined) button at a time. No duplicate labels.
 
-            published → [Unpublish] [Delete] [Save changes]
-            draft     → [Save draft] [Delete] [Publish]
-            new       → [Save draft] [Publish]
+            published → [Unpublish] [Delete] [FloppyDisk changes]
+            draft     → [FloppyDisk draft] [Delete] [Publish]
+            new       → [FloppyDisk draft] [Publish]
         */}
         <div className="flex flex-wrap items-center gap-2">
           {isEdit && isPublished && (
             <>
               <Button variant="outlined" onClick={handleUnpublish} disabled={saving}>
-                <Undo2 className="size-4" />
+                <ArrowUUpLeft className="size-4" />
                 {t("editor.unpublish")}
               </Button>
               <Button
@@ -253,10 +253,10 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
                 disabled={saving}
                 aria-label={t("editor.delete")}
               >
-                <Trash2 className="size-4" />
+                <Trash className="size-4" />
               </Button>
               <Button onClick={() => handleSave("published")} disabled={saving}>
-                <Save className="size-4" />
+                <FloppyDisk className="size-4" />
                 {t("editor.save_changes")}
               </Button>
             </>
@@ -265,7 +265,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           {isEdit && !isPublished && (
             <>
               <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-                <Save className="size-4" />
+                <FloppyDisk className="size-4" />
                 {t("editor.save_draft")}
               </Button>
               <Button
@@ -275,7 +275,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
                 disabled={saving}
                 aria-label={t("editor.delete")}
               >
-                <Trash2 className="size-4" />
+                <Trash className="size-4" />
               </Button>
               <Button onClick={() => handleSave("published")} disabled={saving}>
                 <Rocket className="size-4" />
@@ -287,7 +287,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           {!isEdit && (
             <>
               <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-                <Save className="size-4" />
+                <FloppyDisk className="size-4" />
                 {t("editor.save_draft")}
               </Button>
               <Button onClick={() => handleSave("published")} disabled={saving}>
@@ -302,7 +302,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
       {/* Review status banner */}
       {isEdit && isPending && (
         <Card className="rounded-3xl border border-blue-500/30 bg-blue-500/5 p-5 flex items-start gap-4">
-          <Clock className="size-5 text-blue-500 shrink-0 mt-0.5" />
+          <ClockIcon className="size-5 text-blue-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-heading-5 text-(--on-bg-high) mb-1">На проверке</p>
             <p className="text-body-4 text-(--on-bg-medium)">
@@ -314,7 +314,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
 
       {isEdit && isRejected && initial?.review_note && (
         <Card className="rounded-3xl border border-rose-500/30 bg-rose-500/5 p-5 flex items-start gap-4">
-          <XCircle className="size-5 text-rose-500 shrink-0 mt-0.5" />
+          <XCircleIcon className="size-5 text-rose-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-heading-5 text-(--on-bg-high) mb-1">Статья отклонена</p>
             <p className="text-body-3 text-(--on-bg-medium) mb-2">
@@ -404,10 +404,10 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           onClick={() => setAiOpen((v) => !v)}
         >
           <span className="flex items-center gap-2 text-heading-3">
-            <Sparkles className="size-4 text-(--primary)" />
+            <Sparkle className="size-4 text-(--primary)" />
             {t("editor.section_ai")}
           </span>
-          {aiOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          {aiOpen ? <CaretUp className="size-4" /> : <CaretDown className="size-4" />}
         </button>
         {aiOpen && (
           <>
@@ -420,7 +420,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
             />
             <div>
               <Button variant="outlined" size="small" onClick={applyAiJson}>
-                <Sparkles className="size-3.5" />
+                <Sparkle className="size-3.5" />
                 {t("editor.ai_apply")}
               </Button>
             </div>
@@ -446,7 +446,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
           onClick={() => setSeoOpen((v) => !v)}
         >
           <span className="text-heading-3">{t("editor.section_seo")}</span>
-          {seoOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          {seoOpen ? <CaretUp className="size-4" /> : <CaretDown className="size-4" />}
         </button>
         {seoOpen && (
           <div className="grid grid-cols-1 gap-3">

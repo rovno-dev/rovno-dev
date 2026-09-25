@@ -31,13 +31,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
-  FileText,
-  Download,
-  Phone,
-  Mail,
+  FileTextIcon,
+  DownloadIcon,
+  PhoneIcon,
+  EnvelopeIcon,
   ImageIcon,
-  X,
-} from "lucide-react";
+  XIcon,
+} from "@phosphor-icons/react";
 import { $fetch } from "@/utils/fetch";
 import Link from "next/link";
 import { TelegramLogotypeMonoIcon } from "@/components/icons";
@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
       const res = await $fetch(`/api/v1/admin/order-requests/${order.id}`, {
         method: "PATCH",
         body: JSON.stringify({ status, cancellation_reason: reason ?? null }),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-TextT": "application/json" },
         isToast: false,
       });
       if (!res.response?.ok) {
@@ -347,11 +347,11 @@ export default function AdminOrdersPage() {
                   <div className="text-body-5 space-y-1">
                     <p><span className="font-medium">Имя:</span> {order.contact?.name || "—"}</p>
                     <div className="flex gap-1 items-center">
-                      <Phone className="size-3" />
+                      <PhoneIcon className="size-3" />
                       <p>{order.contact?.phone || "—"}</p>
                     </div>
                     <div className="flex gap-1 items-center">
-                      <Mail className="size-3" />
+                      <EnvelopeIcon className="size-3" />
                       <p>{order.contact?.email || "—"}</p>
                     </div>
                     <div className="flex gap-1 items-center">
@@ -394,10 +394,10 @@ export default function AdminOrdersPage() {
                                 </button>
                               ) : (
                                 <>
-                                  <FileText className="size-8 aspect-square! text-muted-foreground mt-3" />
+                                  <FileTextIcon className="size-8 aspect-square! text-muted-foreground mt-3" />
                                   <span className="text-[10px] truncate w-full text-center px-1 mt-1">{file.filename}</span>
                                   <a href={file.file_path} target="_blank" rel="noreferrer" className="mt-1">
-                                    <Download className="size-3 text-primary" />
+                                    <DownloadIcon className="size-3 text-primary" />
                                   </a>
                                 </>
                               )}
@@ -425,7 +425,7 @@ export default function AdminOrdersPage() {
                   {order.contact?.phone && (
                     <Button variant="filled" asChild>
                       <Link href={`tel:${order.contact.phone}`}>
-                        <Phone />
+                        <PhoneIcon />
                         Позвонить
                       </Link>
                     </Button>
@@ -477,7 +477,7 @@ export default function AdminOrdersPage() {
             className="absolute top-4 right-4 z-[60] rounded-full border-white/20"
             onClick={() => setLightbox(null)}
           >
-            <X className="size-6! text-white" />
+            <XIcon className="size-6! text-white" />
           </Button>
           {lightbox && lightbox.files.length > 0 && (
             <Carousel setApi={setLightboxApi} className="w-full h-full">

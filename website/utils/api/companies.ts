@@ -40,7 +40,7 @@ const API_BASE =
 
 export async function fetchClientsServer(): Promise<ClientListItem[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/clients`, {
+    const res = await fetch(`${API_BASE}/api/v1/companies`, {
       next: { revalidate: 300 },
     } as any);
     if (!res.ok) return [];
@@ -54,7 +54,7 @@ export async function fetchClientsServer(): Promise<ClientListItem[]> {
 export async function fetchClientServer(slug: string): Promise<ClientDetail | null> {
   try {
     const res = await fetch(
-      `${API_BASE}/api/v1/clients/${encodeURIComponent(slug)}`,
+      `${API_BASE}/api/v1/companies/${encodeURIComponent(slug)}`,
       { next: { revalidate: 300 } } as any,
     );
     if (!res.ok) return null;
@@ -64,7 +64,7 @@ export async function fetchClientServer(slug: string): Promise<ClientDetail | nu
   }
 }
 
-/** Admin list — uses /admin/companies so it includes unpublished clients. */
+/** Admin list — uses /admin/companies so it includes unpublished companies. */
 export async function fetchCompanies(): Promise<ClientListItem[]> {
   const res = await $fetch("/api/v1/admin/companies", { isToast: false });
   if (!Array.isArray(res?.json)) return [];

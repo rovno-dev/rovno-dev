@@ -3,13 +3,13 @@ import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { fetchClientsServer } from "@/utils/api/clients";
-import { ArrowUpRight, Handshake } from "lucide-react";
+import { fetchClientsServer } from "@/utils/api/companies";
+import { ArrowUpRight, Handshake } from "@phosphor-icons/react";
 
 export const revalidate = 300;
 
 export const metadata = {
-  title: "Клиенты · Rovno.dev",
+  title: "Компании · Rovno.dev",
   description:
     "Организации, с которыми мы работали — от брендинга и айдентики до продуктовых сайтов и 3D.",
 };
@@ -34,7 +34,7 @@ export default async function ClientsPage() {
         <Container>
           <div className="max-w-[800px] animate-reveal">
             <p className="text-body-5 uppercase tracking-[0.3em] text-(--on-bg-low) mb-4">
-              Клиенты
+              Компании
             </p>
             <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-[1.05]">
               Те, для кого мы <span className="text-(--primary)">работали</span>.
@@ -114,7 +114,7 @@ function ClientTile({
   const hasLogo = !!client.logotype_url;
   // Prefer the internal profile page — it shows every project and reads
   // as a client dossier. The website link lives on the profile header.
-  const href = `/clients/${client.slug}`;
+  const href = `/companies/${client.slug}`;
   const isExternal = false;
 
   return (

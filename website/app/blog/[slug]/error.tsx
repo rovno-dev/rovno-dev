@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
 
 export default function BlogArticleError({
   error,
@@ -23,7 +23,7 @@ export default function BlogArticleError({
       <Container>
         <div className="max-w-lg mx-auto text-center">
           <div className="inline-flex size-16 items-center justify-center rounded-3xl bg-(--error-card) text-(--error) mb-6">
-            <TriangleAlert className="size-8" />
+            <WarningIcon className="size-8" />
           </div>
           <h1 className="text-display-2 text-(--on-bg-high) mb-4">
             Не удалось загрузить статью
@@ -34,7 +34,7 @@ export default function BlogArticleError({
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="filled" size="large" onClick={reset}>
-              <RefreshCw className="size-4" />
+              <ArrowClockwiseIcon className="size-4" />
               Попробовать снова
             </Button>
             <Button variant="outlined" size="large" asChild>

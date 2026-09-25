@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CircleNotch, MagnifyingGlass, At, FolderSimple, Users,
+  CircleNotchIcon, MagnifyingGlassIcon, At, FolderSimple, Users,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { searchMentions, type MentionResults } from "@/utils/api/mentions";
@@ -117,7 +117,7 @@ export function MentionPicker({ open, onOpenChange, onInsert }: Props) {
 
         <div className="p-2 border-b border-(--outline)">
           <div className="relative">
-            <MagnifyingGlass className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+            <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
             <Input
               ref={inputRef}
               value={q}
@@ -126,7 +126,7 @@ export function MentionPicker({ open, onOpenChange, onInsert }: Props) {
               className="pl-9 border-0 focus-visible:ring-0 focus-visible:border-0"
             />
             {loading && (
-              <CircleNotch className="size-4 absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-(--on-bg-low)" />
+              <CircleNotchIcon className="size-4 absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-(--on-bg-low)" />
             )}
           </div>
         </div>
@@ -185,8 +185,8 @@ export function MentionPicker({ open, onOpenChange, onInsert }: Props) {
                 {item.kind === "user"
                   ? "Пользователь"
                   : item.kind === "project"
-                  ? "Проект"
-                  : "Клиент"}
+                    ? "Проект"
+                    : "Клиент"}
               </Badge>
             </button>
           ))}

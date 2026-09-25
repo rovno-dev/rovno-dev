@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpenIcon } from "@phosphor-icons/react";
 import { fetchPublishedArticlesServer } from "@/utils/api/articles";
 
-// Server component so it can pull the recent-articles list without an
+// HardDrives component so it can pull the recent-articles list without an
 // extra client fetch. Wrapped in try/catch — a 404 page that itself 500s
 // is the worst possible outcome.
 async function getRecentArticles() {
@@ -35,7 +35,7 @@ export default async function BlogArticleNotFound() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
             <Button variant="filled" size="large" asChild>
               <Link href="/blog">
-                <BookOpen className="size-4" />
+                <BookOpenIcon className="size-4" />
                 Все статьи
               </Link>
             </Button>

@@ -11,7 +11,7 @@ from app.models.company import Company
 from app.models.article import Article
 from app.models.project import Project
 from app.models.team_member import TeamMember
-from app.models.contact import Contact
+from app.models.client import Client
 from database.database import get_db
 from uuid import UUID
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -301,7 +301,7 @@ async def delete_company(company_id: UUID, db: Session = Depends(get_db), _: Use
 from app.models.order_request_file import OrderRequestFile
 from sqlalchemy.orm import joinedload
 
-class ContactResponse(BaseModel):
+class ClientResponse(BaseModel):
     id: UUID
     name: Optional[str]
     phone: Optional[str]
@@ -317,7 +317,7 @@ class OrderRequestFileResponse(BaseModel):
 
 class OrderRequestWithFiles(BaseModel):
     id: UUID
-    contact_id: Optional[UUID]
+    client_id: Optional[UUID]
     service_types_json: Optional[List[str]]
     about: Optional[str]
     estimate_deadline: Optional[str]
@@ -327,7 +327,7 @@ class OrderRequestWithFiles(BaseModel):
     cancellation_reason: Optional[str] = None
     created_at: datetime
     files: List[OrderRequestFileResponse]
-    contact: Optional[ContactResponse]
+    contact: Optional[ClientResponse]
     class Config:
         from_attributes = True
 

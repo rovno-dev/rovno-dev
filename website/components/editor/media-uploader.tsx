@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CircleNotch, CloudArrowUp, X, Play, DotsSixVertical,
+  CircleNotchIcon, CloudArrowUp, X, Play, DotsSixVertical,
   ArrowUp, ArrowDown, PencilSimple,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -272,7 +272,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
       >
         {uploading ? (
           <>
-            <CircleNotch className="size-6 animate-spin text-(--primary)" />
+            <CircleNotchIcon className="size-6 animate-spin text-(--primary)" />
             <span className="text-xs font-medium text-(--on-bg-medium)">Загрузка…</span>
           </>
         ) : (

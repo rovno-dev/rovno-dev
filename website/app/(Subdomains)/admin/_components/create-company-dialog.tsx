@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react";
 
 export function CreateCompanyDialog({ onSuccess }: { onSuccess?: () => void }) {
   const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ export function CreateCompanyDialog({ onSuccess }: { onSuccess?: () => void }) {
     try {
       const res = await fetch("/api/v1/admin/companies", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-TextT": "application/json" },
         body: JSON.stringify(form),
       });
       if (!res.ok) {

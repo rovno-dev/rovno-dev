@@ -6,7 +6,7 @@ import { CheckUser } from "@/entities/user/model/check-user";
 import { ProjectEditorForm } from "@/components/editor/project-editor-form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, TriangleAlert, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowClockwiseIcon, WarningIcon, CircleNotchIcon } from "@phosphor-icons/react";
 import { fetchAdminProject, type ProjectDetail } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 
@@ -49,7 +49,7 @@ export default function EditProjectPage({
     <CheckUser>
       {loading ? (
         <div className="min-h-[40vh] flex items-center justify-center gap-2 text-body-3 text-(--on-bg-low)">
-          <Loader2 className="size-4 animate-spin" />
+          <CircleNotchIcon className="size-4 animate-spin" />
           Loading…
         </div>
       ) : project ? (
@@ -58,7 +58,7 @@ export default function EditProjectPage({
         <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6 max-w-2xl">
           <div className="flex items-start gap-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-(--error-card) text-(--error)">
-              <TriangleAlert className="size-5" />
+              <WarningIcon className="size-5" />
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-heading-4 text-(--on-bg-high) mb-1">
@@ -82,7 +82,7 @@ export default function EditProjectPage({
                   size="small"
                   onClick={() => window.location.reload()}
                 >
-                  <RefreshCw className="size-4" />
+                  <ArrowClockwiseIcon className="size-4" />
                   Обновить
                 </Button>
               </div>

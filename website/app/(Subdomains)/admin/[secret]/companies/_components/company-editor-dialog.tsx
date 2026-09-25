@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/select";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { toast } from "sonner";
-import { CircleNotch, Buildings } from "@phosphor-icons/react";
+import { CircleNotchIcon, Buildings } from "@phosphor-icons/react";
 import {
   createCompany, updateCompany, type ClientListItem,
-} from "@/utils/api/clients";
+} from "@/utils/api/companies";
 
 const LIFECYCLE_OPTIONS = [
   { value: "lead", label: "Lead" },
@@ -45,7 +45,7 @@ interface FormState {
   lifecycle_stage: string;
 }
 
-export function ClientEditorDialog({ client, open, onOpenChange, onSaved }: Props) {
+export function CompanyEditorDialog({ client, open, onOpenChange, onSaved }: Props) {
   const isEdit = !!client;
   const [form, setForm] = useState<FormState>({
     name: "", slug: "", website: "", industry: "",
@@ -95,10 +95,10 @@ export function ClientEditorDialog({ client, open, onOpenChange, onSaved }: Prop
 
       if (isEdit && client) {
         await updateCompany(client.id, payload);
-        toast.success("Клиент обновлён");
+        toast.success("Компания обновлена");
       } else {
         await createCompany(payload);
-        toast.success("Клиент создан");
+        toast.success("Компания создана");
       }
       onSaved();
       onOpenChange(false);
@@ -123,7 +123,7 @@ export function ClientEditorDialog({ client, open, onOpenChange, onSaved }: Prop
                 <Buildings className="size-4" />
               </div>
             )}
-            {isEdit ? "Редактировать клиента" : "Новый клиент"}
+            {isEdit ? "Редактировать компанию" : "Новая компания"}
           </DialogTitle>
         </DialogHeader>
 
@@ -145,7 +145,7 @@ export function ClientEditorDialog({ client, open, onOpenChange, onSaved }: Prop
                 placeholder="генерируется из названия"
               />
               <p className="text-body-6 text-(--on-bg-low) mt-1">
-                Публичная страница: <code className="font-mono">/clients/{form.slug || "…"}</code>
+                Публичная страница: <code className="font-mono">/companies/{form.slug || "…"}</code>
               </p>
             </Field>
             <Field>
@@ -205,7 +205,7 @@ export function ClientEditorDialog({ client, open, onOpenChange, onSaved }: Prop
             Отмена
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving && <CircleNotch className="size-4 animate-spin" />}
+            {saving && <CircleNotchIcon className="size-4 animate-spin" />}
             Сохранить
           </Button>
         </DialogFooter>

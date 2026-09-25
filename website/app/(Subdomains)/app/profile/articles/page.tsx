@@ -9,13 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   Plus,
-  Pencil,
-  Trash2,
-  ExternalLink,
-  RefreshCw,
+  PencilSimple,
+  Trash,
+  ArrowSquareOutIcon,
+  ArrowClockwiseIcon,
   Newspaper,
   ArrowUpRight,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 import {
@@ -148,7 +148,7 @@ export default function MyArticlesPage() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outlined" size="small" onClick={load}>
-                    <RefreshCw className="size-4" />
+                    <ArrowClockwiseIcon className="size-4" />
                     Повторить
                   </Button>
                   <Button variant="text" size="small" asChild>
@@ -293,7 +293,7 @@ export default function MyArticlesPage() {
                       title={t("editor.edit")}
                     >
                       <Link href={`/app/profile/articles/${a.slug}/edit`}>
-                        <Pencil className="size-4" />
+                        <PencilSimple className="size-4" />
                       </Link>
                     </Button>
                     <Button
@@ -302,7 +302,7 @@ export default function MyArticlesPage() {
                       onClick={() => handleDelete(a.slug, a.title)}
                       title={t("editor.delete")}
                     >
-                      <Trash2 className="size-4" />
+                      <Trash className="size-4" />
                     </Button>
                   </div>
                 </Card>

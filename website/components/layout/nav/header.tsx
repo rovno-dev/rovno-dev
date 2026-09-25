@@ -4,7 +4,7 @@ import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
-import { Lightbulb, User } from "lucide-react";
+import { Lightbulb, User } from "@phosphor-icons/react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import { useState, useEffect } from "react";
@@ -70,7 +70,7 @@ export default function Header() {
           </Link>
           <nav className="hidden md:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
-            <NavLink href={ROUTES.clients.href}>{t("nav.clients")}</NavLink>
+            <NavLink href={ROUTES.companies.href}>{t("nav.companies")}</NavLink>
             <NavLink href={ROUTES.about.href}>{t("nav.about")}</NavLink>
             <NavLink href={ROUTES.blog.href}>{t("nav.blog")}</NavLink>
           </nav>

@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CheckUser } from "@/entities/user/model/check-user";
@@ -10,40 +9,81 @@ import { useUser } from "@/entities/user/model/user-context";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
-  Plus, PencilSimple, Trash, ArrowSquareOut, Buildings, ArrowClockwise, CircleNotch,
+  MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon, User,
+  Phone, EnvelopeSimple, TelegramLogo, ArrowSquareOutIcon,
 } from "@phosphor-icons/react";
-import {
-  fetchCompanies, deleteCompany, type ClientListItem,
-} from "@/utils/api/clients";
-import { ClientEditorDialog } from "./_components/client-editor-dialog";
+import { $fetch } from "@/utils/fetch";
+import { useAdminSecret } from "@/hooks/use-admin-secret";
+
+interface ClientRow {
+  id: string;
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+  telegram_username: string | null;
+  role_title: string | null;
+  order_count: number;
+  last_order_at: string | null;
+  created_at: string;
+}
 
 type LoadState =
   | { kind: "loading" }
-  | { kind: "ready"; clients: ClientListItem[] }
+  | { kind: "ready"; clients: ClientRow[] }
   | { kind: "error"; message: string };
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-}
 
 export default function AdminClientsPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<ClientListItem | null>(null);
+  const [query, setQuery] = useState("");
+  const { secret } = useAdminSecret();
 
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const clients = await fetchCompanies();
-      setState({ kind: "ready", clients });
+      // Derive the client list from order-requests — each row carries its
+      // client nested. Dedupe by client id in-memory and count orders.
+      const res = await $fetch("/api/v1/admin/order-requests?limit=500", { isToast: false });
+      if (!res?.response?.ok) {
+        throw new Error(res?.json?.detail || `HTTP ${res?.response?.status}`);
+      }
+      const orders = Array.isArray(res.json) ? res.json : [];
+
+      const byClient = new Map<string, ClientRow>();
+      for (const o of orders) {
+        const c = o.client;
+        if (!c?.id) continue;
+        const existing = byClient.get(c.id);
+        const created = o.created_at || new Date().toISOString();
+        if (existing) {
+          existing.order_count += 1;
+          if (!existing.last_order_at || created > existing.last_order_at) {
+            existing.last_order_at = created;
+          }
+        } else {
+          byClient.set(c.id, {
+            id: c.id,
+            name: c.name || null,
+            phone: c.phone || null,
+            email: c.email || null,
+            telegram_username: c.telegram_username || null,
+            role_title: c.role_title || null,
+            order_count: 1,
+            last_order_at: created,
+            created_at: c.created_at || created,
+          });
+        }
+      }
+
+      const list = Array.from(byClient.values()).sort((a, b) => {
+        const la = a.last_order_at || "";
+        const lb = b.last_order_at || "";
+        return lb.localeCompare(la);
+      });
+      setState({ kind: "ready", clients: list });
     } catch (err: any) {
       setState({ kind: "error", message: err?.message || "Не удалось загрузить клиентов" });
     }
@@ -60,26 +100,16 @@ export default function AdminClientsPage() {
     return null;
   }
 
-  const handleDelete = async (c: ClientListItem) => {
-    if (!confirm(`Удалить клиента «${c.name}»? Проекты останутся, но потеряют привязку.`)) return;
-    try {
-      await deleteCompany(c.id);
-      toast.success("Клиент удалён");
-      load();
-    } catch (err: any) {
-      toast.error(err?.message || "Ошибка удаления");
-    }
-  };
-
-  const openCreate = () => {
-    setEditing(null);
-    setDialogOpen(true);
-  };
-
-  const openEdit = (c: ClientListItem) => {
-    setEditing(c);
-    setDialogOpen(true);
-  };
+  const filtered = useMemo(() => {
+    if (state.kind !== "ready") return [];
+    const q = query.trim().toLowerCase();
+    if (!q) return state.clients;
+    return state.clients.filter((c) =>
+      [c.name, c.phone, c.email, c.telegram_username]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    );
+  }, [state, query]);
 
   const clients = state.kind === "ready" ? state.clients : [];
 
@@ -90,27 +120,35 @@ export default function AdminClientsPage() {
           <div>
             <h1 className="text-display-2 mb-1">Клиенты</h1>
             <p className="text-body-3 text-(--on-bg-medium)">
-              {state.kind === "ready" ? `${clients.length} клиентов` : "Загрузка…"}
+              {state.kind === "ready"
+                ? `${clients.length} ${clients.length === 1 ? "клиент" : clients.length < 5 ? "клиента" : "клиентов"}`
+                : "Загрузка…"}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outlined" size="small" onClick={load}>
-              {state.kind === "loading"
-                ? <CircleNotch className="size-4 animate-spin" />
-                : <ArrowClockwise className="size-4" />}
-              Обновить
-            </Button>
-            <Button onClick={openCreate}>
-              <Plus className="size-4" />
-              Новый клиент
-            </Button>
-          </div>
+          <Button variant="outlined" size="small" onClick={load}>
+            {state.kind === "loading"
+              ? <CircleNotchIcon className="size-4 animate-spin" />
+              : <ArrowClockwiseIcon className="size-4" />}
+            Обновить
+          </Button>
         </div>
 
+        <Card className="rounded-3xl border-(--outline) p-4">
+          <div className="relative">
+            <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Поиск по имени, телефону, email или Telegram…"
+              className="pl-9"
+            />
+          </div>
+        </Card>
+
         {state.kind === "loading" && (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <Card key={i} className="rounded-3xl border-(--outline) aspect-square animate-pulse bg-muted/30" />
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i} className="rounded-3xl border-(--outline) h-24 animate-pulse bg-muted/30" />
             ))}
           </div>
         )}
@@ -122,87 +160,74 @@ export default function AdminClientsPage() {
           </Card>
         )}
 
-        {state.kind === "ready" && clients.length === 0 && (
+        {state.kind === "ready" && filtered.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <Buildings className="size-6" />
+              <User className="size-6" />
             </div>
-            <p className="text-body-3 text-(--on-bg-medium) mb-4">Пока нет клиентов.</p>
-            <Button onClick={openCreate}>
-              <Plus className="size-4" />
-              Добавить первого
-            </Button>
+            <p className="text-body-3 text-(--on-bg-medium)">
+              {query
+                ? "Ничего не найдено"
+                : "Клиенты появятся здесь после первой заявки"}
+            </p>
           </Card>
         )}
 
-        {state.kind === "ready" && clients.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {clients.map((c) => (
+        {state.kind === "ready" && filtered.length > 0 && (
+          <div className="space-y-3">
+            {filtered.map((c) => (
               <Card
                 key={c.id}
-                className="group relative aspect-square rounded-3xl border-(--outline) bg-(--card) overflow-hidden transition-all hover:border-(--primary)/40 cursor-pointer"
-                onClick={() => openEdit(c)}
+                className="rounded-3xl border-(--outline) p-5 flex flex-col sm:flex-row sm:items-center gap-4"
               >
-                <div className="absolute inset-0 flex items-center justify-center p-8">
-                  {c.logotype_url ? (
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={c.logotype_url}
-                        alt={c.name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                        className="object-contain p-2"
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-display-2 font-heading font-semibold tracking-tighter text-(--on-bg-high) opacity-40">
-                      {initials(c.name)}
-                    </span>
+                {/* Avatar circle with initials */}
+                <div className="size-12 shrink-0 rounded-full bg-(--primary-card) flex items-center justify-center text-(--primary) font-medium">
+                  {(c.name || "?").trim().slice(0, 2).toUpperCase()}
+                </div>
+
+                <div className="flex-1 min-w-0 space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-heading-4 truncate">
+                      {c.name || "Без имени"}
+                    </h3>
+                    <Badge variant="tonal-card-static" size="chip-small">
+                      {c.order_count}{" "}
+                      {c.order_count === 1 ? "заявка" : c.order_count < 5 ? "заявки" : "заявок"}
+                    </Badge>
+                  </div>
+                  {c.role_title && (
+                    <p className="text-body-5 text-(--on-bg-low)">{c.role_title}</p>
                   )}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-4 text-(--on-bg-medium)">
+                    {c.phone && (
+                      <a href={`tel:${c.phone}`} className="inline-flex items-center gap-1.5 hover:text-(--primary)">
+                        <Phone className="size-3.5" /> {c.phone}
+                      </a>
+                    )}
+                    {c.email && (
+                      <a href={`mailto:${c.email}`} className="inline-flex items-center gap-1.5 hover:text-(--primary)">
+                        <EnvelopeSimple className="size-3.5" /> {c.email}
+                      </a>
+                    )}
+                    {c.telegram_username && (
+                      <a
+                        href={`https://t.me/${c.telegram_username.replace(/^@/, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 hover:text-(--primary)"
+                      >
+                        <TelegramLogo className="size-3.5" /> @{c.telegram_username.replace(/^@/, "")}
+                      </a>
+                    )}
+                  </div>
                 </div>
 
-                {c.industry && (
-                  <span className="absolute top-3 left-3 text-[10px] uppercase tracking-widest text-(--on-bg-low)">
-                    {c.industry}
-                  </span>
-                )}
-
-                <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-body-3 font-medium text-white truncate">
-                    {c.name}
-                  </p>
-                  <p className="text-body-6 text-white/70 font-mono truncate">
-                    /clients/{c.slug}
-                  </p>
-                </div>
-
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="glass"
-                    size="icon-small"
-                    asChild
-                    title="Открыть страницу"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Link href={`/clients/${c.slug}`} target="_blank">
-                      <ArrowSquareOut className="size-3.5" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button variant="outlined" size="small" asChild>
+                    <Link href={`/admin/${secret || "secret"}/orders`}>
+                      <ArrowSquareOutIcon className="size-3.5" />
+                      Заявки
                     </Link>
-                  </Button>
-                  <Button
-                    variant="glass"
-                    size="icon-small"
-                    title="Редактировать"
-                    onClick={(e) => { e.stopPropagation(); openEdit(c); }}
-                  >
-                    <PencilSimple className="size-3.5" />
-                  </Button>
-                  <Button
-                    variant="glass"
-                    size="icon-small"
-                    title="Удалить"
-                    onClick={(e) => { e.stopPropagation(); handleDelete(c); }}
-                  >
-                    <Trash className="size-3.5" />
                   </Button>
                 </div>
               </Card>
@@ -210,13 +235,6 @@ export default function AdminClientsPage() {
           </div>
         )}
       </div>
-
-      <ClientEditorDialog
-        client={editing}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSaved={load}
-      />
     </CheckUser>
   );
 }

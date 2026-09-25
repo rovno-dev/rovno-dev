@@ -15,9 +15,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Search, RefreshCw, CheckCircle2, XCircle, ExternalLink, Loader2,
-  Clock, FileEdit, BookOpen, Users, User,
-} from "lucide-react";
+  MagnifyingGlassIcon, ArrowClockwiseIcon, CheckCircleIcon, XCircleIcon, ArrowSquareOutIcon, CircleNotchIcon,
+  ClockIcon, PencilIcon, BookOpenIcon, UsersIcon, UserIcon,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
   fetchAdminArticles, approveArticle, rejectArticle,
@@ -25,10 +25,10 @@ import {
 } from "@/utils/api/admin-articles";
 
 const STATUS_META: Record<string, { label: string; className: string; icon: any }> = {
-  pending_review: { label: "На проверке", className: "bg-blue-500/15 text-blue-500 border-blue-500/30", icon: Clock },
-  published: { label: "Опубликовано", className: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30", icon: BookOpen },
-  rejected: { label: "Отклонено", className: "bg-rose-500/15 text-rose-500 border-rose-500/30", icon: XCircle },
-  draft: { label: "Черновик", className: "bg-amber-500/15 text-amber-500 border-amber-500/30", icon: FileEdit },
+  pending_review: { label: "На проверке", className: "bg-blue-500/15 text-blue-500 border-blue-500/30", icon: ClockIcon },
+  published: { label: "Опубликовано", className: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30", icon: BookOpenIcon },
+  rejected: { label: "Отклонено", className: "bg-rose-500/15 text-rose-500 border-rose-500/30", icon: XCircleIcon },
+  draft: { label: "Черновик", className: "bg-amber-500/15 text-amber-500 border-amber-500/30", icon: PencilIcon },
 };
 
 type StatusFilter = ReviewStatus | "all";
@@ -136,7 +136,7 @@ export default function AdminArticlesPage() {
             </p>
           </div>
           <Button variant="outlined" size="small" onClick={load} disabled={loading}>
-            {loading ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+            {loading ? <CircleNotchIcon className="size-4 animate-spin" /> : <ArrowClockwiseIcon className="size-4" />}
             Обновить
           </Button>
         </div>
@@ -145,7 +145,7 @@ export default function AdminArticlesPage() {
         <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+              <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -184,14 +184,14 @@ export default function AdminArticlesPage() {
               variant={authorFilter === "team" ? "filled" : "tonal-card"}
               onClick={() => setAuthorFilter("team")}
             >
-              <Users className="size-3.5" /> Команда
+              <UsersIcon className="size-3.5" /> Команда
             </Button>
             <Button
               size="chip-small" shape="round"
               variant={authorFilter === "external" ? "filled" : "tonal-card"}
               onClick={() => setAuthorFilter("external")}
             >
-              <User className="size-3.5" /> Внешние
+              <UserIcon className="size-3.5" /> Внешние
             </Button>
           </div>
         </Card>
@@ -252,7 +252,7 @@ export default function AdminArticlesPage() {
                         </Badge>
                         {a.is_team_author && (
                           <Badge variant="tonal-primary-static" size="chip-small" className="gap-1">
-                            <Users className="size-3" />
+                            <UsersIcon className="size-3" />
                             Команда
                           </Badge>
                         )}
@@ -287,7 +287,7 @@ export default function AdminArticlesPage() {
                   <div className="flex flex-wrap gap-2 mt-auto pt-2 border-t border-(--outline)">
                     {canApprove && (
                       <Button size="small" onClick={() => handleApprove(a)} disabled={saving}>
-                        {saving ? <Loader2 className="size-4 animate-spin" /> : <CheckCircle2 className="size-4" />}
+                        {saving ? <CircleNotchIcon className="size-4 animate-spin" /> : <CheckCircleIcon className="size-4" />}
                         Одобрить
                       </Button>
                     )}
@@ -298,13 +298,13 @@ export default function AdminArticlesPage() {
                         onClick={() => { setRejectSlug(a.slug); setRejectNote(""); }}
                         disabled={saving}
                       >
-                        <XCircle className="size-4" />
+                        <XCircleIcon className="size-4" />
                         Отклонить
                       </Button>
                     )}
                     <Button size="small" variant="outlined" asChild className="ml-auto">
                       <Link href={`/app/profile/articles/${a.slug}/preview`} target="_blank">
-                        <ExternalLink className="size-4" />
+                        <ArrowSquareOutIcon className="size-4" />
                         Открыть
                       </Link>
                     </Button>

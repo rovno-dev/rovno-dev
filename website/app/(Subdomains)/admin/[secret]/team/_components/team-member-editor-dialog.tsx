@@ -20,8 +20,8 @@ import { Card } from "@/components/ui/card";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { toast } from "sonner";
 import {
-  Loader2, X, Plus, Search, User as UserIcon, FolderOpen,
-} from "lucide-react";
+  CircleNotchIcon, X, Plus, MagnifyingGlassIcon, User as UserIcon, FolderOpen,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { TeamMemberAdmin, TeamMemberProject, ProjectPickerItem } from "@/utils/api/team";
 import {
@@ -315,7 +315,7 @@ export function TeamMemberEditorDialog({
             {pickerOpen && (
               <Card className="rounded-2xl border-(--outline) p-3 space-y-2">
                 <div className="relative">
-                  <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+                  <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
                   <Input
                     autoFocus
                     value={projectSearch}
@@ -353,7 +353,7 @@ export function TeamMemberEditorDialog({
             {/* Assigned list */}
             {projectsLoading ? (
               <div className="flex items-center justify-center py-6 text-(--on-bg-low)">
-                <Loader2 className="size-4 animate-spin mr-2" />
+                <CircleNotchIcon className="size-4 animate-spin mr-2" />
                 Загрузка…
               </div>
             ) : projects.length === 0 ? (
@@ -400,7 +400,7 @@ export function TeamMemberEditorDialog({
             Отмена
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving && <Loader2 className="size-4 animate-spin" />}
+            {saving && <CircleNotchIcon className="size-4 animate-spin" />}
             Сохранить
           </Button>
         </DialogFooter>

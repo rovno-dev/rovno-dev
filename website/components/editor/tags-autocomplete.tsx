@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { Plus, X, Loader2 } from "lucide-react";
+import { Plus, X, CircleNotchIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchTags, type Tag } from "@/utils/api/tags";
 
@@ -169,7 +169,7 @@ export function TagsAutocomplete({
           placeholder={value.length === 0 ? placeholder : ""}
           className="min-w-[8ch] flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
         />
-        {loading && <Loader2 className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
+        {loading && <CircleNotchIcon className="size-3.5 shrink-0 animate-spin text-(--on-bg-low)" />}
       </div>
 
       {open && (suggestions.length > 0 || canCreate) && (

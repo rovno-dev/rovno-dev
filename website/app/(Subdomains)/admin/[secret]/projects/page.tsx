@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
-  Plus, MagnifyingGlass, ArrowClockwise, CircleNotch,
-  PencilSimple, ArrowSquareOut, Cube,
+  Plus, MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon,
+  PencilSimple, ArrowSquareOutIcon, Cube,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchAdminProjects, type ProjectListAdmin } from "@/utils/api/projects";
@@ -75,8 +75,8 @@ export default function AdminProjectsPage() {
           <div className="flex flex-wrap gap-2">
             <Button variant="outlined" size="small" onClick={load}>
               {state.kind === "loading"
-                ? <CircleNotch className="size-4 animate-spin" />
-                : <ArrowClockwise className="size-4" />}
+                ? <CircleNotchIcon className="size-4 animate-spin" />
+                : <ArrowClockwiseIcon className="size-4" />}
               Обновить
             </Button>
             <Button asChild>
@@ -91,7 +91,7 @@ export default function AdminProjectsPage() {
         {/* Search */}
         <Card className="rounded-3xl border-(--outline) p-4">
           <div className="relative">
-            <MagnifyingGlass className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+            <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -191,7 +191,7 @@ export default function AdminProjectsPage() {
                       {p.publication_status === "published" && (
                         <Button variant="text" size="icon-small" asChild title="Открыть на сайте">
                           <Link href={`/projects/${p.slug}`} target="_blank">
-                            <ArrowSquareOut className="size-4" />
+                            <ArrowSquareOutIcon className="size-4" />
                           </Link>
                         </Button>
                       )}

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
-import { PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { SidebarSimpleIcon, SidebarIcon } from "@phosphor-icons/react";
 
 /**
  * A single nav item.
@@ -159,9 +159,9 @@ export function Sidebar({
             aria-label={isCollapsed ? "Развернуть" : "Свернуть"}
           >
             {isCollapsed ? (
-              <PanelLeftOpen className="size-4" />
+              <SidebarSimpleIcon className="size-4" />
             ) : (
-              <PanelLeftClose className="size-4" />
+              <SidebarIcon className="size-4" />
             )}
           </Button>
         )}

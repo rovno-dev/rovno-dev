@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, House } from "lucide-react";
+import { ArrowLeft, House } from "@phosphor-icons/react";
 
 export default function NotFound() {
   return (
     <main className="min-h-screen flex items-center justify-center relative overflow-hidden bg-(--bg)">
-      {/* Grid is intentionally subtle — it should read as texture, not as
+      {/* SquaresFour is intentionally subtle — it should read as texture, not as
           the message. */}\
       <div className="absolute inset-0 pointer-events-none grid-bg opacity-[0.05]" />
       <div className="absolute inset-0 bg-gradient-to-t from-(--bg) via-transparent to-(--bg)/0" />
