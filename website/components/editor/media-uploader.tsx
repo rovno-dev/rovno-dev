@@ -5,8 +5,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, CloudUpload, X, Play, GripVertical } from "lucide-react";
+import {
+  CircleNotch, CloudArrowUp, X, Play, DotsSixVertical,
+  ArrowUp, ArrowDown,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { $fetch } from "@/utils/fetch";
 import type { ProjectMedia } from "@/utils/api/projects";
@@ -16,7 +18,7 @@ interface Props {
   onChange: (next: ProjectMedia[]) => void;
 }
 
-const MAX_BYTES = 10 * 1024 * 1024; // 10 MB — matches the backend ceiling
+const MAX_BYTES = 10 * 1024 * 1024;
 const ACCEPT = "image/*,video/mp4,video/webm,video/quicktime";
 
 export function ProjectMediaUploader({ value, onChange }: Props) {
@@ -68,7 +70,9 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
   };
 
   const remove = (idx: number) => {
-    const next = value.filter((_, i) => i !== idx).map((m, i) => ({ ...m, sort_order: i }));
+    const next = value
+      .filter((_, i) => i !== idx)
+      .map((m, i) => ({ ...m, sort_order: i }));
     onChange(next);
   };
 
@@ -102,7 +106,10 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
               key={idx}
               draggable
               onDragStart={(e) => e.dataTransfer.setData("text/plain", String(idx))}
-              onDragOver={(e) => { e.preventDefault(); setDragOverIdx(idx); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOverIdx(idx);
+              }}
               onDragLeave={() => setDragOverIdx(null)}
               onDrop={(e) => {
                 e.preventDefault();
@@ -126,7 +133,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-white/70">
-                    <Play className="size-8" />
+                    <Play className="size-8" weight="fill" />
                     <span className="text-[10px] uppercase tracking-widest">Видео</span>
                   </div>
                 )}
@@ -139,7 +146,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                 >
                   <X className="size-3.5" />
                 </Button>
-                <GripVertical className="absolute top-2 left-2 size-4 text-white/60" />
+                <DotsSixVertical className="absolute top-2 left-2 size-4 text-white/60" />
               </div>
               <div className="p-2 space-y-1.5">
                 <Input
@@ -157,7 +164,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     disabled={idx === 0}
                     title="Вверх"
                   >
-                    ↑
+                    <ArrowUp className="size-3.5" />
                   </Button>
                   <Button
                     type="button"
@@ -167,7 +174,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     disabled={idx === value.length - 1}
                     title="Вниз"
                   >
-                    ↓
+                    <ArrowDown className="size-3.5" />
                   </Button>
                   <span className="text-[10px] text-(--on-bg-low) font-mono ml-auto">
                     {idx + 1} / {value.length}
@@ -191,12 +198,12 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
       >
         {uploading ? (
           <>
-            <Loader2 className="size-6 animate-spin text-(--primary)" />
+            <CircleNotch className="size-6 animate-spin text-(--primary)" />
             <span className="text-xs font-medium text-(--on-bg-medium)">Загрузка…</span>
           </>
         ) : (
           <>
-            <CloudUpload className="size-6 text-(--on-bg-low) group-hover:text-(--primary) transition-colors" />
+            <CloudArrowUp className="size-6 text-(--on-bg-low) group-hover:text-(--primary) transition-colors" />
             <span className="text-xs font-bold uppercase tracking-wider text-(--on-bg-low) group-hover:text-(--primary)">
               Добавить изображения или видео
             </span>

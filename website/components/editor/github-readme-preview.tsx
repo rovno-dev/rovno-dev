@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Github, RefreshCw } from "lucide-react";
+import { CircleNotch, ArrowClockwise } from "@phosphor-icons/react";
+import { GithubLogotypeMonoIcon } from "@/components/icons";
 import { fetchGithubReadme } from "@/utils/api/projects";
 
 /**
@@ -30,16 +31,20 @@ export function GithubReadmePreview({ repo, branch }: { repo: string; branch?: s
     }
   };
 
-  useEffect(() => { setState({ kind: "idle" }); }, [repo, branch]);
+  useEffect(() => {
+    setState({ kind: "idle" });
+  }, [repo, branch]);
 
   return (
     <Card className="rounded-2xl border-(--outline) bg-(--bg) p-3 space-y-2">
       <div className="flex items-center gap-2">
-        <Github className="size-4 text-(--on-bg-medium)" />
-        <code className="text-xs font-mono text-(--on-bg-medium) flex-1 truncate">{repo}</code>
+        <GithubLogotypeMonoIcon size={16} />
+        <code className="text-xs font-mono text-(--on-bg-medium) flex-1 truncate">
+          {repo}
+        </code>
         {state.kind === "ready" && (
           <Button variant="text" size="icon-small" onClick={load} title="Обновить">
-            <RefreshCw className="size-3.5" />
+            <ArrowClockwise className="size-3.5" />
           </Button>
         )}
       </div>
@@ -49,15 +54,18 @@ export function GithubReadmePreview({ repo, branch }: { repo: string; branch?: s
           Загрузить README
         </Button>
       )}
+
       {state.kind === "loading" && (
         <div className="flex items-center gap-2 text-xs text-(--on-bg-low) py-2">
-          <Loader2 className="size-3.5 animate-spin" />
+          <CircleNotch className="size-3.5 animate-spin" />
           Загрузка из GitHub…
         </div>
       )}
+
       {state.kind === "error" && (
         <p className="text-xs text-(--error) py-1">{state.message}</p>
       )}
+
       {state.kind === "ready" && (
         <pre className="max-h-64 overflow-auto text-[11px] leading-relaxed whitespace-pre-wrap font-mono text-(--on-bg-medium) bg-(--card) rounded-lg p-3">
           {state.readme.slice(0, 4000)}

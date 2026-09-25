@@ -18,7 +18,7 @@ import { ArticleEditor } from "./article-editor";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Save, Rocket, Trash2, Plus, X, Undo2 } from "lucide-react";
+import { FloppyDisk, Rocket, Trash, Plus, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
   createProject, updateProject, deleteProject,
@@ -195,11 +195,11 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         <div className="flex flex-wrap gap-2">
           {isEdit && (
             <Button variant="glass-red" size="icon-medium" onClick={handleDelete} disabled={saving}>
-              <Trash2 className="size-4" />
+              <Trash className="size-4" />
             </Button>
           )}
           <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-            <Save className="size-4" />
+            <FloppyDisk className="size-4" />
             Сохранить черновик
           </Button>
           <Button onClick={() => handleSave("published")} disabled={saving}>

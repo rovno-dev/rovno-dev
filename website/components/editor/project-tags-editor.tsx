@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, X, Star, Scale, Github, Tag } from "lucide-react";
+import { Plus, X, Star, Scales, Tag } from "@phosphor-icons/react";
+import { GithubLogotypeMonoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import type { ProjectTag, ProjectTagKind } from "@/utils/api/projects";
 
@@ -20,39 +20,51 @@ interface Props {
 
 const KIND_META: Record<ProjectTagKind, {
   label: string;
-  icon: any;
   hint: string;
   accent: string;
 }> = {
   from_chief: {
     label: "From Chief",
-    icon: Star,
     hint: "Личный проект автора (не агентский)",
     accent: "bg-violet-500/15 text-violet-500 border-violet-500/30",
   },
   license: {
     label: "Лицензия",
-    icon: Scale,
     hint: "Условия использования проекта",
     accent: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
   },
   github: {
     label: "GitHub",
-    icon: Github,
     hint: "Публичный репозиторий — README подтянется автоматически",
     accent: "bg-blue-500/15 text-blue-500 border-blue-500/30",
   },
   custom: {
     label: "Своя метка",
-    icon: Tag,
     hint: "Произвольная метка",
     accent: "bg-gray-500/15 text-gray-500 border-gray-500/30",
   },
 };
 
-function TagIcon({ kind }: { kind: ProjectTagKind }) {
-  const Icon = KIND_META[kind].icon;
-  return <Icon className="size-3.5" />;
+// One small renderer that picks the right icon for the kind. Phosphor for
+// everything but GitHub; the GitHub glyph comes from the codebase's own
+// logo (lucide dropped brand marks), with `[&_path]:fill-current` so it
+// inherits the badge colour instead of the app's default text colour.
+function TagIcon({ kind, className }: { kind: ProjectTagKind; className?: string }) {
+  switch (kind) {
+    case "from_chief":
+      return <Star className={className} />;
+    case "license":
+      return <Scales className={className} />;
+    case "github":
+      return (
+        <GithubLogotypeMonoIcon
+          size={14}
+          className={cn("[&_path]:fill-current", className)}
+        />
+      );
+    case "custom":
+      return <Tag className={className} />;
+  }
 }
 
 export function ProjectTagsEditor({ value, onChange }: Props) {
@@ -61,7 +73,8 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
   const [draftValue, setDraftValue] = useState("");
 
   const addTag = () => {
-    const label = draftLabel.trim() || (draftKind === "from_chief" ? "From Chief" : "");
+    const label =
+      draftLabel.trim() || (draftKind === "from_chief" ? "From Chief" : "");
     if (!label) return;
 
     let valuePayload: any = undefined;
@@ -85,7 +98,9 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
   };
 
   const removeTag = (idx: number) =>
-    onChange(value.filter((_, i) => i !== idx).map((t, i) => ({ ...t, sort_order: i })));
+    onChange(
+      value.filter((_, i) => i !== idx).map((t, i) => ({ ...t, sort_order: i }))
+    );
 
   const updateTag = (idx: number, patch: Partial<ProjectTag>) =>
     onChange(value.map((t, i) => (i === idx ? { ...t, ...patch } : t)));
@@ -108,7 +123,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                     meta.accent
                   )}
                 >
-                  <TagIcon kind={t.kind} />
+                  <TagIcon kind={t.kind} className="size-3.5" />
                   {meta.label}
                 </span>
                 <Input
@@ -119,7 +134,9 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                 {t.kind === "license" && (
                   <Input
                     value={t.value?.type || ""}
-                    onChange={(e) => updateTag(idx, { value: { ...t.value, type: e.target.value } })}
+                    onChange={(e) =>
+                      updateTag(idx, { value: { ...t.value, type: e.target.value } })
+                    }
                     placeholder="Тип: MIT, Apache-2.0, …"
                     className="h-8 text-xs max-w-[180px]"
                   />
@@ -127,7 +144,9 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                 {t.kind === "github" && (
                   <Input
                     value={t.value?.repo || ""}
-                    onChange={(e) => updateTag(idx, { value: { ...t.value, repo: e.target.value } })}
+                    onChange={(e) =>
+                      updateTag(idx, { value: { ...t.value, repo: e.target.value } })
+                    }
                     placeholder="owner/name"
                     className="h-8 text-xs max-w-[180px] font-mono"
                   />
@@ -135,7 +154,9 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                 {t.kind === "from_chief" && (
                   <Input
                     value={t.value?.author || ""}
-                    onChange={(e) => updateTag(idx, { value: { ...t.value, author: e.target.value } })}
+                    onChange={(e) =>
+                      updateTag(idx, { value: { ...t.value, author: e.target.value } })
+                    }
                     placeholder="Автор (опц.)"
                     className="h-8 text-xs max-w-[160px]"
                   />
@@ -168,7 +189,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                 {(Object.keys(KIND_META) as ProjectTagKind[]).map((k) => (
                   <SelectItem key={k} value={k}>
                     <span className="flex items-center gap-2">
-                      <TagIcon kind={k} />
+                      <TagIcon kind={k} className="size-3.5" />
                       {KIND_META[k].label}
                     </span>
                   </SelectItem>
@@ -189,12 +210,24 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
           </div>
           <div className="space-y-1">
             <Label className="text-xs">
-              {draftKind === "github" ? "Репозиторий" : draftKind === "license" ? "Тип / URL" : draftKind === "from_chief" ? "Автор" : "—"}
+              {draftKind === "github"
+                ? "Репозиторий"
+                : draftKind === "license"
+                ? "Тип / URL"
+                : draftKind === "from_chief"
+                ? "Автор"
+                : "—"}
             </Label>
             <Input
               value={draftValue}
               onChange={(e) => setDraftValue(e.target.value)}
-              placeholder={draftKind === "github" ? "owner/name" : draftKind === "license" ? "MIT" : ""}
+              placeholder={
+                draftKind === "github"
+                  ? "owner/name"
+                  : draftKind === "license"
+                  ? "MIT"
+                  : ""
+              }
               className="h-9"
               disabled={draftKind === "custom"}
             />

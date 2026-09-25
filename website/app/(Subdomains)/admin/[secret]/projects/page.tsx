@@ -12,8 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
-  Plus, Search, RefreshCw, Loader2, Pencil, ExternalLink, Box,
-} from "lucide-react";
+  Plus, MagnifyingGlass, ArrowClockwise, CircleNotch,
+  PencilSimple, ArrowSquareOut, Cube,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchAdminProjects, type ProjectListAdmin } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
@@ -74,8 +75,8 @@ export default function AdminProjectsPage() {
           <div className="flex flex-wrap gap-2">
             <Button variant="outlined" size="small" onClick={load}>
               {state.kind === "loading"
-                ? <Loader2 className="size-4 animate-spin" />
-                : <RefreshCw className="size-4" />}
+                ? <CircleNotch className="size-4 animate-spin" />
+                : <ArrowClockwise className="size-4" />}
               Обновить
             </Button>
             <Button asChild>
@@ -90,7 +91,7 @@ export default function AdminProjectsPage() {
         {/* Search */}
         <Card className="rounded-3xl border-(--outline) p-4">
           <div className="relative">
-            <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+            <MagnifyingGlass className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -121,7 +122,7 @@ export default function AdminProjectsPage() {
         {state.kind === "ready" && projects.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <Box className="size-6" />
+              <Cube className="size-6" />
             </div>
             <p className="text-body-3 text-(--on-bg-medium) mb-4">Пока нет проектов.</p>
             <Button asChild>
@@ -190,11 +191,11 @@ export default function AdminProjectsPage() {
                       {p.publication_status === "published" && (
                         <Button variant="text" size="icon-small" asChild title="Открыть на сайте">
                           <Link href={`/projects/${p.slug}`} target="_blank">
-                            <ExternalLink className="size-4" />
+                            <ArrowSquareOut className="size-4" />
                           </Link>
                         </Button>
                       )}
-                      <Pencil className="size-4 text-(--on-bg-low)" />
+                      <PencilSimple className="size-4 text-(--on-bg-low)" />
                     </div>
                   </div>
                 </Link>

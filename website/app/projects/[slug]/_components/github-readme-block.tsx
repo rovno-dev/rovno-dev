@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Github } from "lucide-react";
+import { GithubLogotypeMonoIcon } from "@/components/icons";
 
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||
@@ -35,7 +35,7 @@ export async function GithubReadmeBlock({ repo, branch }: Props) {
   return (
     <Card className="rounded-3xl border-(--outline) bg-(--card) p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Github className="size-5 text-(--on-bg-medium)" />
+        <GithubLogotypeMonoIcon size={20} />
         <h2 className="text-heading-3 flex-1 truncate">
           <a
             href={`https://github.com/${repo}`}
