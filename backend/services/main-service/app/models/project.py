@@ -22,7 +22,6 @@ class Project(Base):
     slug = Column(String, unique=True, nullable=False)
     title = Column(String, nullable=False)
     client_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"))
-    category = Column(String, nullable=True)
     platform = Column(String, nullable=True)
     period = Column(String, nullable=True)
     short_description = Column(Text, nullable=True)
@@ -40,3 +39,17 @@ class Project(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     category_id = Column(UUID(as_uuid=True), ForeignKey("project_categories.id"), nullable=True)
     category = relationship("ProjectCategory", lazy="joined")
+    tag_records = relationship(
+        "ProjectTag",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="ProjectTag.sort_order",
+    )
+    media = relationship(
+        "ProjectMedia",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="ProjectMedia.sort_order",
+    )
