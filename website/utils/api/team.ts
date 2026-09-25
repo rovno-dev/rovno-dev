@@ -142,3 +142,36 @@ export async function fetchProjectsForPicker(): Promise<ProjectPickerItem[]> {
   if (!Array.isArray(res?.json)) return [];
   return res.json as ProjectPickerItem[];
 }
+
+/** A project linked to a team member, as exposed by the public team API. */
+export interface TeamMemberPublicProject {
+  id: string;
+  slug: string;
+  title: string;
+  short_description?: string | null;
+  cover_image_src: string;
+  cover_video_src?: string | null;
+  period?: string | null;
+  role_on_project?: string | null;
+  category_label?: string | null;
+}
+
+/**
+ * Public list of projects a team member is pinned to. Rendered on the expert
+ * profile. Returns [] on any failure so the page never blanks out.
+ */
+export async function fetchTeamMemberProjectsPublic(
+  username: string,
+): Promise<TeamMemberPublicProject[]> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/api/v1/team/by-username/${encodeURIComponent(username)}/projects`,
+      { next: { revalidate: 60 } } as any,
+    );
+    if (!res.ok) return [];
+    const body = await res.json();
+    return Array.isArray(body) ? (body as TeamMemberPublicProject[]) : [];
+  } catch {
+    return [];
+  }
+}

@@ -102,7 +102,7 @@ export function Toc({ headings, label, ariaLabel }: TocProps) {
             "max-w-[min(80vw,320px)]"
           )}
         >
-          <List className="size-4 shrink-0" />
+          <ListIcon className="size-4 shrink-0" />
           <span className="truncate">{activeHeading ? activeHeading.text : label}</span>
         </button>
         {mobileOpen && (
@@ -132,7 +132,7 @@ export function Toc({ headings, label, ariaLabel }: TocProps) {
                   className="text-(--on-bg-low) hover:text-(--on-bg-high)"
                   aria-label="Close"
                 >
-                  <X className="size-4" />
+                  <XIcon className="size-4" />
                 </button>
               </div>
               <ul className="space-y-0.5">

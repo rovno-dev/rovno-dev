@@ -52,6 +52,7 @@ export function FloatingMenu({
   }, [open]);
   const links = [
     { href: ROUTES.projects.href, label: t("nav.projects") },
+    { href: ROUTES.services.href, label: "Услуги" },
     { href: ROUTES.about.href, label: t("nav.about") },
     { href: ROUTES.blog.href, label: t("nav.blog") },
   ];
