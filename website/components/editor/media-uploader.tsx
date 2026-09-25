@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CircleNotchIcon, CloudArrowUp, X, Play, DotsSixVertical,
-  ArrowUp, ArrowDown, PencilSimple,
+  CircleNotchIcon, CloudArrowUpIcon, XIcon, PlayIcon, DotsSixVerticalIcon,
+  ArrowUpIcon, ArrowDownIcon, PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { $fetch } from "@/utils/fetch";
@@ -203,9 +203,9 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                   className="absolute top-2 right-2 size-7 rounded-full"
                   onClick={() => remove(idx)}
                 >
-                  <X className="size-3.5" />
+                  <XIcon className="size-3.5" />
                 </Button>
-                <DotsSixVertical className="absolute top-2 left-2 size-4 text-white/60" />
+                <DotsSixVerticalIcon className="absolute top-2 left-2 size-4 text-white/60" />
                 {m.type === "image" && (
                   <Button
                     type="button"
@@ -218,7 +218,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     }}
                     title="Редактировать"
                   >
-                    <PencilSimple className="size-3.5" />
+                    <PencilSimpleIcon className="size-3.5" />
                   </Button>
                 )}
               </div>
@@ -238,7 +238,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     disabled={idx === 0}
                     title="Вверх"
                   >
-                    <ArrowUp className="size-3.5" />
+                    <ArrowUpIcon className="size-3.5" />
                   </Button>
                   <Button
                     type="button"
@@ -248,7 +248,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
                     disabled={idx === value.length - 1}
                     title="Вниз"
                   >
-                    <ArrowDown className="size-3.5" />
+                    <ArrowDownIcon className="size-3.5" />
                   </Button>
                   <span className="text-[10px] text-(--on-bg-low) font-mono ml-auto">
                     {idx + 1} / {value.length}
@@ -277,7 +277,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
           </>
         ) : (
           <>
-            <CloudArrowUp className="size-6 text-(--on-bg-low) group-hover:text-(--primary) transition-colors" />
+            <CloudArrowUpIcon className="size-6 text-(--on-bg-low) group-hover:text-(--primary) transition-colors" />
             <span className="text-xs font-bold uppercase tracking-wider text-(--on-bg-low) group-hover:text-(--primary)">
               Добавить изображения или видео
             </span>
@@ -340,7 +340,7 @@ function VideoThumb({ url }: { url: string }) {
       />
       <span className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover/video:bg-black/50 transition-colors">
         <span className="flex size-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">
-          <Play className="size-5 ml-0.5" weight="fill" />
+          <PlayIcon className="size-5 ml-0.5" weight="fill" />
         </span>
       </span>
     </button>

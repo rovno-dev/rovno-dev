@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ListIcon, X } from "@phosphor-icons/react";
+import { ListIcon, XIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
@@ -67,7 +67,7 @@ export function FloatingMenu({
         aria-controls="floating-menu-panel"
         aria-label={t("nav.menu")}
       >
-        {open ? <X className={triggerIconClassName} /> : <ListIcon className={triggerIconClassName} />}
+        {open ? <XIcon className={triggerIconClassName} /> : <ListIcon className={triggerIconClassName} />}
       </Button>
       {open && (
         <div

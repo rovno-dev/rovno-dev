@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CircleNotchIcon, MagnifyingGlassIcon, At, FolderSimple, Users,
+  CircleNotchIcon, MagnifyingGlassIcon, AtIcon, FolderSimpleIcon, UsersIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { searchMentions, type MentionResults } from "@/utils/api/mentions";

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import {
-  Plus, X, MagnifyingGlassIcon, CircleNotchIcon,
+  PlusIcon, XIcon, MagnifyingGlassIcon, CircleNotchIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 

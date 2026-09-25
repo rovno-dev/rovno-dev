@@ -9,7 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, X, Star, Scales, Tag, CaretDown, CaretUp,
+  PlusIcon, XIcon, StarIcon, ScalesIcon, TagIcon as PhosphorTagIcon, CaretDownIcon, CaretUpIcon,
 } from "@phosphor-icons/react";
 import { GithubLogotypeMonoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -26,16 +26,16 @@ const KIND_META: Record<ProjectTagKind, {
   accent: string;
 }> = {
   from_chief: { label: "From Chief", hint: "Личный проект автора", accent: "bg-violet-500/15 text-violet-500 border-violet-500/30" },
-  license:    { label: "Лицензия",   hint: "Условия использования", accent: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30" },
-  github:     { label: "GitHub",     hint: "README подтягивается автоматически", accent: "bg-blue-500/15 text-blue-500 border-blue-500/30" },
-  custom:     { label: "Своя метка", hint: "Произвольная метка", accent: "bg-gray-500/15 text-gray-500 border-gray-500/30" },
+  license: { label: "Лицензия", hint: "Условия использования", accent: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30" },
+  github: { label: "GitHub", hint: "README подтягивается автоматически", accent: "bg-blue-500/15 text-blue-500 border-blue-500/30" },
+  custom: { label: "Своя метка", hint: "Произвольная метка", accent: "bg-gray-500/15 text-gray-500 border-gray-500/30" },
 };
 
 function TagIcon({ kind, className }: { kind: ProjectTagKind; className?: string }) {
   switch (kind) {
-    case "from_chief": return <Star className={className} />;
-    case "license":    return <Scales className={className} />;
-    case "custom":     return <Tag className={className} />;
+    case "from_chief": return <StarIcon className={className} />;
+    case "license": return <ScalesIcon className={className} />;
+    case "custom": return <PhosphorTagIcon className={className} />;
     case "github":
       return (
         <GithubLogotypeMonoIcon
@@ -171,7 +171,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                       onClick={() => setExpandedIdx(expanded ? null : idx)}
                       title={expanded ? "Свернуть" : "Настроить"}
                     >
-                      {expanded ? <CaretUp className="size-3.5" /> : <CaretDown className="size-3.5" />}
+                      {expanded ? <CaretUpIcon className="size-3.5" /> : <CaretDownIcon className="size-3.5" />}
                     </Button>
                   )}
                   <Button
@@ -181,7 +181,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                     onClick={() => removeTag(idx)}
                     title="Убрать"
                   >
-                    <X className="size-3.5" />
+                    <XIcon className="size-3.5" />
                   </Button>
                 </div>
                 {expanded && (
@@ -229,16 +229,16 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
             onChange={(e) => setDraftValue(e.target.value)}
             placeholder={
               draftKind === "github" ? "owner/name"
-              : draftKind === "license" ? "MIT"
-              : draftKind === "from_chief" ? "Автор (опц.)"
-              : "—"
+                : draftKind === "license" ? "MIT"
+                  : draftKind === "from_chief" ? "Автор (опц.)"
+                    : "—"
             }
             className="h-9 text-sm font-mono"
             disabled={draftKind === "custom"}
           />
 
           <Button type="button" onClick={addTag} className="h-9 shrink-0">
-            <Plus className="size-4" />
+            <PlusIcon className="size-4" />
             Добавить
           </Button>
         </div>

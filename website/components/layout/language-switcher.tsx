@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/providers/language-provider";
-import { Globe, Check, CaretDown } from "@phosphor-icons/react";
+import { GlobeIcon, CheckIcon, CaretDownIcon, Globe, CaretDown, Check } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {

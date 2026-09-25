@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "@phosphor-icons/react";
+import { PlusIcon } from "@phosphor-icons/react";
 
 export function CreateCompanyDialog({ onSuccess }: { onSuccess?: () => void }) {
   const [open, setOpen] = useState(false);
@@ -44,7 +44,7 @@ export function CreateCompanyDialog({ onSuccess }: { onSuccess?: () => void }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="filled" size="medium">
-          <Plus className="size-4" />
+          <PlusIcon className="size-4" />
           Добавить компанию
         </Button>
       </DialogTrigger>

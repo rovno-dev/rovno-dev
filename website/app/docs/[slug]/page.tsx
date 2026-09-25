@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { compileMDX } from "next-mdx-remote/rsc";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import {
   LEGAL_DOCS,
   LEGAL_DOC_ORDER,
@@ -122,7 +122,7 @@ export default async function LegalDocPage({
               href="/docs"
               className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-6"
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeftIcon className="size-4" />
               Все документы
             </Link>
             <p className="text-body-5 uppercase tracking-[0.3em] text-(--on-bg-low) mb-3">

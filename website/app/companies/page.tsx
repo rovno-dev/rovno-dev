@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { fetchClientsServer } from "@/utils/api/companies";
-import { ArrowUpRight, Handshake } from "@phosphor-icons/react";
+import { ArrowUpRightIcon, HandshakeIcon } from "@phosphor-icons/react";
 
 export const revalidate = 300;
 
@@ -54,7 +54,7 @@ export default async function ClientsPage() {
           {clients.length === 0 ? (
             <Card className="rounded-3xl border-(--outline) p-12 text-center max-w-xl mx-auto">
               <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-                <Handshake className="size-6" />
+                <HandshakeIcon className="size-6" />
               </div>
               <h2 className="text-heading-3 mb-2">Пока пусто</h2>
               <p className="text-body-4 text-(--on-bg-medium) mb-6">
@@ -63,7 +63,7 @@ export default async function ClientsPage() {
               <Button asChild>
                 <Link href="/projects">
                   Смотреть проекты
-                  <ArrowUpRight className="size-4" />
+                  <ArrowUpRightIcon className="size-4" />
                 </Link>
               </Button>
             </Card>
@@ -93,7 +93,7 @@ export default async function ClientsPage() {
               <Button size="large" asChild className="shrink-0">
                 <Link href="/order">
                   Оформить заказ
-                  <ArrowUpRight className="size-4" />
+                  <ArrowUpRightIcon className="size-4" />
                 </Link>
               </Button>
             </div>

@@ -17,7 +17,7 @@ import { ProjectTagsEditor } from "./project-tags-editor";
 import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
 import { ArticleEditor } from "./article-editor";
-import { FloppyDisk, Rocket, Trash } from "@phosphor-icons/react";
+import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
   createProject, updateProject, deleteProject,
@@ -246,15 +246,15 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         <div className="flex flex-wrap gap-2">
           {isEdit && (
             <Button variant="glass-red" size="icon-medium" onClick={handleDelete} disabled={saving}>
-              <Trash className="size-4" />
+              <TrashIcon className="size-4" />
             </Button>
           )}
           <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-            <FloppyDisk className="size-4" />
+            <FloppyDiskIcon className="size-4" />
             Сохранить черновик
           </Button>
           <Button onClick={() => handleSave("published")} disabled={saving}>
-            <Rocket className="size-4" />
+            <RocketIcon className="size-4" />
             {isPublished ? "Сохранить и опубликовать" : "Опубликовать"}
           </Button>
         </div>

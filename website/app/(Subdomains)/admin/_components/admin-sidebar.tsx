@@ -3,30 +3,30 @@
 import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import {
-  Handshake,
-  Newspaper,
-  Cube,
-  Buildings,
-  Receipt,
-  Users,
-  UsersThree,
-  ChartLineUp,
+  HandshakeIcon,
+  NewspaperIcon,
+  CubeIcon,
+  BuildingsIcon,
+  ReceiptIcon,
+  UsersIcon,
+  UsersThreeIcon,
+  ChartLineUpIcon,
 } from "@phosphor-icons/react";
 
 // Mapping from the previous lucide-ish names:
-//   ChartSpline          → ChartLineUp
-//   BanknoteArrowDown    → Receipt
-//   BicepsFlexed         → UsersThree
-//   Box (lucide)         → Cube (phosphor)
+//   ChartSpline          → ChartLineUpIcon
+//   BanknoteArrowDown    → ReceiptIcon
+//   BicepsFlexed         → UsersThreeIcon
+//   Box (lucide)         → CubeIcon (phosphor)
 const NAV: SidebarItem[] = [
-  { label: "Дашборд",       href: "",           icon: ChartLineUp, exact: true },
-  { label: "Пользователи",  href: "/users",     icon: Users },
-  { label: "Заявки",        href: "/orders",    icon: Receipt },
-  { label: "Компании",      href: "/companies", icon: Buildings },
-  { label: "Клиенты",       href: "/clients",   icon: Handshake },
-  { label: "Проекты",       href: "/projects",  icon: Cube },
-  { label: "Статьи",        href: "/articles",  icon: Newspaper },
-  { label: "Команда",       href: "/team",      icon: UsersThree },
+  { label: "Дашборд",       href: "",           icon: ChartLineUpIcon, exact: true },
+  { label: "Пользователи",  href: "/users",     icon: UsersIcon },
+  { label: "Заявки",        href: "/orders",    icon: ReceiptIcon },
+  { label: "Компании",      href: "/companies", icon: BuildingsIcon },
+  { label: "Клиенты",       href: "/clients",   icon: HandshakeIcon },
+  { label: "Проекты",       href: "/projects",  icon: CubeIcon },
+  { label: "Статьи",        href: "/articles",  icon: NewspaperIcon },
+  { label: "Команда",       href: "/team",      icon: UsersThreeIcon },
 ];
 
 export function AdminSidebar() {

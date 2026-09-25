@@ -6,8 +6,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Crop, Pencil, ArrowClockwiseIcon,
-  Trash, Check, CircleNotchIcon, Eraser, Palette,
+  CropIcon, PencilIcon, ArrowClockwiseIcon,
+  TrashIcon, CheckIcon, CircleNotchIcon, EraserIcon, PaletteIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {

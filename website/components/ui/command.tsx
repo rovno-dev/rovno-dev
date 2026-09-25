@@ -15,7 +15,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
-import { SearchIcon, CheckCircleIcon } from "@phosphor-icons/react"
+import { MagnifyingGlassIcon, CheckCircleIcon } from "@phosphor-icons/react"
 
 function Command({
   className,

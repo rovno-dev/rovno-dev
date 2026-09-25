@@ -12,7 +12,7 @@ import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { useLanguage } from "@/providers/language-provider"
-import { Mail } from "@phosphor-icons/react"
+import { EnvelopeIcon } from "@phosphor-icons/react"
 const verifySchema = z.object({
   code: z.string().length(6, "errors.code_length"),
 })
@@ -123,7 +123,7 @@ function VerifyEmailInner() {
           </p>
           {formData.email && (
             <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-(--outline) bg-(--card) px-3 py-1.5 text-xs font-medium text-(--on-bg-high)">
-              <Mail className="size-3.5" />
+              <EnvelopeIcon className="size-3.5" />
               {formData.email}
             </p>
           )}

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Lock, ArrowClockwiseIcon } from "@phosphor-icons/react";
+import { ArrowUpRightIcon, LockIcon, ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Card } from "./ui/card";
@@ -179,7 +179,7 @@ function ClickHint() {
   return (
     <div className="flex items-center gap-1.5 pt-3 mt-2 border-t border-border text-[11px] font-medium text-(--on-bg-low) group-hover:text-primary transition-colors">
       <span>Click and see more</span>
-      <ArrowUpRight
+      <ArrowUpRightIcon
         size={12}
         className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
       />
@@ -233,7 +233,7 @@ export function FakeAddressBar({ url }: { url: string }) {
       </div>
       <div className="flex-1 max-w-md mx-auto bg-background border border-border/80 rounded-md py-1 px-3 flex items-center justify-between gap-2 shadow-sm">
         <div className="flex items-center gap-1.5 min-w-0">
-          <Lock size={10} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <LockIcon size={10} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="truncate tracking-wide">{displayUrl}</span>
         </div>
         <ArrowClockwiseIcon size={10} className="opacity-50 shrink-0 cursor-pointer hover:opacity-100 transition-opacity" />
@@ -395,7 +395,7 @@ export function SocialContentPreview({
                 <p className="text-[11px] text-muted-foreground">{date}</p>
               </div>
               <div className="ml-auto text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all">
-                <ArrowUpRight size={16} />
+                <ArrowUpRightIcon size={16} />
               </div>
             </div>
             <div className="p-4 space-y-2.5 overflow-y-auto min-h-0 flex-1">

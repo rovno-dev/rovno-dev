@@ -5,7 +5,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
 import { extractMdxHeadings } from "@/utils/mdx-headings";
@@ -181,7 +181,7 @@ export default async function ArticlePage({
           <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
             <Button variant="glass" size="icon-medium" shape="round" asChild>
               <Link href="/blog" aria-label="Все статьи">
-                <ArrowLeft className="size-5" />
+                <ArrowLeftIcon className="size-5" />
               </Link>
             </Button>
           </div>
@@ -316,7 +316,7 @@ export default async function ArticlePage({
         <Container>
           <Button variant="outlined" size="medium" shape="round" asChild>
             <Link href="/blog">
-              <ArrowLeft className="size-4" />
+              <ArrowLeftIcon className="size-4" />
               Все статьи
             </Link>
           </Button>

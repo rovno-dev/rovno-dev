@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, PencilSimple, Eye, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, PencilSimpleIcon, EyeIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
 import { slugify } from "@/utils/slugify";
 import {
   Gallery,
@@ -229,7 +229,7 @@ export default async function PreviewArticlePage({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
           <Badge variant="tonal-card-static" size="chip-small" className="gap-1">
-            <Eye className="size-3" />
+            <EyeIcon className="size-3" />
             Предпросмотр
           </Badge>
           <Badge
@@ -247,13 +247,13 @@ export default async function PreviewArticlePage({
         <div className="flex gap-2 shrink-0">
           <Button variant="outlined" asChild>
             <Link href="/app/profile/articles">
-              <ArrowLeft className="size-4" />
+              <ArrowLeftIcon className="size-4" />
               К списку
             </Link>
           </Button>
           <Button asChild>
             <Link href={`/app/profile/articles/${slug}/edit`}>
-              <PencilSimple className="size-4" />
+              <PencilSimpleIcon className="size-4" />
               Редактировать
             </Link>
           </Button>

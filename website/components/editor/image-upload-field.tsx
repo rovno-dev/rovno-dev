@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CloudArrowUp, CircleNotchIcon, X, PencilSimple,
+  CloudArrowUpIcon, CircleNotchIcon, XIcon, PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { $fetch } from "@/utils/fetch";
 import { ImageEditorDialog } from "./image-editor/image-editor-dialog";
@@ -104,7 +104,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
               onClick={handleEditExisting}
               title="Редактировать"
             >
-              <PencilSimple className="size-3.5" />
+              <PencilSimpleIcon className="size-3.5" />
             </Button>
             <Button
               type="button"
@@ -114,7 +114,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
               onClick={() => onChange("")}
               title="Удалить"
             >
-              <X className="size-3.5" />
+              <XIcon className="size-3.5" />
             </Button>
           </div>
         </div>
@@ -136,7 +136,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
           {uploading ? (
             <CircleNotchIcon className="size-4 animate-spin" />
           ) : (
-            <CloudArrowUp className="size-4" />
+            <CloudArrowUpIcon className="size-4" />
           )}
           {uploading ? "Загрузка…" : "Загрузить"}
         </Button>

@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { $fetch } from "@/utils/fetch";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { PencilSimple, Trash, Plus, Users, UserMinus } from "@phosphor-icons/react";
+import { PencilSimpleIcon, TrashIcon, PlusIcon, UsersIcon, UserMinusIcon } from "@phosphor-icons/react";
 import { makeTeamMember, removeTeamMember, fetchTeamMembers } from "@/utils/api/team";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -264,7 +264,7 @@ export default function AdminUsersPage() {
         if (role) {
           return (
             <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-              <Users className="size-3" /> {role}
+              <UsersIcon className="size-3" /> {role}
             </span>
           );
         }
@@ -285,7 +285,7 @@ export default function AdminUsersPage() {
               disabled={!canEdit}
               title={!canEdit ? "Нельзя редактировать администратора" : "Редактировать"}
             >
-              <PencilSimple className="size-4" />
+              <PencilSimpleIcon className="size-4" />
             </Button>
             <Button
               size="icon-small"
@@ -294,7 +294,7 @@ export default function AdminUsersPage() {
               disabled={!canEdit || u.id === currentUser.id}
               title={u.id === currentUser.id ? "Нельзя удалить себя" : !canEdit ? "Нельзя удалить администратора" : "Удалить"}
             >
-              <Trash className="size-4" />
+              <TrashIcon className="size-4" />
             </Button>
             {teamRoles[u.id] ? (
               <Button
@@ -303,7 +303,7 @@ export default function AdminUsersPage() {
                 onClick={() => handleRemoveTeamMember(u.id)}
                 title="Убрать из команды"
               >
-                <UserMinus className="size-4" />
+                <UserMinusIcon className="size-4" />
               </Button>
             ) : (
               <Button
@@ -312,7 +312,7 @@ export default function AdminUsersPage() {
                 onClick={() => { setTeamDialogUserId(u.id); setTeamDialogRole(""); setTeamDialogBio(""); }}
                 title="Сделать участником команды"
               >
-                <Users className="size-4" />
+                <UsersIcon className="size-4" />
               </Button>
             )}
           </div>
@@ -330,7 +330,7 @@ export default function AdminUsersPage() {
             <p className="text-muted-foreground">Управление пользователями системы</p>
           </div>
           <Button onClick={openCreateDialog}>
-            <Plus className="size-4 mr-2" />
+            <PlusIcon className="size-4 mr-2" />
             Добавить пользователя
           </Button>
         </div>
@@ -345,7 +345,7 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Create/PencilSimple Dialog */}
+      {/* Create/PencilSimpleIcon Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CaretRight, Newspaper, Gem, Globe, Signature, Box } from "@phosphor-icons/react";
+import { CaretRightIcon, NewspaperIcon, GemIcon, GlobeIcon, SignatureIcon, CubeIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 /* ---------- Hero Section ---------- */
 function HeroSection() {
@@ -36,7 +36,7 @@ function CompanyDetailsCard() {
     <Card className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both">
       <div className="flex items-center gap-4 mb-6">
         <div className="flex size-12 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary)">
-          <Gem className="size-6" />
+          <GemIcon className="size-6" />
         </div>
         <h2 className="text-display-4 text-(--on-bg-high)">Реквизиты компании</h2>
       </div>
@@ -68,7 +68,7 @@ function DocumentsCard() {
     <Card className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both delay-100">
       <div className="flex items-center gap-4 mb-6">
         <div className="flex size-12 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary)">
-          <Newspaper className="size-6" />
+          <NewspaperIcon className="size-6" />
         </div>
         <h2 className="text-display-4 text-(--on-bg-high)">Документы</h2>
       </div>
@@ -80,7 +80,7 @@ function DocumentsCard() {
             className="group flex items-center justify-between rounded-xl border border-(--outline) bg-(--card) px-5 py-4 transition-all hover:bg-(--state-hover) active:scale-[0.98]"
           >
             <span className="text-body-3 text-(--on-bg-high)">{doc.title}</span>
-            <CaretRight className="size-5 text-(--on-bg-low) transition-transform group-hover:translate-x-0.5" />
+            <CaretRightIcon className="size-5 text-(--on-bg-low) transition-transform group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>
@@ -92,22 +92,22 @@ const certificates = [
   {
     title: "Аккредитованная IT-компания",
     subtitle: "Минцифры РФ",
-    icon: <Box className="size-8 text-(--primary)" />,
+    icon: <CubeIcon className="size-8 text-(--primary)" />,
   },
   {
     title: "Сертификат ISO 27001",
     subtitle: "Информационная безопасность",
-    icon: <Globe className="size-8 text-(--primary)" />,
+    icon: <GlobeIcon className="size-8 text-(--primary)" />,
   },
   {
     title: "Партнер 1С-Битрикс",
     subtitle: "Золотой сертификат",
-    icon: <Gem className="size-8 text-(--primary)" />,
+    icon: <GemIcon className="size-8 text-(--primary)" />,
   },
   {
     title: "Топ-10 RUWARD",
     subtitle: "Рейтинг веб-студий 2023",
-    icon: <Signature className="size-8 text-(--primary)" />,
+    icon: <SignatureIcon className="size-8 text-(--primary)" />,
   },
 ];
 function CertificatesSection() {

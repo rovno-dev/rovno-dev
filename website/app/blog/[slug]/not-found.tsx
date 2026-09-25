@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpenIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, BookOpenIcon } from "@phosphor-icons/react";
 import { fetchPublishedArticlesServer } from "@/utils/api/articles";
 
 // HardDrives component so it can pull the recent-articles list without an

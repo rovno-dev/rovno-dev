@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowUpRight, Globe } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowUpRightIcon, GlobeIcon } from "@phosphor-icons/react";
 import { fetchClientServer } from "@/utils/api/companies";
 
 export const revalidate = 300;
@@ -53,7 +53,7 @@ export default async function ClientProfilePage({
             href="/companies"
             className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-8"
           >
-            <ArrowLeft className="size-4" />
+            <ArrowLeftIcon className="size-4" />
             Все компании
           </Link>
 
@@ -100,7 +100,7 @@ export default async function ClientProfilePage({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Globe className="size-4" />
+                      <GlobeIcon className="size-4" />
                       {client.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
                     </a>
                   </Button>
@@ -170,7 +170,7 @@ export default async function ClientProfilePage({
                     </div>
                     <div className="absolute bottom-6 right-6 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                       <span className="flex size-10 items-center justify-center rounded-full bg-white text-black shadow-lg">
-                        <ArrowUpRight className="size-5" />
+                        <ArrowUpRightIcon className="size-5" />
                       </span>
                     </div>
                   </Card>

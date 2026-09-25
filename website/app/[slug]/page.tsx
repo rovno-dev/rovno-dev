@@ -3,7 +3,7 @@ import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export default function ExpertPage({ params }: { params: Promise<{ slug: string 
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-30">
               <Button variant="glass" size="icon-medium" shape="round" asChild>
                 <Link href="/about" aria-label="Назад к команде">
-                  <ArrowLeft className="size-5" />
+                  <ArrowLeftIcon className="size-5" />
                 </Link>
               </Button>
             </div>

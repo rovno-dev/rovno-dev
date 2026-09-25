@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react";
 
 export default function BlogArticleError({
   error,

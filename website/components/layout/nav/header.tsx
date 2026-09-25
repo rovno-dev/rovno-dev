@@ -4,7 +4,7 @@ import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
-import { Lightbulb, User } from "@phosphor-icons/react";
+import { LightbulbIcon, UserIcon } from "@phosphor-icons/react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import { useState, useEffect } from "react";
@@ -78,7 +78,7 @@ export default function Header() {
         <div className="flex items-center gap-1">
           <Button size={'small'} className="hidden sm:flex" asChild>
             <Link href={ROUTES.order.href}>
-              <Lightbulb />
+              <LightbulbIcon />
               {t("nav.order")}
             </Link>
           </Button>
@@ -92,7 +92,7 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="text" size="icon-small" className="ml-2">
-                    <User className="stroke-primary" />
+                    <UserIcon className="stroke-primary" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

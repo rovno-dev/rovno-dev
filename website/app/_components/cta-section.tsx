@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useLanguage } from "@/providers/language-provider";
 import { useEffect, useState } from "react";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { TelegramLogotypeMonoIcon } from "@/components/icons";
 
 /** True when the current UTC hour maps to 8:00–22:00 MSK (UTC+3). */
@@ -133,7 +133,7 @@ export default function CtaSection() {
             className="group inline-flex items-center gap-1.5 mt-6 text-body-3 md:text-body-2 font-medium text-(--on-bg-medium) hover:text-(--primary) transition-colors"
           >
             {EMAIL}
-            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ArrowUpRightIcon className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
       </Container>

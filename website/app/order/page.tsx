@@ -12,7 +12,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { X, Newspaper } from "@phosphor-icons/react";
+import { XIcon, NewspaperIcon } from "@phosphor-icons/react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -297,7 +297,7 @@ export default function OrderPage() {
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent showCloseButton={false} className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0">
           <Button variant="glass" className="absolute top-4 right-4 z-[999]! rounded-full border-(--white)" size="icon-medium" onClick={() => setLightboxOpen(false)}>
-            <X className="size-10! [&>path]:fill-(--white)" />
+            <XIcon className="size-10! [&>path]:fill-(--white)" />
           </Button>
           <Carousel setApi={setApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">
@@ -314,7 +314,7 @@ export default function OrderPage() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-8 p-12 rounded-[40px] border border-white/10 bg-(--glass) backdrop-blur-3xl text-center max-w-lg">
-                        <Newspaper className="size-16! [&>path]:fill-(--dark-1)!" />
+                        <NewspaperIcon className="size-16! [&>path]:fill-(--dark-1)!" />
                         <h2 className="text-display-3 text-white break-all">{attr.file.name}</h2>
                         <Button variant="glass" shape="round" size="large" asChild><a href={attr.preview || URL.createObjectURL(attr.file)} download={attr.file.name}>Скачать</a></Button>
                       </div>

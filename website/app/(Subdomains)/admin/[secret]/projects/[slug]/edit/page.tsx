@@ -6,7 +6,7 @@ import { CheckUser } from "@/entities/user/model/check-user";
 import { ProjectEditorForm } from "@/components/editor/project-editor-form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowClockwiseIcon, WarningIcon, CircleNotchIcon } from "@phosphor-icons/react";
+import { ArrowLeftIcon, ArrowClockwiseIcon, WarningIcon, CircleNotchIcon } from "@phosphor-icons/react";
 import { fetchAdminProject, type ProjectDetail } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 

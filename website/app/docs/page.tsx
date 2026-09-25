@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LEGAL_DOCS, LEGAL_DOC_ORDER } from "@/app/_data/legal";
-import { ShieldCheck, Cookie, Scale, MessageSquareQuote, ArrowRight } from "@phosphor-icons/react";
+import { ShieldCheckIcon, CookieIcon, ScalesIcon, QuotesIcon, ArrowRightIcon } from "@phosphor-icons/react";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   privacy: ShieldCheck,

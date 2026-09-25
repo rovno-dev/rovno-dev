@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDown } from "@phosphor-icons/react";
+import { ArrowUpRightIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
 
 interface AlxProject {

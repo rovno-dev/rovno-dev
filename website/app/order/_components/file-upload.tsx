@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import { CloudIcon, X, Newspaper } from "@phosphor-icons/react";
+import { CloudIcon, XIcon, NewspaperIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -38,12 +38,12 @@ export function FileUpload({
                 <Image src={attr.preview} alt="preview" fill className="object-contain" />
               ) : (
                 <>
-                  <div className={cn("size-14 rounded-xl flex items-center justify-center mb-2", attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}><Newspaper className="size-8! fill-current" /></div>
+                  <div className={cn("size-14 rounded-xl flex items-center justify-center mb-2", attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}><NewspaperIcon className="size-8! fill-current" /></div>
                   <span className="text-[11px] font-semibold text-(--on-bg-medium) text-center line-clamp-2 px-1">{attr.file.name}</span>
                 </>
               )}
             </div>
-            <Button variant={'glass'} size={'icon-small'} onClick={(e) => { e.stopPropagation(); onRemoveFile(attr.id); }} className="absolute top-2 right-2 size-7 rounded-full"><X className="size-5!" /></Button>
+            <Button variant={'glass'} size={'icon-small'} onClick={(e) => { e.stopPropagation(); onRemoveFile(attr.id); }} className="absolute top-2 right-2 size-7 rounded-full"><XIcon className="size-5!" /></Button>
           </div>
         ))}
         <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-(--outline) hover:border-(--primary) hover:bg-(--primary-glass) transition-all group">

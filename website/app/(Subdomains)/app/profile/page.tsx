@@ -13,7 +13,7 @@ import { updateProfile } from "@/utils/api/user";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
-import { Users, User as UserIcon } from "@phosphor-icons/react";
+import { UsersIcon, UserIcon as UserIcon } from "@phosphor-icons/react";
 
 interface ProfileForm {
   name: string;
@@ -206,7 +206,7 @@ export default function ProfilePage() {
         {isTeam && (
           <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <Users className="size-5 text-(--primary)" />
+              <UsersIcon className="size-5 text-(--primary)" />
               <h2 className="text-heading-3">Команда Rovno.dev</h2>
               <Badge variant="tonal-primary-static" size="chip-small">Активен</Badge>
             </div>

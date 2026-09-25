@@ -20,7 +20,7 @@ import { Card } from "@/components/ui/card";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { toast } from "sonner";
 import {
-  CircleNotchIcon, X, Plus, MagnifyingGlassIcon, User as UserIcon, FolderOpen,
+  CircleNotchIcon, XIcon, PlusIcon, MagnifyingGlassIcon, UserIcon as UserIcon, FolderOpenIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { TeamMemberAdmin, TeamMemberProject, ProjectPickerItem } from "@/utils/api/team";

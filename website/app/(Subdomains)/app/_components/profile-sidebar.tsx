@@ -5,21 +5,21 @@ import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useUser } from "@/entities/user/model/user-context";
 import { Button } from "@/components/ui/button";
 import {
-  SignOut,
-  User,
-  Settings,
-  BriefcaseBusiness,
-  Newspaper,
+  SignOutIcon,
+  UserIcon,
+  GearIcon,
+  BriefcaseIcon,
+  NewspaperIcon,
 } from "@phosphor-icons/react";
 
 // Profile routes resolve to /app/* (the (Subdomains) folder is a route
 // group and contributes nothing to the URL), so basePath is "/app" and
 // each item.href is a suffix.
 const NAV_ITEMS: SidebarItem[] = [
-  { label: "Профиль",      href: "/profile",            icon: User,              exact: true },
-  { label: "Статьи",       href: "/profile/articles",   icon: Newspaper },
-  { label: "Настройки",    href: "/profile/settings",   icon: Settings,          exact: true },
-  { label: "Безопасность", href: "/profile/security",   icon: BriefcaseBusiness, exact: true },
+  { label: "Профиль",      href: "/profile",            icon: UserIcon,              exact: true },
+  { label: "Статьи",       href: "/profile/articles",   icon: NewspaperIcon },
+  { label: "Настройки",    href: "/profile/settings",   icon: GearIcon,          exact: true },
+  { label: "Безопасность", href: "/profile/security",   icon: BriefcaseIcon, exact: true },
 ];
 
 export function ProfileSidebar() {
@@ -44,7 +44,7 @@ export function ProfileSidebar() {
           onClick={handleLogout}
           className="w-full justify-start gap-3 p-3"
         >
-          <SignOut className="size-5 shrink-0" />
+          <SignOutIcon className="size-5 shrink-0" />
           <span className="text-sm">Выйти</span>
         </Button>
       }

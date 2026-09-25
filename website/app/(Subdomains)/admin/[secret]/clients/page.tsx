@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
-  MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon, User,
-  Phone, EnvelopeSimple, TelegramLogo, ArrowSquareOutIcon,
+  MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon, UserIcon,
+  PhoneIcon, EnvelopeSimpleIcon, TelegramLogoIcon, ArrowSquareOutIcon,
 } from "@phosphor-icons/react";
 import { $fetch } from "@/utils/fetch";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
@@ -163,7 +163,7 @@ export default function AdminClientsPage() {
         {state.kind === "ready" && filtered.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <User className="size-6" />
+              <UserIcon className="size-6" />
             </div>
             <p className="text-body-3 text-(--on-bg-medium)">
               {query
@@ -201,12 +201,12 @@ export default function AdminClientsPage() {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-4 text-(--on-bg-medium)">
                     {c.phone && (
                       <a href={`tel:${c.phone}`} className="inline-flex items-center gap-1.5 hover:text-(--primary)">
-                        <Phone className="size-3.5" /> {c.phone}
+                        <PhoneIcon className="size-3.5" /> {c.phone}
                       </a>
                     )}
                     {c.email && (
                       <a href={`mailto:${c.email}`} className="inline-flex items-center gap-1.5 hover:text-(--primary)">
-                        <EnvelopeSimple className="size-3.5" /> {c.email}
+                        <EnvelopeSimpleIcon className="size-3.5" /> {c.email}
                       </a>
                     )}
                     {c.telegram_username && (
@@ -216,7 +216,7 @@ export default function AdminClientsPage() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 hover:text-(--primary)"
                       >
-                        <TelegramLogo className="size-3.5" /> @{c.telegram_username.replace(/^@/, "")}
+                        <TelegramLogoIcon className="size-3.5" /> @{c.telegram_username.replace(/^@/, "")}
                       </a>
                     )}
                   </div>

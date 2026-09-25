@@ -10,7 +10,7 @@ import {
   GithubLogotypeMonoIcon,
   DprofileLogotypeMonoIcon,
 } from "@/components/icons";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { SocialContentPreview, SocialContentPreviewProps } from "@/components/social-content-preview";
 import { BehanceLogoMono } from "@/components/icons/logotypes/behance-logo-mono";
 import { YoutubeLogoMono } from "@/components/icons/logotypes/youtube-logo-mono";

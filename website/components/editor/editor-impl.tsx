@@ -31,7 +31,7 @@ import {
 import "@mdxeditor/editor/style.css";
 import "@/app/mdx-editor-theme.css";
 import { Button } from "@/components/ui/button";
-import { At } from "@phosphor-icons/react";
+import { AtIcon } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { $fetch } from "@/utils/fetch";
 import { MentionPicker } from "./mention-picker";
@@ -79,7 +79,7 @@ export default function EditorImpl({ markdown, onChange, placeholder }: EditorIm
       onMouseDown={(e) => e.preventDefault()} // don't blur the editor
       onClick={() => setMentionOpen(true)}
     >
-      <At className="size-4" />
+      <AtIcon className="size-4" />
     </Button>
   );
 

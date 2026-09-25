@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
-  Plus, MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon,
-  PencilSimple, ArrowSquareOutIcon, Cube,
+  PlusIcon, MagnifyingGlassIcon, ArrowClockwiseIcon, CircleNotchIcon,
+  PencilSimpleIcon, ArrowSquareOutIcon, CubeIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchAdminProjects, type ProjectListAdmin } from "@/utils/api/projects";
@@ -81,7 +81,7 @@ export default function AdminProjectsPage() {
             </Button>
             <Button asChild>
               <Link href={`${base}/new`}>
-                <Plus className="size-4" />
+                <PlusIcon className="size-4" />
                 Новый проект
               </Link>
             </Button>
@@ -122,12 +122,12 @@ export default function AdminProjectsPage() {
         {state.kind === "ready" && projects.length === 0 && (
           <Card className="rounded-3xl border-(--outline) p-10 text-center">
             <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <Cube className="size-6" />
+              <CubeIcon className="size-6" />
             </div>
             <p className="text-body-3 text-(--on-bg-medium) mb-4">Пока нет проектов.</p>
             <Button asChild>
               <Link href={`${base}/new`}>
-                <Plus className="size-4" />
+                <PlusIcon className="size-4" />
                 Создать первый проект
               </Link>
             </Button>
@@ -195,7 +195,7 @@ export default function AdminProjectsPage() {
                           </Link>
                         </Button>
                       )}
-                      <PencilSimple className="size-4 text-(--on-bg-low)" />
+                      <PencilSimpleIcon className="size-4 text-(--on-bg-low)" />
                     </div>
                   </div>
                 </Link>

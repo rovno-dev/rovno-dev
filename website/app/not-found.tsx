@@ -1,7 +1,9 @@
+"use client"
+
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, House } from "@phosphor-icons/react";
+import { ArrowLeftIcon, HouseIcon } from "@phosphor-icons/react";
 
 export default function NotFound() {
   return (
@@ -24,13 +26,13 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button size="large" asChild>
             <Link href="/">
-              <House className="size-4" />
+              <HouseIcon className="size-4" />
               На главную
             </Link>
           </Button>
           <Button variant="outlined" size="large" asChild>
             <Link href="/blog">
-              <ArrowLeft className="size-4" />
+              <ArrowLeftIcon className="size-4" />
               В журнал
             </Link>
           </Button>

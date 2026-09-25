@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CircleNotchIcon, Users, UserMinus, UserPlus, ArrowClockwiseIcon, FolderOpen, PencilSimple,
+  CircleNotchIcon, UsersIcon, UserMinusIcon, UserPlusIcon, ArrowClockwiseIcon, FolderOpenIcon, PencilSimpleIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {

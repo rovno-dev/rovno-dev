@@ -4,7 +4,7 @@ import { ReactNode, useState, ElementType } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { X } from "@phosphor-icons/react";
+import { XIcon } from "@phosphor-icons/react";
 import {
   Carousel,
   CarouselContent,
@@ -244,7 +244,7 @@ export function Gallery({
             size="icon-medium"
             onClick={() => setLightboxOpen(false)}
           >
-            <X className="size-10! [&>path]:fill-white" />
+            <XIcon className="size-10! [&>path]:fill-white" />
           </Button>
           <Carousel setApi={setCarouselApi} className="w-full h-full">
             <CarouselContent className="h-[100dvh] ml-0">

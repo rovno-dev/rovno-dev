@@ -8,13 +8,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
-  Plus,
-  PencilSimple,
-  Trash,
+  PlusIcon,
+  PencilSimpleIcon,
+  TrashIcon,
   ArrowSquareOutIcon,
   ArrowClockwiseIcon,
-  Newspaper,
-  ArrowUpRight,
+  NewspaperIcon,
+  ArrowUpRightIcon,
 } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
@@ -113,7 +113,7 @@ export default function MyArticlesPage() {
           </div>
           <Button asChild className="shrink-0">
             <Link href="/app/profile/articles/new">
-              <Plus className="size-4" />
+              <PlusIcon className="size-4" />
               <span className="hidden sm:inline">{t("editor.new_article")}</span>
               <span className="sm:hidden">Новая</span>
             </Link>
@@ -137,7 +137,7 @@ export default function MyArticlesPage() {
           <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6">
             <div className="flex items-start gap-4">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-(--error-card) text-(--error)">
-                <Newspaper className="size-5" />
+                <NewspaperIcon className="size-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-heading-4 text-(--on-bg-high) mb-1">
@@ -168,7 +168,7 @@ export default function MyArticlesPage() {
             </p>
             <Button asChild>
               <Link href="/app/profile/articles/new">
-                <Plus className="size-4" />
+                <PlusIcon className="size-4" />
                 {t("editor.new_article")}
               </Link>
             </Button>
@@ -283,7 +283,7 @@ export default function MyArticlesPage() {
                       title="Предпросмотр"
                     >
                       <Link href={`/app/profile/articles/${a.slug}/preview`}>
-                        <ArrowUpRight className="size-4" />
+                        <ArrowUpRightIcon className="size-4" />
                       </Link>
                     </Button>
                     <Button
@@ -293,7 +293,7 @@ export default function MyArticlesPage() {
                       title={t("editor.edit")}
                     >
                       <Link href={`/app/profile/articles/${a.slug}/edit`}>
-                        <PencilSimple className="size-4" />
+                        <PencilSimpleIcon className="size-4" />
                       </Link>
                     </Button>
                     <Button
@@ -302,7 +302,7 @@ export default function MyArticlesPage() {
                       onClick={() => handleDelete(a.slug, a.title)}
                       title={t("editor.delete")}
                     >
-                      <Trash className="size-4" />
+                      <TrashIcon className="size-4" />
                     </Button>
                   </div>
                 </Card>

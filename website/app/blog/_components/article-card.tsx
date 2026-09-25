@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { ArrowUpRight } from "@phosphor-icons/react";
+import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import type { ArticleListItem } from "@/utils/api/articles";
 
 function formatDate(iso: string, lang: string) {
@@ -76,7 +76,7 @@ export function ArticleCard({
         </div>
         <div className="absolute bottom-6 right-6 z-10 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <span className="flex size-10 items-center justify-center rounded-full bg-white text-black shadow-lg">
-            <ArrowUpRight className="size-5" />
+            <ArrowUpRightIcon className="size-5" />
           </span>
         </div>
       </Card>

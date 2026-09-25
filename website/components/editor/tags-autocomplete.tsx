@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { Plus, X, CircleNotchIcon } from "@phosphor-icons/react";
+import { PlusIcon, XIcon, CircleNotchIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { fetchTags, type Tag } from "@/utils/api/tags";
 
@@ -155,7 +155,7 @@ export function TagsAutocomplete({
               className="hover:opacity-70"
               aria-label={`Удалить тег ${tag}`}
             >
-              <X className="size-3" />
+              <XIcon className="size-3" />
             </button>
           </span>
         ))}
@@ -203,7 +203,7 @@ export function TagsAutocomplete({
                 suggestions.length === highlight ? "bg-(--state-hover) text-(--on-bg-high)" : "text-(--on-bg-medium)"
               )}
             >
-              <Plus className="size-3.5" />
+              <PlusIcon className="size-3.5" />
               <span>Создать «{draft.trim()}»</span>
             </button>
           )}
