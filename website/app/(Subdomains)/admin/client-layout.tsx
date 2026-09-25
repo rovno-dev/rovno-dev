@@ -27,9 +27,9 @@ export default function AdminRootClientLayout({
           <div className="w-full md:w-auto md:sticky md:top-24 md:self-start shrink-0">
             <AdminSidebar />
           </div>
-          <main className="w-full min-w-0 pb-24">
+          <div role="main" className="w-full min-w-0 pb-24">
             {children}
-          </main>
+          </div>
         </div>
       </Container>
     </div>

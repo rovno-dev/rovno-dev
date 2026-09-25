@@ -691,3 +691,15 @@
     animation: none;
   }
 }
+
+/* Skeleton shimmer — used by <ProjectGridSkeleton> and any other loading
+   placeholder that wants the same premium sweep instead of a pulse. */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  60%  { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes shimmer { 0%, 100% { transform: translateX(-100%); } }
+}

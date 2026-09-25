@@ -1,27 +1,46 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import Image from "next/image";
+import { compileMDX } from "next-mdx-remote/rsc";
+import path from "path";
+import fs from "fs";
+import matter from "gray-matter";
+
 import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Project, PROJECTS } from "@/app/_data/projects";
 import { getAllProjects } from "@/app/_data/projects/parser";
 import { CLIENTS } from "@/app/_data/clients";
 import { PROJECT_CATEGORIES } from "@/app/_data/categories";
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import { compileMDX } from "next-mdx-remote/rsc";
-import { ProjectHero } from "@/app/projects/[slug]/_components/project-hero";
-import { AlxProjectPage } from "@/app/projects/[slug]/_components/alx-project-page";
+import { PROJECT_TAGS } from "@/app/_data/project-tags";
+
+import { AlxProjectPage } from "./_components/alx-project-page";
+import { BreadProjectPage } from "./_components/bread-project-page";
 import { GithubReadmeBlock } from "./_components/github-readme-block";
 import {
-  Gallery, MetricCard, MDXHeading, MDXImage, MDXBlockquote, MDXCode,
-  MDXPre, MDXList, MDXListItem, MDXParagraph, MDXHr, MDXLink,
-  MDXTable, MDXThead, MDXTh, MDXTd, MDXCard,
+  CustomProjectPage,
+  type RelatedRef,
+} from "./_components/custom-project-page";
+
+import {
+  Gallery,
+  MetricCard,
+  MDXHeading,
+  MDXImage,
+  MDXBlockquote,
+  MDXCode,
+  MDXPre,
+  MDXList,
+  MDXListItem,
+  MDXParagraph,
+  MDXHr,
+  MDXLink,
+  MDXTable,
+  MDXThead,
+  MDXTh,
+  MDXTd,
+  MDXCard,
 } from "@/components/mdx";
 
-export const dynamic = "force-static";
+export const revalidate = 60;
 
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||
@@ -66,9 +85,10 @@ interface DBProject {
 
 async function fetchDbProject(slug: string): Promise<DBProject | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/v1/projects/${encodeURIComponent(slug)}`, {
-      next: { revalidate: 60 },
-    } as any);
+    const res = await fetch(
+      `${API_BASE}/api/v1/projects/${encodeURIComponent(slug)}`,
+      { next: { revalidate: 60 } } as any,
+    );
     if (!res.ok) return null;
     return (await res.json()) as DBProject;
   } catch {
@@ -123,10 +143,43 @@ const getCompiledMDX = cache(async (content: string) => {
   return compiled;
 });
 
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+function buildRelated(currentSlug: string, limit = 3): RelatedRef[] {
+  return Object.values(PROJECTS)
+    .filter((p) => p.slug !== currentSlug)
+    .slice(0, limit)
+    .map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      coverImage: p.cover.imageSrc,
+      categoryLabel: PROJECT_CATEGORIES.find((c) => c.code === p.category)?.label,
+    }));
+}
+
+/** Compile an MDX file's body into React nodes, ready to drop into the page. */
+async function loadMdxBody(slug: string): Promise<React.ReactNode> {
+  const filePath = path.join(
+    process.cwd(),
+    "_data/projects/content",
+    `${slug}.mdx`,
+  );
+  let source: string | undefined;
+  try {
+    source = fs.readFileSync(filePath, "utf8");
+  } catch {
+    return null;
+  }
+  const { content } = matter(source);
+  return getCompiledMDX(content);
+}
+
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
 
-  // ---- 1. Custom component (hardcoded slug) -------------------------------
+  // ── 1. alx — dedicated art-directed page with the glitch treatment. ────
   if (slug === "alx") {
     const fallback = PROJECTS[slug] as Project | undefined;
     if (fallback) {
@@ -145,21 +198,48 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     }
   }
 
-  // ---- 2. Filesystem MDX --------------------------------------------------
+  // ── 2. bread — warm, film-first bespoke page. ─────────────────────────
+  if (slug === "bread") {
+    const project = PROJECTS[slug] as Project | undefined;
+    if (project) {
+      const content = await loadMdxBody(slug);
+      return (
+        <BreadProjectPage
+          project={{
+            title: project.title,
+            shortDescription: project.shortDescription || "",
+            description: project.description || "",
+            coverImage: project.cover.imageSrc,
+            coverVideo: project.cover.videoSrc,
+            href: project.href,
+            period: project.period,
+            clientName: CLIENTS[project.clientId]?.name,
+            platform: project.platform,
+            techStack: project.techStack || [],
+            tags: (PROJECT_TAGS[slug] || []).map((t) => ({
+              id: t.id,
+              kind: t.kind,
+              label: t.label,
+              meta: t.meta ?? null,
+            })),
+            media: [], // gallery is rendered inline from the MDX <Gallery /> block
+          }}
+          content={content}
+        />
+      );
+    }
+  }
+
+  // ── 3. Everything else: MDX/hardcoded/DB → shared premium shell. ──────
   const mdxProjects = getAllProjects();
   const mdxProject = mdxProjects.find((p) => p.slug === slug);
-
-  // ---- 3. Fallback to PROJECTS index -------------------------------------
   const fallbackProject = PROJECTS[slug] as Project | undefined;
-
   const projectData = mdxProject || fallbackProject;
-
-  // ---- 4. DB (admin-created) ---------------------------------------------
   const dbProject = !projectData ? await fetchDbProject(slug) : null;
 
   if (!projectData && !dbProject) notFound();
 
-  // ----- Render DB-backed project -----------------------------------------
+  // DB-only project (created through the admin panel).
   if (dbProject) {
     const mdxContent = dbProject.mdx_content
       ? await getCompiledMDX(dbProject.mdx_content)
@@ -167,93 +247,39 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
     return (
       <>
-        <ProjectHero
-          title={dbProject.title}
-          description={dbProject.description || dbProject.short_description || ""}
-          cover={{
-            imageSrc: dbProject.cover_image_src,
-            videoSrc: dbProject.cover_video_src || undefined,
+        <CustomProjectPage
+          project={{
+            slug: dbProject.slug,
+            title: dbProject.title,
+            shortDescription:
+              dbProject.short_description || dbProject.description || "",
+            description:
+              dbProject.description || dbProject.short_description || "",
+            coverImage: dbProject.cover_image_src,
+            coverVideo: dbProject.cover_video_src || undefined,
+            href: dbProject.href || undefined,
+            category: dbProject.category?.code,
+            categoryLabel: dbProject.category?.label,
+            clientName: undefined,
+            period: dbProject.period || undefined,
+            platform: dbProject.platform || undefined,
+            techStack: dbProject.tech_stack || [],
+            tags: (dbProject.tags || []).map((t) => ({
+              id: t.id,
+              kind: t.kind as "from_chief" | "license" | "github" | "custom",
+              label: t.label,
+              meta: t.value?.author ?? null,
+            })),
+            media: (dbProject.media || []).map((m) => ({
+              id: m.id,
+              type: m.type,
+              url: m.url,
+              caption: m.caption ?? null,
+            })),
           }}
-          category={dbProject.category?.label}
-          clientName={dbProject.platform || undefined}
-          period={dbProject.period || undefined}
-          techStack={dbProject.tech_stack || []}
-          href={dbProject.href || undefined}
+          content={mdxContent}
+          related={buildRelated(dbProject.slug)}
         />
-
-        {/* Project tags row */}
-        {dbProject.tags.length > 0 && (
-          <Container className="pt-8">
-            <div className="flex flex-wrap gap-2">
-              {dbProject.tags.map((t) => (
-                <Badge
-                  key={t.id}
-                  variant="tonal-card-static"
-                  size="chip-medium"
-                  className="gap-1"
-                >
-                  {t.kind === "from_chief" && "★ "}
-                  {t.kind === "license" && "⚖ "}
-                  {t.kind === "github" && "⧫ "}
-                  {t.label}
-                  {t.kind === "from_chief" && t.value?.author && ` · ${t.value.author}`}
-                </Badge>
-              ))}
-            </div>
-          </Container>
-        )}
-
-        {/* Body */}
-        <Container className="py-8 md:py-12">
-          {mdxContent ? (
-            <div className="prose prose-invert max-w-none">{mdxContent}</div>
-          ) : dbProject.short_description ? (
-            <p className="text-body-1 text-(--on-bg-medium) leading-relaxed max-w-3xl">
-              {dbProject.short_description}
-            </p>
-          ) : null}
-        </Container>
-
-        {/* Media gallery */}
-        {dbProject.media.length > 0 && (
-          <Container className="pb-12">
-            <h2 className="text-display-3 mb-6">Галерея</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {dbProject.media.map((m) => (
-                <Card
-                  key={m.id}
-                  className="rounded-3xl border-(--outline) overflow-hidden"
-                >
-                  {m.type === "image" ? (
-                    <div className="relative aspect-video">
-                      <Image
-                        src={m.url}
-                        alt={m.caption || ""}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <video
-                      src={m.url}
-                      controls
-                      className="w-full aspect-video bg-black"
-                      preload="metadata"
-                    />
-                  )}
-                  {m.caption && (
-                    <p className="px-4 py-3 text-body-4 text-(--on-bg-medium)">
-                      {m.caption}
-                    </p>
-                  )}
-                </Card>
-              ))}
-            </div>
-          </Container>
-        )}
-
-        {/* GitHub README blocks — one per github tag */}
         {dbProject.tags
           .filter((t) => t.kind === "github" && t.value?.repo)
           .map((t) => (
@@ -265,50 +291,40 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     );
   }
 
-  // ----- Render filesystem/MDX project (existing path) --------------------
-  let mdxContent = null;
-  if (mdxProject) {
-    const filePath = path.join(process.cwd(), "_data/projects/content", `${slug}.mdx`);
-    let source: string | undefined;
-    try { source = fs.readFileSync(filePath, "utf8"); } catch {}
-    if (source) {
-      const { content } = matter(source);
-      mdxContent = await getCompiledMDX(content);
-    }
-  }
-
+  // MDX or hardcoded → shared shell with the tag metadata from the map.
+  const content = mdxProject ? await loadMdxBody(slug) : null;
   const client = projectData!.clientId ? CLIENTS[projectData!.clientId] : null;
-  let categoryLabel = projectData!.category || "";
-  if (projectData!.category) {
-    const found = PROJECT_CATEGORIES.find((c) => c.code === projectData!.category);
-    if (found) categoryLabel = found.label;
-  }
+  const categoryLabel = PROJECT_CATEGORIES.find(
+    (c) => c.code === projectData!.category,
+  )?.label;
 
   return (
-    <>
-      <ProjectHero
-        title={projectData!.title}
-        description={projectData!.description || ""}
-        cover={projectData!.cover}
-        category={categoryLabel}
-        clientName={client?.name}
-        period={projectData!.period}
-        techStack={projectData!.techStack}
-        href={projectData!.href}
-      />
-      <Container className="py-8 md:py-12">
-        {mdxContent ? (
-          <div className="prose prose-invert max-w-none">{mdxContent}</div>
-        ) : (
-          <div className="prose prose-invert max-w-none">
-            {projectData!.shortDescription && (
-              <p className="text-body-1 text-(--on-bg-medium) leading-relaxed">
-                {projectData!.shortDescription}
-              </p>
-            )}
-          </div>
-        )}
-      </Container>
-    </>
+    <CustomProjectPage
+      project={{
+        slug: projectData!.slug,
+        title: projectData!.title,
+        shortDescription:
+          projectData!.shortDescription || projectData!.description || "",
+        description: projectData!.description || "",
+        coverImage: projectData!.cover.imageSrc,
+        coverVideo: projectData!.cover.videoSrc,
+        href: projectData!.href,
+        category: projectData!.category,
+        categoryLabel,
+        clientName: client?.name,
+        period: projectData!.period,
+        platform: projectData!.platform,
+        techStack: projectData!.techStack || [],
+        tags: (PROJECT_TAGS[projectData!.slug] || []).map((t) => ({
+          id: t.id,
+          kind: t.kind,
+          label: t.label,
+          meta: t.meta ?? null,
+        })),
+        media: [],
+      }}
+      content={content}
+      related={buildRelated(projectData!.slug)}
+    />
   );
 }

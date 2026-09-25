@@ -1,5 +1,9 @@
 import { $fetch } from "@/utils/fetch";
 
+const SERVER_API_BASE =
+  process.env.API_BASE_URL_INTERNAL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:8000";
 export type ProjectTagKind = "from_chief" | "license" | "github" | "custom";
 
 export interface ProjectTag {
@@ -123,4 +127,20 @@ export async function fetchGithubReadme(repo: string, branch?: string): Promise<
   const res = await $fetch(`/api/v1/admin/projects/github-readme?${qs}`, { isToast: false });
   if (!res?.response?.ok) return null;
   return res.json;
+}
+
+
+/**
+ * Client-side fetch of the public project list. Uses $fetch, which resolves
+ * NEXT_PUBLIC_API_BASE_URL from the browser — the same base every authed
+ * call already uses. Fails soft so a backend blip never breaks the grid.
+ */
+export async function fetchPublishedProjectsClient(): Promise<DbProjectList[]> {
+  try {
+    const res = await $fetch("/api/v1/projects", { isToast: false });
+    if (!res?.response?.ok) return [];
+    return Array.isArray(res.json) ? (res.json as DbProjectList[]) : [];
+  } catch {
+    return [];
+  }
 }

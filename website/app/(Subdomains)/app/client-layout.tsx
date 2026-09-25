@@ -16,11 +16,14 @@ export default function ProfileRootClientLayout({
           <aside className="w-full md:w-auto shrink-0">
             <ProfileSidebar />
           </aside>
-          <main className="flex-1 flex justify-center">
-            <div className="w-full max-w-5xl space-y-8">
+          {/* Nested <main> inside the root layout's <main> is invalid HTML
+              and causes inconsistent overflow in Chromium. Use a plain div
+              with role="main" instead. */}
+          <div role="main" className="flex-1 flex justify-center min-w-0">
+            <div className="w-full max-w-5xl space-y-8 min-w-0">
               {children}
             </div>
-          </main>
+          </div>
         </div>
       </Container>
     </div>

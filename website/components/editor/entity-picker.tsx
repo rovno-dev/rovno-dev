@@ -165,7 +165,7 @@ export function EntityPicker({
               }}
               aria-label={`Очистить ${value.label}`}
             >
-              <X className="size-3" />
+              <XIcon className="size-3" />
             </button>
           </span>
         ) : (
@@ -235,7 +235,7 @@ export function EntityPicker({
               {creating ? (
                 <CircleNotchIcon className="size-3.5 animate-spin" />
               ) : (
-                <Plus className="size-3.5" />
+                <PlusIcon className="size-3.5" />
               )}
               <span>
                 {createNoun || "Создать"} «{draft.trim()}»
