@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
 import { toast } from "sonner";
-import { CircleNotchIcon, BuildingsIcon } from "@phosphor-icons/react";
+import { CircleNotchIcon, BuildingsIcon, Buildings } from "@phosphor-icons/react";
 import {
   createCompany, updateCompany, type ClientListItem,
 } from "@/utils/api/companies";

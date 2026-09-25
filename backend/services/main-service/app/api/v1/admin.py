@@ -327,7 +327,9 @@ class OrderRequestWithFiles(BaseModel):
     cancellation_reason: Optional[str] = None
     created_at: datetime
     files: List[OrderRequestFileResponse]
-    contact: Optional[ClientResponse]
+    # JSON key stays "contact" for the frontend, but the ORM
+    # relationship was renamed to `client` in migration b5e0f1a2c3d4.
+    contact: Optional[ClientResponse] = Field(None, validation_alias="client")
     class Config:
         from_attributes = True
 
@@ -352,7 +354,7 @@ async def list_order_requests(
 ):
     return (
         db.query(OrderRequest)
-        .options(joinedload(OrderRequest.files), joinedload(OrderRequest.contact))
+        .options(joinedload(OrderRequest.files), joinedload(OrderRequest.client))
         .order_by(STATUS_PRIORITY, OrderRequest.created_at.desc())
         .offset(skip)
         .limit(limit)

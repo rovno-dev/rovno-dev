@@ -3,7 +3,10 @@ import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { fetchClientsServer } from "@/utils/api/companies";
+import {
+  fetchClientsServer,
+  type ClientListItem,
+} from "@/utils/api/companies";
 import { ArrowUpRightIcon, HandshakeIcon } from "@phosphor-icons/react";
 
 export const revalidate = 300;
@@ -108,7 +111,7 @@ function ClientTile({
   client,
   index,
 }: {
-  client: import("@/utils/api/clients").ClientListItem;
+  client: ClientListItem;
   index: number;
 }) {
   const hasLogo = !!client.logotype_url;

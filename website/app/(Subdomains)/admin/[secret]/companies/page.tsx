@@ -11,7 +11,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  PlusIcon, PencilSimpleIcon, TrashIcon, ArrowSquareOutIcon, BuildingsIcon, ArrowClockwiseIcon, CircleNotchIcon,
+  ArrowSquareOutIcon, ArrowClockwiseIcon, CircleNotchIcon,
+  Buildings,
+  Plus,
+  PencilSimple,
+  Trash,
 } from "@phosphor-icons/react";
 import {
   fetchCompanies, deleteCompany, type ClientListItem,

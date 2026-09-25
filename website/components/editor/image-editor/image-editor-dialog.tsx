@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   CropIcon, PencilIcon, ArrowClockwiseIcon,
   TrashIcon, CheckIcon, CircleNotchIcon, EraserIcon, PaletteIcon,
+  ArrowCounterClockwiseIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -275,7 +276,7 @@ export function ImageEditorDialog({
                   : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
-              <Crop className="size-3.5" /> Обрезка
+              <CropIcon className="size-3.5" /> Обрезка
             </button>
             <button
               type="button"
@@ -287,7 +288,7 @@ export function ImageEditorDialog({
                   : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
-              <Pencil className="size-3.5" /> Рисование
+              <PencilIcon className="size-3.5" /> Рисование
             </button>
           </div>
         </DialogHeader>
@@ -334,7 +335,7 @@ export function ImageEditorDialog({
             Отмена
           </Button>
           <Button onClick={handleApply} disabled={!img || applying}>
-            {applying ? <CircleNotchIcon className="size-4 animate-spin" /> : <Check className="size-4" />}
+            {applying ? <CircleNotchIcon className="size-4 animate-spin" /> : <CheckIcon className="size-4" />}
             Применить
           </Button>
         </DialogFooter>
@@ -555,7 +556,7 @@ function DrawTab({
               )}
               title="Отменить"
             >
-              <ArrowCounterClockIconwise className="size-4" />
+              <ArrowCounterClockwiseIcon className="size-4" />
             </button>
             <button
               type="button"
@@ -577,7 +578,7 @@ function DrawTab({
               className="size-8 rounded-full flex items-center justify-center text-(--on-bg-medium) hover:bg-(--state-hover) transition-colors"
               title="Очистить"
             >
-              <Trash className="size-4" />
+              <TrashIcon className="size-4" />
             </button>
           </div>
         </div>
