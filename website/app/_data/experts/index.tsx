@@ -5,10 +5,22 @@ import {
   GithubLogotypeMonoIcon,
 } from "@/components/icons";
 import RovnoLogotypeIcon from "@/components/layout/logo/logo-icon";
-import { Project, PROJECTS } from "@/app/_data/projects/";
 import { AmorfaLogo } from "@/components/icons/logotypes/amorfa-logo";
 import { VershinyLogo } from "@/components/icons/logotypes/vershiny-logo";
 import { UnidokaLogoMono } from "@/components/icons/logotypes/unidoka-logo-mono";
+
+/**
+ * Optional enrichment for a team member's expert profile. Everything here is
+ * presentation-only — identity (name, avatar, role, bio) and linked projects
+ * both come from the DB at render time. This file exists purely to add
+ * hardcoded extras (stats, skills, milestones, tags, socials) that aren't
+ * modelled in the database yet.
+ *
+ * There is intentionally NO `projects` field here. Which projects show on an
+ * expert's page is decided entirely by `project_team_assignments` in the DB,
+ * managed from /admin/<secret>/team. If a project isn't pinned there, it
+ * doesn't appear.
+ */
 
 export interface ExpertTag {
   label: string;
@@ -20,14 +32,12 @@ export interface ExpertSocial {
   href: string;
 }
 
-/** A short line in the career/timeline block on the expert page. */
 export interface ExpertMilestone {
   year: string;
   title: string;
   body: string;
 }
 
-/** A single skill chip with a proficiency read. `level` is 0-100. */
 export interface ExpertSkill {
   label: string;
   level: number;
@@ -42,24 +52,17 @@ export interface ExpertData {
   id: string;
   name: string;
   avatar: string;
-  /** Optional wide cover for the hero background. Falls back to avatar. */
   cover?: string;
   role: string;
   description: string;
-  /** Long-form bio shown below the hero. 2-4 short paragraphs. */
   longBio?: string[];
   telegramChannel?: string;
   location?: string;
   tags: ExpertTag[];
   socials: ExpertSocial[];
-  /** Aggregate numbers, shown as a strip under the hero. */
   stats?: ExpertStat[];
-  /** What this person actually does, weighted for the bar chart. */
   skills?: ExpertSkill[];
-  /** Career timeline, newest first. */
   milestones?: ExpertMilestone[];
-  /** Hardcoded fallback projects. Merged with the DB list at render time. */
-  projects: Project[];
 }
 
 export const EXPERTS_DATA: Record<string, ExpertData> = {
@@ -118,13 +121,6 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
         body: "Продуктовая студия с фокусом на внутренние инструменты и дизайн-системы.",
       },
     ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-      PROJECTS.concord,
-    ],
   },
 
   RovnoMikhail: {
@@ -164,13 +160,6 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
         title: "Rovno.dev — со-основатель",
         body: "Отвечает за работу с клиентами и продуктовую стратегию агентства.",
       },
-    ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-      PROJECTS.concord,
     ],
   },
 
@@ -217,14 +206,6 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
         body: "Разработка концепт-арта и финальной 3D-модели для крупнейшей выставки роботостроения.",
       },
     ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-      PROJECTS.concord,
-      PROJECTS.bread,
-    ],
   },
 
   web_senior: {
@@ -261,14 +242,6 @@ export const EXPERTS_DATA: Record<string, ExpertData> = {
         title: "Rovno.dev — технологический партнёр",
         body: "Отвечает за инфраструктуру, CI/CD и безопасность всех проектов агентства.",
       },
-    ],
-    projects: [
-      PROJECTS.alx,
-      PROJECTS.sadovod,
-      PROJECTS.vanguard,
-      PROJECTS.courtElegance,
-      PROJECTS.concord,
-      PROJECTS.bread,
     ],
   },
 };

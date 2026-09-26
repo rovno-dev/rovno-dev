@@ -39,6 +39,7 @@ import {
   type ClientListItem,
 } from "@/utils/api/companies";
 import { fetchStack, createStackItem, type StackItem } from "@/utils/api/stack";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 interface FormState {
   slug: string;
@@ -311,7 +312,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               emptyText="Нет компаний"
               createNoun="Создать клиента"
               onCreate={async (name) => {
-                const c = await createCompany(name);
+                const c = await createCompany({ name });
                 setCompanies((prev) => [...prev, c]);
                 return { id: c.id, label: c.name };
               }}

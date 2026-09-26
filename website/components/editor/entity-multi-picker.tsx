@@ -133,7 +133,7 @@ export function EntityMultiPicker({
               onClick={(e) => { e.stopPropagation(); onChange(value.filter((x) => x.id !== v.id)); }}
               aria-label={`Убрать ${v.label}`}
             >
-              <X className="size-3" />
+              <XIcon className="size-3" />
             </button>
           </span>
         ))}
@@ -186,7 +186,7 @@ export function EntityMultiPicker({
                 filtered.length === highlight ? "bg-(--state-hover) text-(--on-bg-high)" : "text-(--on-bg-medium)"
               )}
             >
-              {creating ? <CircleNotchIcon className="size-3.5 animate-spin" /> : <Plus className="size-3.5" />}
+              {creating ? <CircleNotchIcon className="size-3.5 animate-spin" /> : <PlusIcon className="size-3.5" />}
               <span>{createNoun || "Создать"} «{draft.trim()}»</span>
             </button>
           )}

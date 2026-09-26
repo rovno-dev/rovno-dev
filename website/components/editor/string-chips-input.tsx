@@ -74,7 +74,7 @@ export function StringChipsInput({
             }}
             aria-label={`Удалить ${v}`}
           >
-            <X className="size-3" />
+            <XIcon className="size-3" />
           </button>
         </span>
       ))}
