@@ -70,7 +70,10 @@ export async function fetchPublishedEventsServer(
   try {
     const res = await fetch(
       `${SERVER_API_BASE}/api/v1/events${qs.toString() ? `?${qs}` : ""}`,
-      { next: { revalidate: 60 } } as any,
+      // Cached for 60s as a fallback, and tagged so admin mutations can
+      // invalidate on demand via /api/revalidate. Tag invalidation is what
+      // makes a freshly-created event appear immediately.
+      { next: { revalidate: 60, tags: ["events"] } } as any,
     );
     if (!res.ok) return [];
     const body = await res.json();
@@ -84,7 +87,9 @@ export async function fetchEventServer(slug: string): Promise<EventDetail | null
   try {
     const res = await fetch(
       `${SERVER_API_BASE}/api/v1/events/${encodeURIComponent(slug)}`,
-      { next: { revalidate: 60 } } as any,
+      // Same tag — a single invalidateTag("events") clears the list AND
+      // every event detail page.
+      { next: { revalidate: 60, tags: ["events"] } } as any,
     );
     if (!res.ok) return null;
     return (await res.json()) as EventDetail;

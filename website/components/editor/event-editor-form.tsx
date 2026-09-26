@@ -22,6 +22,7 @@ import {
   type EventDetail, type EventPayload,
 } from "@/utils/api/events";
 import { EVENT_CUSTOM_PAGES_META } from "@/app/events/[slug]/_components/event-custom-pages-meta";
+import { revalidateTags } from "@/utils/revalidate";
 
 interface FormState {
   slug: string;
@@ -157,6 +158,10 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
           ? await updateEvent(initial.slug, payload)
           : await createEvent(payload);
       toast.success(status === "published" ? "Событие опубликовано" : "Черновик сохранён");
+      // Bust the events cache so the public list and detail page reflect
+      // the change on the next request. Await is intentional — we want the
+      // user to know the site is updated before we navigate.
+      await revalidateTags(["events"]);
       if (!isEdit) {
         router.replace(`../${saved.slug}/edit`);
       } else {
@@ -175,6 +180,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
     setSaving(true);
     try {
       await deleteEvent(initial.slug);
+      await revalidateTags(["events"]);
       toast.success("Удалено");
       router.push("../");
     } catch (err: any) {

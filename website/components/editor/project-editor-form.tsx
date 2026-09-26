@@ -16,6 +16,7 @@ import { EntityMultiPicker, type MultiPickerItem } from "./entity-multi-picker";
 import { ProjectTagsEditor } from "./project-tags-editor";
 import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
+import { revalidateTags } from "@/utils/revalidate";
 import {
   CUSTOM_PAGES_META,
   findCustomPageMeta,
@@ -211,6 +212,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         ? await updateProject(initial.slug, payload)
         : await createProject(payload);
       toast.success(status === "published" ? "Проект опубликован" : "Проект сохранён");
+      await revalidateTags(["projects"]);
       if (!isEdit) router.replace(`/admin/secret-placeholder/projects/${saved.slug}/edit`);
       else router.refresh();
     } catch (err: any) {
@@ -226,6 +228,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     setSaving(true);
     try {
       await deleteProject(initial.slug);
+      await revalidateTags(["projects"]);
       toast.success("Проект удалён");
       router.push("../");
     } catch (err: any) {

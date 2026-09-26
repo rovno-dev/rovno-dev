@@ -17,15 +17,20 @@ export default function ClientRootLayout({
   const { lang } = useLanguage();
 
   // Pages whose topmost section is designed to sit behind the fixed header
-  // — the home hero and every project case study. Every other page needs
-  // the mt offset so its content clears the header.
+  // — the home hero, every project case study, and every event landing
+  // (the Nash.Dev terminal opens at the top of the viewport, its first
+  // line painted behind the header bar).
   //
-  // `/projects/<slug>` matches: split('/') → ["", "projects", "<slug>"]
-  // → length 3. `/projects` itself is length 2 and keeps the offset.
+  // Detail pages match on `/projects/<slug>` and `/events/<slug>`:
+  // split('/').filter(Boolean) → ["projects", "<slug>"] → length 2.
+  // The list pages `/projects` and `/events` are length 1 and keep the
+  // offset.
+  const segments = pathname?.split("/").filter(Boolean) ?? [];
+  const isDetailRoute = segments.length === 2;
   const isFullscreenTop =
     pathname === "/" ||
-    (pathname?.startsWith("/projects/") &&
-      pathname.split("/").filter(Boolean).length === 2);
+    (isDetailRoute &&
+      (segments[0] === "projects" || segments[0] === "events"));
 
   return (
     <>
