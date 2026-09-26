@@ -77,6 +77,7 @@ export default function Header() {
           <nav className="hidden lg:flex gap-4 text-sm">
             <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
             <NavLink href={ROUTES.services.href}>Услуги</NavLink>
+            <NavLink href={ROUTES.events.href}>События</NavLink>
             <NavLink href={ROUTES.companies.href}>{t("nav.companies")}</NavLink>
             <NavLink href={ROUTES.about.href}>{t("nav.about")}</NavLink>
             <NavLink href={ROUTES.blog.href}>{t("nav.blog")}</NavLink>

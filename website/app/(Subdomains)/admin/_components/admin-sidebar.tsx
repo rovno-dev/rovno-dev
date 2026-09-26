@@ -11,6 +11,8 @@ import {
   UsersThree,
   ChartLineUp,
   FolderSimple,
+  CalendarBlank,
+  Ticket,
 } from "@phosphor-icons/react";
 
 const NAV: SidebarItem[] = [
@@ -22,6 +24,8 @@ const NAV: SidebarItem[] = [
   { label: "Проекты",       href: "/projects",   icon: Cube },
   { label: "Статьи",        href: "/articles",   icon: Newspaper },
   { label: "Команда",       href: "/team",       icon: UsersThree },
+  { label: "События",       href: "/events",     icon: CalendarBlank },
+  { label: "Заявки на события", href: "/event-requests", icon: Ticket },
   { label: "Каталоги",      href: "/catalog",    icon: FolderSimple },
 ];
 

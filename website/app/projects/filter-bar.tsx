@@ -12,6 +12,7 @@ import {
   type Taxonomy,
 } from "@/utils/api/taxonomies";
 import { fetchPublishedProjectsClient } from "@/utils/api/projects";
+import { FilterChipsBar } from "@/components/layout/page/filter-chips-bar";
 
 interface DbProject {
   id: string;
@@ -119,45 +120,29 @@ export function FilterBar({
 
   return (
     <>
-      {/* Category chips row — sticky so the filter stays reachable while
-          scrolling a long grid. */}
-      <section className="sticky top-[46px] md:top-[88px] z-30 -mb-2 py-3 backdrop-blur-md bg-(--bg)/85 border-b border-(--outline)">
-        <Container>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-            <Button
-              variant={activeCategory === null ? "filled" : "tonal-card"}
-              size="chip-medium"
-              shape="round"
-              onClick={() => setActiveCategory(null)}
-              className="shrink-0"
-            >
-              Все
-              <span className="ml-1 text-[10px] opacity-60 tabular-nums">
-                {allProjects.length}
-              </span>
-            </Button>
-            {categories.map((cat) => {
-              const label = cat.labels.en || cat.label || cat.code;
-              const count = categoryCounts[cat.code] || 0;
-              return (
-                <Button
-                  key={cat.id}
-                  variant={activeCategory === cat.code ? "filled" : "tonal-card"}
-                  size="chip-medium"
-                  shape="round"
-                  onClick={() => setActiveCategory(cat.code)}
-                  className="shrink-0"
-                >
-                  {label}
-                  <span className="ml-1 text-[10px] opacity-60 tabular-nums">
-                    {count}
-                  </span>
-                </Button>
-              );
-            })}
-          </div>
-        </Container>
-      </section>
+      {/* Category chips — visually mirrors the site header (rounded pill,
+          backdrop blur, same vertical rhythm). Sticky so it stays reachable
+          while scrolling the grid. */}
+      <FilterChipsBar
+        className="mt-2 mb-4"
+        chips={[
+          {
+            id: "__all__",
+            label: "Все",
+            count: allProjects.length,
+            active: activeCategory === null,
+          },
+          ...categories.map((cat) => ({
+            id: cat.code,
+            label: cat.labels.en || cat.label || cat.code,
+            count: categoryCounts[cat.code] || 0,
+            active: activeCategory === cat.code,
+          })),
+        ]}
+        onSelect={(id) =>
+          setActiveCategory(id === "__all__" ? null : id)
+        }
+      />
 
       <section className="pt-6 pb-24 md:pb-32">
         <Container>
