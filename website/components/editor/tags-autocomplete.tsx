@@ -173,7 +173,7 @@ export function TagsAutocomplete({
       </div>
 
       {open && (suggestions.length > 0 || canCreate) && (
-        <div className="absolute z-50 mt-1 w-full max-h-64 overflow-auto rounded-lg border border-(--outline) bg-(--card) shadow-lg p-1">
+        <div className="absolute z-[60] mt-1 w-full max-h-64 overflow-auto rounded-lg border border-(--outline) bg-(--card) shadow-lg p-1">
           {suggestions.map((t, idx) => (
             <button
               key={t.id}

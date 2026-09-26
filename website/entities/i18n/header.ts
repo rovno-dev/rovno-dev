@@ -11,6 +11,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.menu': 'Open menu',
     'nav.order': 'Make an Order',
     'nav.profile': 'Profile',
+    'nav.register': 'Sign Up',
     'nav.projects': 'Projects',
   },
   ru: {
@@ -24,6 +25,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.menu': 'Открыть меню',
     'nav.order': 'Оформить заказ',
     'nav.profile': 'Профиль',
+    'nav.register': 'Регистрация',
     'nav.projects': 'Проекты',
   },
 };

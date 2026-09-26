@@ -2,11 +2,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ListIcon, XIcon } from "@phosphor-icons/react";
+import { ListIcon, X, User as UserIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
+import { useUser } from "@/entities/user/model/user-context";
+import { rootDomainUrl, isAbsoluteUrl } from "@/utils/root-domain";
+import { crossSubdomainUrl } from "@/utils/root-domain";
 import { cn } from "@/lib/utils";
+
 interface FloatingMenuProps {
   position?: "top" | "bottom";
   triggerClassName?: string;
@@ -14,6 +18,7 @@ interface FloatingMenuProps {
   triggerShape?: React.ComponentProps<typeof Button>["shape"];
   triggerIconClassName?: string;
 }
+
 export function FloatingMenu({
   position = "bottom",
   triggerClassName,
@@ -23,11 +28,14 @@ export function FloatingMenu({
 }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
+  const { user, isLoading } = useUser();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -36,6 +44,7 @@ export function FloatingMenu({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent | TouchEvent) => {
@@ -50,12 +59,22 @@ export function FloatingMenu({
       document.removeEventListener("touchstart", onDown);
     };
   }, [open]);
+
   const links = [
     { href: ROUTES.projects.href, label: t("nav.projects") },
     { href: ROUTES.services.href, label: "Услуги" },
     { href: ROUTES.about.href, label: t("nav.about") },
     { href: ROUTES.blog.href, label: t("nav.blog") },
   ];
+
+  // Cross-subdomain URLs to the auth pages on the root domain. On localhost
+  // these collapse to plain paths via isPathMode().
+  const loginHref = rootDomainUrl("/login");
+  const registerHref = rootDomainUrl("/register");
+  const loginIsAbsolute = isAbsoluteUrl(loginHref);
+  const registerIsAbsolute = isAbsoluteUrl(registerHref);
+  const profileHref = crossSubdomainUrl("app", "/profile");
+
   return (
     <div ref={wrapperRef} className="contents">
       <Button
@@ -68,23 +87,24 @@ export function FloatingMenu({
         aria-controls="floating-menu-panel"
         aria-label={t("nav.menu")}
       >
-        {open ? <XIcon className={triggerIconClassName} /> : <ListIcon className={triggerIconClassName} />}
+        {open ? (
+          <X className={triggerIconClassName} />
+        ) : (
+          <ListIcon className={triggerIconClassName} />
+        )}
       </Button>
+
       {open && (
         <div
           id="floating-menu-panel"
           className={cn(
-            // LLM context: on mobile, use 8px side gutters (was 16px) so the
-            // panel reads as a full-width sheet. `sm:` restores the anchored
-            // desktop dropdown. bottom-32 (128px) sits just above the bottom
-            // app bar (~136px tall) with a hair of overlap the shadow absorbs.
             "fixed left-2 right-2 sm:left-auto sm:right-6 sm:w-96 z-[60]",
             "rounded-3xl border border-(--outline)",
             "bg-(--card) shadow-2xl p-2",
             "animate-in fade-in duration-200",
             position === "bottom"
               ? "bottom-32 slide-in-from-bottom-4"
-              : "top-24 slide-in-from-top-4"
+              : "top-24 slide-in-from-top-4",
           )}
         >
           <nav className="flex flex-col">
@@ -99,7 +119,7 @@ export function FloatingMenu({
                     "px-4 py-2.5 rounded-2xl text-body-2 font-medium transition-colors",
                     isActive
                       ? "bg-(--primary-glass) text-(--primary)"
-                      : "text-(--on-bg-high) hover:bg-(--state-hover)"
+                      : "text-(--on-bg-high) hover:bg-(--state-hover)",
                   )}
                 >
                   {link.label}
@@ -107,13 +127,56 @@ export function FloatingMenu({
               );
             })}
           </nav>
-          <div className="mt-1.5 pt-2 border-t border-(--outline)">
-            <Button className="w-full" size="large" asChild>
-              <Link href={ROUTES.order.href} onClick={() => setOpen(false)}>
-                {t("nav.order")}
-              </Link>
-            </Button>
-          </div>
+
+          {/* Auth footer. The order CTA lives in the header (desktop) and
+              the bottom app bar (mobile) — never duplicated here. Signed-out
+              users get Login + Register; signed-in users get a Profile link. */}
+          {!isLoading && (
+            <div className="mt-1.5 pt-2 border-t border-(--outline)">
+              {user ? (
+                <Button
+                  variant="outlined"
+                  size="large"
+                  className="w-full"
+                  asChild
+                >
+                  <Link
+                    href={profileHref}
+                    prefetch={false}
+                    onClick={() => setOpen(false)}
+                  >
+                    <UserIcon className="size-4" />
+                    {t("nav.profile")}
+                  </Link>
+                </Button>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outlined" size="large" asChild>
+                    {loginIsAbsolute ? (
+                      <a href={loginHref} onClick={() => setOpen(false)}>
+                        {t("nav.login")}
+                      </a>
+                    ) : (
+                      <Link href={loginHref} onClick={() => setOpen(false)}>
+                        {t("nav.login")}
+                      </Link>
+                    )}
+                  </Button>
+                  <Button size="large" asChild>
+                    {registerIsAbsolute ? (
+                      <a href={registerHref} onClick={() => setOpen(false)}>
+                        {t("nav.register")}
+                      </a>
+                    ) : (
+                      <Link href={registerHref} onClick={() => setOpen(false)}>
+                        {t("nav.register")}
+                      </Link>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

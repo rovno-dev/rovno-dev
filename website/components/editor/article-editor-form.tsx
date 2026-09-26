@@ -329,7 +329,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
       )}
 
       {/* Metadata */}
-      <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-4">
+      <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-4 overflow-visible">
         <h2 className="text-heading-3">{t("editor.section_meta")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field className="md:col-span-2">

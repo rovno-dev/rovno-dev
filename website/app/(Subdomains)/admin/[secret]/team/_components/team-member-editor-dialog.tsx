@@ -350,7 +350,7 @@ export function TeamMemberEditorDialog({
 
             {/* Picker */}
             {pickerOpen && (
-              <Card className="rounded-2xl border-(--outline) p-3 space-y-2">
+              <Card className="rounded-2xl border-(--outline) p-3 space-y-2 overflow-visible">
                 <div className="relative">
                   <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
                   <Input

@@ -275,7 +275,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </div>
 
       {/* Basics */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">Основное</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field className="md:col-span-2">
@@ -413,7 +413,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </Card>
 
       {/* Cover */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">Обложка</h2>
         <Field>
           <FieldLabel>Изображение обложки</FieldLabel>
@@ -434,7 +434,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </Card>
 
       {/* Stack */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-3">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-3 overflow-visible">
         <h2 className="text-heading-3">Стек</h2>
         <p className="text-body-4 text-(--on-bg-medium)">
           Технологии и инструменты проекта. Выбирайте из списка или создавайте новые.
@@ -459,7 +459,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </Card>
 
       {/* Project tags */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <div>
           <h2 className="text-heading-3 mb-1">Метки проекта</h2>
           <p className="text-body-4 text-(--on-bg-medium)">
@@ -476,7 +476,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
 
       {/* Media gallery — hidden when a premade template owns the visuals. */}
       {!isCustomPage && (
-        <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+        <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
           <div>
             <h2 className="text-heading-3 mb-1">Медиа</h2>
             <p className="text-body-4 text-(--on-bg-medium)">
@@ -500,7 +500,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       )}
 
       {/* SEO */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">SEO</h2>
         <div className="grid grid-cols-1 gap-3">
           <Field>
@@ -519,7 +519,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </Card>
 
       {/* Flags */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">Флаги</h2>
         <div className="flex items-center gap-3">
           <Switch
