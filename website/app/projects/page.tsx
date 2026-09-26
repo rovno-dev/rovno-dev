@@ -1,17 +1,12 @@
 import { Container } from "@/components/ui/container";
 import { getAllProjects } from "@/app/_data/projects/parser";
 import { PROJECTS } from "@/app/_data/projects";
-import PageHeadingSection from "@/components/layout/page/page-heading-section";
 import { FilterBar } from "./filter-bar";
-import { PROJECT_CATEGORIES } from "@/app/_data/categories";
+import { fetchProjectCategories } from "@/utils/api/taxonomies";
 
-// Static projects are on disk — they render on the server in one pass. The
-// DB-backed projects are appended on the client by <FilterBar> after mount.
-// This avoids the server-side fetch, which fails in local dev because the
-// Next.js process can't resolve the public API URL the browser uses.
 export const revalidate = 60;
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
   const mdxProjects = getAllProjects();
   const fallbackProjects = Object.values(PROJECTS);
 
@@ -22,21 +17,38 @@ export default function ProjectsPage() {
     return true;
   });
 
-  const categories = PROJECT_CATEGORIES.map((c) => ({
-    id: c.code,
-    code: c.code,
-    label: c.label,
-  }));
+  // Fetch categories from the DB. If the backend is down, fall back to an
+  // empty list — <FilterBar> refetches client-side anyway and will populate.
+  let categories: Awaited<ReturnType<typeof fetchProjectCategories>> = [];
+  try {
+    categories = await fetchProjectCategories();
+  } catch {
+    /* backend unreachable — client-side fetch will retry */
+  }
   const categoryMap = Object.fromEntries(
-    categories.map((c) => [c.code, c.label]),
+    categories.map((c) => [c.code, c.labels.en || c.label || c.code]),
   );
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      <PageHeadingSection
-        title="Проекты"
-        description="Высокопроизводительные цифровые решения."
-      />
+      {/* Compact hero — the filter chips row below is sticky and takes over
+          navigation, so this section only needs to orient the reader. */}
+      <section className="pt-8 md:pt-12 pb-4">
+        <Container>
+          <div className="max-w-[720px]">
+            <p className="text-body-5 uppercase tracking-[0.32em] text-(--on-bg-low) mb-3">
+              Портфолио
+            </p>
+            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-[-0.02em] leading-[1.05] mb-3">
+              Проекты
+            </h1>
+            <p className="text-body-2 text-(--on-bg-medium) leading-relaxed">
+              Избранные кейсы агентства — от айдентики до 3D и веб-разработки.
+            </p>
+          </div>
+        </Container>
+      </section>
+
       <FilterBar
         categories={categories}
         categoryMap={categoryMap}

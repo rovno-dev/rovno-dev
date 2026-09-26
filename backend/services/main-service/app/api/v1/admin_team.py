@@ -160,6 +160,7 @@ def remove_team_member(
 
 from app.models.project import Project
 from app.models.project_team_assignment import ProjectTeamAssignment
+from app.models.project_role import ProjectRole
 from pydantic import BaseModel
 
 
@@ -242,12 +243,24 @@ def set_team_member_projects(
 
     # Dedupe incoming ids in case the client sends the same project twice.
     seen: set[str] = set()
+
+            # Validate every role_id actually exists before writing.
+            role_ids = [p.role_id for p in payload.projects if p.role_id]
+            if role_ids:
+                existing_roles = {
+                    row[0]
+                    for row in db.query(ProjectRole.id).filter(ProjectRole.id.in_(role_ids)).all()
+                }
+                missing_roles = set(role_ids) - existing_roles
+                if missing_roles:
+                    raise HTTPException(422, f"Unknown role ids: {sorted(map(str, missing_roles))}")
     for p in payload.projects:
         if p.project_id in seen:
             continue
         seen.add(p.project_id)
         db.add(
             ProjectTeamAssignment(
+                role_id=p.role_id,
                 project_id=p.project_id,
                 team_member_id=tm.id,
                 role_on_project=p.role_on_project,

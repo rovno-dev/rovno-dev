@@ -5,10 +5,14 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import ProjectCard from "@/components/layout/projects/project-card";
 import { Project } from "@/app/_data/projects";
-import { ProjectCategory } from "@/utils/api/categories";
+import {
+  fetchProjectCategories,
+  fetchProjectRoles,
+  pickLabel,
+  type Taxonomy,
+} from "@/utils/api/taxonomies";
 import { fetchPublishedProjectsClient } from "@/utils/api/projects";
 
-/** Shape returned by GET /api/v1/projects — see DbProjectList in utils/api. */
 interface DbProject {
   id: string;
   slug: string;
@@ -16,25 +20,49 @@ interface DbProject {
   short_description?: string | null;
   cover_image_src: string;
   cover_video_src?: string | null;
-  category?: { id: string; code: string; label: string } | null;
+  category?: { id: string; code: string; label?: string; labels?: Record<string, string> } | null;
   period?: string | null;
 }
 
 export function FilterBar({
   projects,
-  categories,
-  categoryMap,
+  categories: initialCategories,
+  categoryMap: initialCategoryMap,
 }: {
   projects: Project[];
-  categories: ProjectCategory[];
+  categories: Taxonomy[];
   categoryMap: Record<string, string>;
 }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [dbProjects, setDbProjects] = useState<Project[]>([]);
   const [loadingDb, setLoadingDb] = useState(true);
+  const [categories, setCategories] = useState<Taxonomy[]>(initialCategories);
+  const [categoryMap, setCategoryMap] = useState<Record<string, string>>(initialCategoryMap);
+  // Populated but currently unused for filtering — reserved for a role filter
+  // once project cards surface per-role info.
+  const [, setRoles] = useState<Taxonomy[]>([]);
 
-  // Fetch admin-created projects on mount. Static projects render
-  // immediately; these append when the request lands.
+  // Fetch fresh taxonomy so codes added since the last build appear.
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([fetchProjectCategories(), fetchProjectRoles()]).then(
+      ([cats, rls]) => {
+        if (cancelled) return;
+        if (cats.length > 0) {
+          setCategories(cats);
+          setCategoryMap(
+            Object.fromEntries(cats.map((c) => [c.code, c.labels.en || c.label || c.code])),
+          );
+        }
+        setRoles(rls);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Fetch DB projects once.
   useEffect(() => {
     let cancelled = false;
     const existing = new Set(projects.map((p) => p.slug));
@@ -63,9 +91,7 @@ export function FilterBar({
           }));
         setDbProjects(mapped);
       })
-      .catch(() => {
-        // Silent: the static projects still render.
-      })
+      .catch(() => {})
       .finally(() => {
         if (!cancelled) setLoadingDb(false);
       });
@@ -75,45 +101,65 @@ export function FilterBar({
     };
   }, [projects]);
 
-  const allProjects = useMemo(
-    () => [...projects, ...dbProjects],
-    [projects, dbProjects],
-  );
+  const allProjects = useMemo(() => [...projects, ...dbProjects], [projects, dbProjects]);
 
   const filteredProjects = useMemo(() => {
     if (!activeCategory) return allProjects;
     return allProjects.filter((p) => p.category === activeCategory);
   }, [activeCategory, allProjects]);
 
+  // Counts per category (client-side).
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of allProjects) {
+      if (p.category) counts[p.category] = (counts[p.category] || 0) + 1;
+    }
+    return counts;
+  }, [allProjects]);
+
   return (
     <>
-      <section className="pb-8">
+      {/* Category chips row — sticky so the filter stays reachable while
+          scrolling a long grid. */}
+      <section className="sticky top-[46px] md:top-[88px] z-30 -mb-2 py-3 backdrop-blur-md bg-(--bg)/85 border-b border-(--outline)">
         <Container>
-          <div className="flex flex-wrap gap-2 animate-reveal delay-100 fill-mode-both">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
             <Button
               variant={activeCategory === null ? "filled" : "tonal-card"}
-              size="chip-large"
+              size="chip-medium"
               shape="round"
               onClick={() => setActiveCategory(null)}
+              className="shrink-0"
             >
               Все
+              <span className="ml-1 text-[10px] opacity-60 tabular-nums">
+                {allProjects.length}
+              </span>
             </Button>
-            {categories.map((cat) => (
-              <Button
-                key={cat.code}
-                variant={activeCategory === cat.code ? "filled" : "tonal-card"}
-                size="chip-large"
-                shape="round"
-                onClick={() => setActiveCategory(cat.code)}
-              >
-                {cat.label}
-              </Button>
-            ))}
+            {categories.map((cat) => {
+              const label = cat.labels.en || cat.label || cat.code;
+              const count = categoryCounts[cat.code] || 0;
+              return (
+                <Button
+                  key={cat.id}
+                  variant={activeCategory === cat.code ? "filled" : "tonal-card"}
+                  size="chip-medium"
+                  shape="round"
+                  onClick={() => setActiveCategory(cat.code)}
+                  className="shrink-0"
+                >
+                  {label}
+                  <span className="ml-1 text-[10px] opacity-60 tabular-nums">
+                    {count}
+                  </span>
+                </Button>
+              );
+            })}
           </div>
         </Container>
       </section>
 
-      <section className="pb-24 md:pb-32">
+      <section className="pt-6 pb-24 md:pb-32">
         <Container>
           {filteredProjects.length === 0 && !loadingDb ? (
             <p className="text-body-2 text-(--on-bg-medium) text-center py-20">
@@ -129,8 +175,6 @@ export function FilterBar({
                   categoryMap={categoryMap}
                 />
               ))}
-              {/* Placeholder tiles for the in-flight DB fetch. Keeps the grid
-                  from reflowing when the response lands. */}
               {loadingDb &&
                 Array.from({ length: 3 }).map((_, i) => (
                   <div

@@ -23,7 +23,10 @@ class TeamProjectRef(BaseModel):
     cover_image_src: str
     cover_video_src: Optional[str] = None
     period: Optional[str] = None
+    role_id: Optional[str] = None
     role_on_project: Optional[str] = None
+    # Translated role labels from the managed taxonomy. Client picks per lang.
+    role_labels: Optional[dict] = None
     category_label: Optional[str] = None
 
 
@@ -126,17 +129,33 @@ def get_team_member_projects(username: str, db: Session = Depends(get_db)):
         .order_by(Project.updated_at.desc())
         .all()
     )
-    return [
-        TeamProjectRef(
-            id=proj.id,
-            slug=proj.slug,
-            title=proj.title,
-            short_description=proj.short_description,
-            cover_image_src=proj.cover_image_src,
-            cover_video_src=proj.cover_video_src,
-            period=proj.period,
-            role_on_project=asg.role_on_project,
-            category_label=(proj.category.label if proj.category else None),
+    out: list[TeamProjectRef] = []
+    for asg, proj in rows:
+        role_labels = (
+            asg.role.labels
+            if asg.role and isinstance(asg.role.labels, dict)
+            else None
         )
-        for asg, proj in rows
-    ]
+        cat_labels = None
+        if proj.category:
+            cat_labels = (
+                proj.category.labels
+                if isinstance(proj.category.labels, dict)
+                else {"en": proj.category.label}
+            )
+        out.append(
+            TeamProjectRef(
+                id=proj.id,
+                slug=proj.slug,
+                title=proj.title,
+                short_description=proj.short_description,
+                cover_image_src=proj.cover_image_src,
+                cover_video_src=proj.cover_video_src,
+                period=proj.period,
+                role_id=str(asg.role_id) if asg.role_id else None,
+                role_on_project=asg.role_on_project,
+                role_labels=role_labels,
+                category_label=(proj.category.label if proj.category else None),
+            )
+        )
+    return out

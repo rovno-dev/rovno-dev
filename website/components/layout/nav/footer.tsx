@@ -1,6 +1,7 @@
 "use client"
 import { ROUTES } from "@/utils/constants/routes";
 import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
+import { PhoneCall } from "@phosphor-icons/react";
 import { Button } from "../../ui/button";
 import { Container } from "../../ui/container";
 import RovnoLogotypeWordmark from "../logo/logo-wordmark";
@@ -11,6 +12,9 @@ import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-i
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/language-provider";
 import { useRootHref } from "@/hooks/use-root-href";
+
+// Dialable phone from env. Empty when unset — the button hides.
+const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -64,7 +68,13 @@ export default function Footer() {
               <RovnoLogotypeWordmark className="h-8! w-auto" />
             </Link>
             <div className="flex items-center gap-1 mt-2">
-              <SocialButton href="https://t.me/rovno_dev" icon={<TelegramLogotypeMonoIcon />} />
+              {CONTACT_PHONE && (
+                <SocialButton
+                  href={`tel:${CONTACT_PHONE.replace(/\s+/g, "")}`}
+                  icon={<PhoneCall />}
+                />
+              )}
+              <SocialButton href={process.env.NEXT_PUBLIC_CONTACT_TELEGRAM || "https://t.me/rovno_dev"} icon={<TelegramLogotypeMonoIcon />} />
               <SocialButton href="https://vk.com/rovno_dev" icon={<VKLogotypeMonoIcon />} />
               <SocialButton href="https://github.com/rovno-dev" icon={<GithubLogotypeMonoIcon />} />
               <SocialButton href="https://dprofile.ru/rovno_dev" icon={<DprofileLogotypeMonoIcon />} />

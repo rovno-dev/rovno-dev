@@ -21,7 +21,10 @@ import {
   type TeamMemberPublicProject,
 } from "@/utils/api/team";
 
-export const revalidate = 60;
+// Render on every request. The expert page reflects admin-pinned projects
+// immediately — no ISR staleness window.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface RenderProject {
   slug: string;

@@ -4,6 +4,7 @@ from app.api.v1 import admin
 from app.api.v1 import admin_articles
 from app.api.v1 import admin_projects
 from app.api.v1 import admin_team
+from app.api.v1 import admin_taxonomies
 from app.api.v1 import me
 from app.api.v1 import categories
 from app.api.v1 import companies
@@ -22,6 +23,7 @@ router.include_router(admin.router)
 router.include_router(admin_articles.router)
 router.include_router(admin_projects.router)
 router.include_router(admin_team.router)
+router.include_router(admin_taxonomies.router)
 router.include_router(me.router)
 router.include_router(categories.router)
 router.include_router(companies.router)

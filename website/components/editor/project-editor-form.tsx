@@ -32,7 +32,7 @@ import {
   fetchProjectCategoriesAdmin,
   createProjectCategory,
   type ProjectCategory,
-} from "@/utils/api/project-categories";
+} from "@/utils/api/taxonomies";
 import {
   fetchCompanies,
   createCompany,

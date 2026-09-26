@@ -7,6 +7,7 @@ from .user import User
 from .team_member import TeamMember
 from .project import Project
 from .project_category import ProjectCategory
+from .project_role import ProjectRole
 from .project_team_assignment import ProjectTeamAssignment
 from .project_tag import ProjectTag, ProjectTagKind
 from .project_media import ProjectMedia, ProjectMediaType
