@@ -356,6 +356,10 @@ export function BreadProjectPage({
       </ScrollReveal>
 
       {/* ────────────────  CASE BODY (MDX)  ──────────────── */}
+      {/* Only renders when the admin supplied MDX content. Projects that
+          rely solely on the template's hard-coded sections (process,
+          manifesto, film) skip this block entirely. */}
+      {content && (
       <ScrollReveal threshold={0.02}>
         <section
           id="case"
@@ -421,6 +425,7 @@ export function BreadProjectPage({
           </Container>
         </section>
       </ScrollReveal>
+      )}
 
       {/* ────────────────  MEDIA GALLERY  ──────────────── */}
       {project.media.length > 0 && (

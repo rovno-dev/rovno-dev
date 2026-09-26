@@ -239,6 +239,9 @@ export function CustomProjectPage({
       )}
 
       {/* ────────────────  CASE BODY (MDX)  ──────────────── */}
+      {/* Only renders when MDX content exists. Otherwise the page falls
+          back to the hero + gallery + related sections alone. */}
+      {content && (
       <ScrollReveal threshold={0.02}>
         <section id="case" className="py-24 md:py-32 border-b border-(--outline)">
           <Container variant="full-width">
@@ -253,6 +256,7 @@ export function CustomProjectPage({
           </Container>
         </section>
       </ScrollReveal>
+      )}
 
       {/* ────────────────  MEDIA GALLERY  ──────────────── */}
       {project.media.length > 0 && (

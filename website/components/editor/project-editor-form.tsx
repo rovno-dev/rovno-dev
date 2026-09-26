@@ -237,6 +237,11 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
 
   const githubTags = form.tags.filter((t) => t.kind === "github");
 
+  // A project with a bespoke template ignores MDX content and media —
+  // the template renders its own hard-coded sections. Only the
+  // identity fields need to be filled in.
+  const isCustomPage = !!form.custom_page;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -469,26 +474,30 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         )}
       </Card>
 
-      {/* Media gallery */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
-        <div>
-          <h2 className="text-heading-3 mb-1">Медиа</h2>
-          <p className="text-body-4 text-(--on-bg-medium)">
-            Изображения и короткие видео до 10 МБ. Автоматически рендерятся в галерее на странице проекта.
-          </p>
-        </div>
-        <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
-      </Card>
+      {/* Media gallery — hidden when a premade template owns the visuals. */}
+      {!isCustomPage && (
+        <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
+          <div>
+            <h2 className="text-heading-3 mb-1">Медиа</h2>
+            <p className="text-body-4 text-(--on-bg-medium)">
+              Изображения и короткие видео до 10 МБ. Автоматически рендерятся в галерее на странице проекта.
+            </p>
+          </div>
+          <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
+        </Card>
+      )}
 
-      {/* Content */}
-      <div className="space-y-3">
-        <h2 className="text-heading-3">Содержимое (MDX)</h2>
-        <ArticleEditor
-          value={form.mdx_content}
-          onChange={(v) => update("mdx_content", v)}
-          placeholder="Опишите процесс, результаты, добавьте галереи и метрики…"
-        />
-      </div>
+      {/* Content — hidden when a premade template is selected. */}
+      {!isCustomPage && (
+        <div className="space-y-3">
+          <h2 className="text-heading-3">Содержимое (MDX)</h2>
+          <ArticleEditor
+            value={form.mdx_content}
+            onChange={(v) => update("mdx_content", v)}
+            placeholder="Опишите процесс, результаты, добавьте галереи и метрики…"
+          />
+        </div>
+      )}
 
       {/* SEO */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">

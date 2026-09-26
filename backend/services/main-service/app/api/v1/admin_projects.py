@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.v1.admin import get_admin_user
@@ -179,17 +180,17 @@ def create_project(
         client_id=payload.client_id,
         platform=payload.platform,
         period=payload.period,
-        tech_stack=payload.tech_stack or [],
         mdx_content=payload.mdx_content or "",
         seo_title=payload.seo_title,
         meta_description=payload.meta_description,
         is_featured=payload.is_featured or False,
+        custom_page=payload.custom_page or None,
         publication_status=PublicationStatus(status_val),
     )
     _apply_tags(db, project, payload.tags)
     _apply_media(db, project, payload.media)
     from app.services.stack_service import resolve_stack
-    project.stack_items = resolve_stack(db, payload.stack)
+    project.stack_items = resolve_stack(db, payload.stack or [])
 
     db.add(project)
     db.commit()
