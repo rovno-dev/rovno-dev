@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
         res = await $fetch("/api/v1/admin/users", {
           method: "POST",
           body: JSON.stringify(formData),
-          headers: { "Content-TextT": "application/json" },
+          headers: { "Content-Type": "application/json" },
         });
       } else {
         // PATCH: only send changed fields (excluding password if empty)
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
         res = await $fetch(`/api/v1/admin/users/${editingUser!.id}`, {
           method: "PATCH",
           body: JSON.stringify(patchData),
-          headers: { "Content-TextT": "application/json" },
+          headers: { "Content-Type": "application/json" },
         });
       }
       if (res.response?.ok) {

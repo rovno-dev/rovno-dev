@@ -60,6 +60,40 @@ class UserCreate(BaseModel):
         if not any(char.isupper() for char in v):
             raise ValueError('Password must contain at least one uppercase letter')
         return v
+class UserOut(BaseModel):
+    """Serialised user shape returned to the admin panel.
+
+    The ORM model stores the role as `user_role` and the frontend expects
+    `role`; this schema bridges the two so the JSON is stable regardless of
+    the model's internal field name.
+    """
+    id: UUID
+    email: str
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    phone: Optional[str] = None
+    username: Optional[str] = None
+    role: str
+    verified: bool = False
+    blocked: bool = False
+    created_at: Optional[datetime] = None
+
+    @classmethod
+    def from_user(cls, u: User) -> "UserOut":
+        return cls(
+            id=u.id,
+            email=u.email,
+            name=u.name,
+            surname=u.surname,
+            phone=u.phone,
+            username=u.username,
+            role=(u.user_role.value if u.user_role else "user"),
+            verified=bool(u.verified),
+            blocked=bool(u.blocked),
+            created_at=u.created_at,
+        )
+
+
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     name: Optional[str] = None
@@ -68,6 +102,21 @@ class UserUpdate(BaseModel):
     role: Optional[UserRole] = None
     verified: Optional[bool] = None
     blocked: Optional[bool] = None
+    # Optional password reset from the admin dialog. When present it must
+    # satisfy the same strength rules as registration; the endpoint hashes
+    # it before writing. Leave unset to leave the password untouched.
+    password: Optional[str] = Field(None, min_length=8)
+
+    @field_validator("password")
+    @classmethod
+    def check_password_strength(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        if not any(c.isdigit() for c in v):
+            raise ValueError("Password must contain at least one digit")
+        if not any(c.isupper() for c in v):
+            raise ValueError("Password must contain at least one uppercase letter")
+        return v
 # ---------- Dashboard ----------
 @router.get("/dashboard", response_model=DashboardStats)
 async def get_dashboard_stats(
@@ -103,31 +152,37 @@ async def get_dashboard_stats(
         projects_by_category=projects_by_category,
     )
 # ---------- CRUD: Users ----------
-@router.get("/users")
+@router.get("/users", response_model=list[UserOut])
 async def list_users(
-    skip: int = 0, limit: int = 50, db: Session = Depends(get_db), current_user: User = Depends(get_admin_user)
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_admin_user),
 ):
-    # If current user is admin (not root), exclude other admins from the list
+    # If current user is admin (not root), exclude other admins from the list.
     query = db.query(User)
     if current_user.user_role == UserRole.admin:
         query = query.filter(User.user_role != UserRole.admin)
-    return query.offset(skip).limit(limit).all()
-@router.get("/users/{user_id}")
-async def get_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_admin_user)):
+    rows = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+    return [UserOut.from_user(u) for u in rows]
+@router.get("/users/{user_id}", response_model=UserOut)
+async def get_user(
+    user_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_admin_user),
+):
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(404, "User not found")
-    # Admin cannot view other admins
     if current_user.user_role == UserRole.admin and user.user_role == UserRole.admin:
         raise HTTPException(403, "Admins cannot view other admins")
-    return user
-@router.post("/users")
+    return UserOut.from_user(user)
+@router.post("/users", response_model=UserOut, status_code=201)
 async def create_user(
     data: UserCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_admin_user),
 ):
-    # Only root can create admin users
     if data.role == UserRole.admin and current_user.user_role != UserRole.root:
         raise HTTPException(403, "Only root can create admin users")
     existing = db.query(User).filter(User.email == data.email).first()
@@ -146,7 +201,7 @@ async def create_user(
     db.add(user)
     db.commit()
     db.refresh(user)
-    return user
+    return UserOut.from_user(user)
 @router.patch("/users/{user_id}")
 async def update_user(
     user_id: UUID,
@@ -168,11 +223,17 @@ async def update_user(
     # Prevent self-demotion from root to admin
     if user.id == current_user.id and data.role is not None and data.role != UserRole.root and current_user.user_role == UserRole.root:
         raise HTTPException(403, "Root cannot demote themselves")
-    for key, value in data.model_dump(exclude_unset=True).items():
+    update = data.model_dump(exclude_unset=True)
+    # Password lives on the ORM as a hash, so pop it out before the generic
+    # setattr loop and handle it separately.
+    new_password = update.pop("password", None)
+    for key, value in update.items():
         setattr(user, key, value)
+    if new_password:
+        user.password = hash_password(new_password)
     db.commit()
     db.refresh(user)
-    return user
+    return UserOut.from_user(user)
 @router.delete("/users/{user_id}")
 async def delete_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_admin_user)):
     user = db.get(User, user_id)
