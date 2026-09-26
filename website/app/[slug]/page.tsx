@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
+import { ExpertCTA } from "./_components/expert-cta";
 import TatarstanIcon from "@/components/icons/experts-icons/Tatarstan-icon";
 import { EXPERTS_DATA } from "@/app/_data/experts";
 import {
@@ -392,52 +393,7 @@ export default async function ExpertPage({
       </ScrollReveal>
 
       {/* ═══════════ CTA ═══════════ */}
-      <ScrollReveal threshold={0.02}>
-        <Container variant="full-width" className="pt-24 md:pt-32">
-          <div className="max-w-[1200px] mx-auto">
-            <div className="relative rounded-5xl border border-(--outline) bg-(--card) p-8 md:p-14 overflow-hidden text-center">
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 60% 90% at 50% 0%, var(--primary-glass), transparent 70%)",
-                }}
-              />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 mb-6">
-                  <Sparkle className="size-4 text-(--primary)" weight="fill" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-(--on-bg-low)">
-                    Сотрудничество
-                  </span>
-                </div>
-                <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight mb-6 max-w-2xl mx-auto">
-                  Хотите работать с {displayName.split(" ")[0]}?
-                </h2>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button size="large" asChild>
-                    <Link href="/order">
-                      Оформить заказ
-                      <ArrowUpRight className="size-4" />
-                    </Link>
-                  </Button>
-                  {enrichment?.socials?.[0] && (
-                    <Button size="large" variant="outlined" asChild>
-                      <Link
-                        href={enrichment.socials[0].href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Написать напрямую
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </ScrollReveal>
+      <ExpertCTA displayName={displayName} />
     </main>
   );
 }

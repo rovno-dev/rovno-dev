@@ -1,10 +1,8 @@
 """Admin-only team membership management."""
 from typing import Optional
 from uuid import UUID
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from app.api.v1.admin import get_admin_user
 from app.models.team_member import TeamMember
 from app.models.user import User
@@ -12,6 +10,12 @@ from app.schemas.team.requests import TeamMemberCreate, TeamMemberUpdate
 from app.schemas.team.responses import TeamMemberWithUser
 from app.shared.auth import get_current_user
 from database.database import get_db
+
+# ── Project pinning imports ──────────────────────────────────────────────
+from app.models.project import Project
+from app.models.project_role import ProjectRole
+from app.models.project_team_assignment import ProjectTeamAssignment
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/admin/team", tags=["admin-team"])
 
@@ -45,7 +49,6 @@ def list_team(
     if not include_inactive:
         q = q.filter(TeamMember.is_active.is_(True))
     members = q.order_by(TeamMember.sort_order.asc(), TeamMember.created_at.asc()).all()
-
     users_by_id = {
         u.id: u
         for u in db.query(User)
@@ -65,12 +68,8 @@ def make_team_member(
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(404, "User not found")
-
-    existing = (
-        db.query(TeamMember).filter(TeamMember.user_id == user_id).first()
-    )
+    existing = db.query(TeamMember).filter(TeamMember.user_id == user_id).first()
     if existing:
-        # Reactivate and update in place.
         existing.is_active = True
         existing.role = payload.role
         if payload.bio is not None:
@@ -82,7 +81,6 @@ def make_team_member(
         db.commit()
         db.refresh(existing)
         return _to_response(existing, user)
-
     tm = TeamMember(
         user_id=user_id,
         role=payload.role,
@@ -158,14 +156,12 @@ def remove_team_member(
 # than a diff for the size of data involved (a handful of rows per member).
 # ---------------------------------------------------------------------------
 
-from app.models.project import Project
-from app.models.project_team_assignment import ProjectTeamAssignment
-from app.models.project_role import ProjectRole
-from pydantic import BaseModel
-
 
 class ProjectAssignmentIn(BaseModel):
     project_id: str
+    # Prefer role_id (managed taxonomy). role_on_project is the legacy
+    # free-text field — still accepted so older clients keep working.
+    role_id: Optional[UUID] = None
     role_on_project: Optional[str] = None
 
 
@@ -175,7 +171,11 @@ class SetProjectsRequest(BaseModel):
 
 class ProjectAssignmentOut(BaseModel):
     project_id: str
+    role_id: Optional[UUID] = None
     role_on_project: Optional[str] = None
+    # When role_id is set, labels is the ProjectRole.labels dict so the
+    # client can render in the active language. Empty otherwise.
+    role_labels: Optional[dict] = None
     # Denormalized for the dialog — saves a client-side join.
     title: Optional[str] = None
     slug: Optional[str] = None
@@ -190,19 +190,31 @@ def _list_member_projects(db: Session, team_member_id) -> list[ProjectAssignment
         .order_by(Project.title.asc())
         .all()
     )
-    return [
-        ProjectAssignmentOut(
-            project_id=proj.id,
-            role_on_project=asg.role_on_project,
-            title=proj.title,
-            slug=proj.slug,
-            period=proj.period,
+    out: list[ProjectAssignmentOut] = []
+    for asg, proj in rows:
+        labels = (
+            asg.role.labels
+            if asg.role and isinstance(asg.role.labels, dict)
+            else None
         )
-        for asg, proj in rows
-    ]
+        out.append(
+            ProjectAssignmentOut(
+                project_id=proj.id,
+                role_id=asg.role_id,
+                role_on_project=asg.role_on_project,
+                role_labels=labels,
+                title=proj.title,
+                slug=proj.slug,
+                period=proj.period,
+            )
+        )
+    return out
 
 
-@router.get("/users/{user_id}/projects", response_model=list[ProjectAssignmentOut])
+@router.get(
+    "/users/{user_id}/projects",
+    response_model=list[ProjectAssignmentOut],
+)
 def get_team_member_projects(
     user_id: UUID,
     db: Session = Depends(get_db),
@@ -214,7 +226,10 @@ def get_team_member_projects(
     return _list_member_projects(db, tm.id)
 
 
-@router.put("/users/{user_id}/projects", response_model=list[ProjectAssignmentOut])
+@router.put(
+    "/users/{user_id}/projects",
+    response_model=list[ProjectAssignmentOut],
+)
 def set_team_member_projects(
     user_id: UUID,
     payload: SetProjectsRequest,
@@ -237,35 +252,39 @@ def set_team_member_projects(
         if missing:
             raise HTTPException(422, f"Unknown project ids: {sorted(missing)}")
 
+    # Validate that every role_id actually exists too.
+    role_ids = [p.role_id for p in payload.projects if p.role_id]
+    if role_ids:
+        existing_roles = {
+            row[0]
+            for row in db.query(ProjectRole.id)
+            .filter(ProjectRole.id.in_(role_ids))
+            .all()
+        }
+        missing_roles = set(role_ids) - existing_roles
+        if missing_roles:
+            raise HTTPException(
+                422,
+                f"Unknown role ids: {sorted(map(str, missing_roles))}",
+            )
+
+    # Replace-all: delete the member's existing assignments, insert the new
+    # set. Dedupe incoming ids in case the client sends the same project twice.
     db.query(ProjectTeamAssignment).filter(
         ProjectTeamAssignment.team_member_id == tm.id
     ).delete()
-
-    # Dedupe incoming ids in case the client sends the same project twice.
     seen: set[str] = set()
-
-            # Validate every role_id actually exists before writing.
-            role_ids = [p.role_id for p in payload.projects if p.role_id]
-            if role_ids:
-                existing_roles = {
-                    row[0]
-                    for row in db.query(ProjectRole.id).filter(ProjectRole.id.in_(role_ids)).all()
-                }
-                missing_roles = set(role_ids) - existing_roles
-                if missing_roles:
-                    raise HTTPException(422, f"Unknown role ids: {sorted(map(str, missing_roles))}")
     for p in payload.projects:
         if p.project_id in seen:
             continue
         seen.add(p.project_id)
         db.add(
             ProjectTeamAssignment(
-                role_id=p.role_id,
                 project_id=p.project_id,
                 team_member_id=tm.id,
+                role_id=p.role_id,
                 role_on_project=p.role_on_project,
             )
         )
-
     db.commit()
     return _list_member_projects(db, tm.id)
