@@ -46,6 +46,7 @@ export function TeamMemberEditorDialog({
 }: Props) {
   // -- Form state --
   const [role, setRole] = useState("");
+  const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [sortOrder, setSortOrder] = useState(0);
@@ -63,6 +64,7 @@ export function TeamMemberEditorDialog({
   useEffect(() => {
     if (!member) return;
     setRole(member.role || "");
+    setUsername(member.user_username || "");
     setBio(member.bio || "");
     setCoverUrl(member.cover_url || "");
     setSortOrder(member.sort_order ?? 0);
@@ -156,6 +158,8 @@ export function TeamMemberEditorDialog({
         cover_url: coverUrl.trim() || null,
         sort_order: sortOrder,
         is_active: isActive,
+        // Sent even when empty so the admin can intentionally clear it.
+        username: username.trim() || null,
       });
       await setTeamMemberProjects(
         member.user_id,
@@ -242,6 +246,39 @@ export function TeamMemberEditorDialog({
               onChange={(e) => setRole(e.target.value)}
               placeholder="Со-основатель и CTO"
             />
+          </Field>
+
+          {/* Username drives the public URL /<username>. Required for the
+              member to show up on /about and for their expert page to
+              exist. Editable here so the admin doesn't have to hunt
+              through the users page. */}
+          <Field>
+            <FieldLabel>
+              Username (URL)
+              {!username.trim() && (
+                <span className="text-destructive text-body-6 font-normal ml-2">
+                  — без него профиль не появится на сайте
+                </span>
+              )}
+            </FieldLabel>
+            <Input
+              value={username}
+              onChange={(e) =>
+                setUsername(
+                  e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9_-]/g, ""),
+                )
+              }
+              placeholder="niyazgim"
+            />
+            <p className="text-body-6 text-(--on-bg-low) mt-1">
+              Публичная страница:{" "}
+              <code className="font-mono">
+                /{username.trim() || "…"}
+              </code>
+              {" "}· только a-z, 0-9, дефис, подчёркивание
+            </p>
           </Field>
 
           <Field>

@@ -89,6 +89,9 @@ export async function updateTeamMember(
     cover_url?: string | null;
     sort_order?: number;
     is_active?: boolean;
+    /** Applied to the linked user. Required for the member to appear on
+     *  /about and to have a working /<username> profile. */
+    username?: string | null;
   }
 ): Promise<TeamMemberAdmin> {
   const res = await $fetch(`/api/v1/admin/team/users/${userId}`, {
@@ -166,6 +169,87 @@ export async function fetchTeamMemberProjectsPublic(
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/api/v1/team/by-username/${encodeURIComponent(username)}/projects`,
+      { next: { revalidate: 60 } } as any,
+    );
+    if (!res.ok) return [];
+    const body = await res.json();
+    return Array.isArray(body) ? (body as TeamMemberPublicProject[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Server-side fetchers. Used by Server Components (about page, expert page).
+// Plain `fetch` with ISR — no $fetch, no cookie storage, no client deps.
+// ─────────────────────────────────────────────────────────────────────────
+
+const API_BASE =
+  process.env.API_BASE_URL_INTERNAL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:8000";
+
+export interface PublicTeamMember {
+  id: string;
+  user_id: string;
+  username: string;
+  name: string | null;
+  surname: string | null;
+  role: string;
+  bio: string | null;
+  cover_url: string | null;
+  avatar_url: string | null;
+  short_bio: string | null;
+  sort_order: number;
+  project_count: number;
+}
+
+export interface TeamMemberPublicProject {
+  id: string;
+  slug: string;
+  title: string;
+  short_description: string | null;
+  cover_image_src: string;
+  cover_video_src: string | null;
+  period: string | null;
+  role_on_project: string | null;
+  category_label: string | null;
+}
+
+export async function fetchPublicTeamServer(): Promise<PublicTeamMember[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/team`, {
+      next: { revalidate: 60 },
+    } as any);
+    if (!res.ok) return [];
+    const body = await res.json();
+    return Array.isArray(body) ? (body as PublicTeamMember[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchTeamMemberServer(
+  username: string,
+): Promise<PublicTeamMember | null> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/v1/team/by-username/${encodeURIComponent(username)}`,
+      { next: { revalidate: 60 } } as any,
+    );
+    if (!res.ok) return null;
+    return (await res.json()) as PublicTeamMember;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchTeamMemberProjectsServer(
+  username: string,
+): Promise<TeamMemberPublicProject[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/v1/team/by-username/${encodeURIComponent(username)}/projects`,
       { next: { revalidate: 60 } } as any,
     );
     if (!res.ok) return [];

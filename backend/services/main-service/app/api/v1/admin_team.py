@@ -107,8 +107,29 @@ def update_team_member(
     tm = db.query(TeamMember).filter(TeamMember.user_id == user_id).first()
     if not tm:
         raise HTTPException(404, "User is not a team member")
-    for k, v in payload.model_dump(exclude_unset=True).items():
+
+    update = payload.model_dump(exclude_unset=True)
+
+    # `username` lives on the User, not the TeamMember row. Pop it out and
+    # apply it separately with a uniqueness check, then update the rest of
+    # the fields onto the team member as before.
+    username = update.pop("username", None)
+    user = db.get(User, user_id)
+    if username is not None and user is not None:
+        new_username = username.strip() or None
+        if new_username and new_username != user.username:
+            clash = (
+                db.query(User.id)
+                .filter(User.username == new_username, User.id != user.id)
+                .first()
+            )
+            if clash:
+                raise HTTPException(409, "Username already taken")
+            user.username = new_username
+
+    for k, v in update.items():
         setattr(tm, k, v)
+
     db.commit()
     db.refresh(tm)
     return _to_response(tm, db.get(User, user_id))

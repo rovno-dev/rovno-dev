@@ -16,3 +16,8 @@ class TeamMemberUpdate(BaseModel):
     cover_url: Optional[str] = None
     sort_order: Optional[int] = None
     is_active: Optional[bool] = None
+    # Editable from the same dialog for convenience. Saved onto the linked
+    # User record (with a uniqueness check), not the TeamMember row.
+    # Required for the member to appear on the public /about page and to
+    # have a working /<username> expert profile.
+    username: Optional[str] = Field(None, min_length=2, max_length=60)

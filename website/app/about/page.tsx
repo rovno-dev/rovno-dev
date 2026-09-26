@@ -1,22 +1,29 @@
-"use client";
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Star, Users, Code, Palette, FilmStrip } from "@phosphor-icons/react";
-import { EXPERTS_DATA } from "@/app/_data/experts";
+import {
+  ArrowUpRight,
+  Star,
+  Users,
+  Code,
+  Palette,
+  FilmStrip,
+} from "@phosphor-icons/react/dist/ssr";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
+import {
+  fetchPublicTeamServer,
+  type PublicTeamMember,
+} from "@/utils/api/team";
 
-const experts = Object.values(EXPERTS_DATA);
+export const revalidate = 60;
 
 /* ═══════════════════════ HERO ═══════════════════════ */
 function AboutHero() {
   return (
     <section className="relative py-20 md:py-32 border-b border-(--outline) overflow-hidden">
-      {/* Blueprint grid, faded to a radial */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none opacity-[0.05]"
@@ -38,7 +45,6 @@ function AboutHero() {
             "radial-gradient(ellipse 50% 60% at 15% 10%, var(--primary-glass), transparent 65%)",
         }}
       />
-
       <Container className="relative">
         <div className="max-w-[900px] animate-reveal">
           <p className="text-body-5 uppercase tracking-[0.34em] text-(--on-bg-low) mb-5">
@@ -48,7 +54,7 @@ function AboutHero() {
             Создаём цифровые продукты, <br />
             <span className="text-(--primary)">которые меняют правила.</span>
           </h1>
-          <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed max-w-[720px] animate-reveal delay-100 fill-mode-both">
+          <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed max-w-[720px]">
             Rovno.dev — агентство полного цикла, где дизайн встречается с
             передовыми технологиями. Мы не просто рисуем интерфейсы, мы
             проектируем опыт, который помогает брендам расти в мире больших
@@ -77,6 +83,11 @@ const VALUES = [
     title: "Партнёрство",
     body: "Работаем как внутренняя команда клиента, а не как подрядчик на час. Остаёмся после релиза — там, где начинается самое интересное.",
   },
+  {
+    icon: FilmStrip,
+    title: "Скорость без спешки",
+    body: "Спринты по две недели, демо в конце каждого. Быстро — потому что процесс отлажен, а не потому что режем углы.",
+  },
 ];
 
 function ValuesSection() {
@@ -92,17 +103,16 @@ function ValuesSection() {
               </span>
             </div>
             <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight max-w-[700px]">
-              Три вещи, которые мы не готовы менять.
+              Четыре вещи, которые мы не готовы менять.
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {VALUES.map((v, i) => {
               const Icon = v.icon;
               return (
                 <Card
                   key={i}
                   className="rounded-3xl border border-(--outline) bg-(--card) ring-0 p-7 md:p-9 relative overflow-hidden group hover:border-(--primary)/30 transition-all"
-                  style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <div
                     aria-hidden
@@ -134,37 +144,63 @@ function ValuesSection() {
 }
 
 /* ═══════════════════════ TEAM ═══════════════════════ */
-function ExpertCard({ expert, index }: { expert: (typeof experts)[0]; index: number }) {
-  const primaryStat = expert.stats?.[0];
+function ExpertCard({
+  member,
+  index,
+}: {
+  member: PublicTeamMember;
+  index: number;
+}) {
+  const displayName =
+    [member.name, member.surname].filter(Boolean).join(" ") ||
+    member.username ||
+    "Участник";
+  const avatar = member.avatar_url || member.cover_url || "";
+  const bio = member.bio || member.short_bio || "";
+  const projectsWord =
+    member.project_count === 1
+      ? "проект"
+      : member.project_count < 5
+      ? "проекта"
+      : "проектов";
+
   return (
     <Link
-      href={`/${expert.id}`}
+      href={`/${member.username}`}
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${200 + index * 100}ms` }}
     >
       <Card className="border-none bg-transparent shadow-none ring-0 p-0 overflow-visible">
         <div className="relative mb-6 overflow-hidden rounded-4xl border border-(--outline) bg-(--card) transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-(--primary)/10 group-hover:-translate-y-1">
           <AspectRatio ratio={4 / 5}>
-            <Image
-              src={expert.avatar}
-              alt={expert.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
-            />
+            {avatar ? (
+              <Image
+                src={avatar}
+                alt={displayName}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card) flex items-center justify-center">
+                <span className="text-display-1 font-heading font-semibold tracking-tighter text-(--on-bg-high) opacity-30">
+                  {displayName.slice(0, 1)}
+                </span>
+              </div>
+            )}
           </AspectRatio>
 
-          {/* Bottom gradient with role */}
           <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-            <p className="text-[10px] uppercase tracking-[0.24em] text-white/60 mb-1.5">
-              {primaryStat?.value} {primaryStat?.label}
-            </p>
+            {member.project_count > 0 && (
+              <p className="text-[10px] uppercase tracking-[0.24em] text-white/60 mb-1.5 tabular-nums">
+                {member.project_count} {projectsWord}
+              </p>
+            )}
             <p className="text-body-4 text-white/95 leading-tight">
-              {expert.role}
+              {member.role}
             </p>
           </div>
 
-          {/* Hover arrow */}
           <div className="absolute top-4 right-4 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <span className="flex size-10 items-center justify-center rounded-full bg-white text-black shadow-lg">
               <ArrowUpRight className="size-5" />
@@ -174,22 +210,24 @@ function ExpertCard({ expert, index }: { expert: (typeof experts)[0]; index: num
 
         <div className="px-1">
           <h3 className="text-display-4 text-(--on-bg-high) mb-1">
-            {expert.name}
+            {displayName}
           </h3>
-          <p className="text-body-4 text-(--on-bg-medium) line-clamp-2 leading-relaxed">
-            {expert.description}
-          </p>
+          {bio && (
+            <p className="text-body-4 text-(--on-bg-medium) line-clamp-2 leading-relaxed">
+              {bio}
+            </p>
+          )}
         </div>
       </Card>
     </Link>
   );
 }
 
-function ExpertsSection() {
+function ExpertsSection({ members }: { members: PublicTeamMember[] }) {
   return (
     <section className="py-20 md:py-28 bg-(--card)/40 border-y border-(--outline)">
       <Container>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16 animate-reveal">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
           <div className="max-w-[640px]">
             <div className="flex items-center gap-3 mb-4">
               <span className="h-px w-8 bg-(--primary)" />
@@ -201,8 +239,9 @@ function ExpertsSection() {
               Наши эксперты
             </h2>
             <p className="text-body-2 text-(--on-bg-medium) leading-relaxed">
-              Команда специалистов, объединивших свои усилия для создания
-              исключительных решений.
+              {members.length > 0
+                ? "Команда специалистов, объединивших свои усилия для создания исключительных решений."
+                : "Команда скоро появится здесь."}
             </p>
           </div>
           <Button
@@ -223,11 +262,31 @@ function ExpertsSection() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {experts.map((expert, idx) => (
-            <ExpertCard key={idx} expert={expert} index={idx} />
-          ))}
-        </div>
+        {members.length === 0 ? (
+          <Card className="rounded-3xl border-(--outline) bg-(--card) ring-0 p-10 text-center">
+            <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
+              <Users className="size-6" />
+            </div>
+            <p className="text-body-3 text-(--on-bg-medium)">
+              Экспертов пока нет. Они появятся здесь, как только будут
+              добавлены в команду через админ-панель.
+            </p>
+          </Card>
+        ) : (
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 ${
+              members.length >= 4
+                ? "lg:grid-cols-4"
+                : members.length === 3
+                ? "lg:grid-cols-3"
+                : "lg:grid-cols-2"
+            } gap-6 md:gap-8`}
+          >
+            {members.map((m, idx) => (
+              <ExpertCard key={m.id} member={m} index={idx} />
+            ))}
+          </div>
+        )}
       </Container>
     </section>
   );
@@ -379,12 +438,15 @@ function AboutCTA() {
   );
 }
 
-export default function AboutPage() {
+/* ═══════════════════════ PAGE ═══════════════════════ */
+export default async function AboutPage() {
+  const members = await fetchPublicTeamServer();
+
   return (
     <main className="min-h-screen bg-(--bg)">
       <AboutHero />
       <ValuesSection />
-      <ExpertsSection />
+      <ExpertsSection members={members} />
       <NumbersStrip />
       <ProcessSection />
       <AboutCTA />
