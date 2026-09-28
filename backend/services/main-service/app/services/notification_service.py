@@ -5,7 +5,8 @@ import asyncio
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid, formatdate
-from typing import Any, Dict, List, Iterable
+from typing import Any, Dict, Iterable, List
+from uuid import UUID
 import httpx
 from sqlalchemy.orm import Session
 
@@ -21,8 +22,6 @@ from app.models.user import User, UserRole
 
 logger = logging.getLogger(__name__)
 
-# `{{var}}` interpolation. Intentionally not Jinja2 — no filters, no loops,
-# no expressions. Just named substitution.
 _VAR_RE = re.compile(r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}")
 
 
@@ -52,37 +51,61 @@ def get_or_create_prefs(db: Session, user: User) -> UserNotificationPreference:
     return p
 
 
-def _resolve_recipients(db: Session, ids: Iterable | None) -> List[User]:
-    """Explicit recipient list, else every unblocked admin/root.
+def _parse_ids(raw: Iterable | None) -> List[UUID]:
+    """Tolerate the JSON column's contents being strings, UUIDs, or garbage.
 
-    Shared between the email and telegram channels — each one passes in
-    its own id list. Empty/None collapses to the admin/root default.
+    Old rows may hold strings, new rows hold UUIDs, and a hand-edited row
+    could hold anything. Bad entries are skipped with a log line rather
+    than taking the whole notification down.
     """
-    id_list = [str(i) for i in (ids or [])]
+    out: List[UUID] = []
+    for i in (raw or []):
+        try:
+            out.append(UUID(str(i)))
+        except (ValueError, TypeError, AttributeError):
+            logger.warning("Notification settings: skipping invalid recipient id %r", i)
+    return out
+
+
+def _resolve_recipients(db: Session, ids: Iterable | None, channel: str) -> List[User]:
+    id_list = _parse_ids(ids)
     if id_list:
         users = db.query(User).filter(User.id.in_(id_list)).all()
+        found = {u.id for u in users}
+        missing = [str(i) for i in id_list if i not in found]
+        if missing:
+            logger.warning(
+                "%s recipients: %d id(s) do not resolve to a user: %s",
+                channel, len(missing), missing,
+            )
         return [u for u in users if not u.blocked]
-    return (
+    # Fall back to every unblocked admin/root.
+    users = (
         db.query(User)
         .filter(User.user_role.in_([UserRole.admin, UserRole.root]))
         .filter(User.blocked.is_(False))
         .all()
     )
+    logger.info(
+        "%s recipients: empty list — defaulting to %d admin/root user(s)",
+        channel, len(users),
+    )
+    return users
 
 
 def resolve_email_recipients(db: Session, settings: NotificationSettings) -> List[User]:
-    # Prefer the channel-specific list; fall back to the legacy shared one.
     ids = settings.order_email_recipient_ids
     if not ids:
+        # Prefer the channel-specific list, fall back to the legacy one.
         ids = settings.order_recipient_ids
-    return _resolve_recipients(db, ids)
+    return _resolve_recipients(db, ids, "Email")
 
 
 def resolve_telegram_recipients(db: Session, settings: NotificationSettings) -> List[User]:
     ids = settings.order_telegram_recipient_ids
     if not ids:
         ids = settings.order_recipient_ids
-    return _resolve_recipients(db, ids)
+    return _resolve_recipients(db, ids, "Telegram")
 
 
 def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
@@ -121,8 +144,12 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
         logger.error("MAIL_PORT is not a number")
         return False
     if not (sender and password and server):
-        logger.error("Email config incomplete for notification")
+        logger.error(
+            "Email config incomplete — MAIL_SENDER=%r MAIL_SERVER=%r MAIL_PASSWORD=%s",
+            sender, server, "set" if password else "MISSING",
+        )
         return False
+
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = formataddr(("Rovno.dev", sender))
@@ -134,30 +161,36 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
     msg["Auto-Submitted"] = "auto-generated"
     msg["X-Auto-Response-Suppress"] = "All"
     msg.set_content(body)
+
     try:
-        # Port 465 requires implicit TLS; 25/587/2525 use STARTTLS.
         if port == 465:
             with smtplib.SMTP_SSL(server, port, timeout=15) as s:
-                s.ehlo()
-                s.login(sender, password)
-                s.send_message(msg)
+                s.ehlo(); s.login(sender, password); s.send_message(msg)
         else:
             with smtplib.SMTP(server, port, timeout=15) as s:
-                s.ehlo()
-                s.starttls()
-                s.ehlo()
-                s.login(sender, password)
-                s.send_message(msg)
+                s.ehlo(); s.starttls(); s.ehlo()
+                s.login(sender, password); s.send_message(msg)
+        logger.info("Email delivery OK → %s (subject=%r)", to_email, subject)
         return True
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(
+            "Email auth FAILED for %s — server said %s %r. If this is "
+            "Gmail/Yandex/Mail.ru, MAIL_PASSWORD must be an App Password.",
+            sender, e.smtp_code, e.smtp_error,
+        )
+        return False
     except Exception as e:
-        logger.error("Notification email to %s failed: %s", to_email, e, exc_info=True)
+        logger.error(
+            "Email delivery FAILED → %s via %s:%s — %s: %s",
+            to_email, server, port, type(e).__name__, e,
+        )
         return False
 
 
 async def _send_telegram(chat_id: str, text: str) -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
-        logger.warning("TELEGRAM_BOT_TOKEN not set — skipping telegram notification")
+        logger.error("Telegram delivery SKIPPED — TELEGRAM_BOT_TOKEN not set in .env")
         return False
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
@@ -165,79 +198,138 @@ async def _send_telegram(chat_id: str, text: str) -> bool:
         "text": text,
         "disable_web_page_preview": True,
     }
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            r = await client.post(url, json=payload)
-            if r.status_code != 200:
-                logger.error(
-                    "Telegram send failed to %s: %s %s",
-                    chat_id, r.status_code, r.text,
-                )
-                return False
-        return True
-    except Exception as e:
-        logger.error("Telegram send error: %s", e, exc_info=True)
-        return False
+    # 3 attempts with exponential backoff. A single DNS hiccup on a cold
+    # container used to kill the delivery outright; a couple of retries
+    # turns that into a non-event.
+    last_error: str = ""
+    for attempt in range(1, 4):
+        try:
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.post(url, json=payload)
+                if r.status_code == 200:
+                    logger.info("Telegram delivery OK → chat %s", chat_id)
+                    return True
+                # 4xx is a client problem (bad token, user blocked bot) —
+                # retrying won't help. Bail out.
+                if 400 <= r.status_code < 500:
+                    logger.error(
+                        "Telegram delivery FAILED → chat %s — %s %s "
+                        "(not retrying — client error)",
+                        chat_id, r.status_code, r.text,
+                    )
+                    return False
+                last_error = f"HTTP {r.status_code}: {r.text}"
+        except Exception as e:
+            last_error = f"{type(e).__name__}: {e}"
+
+        if attempt < 3:
+            backoff = 2 ** (attempt - 1)
+            logger.warning(
+                "Telegram delivery attempt %d/3 → chat %s failed (%s); "
+                "retrying in %ds",
+                attempt, chat_id, last_error, backoff,
+            )
+            await asyncio.sleep(backoff)
+
+    logger.error(
+        "Telegram delivery FAILED after 3 attempts → chat %s — %s",
+        chat_id, last_error,
+    )
+    return False
 
 
 async def notify_new_order(db: Session, order: OrderRequest) -> None:
     """Fan out a new-order notification to every subscribed recipient.
 
-    Email and telegram have independent recipient lists: a user may receive
-    one channel, the other, both, or neither. Per-channel user preferences
-    (email_enabled / telegram_enabled) are applied on top of the list.
-
-    Called from orders.create_order immediately after commit. Failures are
-    logged and swallowed — the order has already been persisted, and a
-    notification outage must not surface as a 500 to the customer.
+    Email and Telegram are independent channels with independent recipient
+    lists. Per-user preferences gate each channel again. Every decision is
+    logged so a failed delivery is diagnosable from the service logs alone.
     """
+    logger.info("notify_new_order: order %s — building notification", order.id)
+
     settings = get_or_create_settings(db)
+    logger.info(
+        "notify_new_order: settings loaded — "
+        "email_enabled=%s telegram_enabled=%s "
+        "email_ids=%s telegram_ids=%s legacy_ids=%s",
+        settings.order_notify_email,
+        settings.order_notify_telegram,
+        settings.order_email_recipient_ids,
+        settings.order_telegram_recipient_ids,
+        settings.order_recipient_ids,
+    )
 
     email_recipients = (
         resolve_email_recipients(db, settings) if settings.order_notify_email else []
     )
     telegram_recipients = (
-        resolve_telegram_recipients(db, settings)
-        if settings.order_notify_telegram else []
+        resolve_telegram_recipients(db, settings) if settings.order_notify_telegram else []
+    )
+
+    logger.info(
+        "notify_new_order: resolved %d email recipient(s) and %d telegram recipient(s)",
+        len(email_recipients), len(telegram_recipients),
     )
 
     if not email_recipients and not telegram_recipients:
-        logger.info("Order %s: no notification recipients configured", order.id)
+        logger.warning(
+            "notify_new_order: NO recipients to notify for order %s — "
+            "check the admin notifications page", order.id,
+        )
         return
 
     context = build_order_context(db, order)
     subject = render_template(settings.order_template_subject, context)
     body = render_template(settings.order_template_body, context)
 
-    # Dedupe across channels: a user who appears in both lists should get
-    # one email and one telegram, not one of each per list entry. SQLAlchemy
-    # may hand back the same User instance from the identity map, so keying
-    # on id is the safe way to collapse them.
     email_ids = {u.id for u in email_recipients}
     telegram_ids = {u.id for u in telegram_recipients}
     by_id: Dict[Any, User] = {}
     for u in email_recipients + telegram_recipients:
         by_id[u.id] = u
 
-    tasks = []
+    tasks: List = []
     for uid, user in by_id.items():
         prefs = get_or_create_prefs(db, user)
 
-        if uid in email_ids and prefs.email_enabled:
-            tasks.append(
-                asyncio.to_thread(_send_email_sync, user.email, subject, body)
-            )
+        if uid in email_ids:
+            if prefs.email_enabled:
+                tasks.append(
+                    asyncio.to_thread(_send_email_sync, user.email, subject, body)
+                )
+            else:
+                logger.info(
+                    "notify_new_order: user %s opted OUT of email", user.email
+                )
 
-        if uid in telegram_ids and prefs.telegram_enabled and prefs.telegram_chat_id:
-            telegram_text = f"{subject}\n\n{body}"
-            tasks.append(_send_telegram(prefs.telegram_chat_id, telegram_text))
+        if uid in telegram_ids:
+            if not prefs.telegram_enabled:
+                logger.info(
+                    "notify_new_order: user %s opted OUT of telegram", user.email
+                )
+            elif not prefs.telegram_chat_id:
+                logger.warning(
+                    "notify_new_order: user %s has NO telegram_chat_id — "
+                    "cannot deliver", user.email,
+                )
+            else:
+                telegram_text = f"{subject}\n\n{body}"
+                tasks.append(_send_telegram(prefs.telegram_chat_id, telegram_text))
 
     if not tasks:
-        logger.info("Order %s: no delivery channels enabled", order.id)
+        logger.warning(
+            "notify_new_order: NO delivery tasks scheduled for order %s — "
+            "check per-user preferences and chat ids", order.id,
+        )
         return
 
+    logger.info(
+        "notify_new_order: dispatching %d task(s) for order %s",
+        len(tasks), order.id,
+    )
     results = await asyncio.gather(*tasks, return_exceptions=True)
     ok = sum(1 for r in results if r is True)
     logger.info(
-        "Order %s notification: %d/%d delivered", order.id, ok, len(tasks),
+        "notify_new_order: DONE for order %s — %d/%d delivered",
+        order.id, ok, len(tasks),
     )

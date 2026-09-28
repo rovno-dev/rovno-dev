@@ -11,6 +11,20 @@ setup_logging()
 logger = logging.getLogger(__name__)
 logger.info("Starting main service")
 
+# Loud startup check for notification-related env vars. Missing values
+# here are silent at request time (delivery just returns False), so log
+# them once at boot instead of forcing the operator to infer it from a
+# missing email.
+_notif_required = ["MAIL_SENDER", "MAIL_PASSWORD", "MAIL_SERVER"]
+_notif_missing = [k for k in _notif_required if not os.getenv(k)]
+if _notif_missing:
+    logger.warning(
+        "Email notifications DISABLED — missing env vars: %s",
+        ", ".join(_notif_missing),
+    )
+if not os.getenv("TELEGRAM_BOT_TOKEN"):
+    logger.warning("Telegram notifications DISABLED — TELEGRAM_BOT_TOKEN not set")
+
 app = FastAPI(title="Main Service", version="1.0.0", root_path="/api")
 
 # LLM context: ALLOWED_ORIGINS accepts exact origins AND wildcards like

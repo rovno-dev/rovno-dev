@@ -4,7 +4,7 @@ import json
 import asyncio
 import html
 from typing import List, Optional
-from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, status, BackgroundTasks
 from pydantic import BaseModel, EmailStr, Field, ValidationError, field_validator
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -16,7 +16,7 @@ from app.models.company import Company, LifecycleStage
 from app.models.client import Client
 from app.models.order_request import OrderRequest, EstimateDeadline, EstimateBudget
 from app.models.order_request_file import OrderRequestFile
-from database.database import get_db
+from database.database import get_db, SessionLocal
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/orders", tags=["orders"])
@@ -86,6 +86,7 @@ async def notify_telegram(order_data: dict, order_id: str):
 
 @router.post("/create")
 async def create_order(
+    background_tasks: BackgroundTasks,
     services: str = Form(...),
     company_name: Optional[str] = Form(None),
     naming_help: Optional[str] = Form(None),
@@ -236,8 +237,34 @@ async def create_order(
         order_request.id, saved,
     )
 
-    asyncio.create_task(notify_telegram(valid_data.model_dump(), str(order_request.id)))
+    # Fan out the notification with its own DB session (the request-scoped
+    # `db` from Depends(get_db) is closed before the background task runs).
+    background_tasks.add_task(_dispatch_notifications, order_request.id)
     return {"status": "ok", "order_id": str(order_request.id)}
+
+
+async def _dispatch_notifications(order_id) -> None:
+    """Open a fresh session, load the order, hand off to the notification
+    service. Runs as a FastAPI background task, so exceptions must not
+    propagate — a delivery outage can't 500 the (already-persisted) order.
+    """
+    from app.services.notification_service import notify_new_order
+    from app.models.order_request import OrderRequest as _OrderRequest
+
+    logger.info("Notification dispatch: starting for order %s", order_id)
+    try:
+        with SessionLocal() as db:
+            order = db.get(_OrderRequest, order_id)
+            if not order:
+                logger.warning(
+                    "Notification dispatch: order %s not found", order_id
+                )
+                return
+            await notify_new_order(db, order)
+    except Exception:
+        logger.exception(
+            "Notification dispatch crashed for order %s", order_id
+        )
 
 # ponytail: serve uploaded order files. Backend wrote them, so it can read them
 # back. Frontend hits this through the Next.js proxy at /order_files/<name>.
