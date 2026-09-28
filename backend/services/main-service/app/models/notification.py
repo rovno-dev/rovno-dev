@@ -7,30 +7,27 @@ from database.database import Base
 
 # Default template body. Kept here (not in the migration) so both the model
 # default and the migration's seed row reference the same string.
-DEFAULT_ORDER_SUBJECT = "Новый заказ #{{short_id}}"
+DEFAULT_ORDER_SUBJECT = "🎯 Новый заказ #{{short_id}}"
 
-DEFAULT_ORDER_BODY = """**Новый заказ**
+DEFAULT_ORDER_BODY = """🎯 **Новый заказ #{{short_id}}**
 
-ID: `{{order_id}}`
-Создан: {{created_at}}
+**👤 Клиент**
+• Имя: {{name}}
+• Телефон: {{phone}}
+• Email: {{email}}
+• Telegram: {{telegram}}
 
-**Клиент**
-Имя: {{name}}
-Телефон: {{phone}}
-Email: {{email}}
-Telegram: {{telegram}}
+**💼 Проект**
+• Услуги: {{services}}
+• Бюджет: {{budget|не указан}}
+• Срок: {{deadline|не указан}}
+• Нейминг: {{naming_help|—}}
+• Компания: {{company_name|—}}
 
-**Проект**
-Услуги: {{services}}
-Бюджет: {{budget}}
-Срок: {{deadline}}
-Нейминг: {{naming_help}}
-Компания: {{company_name}}
+**📝 Описание**
+{{about|—}}
 
-**Описание**
-{{about}}
-
-**Файлов:** {{files_count}}"""
+📎 Файлов: {{files_count}}"""
 
 
 class NotificationSettings(Base):
