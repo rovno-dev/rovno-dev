@@ -1170,7 +1170,7 @@ function UserEditorDialog({
                         email: form.email,
                         name: form.name,
                         surname: form.surname,
-                      } as User)}
+                      } as unknown as User)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">

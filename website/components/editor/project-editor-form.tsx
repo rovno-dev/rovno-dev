@@ -340,7 +340,10 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               emptyText="Нет категорий"
               createNoun="Создать категорию"
               onCreate={async (label) => {
-                const c = await createProjectCategory(label);
+                // createProjectCategory expects { code?, label?, labels? }.
+                // Passing a bare string would land in `code` and produce
+                // a blank display label.
+                const c = await createProjectCategory({ label });
                 setCategories((prev) => [...prev, c]);
                 return { id: c.id, label: c.label };
               }}

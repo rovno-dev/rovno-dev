@@ -43,7 +43,7 @@ export const safeCookieStorage = {
                 expires: expiresDays,
                 ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
                 path: '/',
-                sameSite: 'Lax',
+                sameSite: 'lax',
                 secure: isHttps,
             })
         } catch (e) {

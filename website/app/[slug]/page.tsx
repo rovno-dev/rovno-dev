@@ -102,7 +102,10 @@ export default async function ExpertPage({
   const longBio = member.bio;
   const shortBio = member.short_bio;
 
-  const projects = mergeProjects(dbProjects, enrichment?.projects || []);
+  // Projects come from project_team_assignments only — the hardcoded
+  // ExpertData no longer carries a `projects` array. Empty fallback
+  // keeps the merge helper's signature intact.
+  const projects = mergeProjects(dbProjects, []);
   const projectWord =
     projects.length === 1
       ? "кейс"

@@ -12,6 +12,11 @@ export interface Taxonomy {
   label: string;
 }
 
+// Aliases so callers can name the exact taxonomy they mean without
+// inventing parallel interfaces. Both tables have the same shape.
+export type ProjectCategory = Taxonomy;
+export type ProjectRole = Taxonomy;
+
 /** Pick the best label for the given language, falling back to English. */
 export function pickLabel(
   t: Taxonomy | { labels?: Record<string, string> | null; label?: string | null; code?: string },

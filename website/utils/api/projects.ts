@@ -134,6 +134,28 @@ export async function fetchGithubReadme(repo: string, branch?: string): Promise<
 
 
 /**
+ * Minimal shape of a row returned by GET /api/v1/projects. Only the
+ * fields `fetchPublishedProjectsClient` actually consumes are declared —
+ * the endpoint returns more, but keeping this narrow keeps the client
+ * surface honest.
+ */
+interface DbProjectList {
+  id: string;
+  slug: string;
+  title: string;
+  short_description?: string | null;
+  cover_image_src: string;
+  cover_video_src?: string | null;
+  category?: {
+    id: string;
+    code: string;
+    label?: string;
+    labels?: Record<string, string>;
+  } | null;
+  period?: string | null;
+}
+
+/**
  * Client-side fetch of the public project list. Uses $fetch, which resolves
  * NEXT_PUBLIC_API_BASE_URL from the browser — the same base every authed
  * call already uses. Fails soft so a backend blip never breaks the grid.

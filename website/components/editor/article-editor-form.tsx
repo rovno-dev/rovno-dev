@@ -44,6 +44,8 @@ interface FormState {
   seo_title: string;
   meta_description: string;
   raw_json: string;
+  // Article gallery — same shape the backend stores on the row.
+  attachments: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[];
 }
 
 function toFormState(article?: Article | null): FormState {
@@ -59,6 +61,7 @@ function toFormState(article?: Article | null): FormState {
       seo_title: "",
       meta_description: "",
       raw_json: "",
+      attachments: [],
     };
   }
   return {
@@ -67,11 +70,17 @@ function toFormState(article?: Article | null): FormState {
     description: article.description || "",
     image_url: article.image_url || "",
     date: (article.date || new Date().toISOString()).slice(0, 10),
-    tags: article.tags || [],
     mdx_content: article.mdx_content || "",
     seo_title: article.seo_title || "",
     meta_description: article.meta_description || "",
     raw_json: article.raw_json ? JSON.stringify(article.raw_json, null, 2) : "",
+    // TagRef[] -> string[] — the tag editor works with names.
+    tags: (article.tags || []).map((t) => t.name),
+    // Default sort_order so the media uploader has a stable key.
+    attachments: (article.attachments || []).map((a, i) => ({
+      ...a,
+      sort_order: a.sort_order ?? i,
+    })),
   };
 }
 

@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CaretRightIcon, NewspaperIcon, GemIcon, GlobeIcon, SignatureIcon, CubeIcon } from "@phosphor-icons/react";
+import { CaretRightIcon, NewspaperIcon, DiamondIcon, GlobeIcon, SignatureIcon, CubeIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 /* ---------- Hero Section ---------- */
 function HeroSection() {
@@ -36,7 +36,7 @@ function CompanyDetailsCard() {
     <Card className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0 animate-reveal fill-mode-both">
       <div className="flex items-center gap-4 mb-6">
         <div className="flex size-12 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary)">
-          <GemIcon className="size-6" />
+          <DiamondIcon className="size-6" />
         </div>
         <h2 className="text-display-4 text-(--on-bg-high)">Реквизиты компании</h2>
       </div>
@@ -102,7 +102,7 @@ const certificates = [
   {
     title: "Партнер 1С-Битрикс",
     subtitle: "Золотой сертификат",
-    icon: <GemIcon className="size-8 text-(--primary)" />,
+    icon: <DiamondIcon className="size-8 text-(--primary)" />,
   },
   {
     title: "Топ-10 RUWARD",

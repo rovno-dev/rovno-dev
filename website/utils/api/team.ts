@@ -204,18 +204,6 @@ export interface PublicTeamMember {
   project_count: number;
 }
 
-export interface TeamMemberPublicProject {
-  id: string;
-  slug: string;
-  title: string;
-  short_description: string | null;
-  cover_image_src: string;
-  cover_video_src: string | null;
-  period: string | null;
-  role_on_project: string | null;
-  category_label: string | null;
-}
-
 export async function fetchPublicTeamServer(): Promise<PublicTeamMember[]> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/team`, {

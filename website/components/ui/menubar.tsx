@@ -22,10 +22,12 @@ function Menubar({
   )
 }
 
-function MenubarMenu({
-  ...props
-}: React.ComponentProps<typeof MenubarPrimitive.List>) {
-  return <MenubarPrimitive.List data-slot="menubar-menu" {...props} />
+// Radix's Menubar has no intermediate `List` component — Triggers and
+// Contents sit directly under Root. This wrapper exists only so callers
+// can write `<MenubarMenu>` without restructuring; it renders children
+// inline.
+function MenubarMenu({ children }: { children?: React.ReactNode }) {
+  return <>{children}</>
 }
 
 function MenubarGroup({
@@ -242,7 +244,7 @@ function MenubarSubTrigger({
       {...props}
     >
       {children}
-      <CaretRight className="ml-auto size-4" />
+      <CaretRightIcon className="ml-auto size-4" />
     </MenubarPrimitive.SubTrigger>
   )
 }

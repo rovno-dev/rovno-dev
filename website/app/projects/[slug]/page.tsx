@@ -274,7 +274,11 @@ export default async function ProjectPage({
   // 3. Normalize to the shape every renderer understands.
   const ctx = dbProject
     ? dbToContext(dbProject, content)
-    : staticToContext(projectData!, content);
+    // parser.Project and index.Project overlap in every field the
+    // renderer reads; only their `category` typing diverges (free-form
+    // string vs literal union). Cast through unknown to satisfy TS
+    // without weakening either definition.
+    : staticToContext(projectData as unknown as Project, content);
 
   // 4. Pick a renderer:
   //      a. DB row's custom_page wins (admin-controlled)

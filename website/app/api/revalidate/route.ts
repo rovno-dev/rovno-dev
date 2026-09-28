@@ -50,7 +50,10 @@ export async function POST(req: NextRequest) {
   }
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    // Next.js 16: revalidateTag(tag, profile). `"default"` uses the
+    // route's own revalidate window. Passing "max" would force the tag
+    // to be considered stale indefinitely.
+    revalidateTag(tag, "default");
   }
 
   return NextResponse.json({

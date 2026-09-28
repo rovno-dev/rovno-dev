@@ -20,9 +20,9 @@ const registerSchema = z.object({
     .regex(/\d/, "errors.password_needs_digit")
     .regex(/[A-Z]/, "errors.password_needs_upper"),
   // Explicit consent is required to submit the form (152-ФЗ).
-  agreement: z.literal(true, {
-    errorMap: () => ({ message: "errors.agreement_required" }),
-  }),
+  // Zod v4: the second param takes `error` (a string or error map),
+  // not `errorMap`. Message is a key looked up by the language hook.
+  agreement: z.literal(true, { error: "errors.agreement_required" }),
 })
 export default function RegisterPage() {
   const router = useRouter()
