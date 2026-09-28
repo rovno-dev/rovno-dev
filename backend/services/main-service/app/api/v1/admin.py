@@ -68,6 +68,24 @@ class UserCreate(BaseModel):
         if not any(char.isupper() for char in v):
             raise ValueError('Password must contain at least one uppercase letter')
         return v
+def _load_prefs_map(db: Session, user_ids: list) -> dict:
+    """Batch-load per-user notification preferences keyed by user_id.
+
+    Returns a dict whose values are the UserNotificationPreference rows.
+    Callers read the fields they need (telegram_chat_id, email_enabled,
+    telegram_enabled) — the row is passed straight through so we only pay
+    for one query per request.
+    """
+    if not user_ids:
+        return {}
+    return {
+        p.user_id: p
+        for p in db.query(UserNotificationPreference)
+        .filter(UserNotificationPreference.user_id.in_(user_ids))
+        .all()
+    }
+
+
 class UserOut(BaseModel):
     """Serialised user shape returned to the admin panel.
 
@@ -75,9 +93,10 @@ class UserOut(BaseModel):
     `role`; this schema bridges the two so the JSON is stable regardless of
     the model's internal field name.
 
-    `telegram_chat_id` lives on `user_notification_preferences`, not on
-    `users`. Callers that already loaded prefs pass it in; when it isn't
-    supplied the field comes back null.
+    Notification fields (`telegram_chat_id`, `email_enabled`,
+    `telegram_enabled`) live on `user_notification_preferences`. Callers
+    pass the loaded pref row in; when it isn't supplied, the defaults below
+    match a fresh row.
     """
     id: UUID
     email: str
@@ -85,14 +104,17 @@ class UserOut(BaseModel):
     surname: Optional[str] = None
     phone: Optional[str] = None
     username: Optional[str] = None
+    avatar_url: Optional[str] = None
     role: str
     verified: bool = False
     blocked: bool = False
     telegram_chat_id: Optional[str] = None
+    email_enabled: bool = True
+    telegram_enabled: bool = True
     created_at: Optional[datetime] = None
 
     @classmethod
-    def from_user(cls, u: User, telegram_chat_id: Optional[str] = None) -> "UserOut":
+    def from_user(cls, u: User, prefs: Optional[UserNotificationPreference] = None) -> "UserOut":
         return cls(
             id=u.id,
             email=u.email,
@@ -100,10 +122,13 @@ class UserOut(BaseModel):
             surname=u.surname,
             phone=u.phone,
             username=u.username,
+            avatar_url=u.avatar_url,
             role=(u.user_role.value if u.user_role else "user"),
             verified=bool(u.verified),
             blocked=bool(u.blocked),
-            telegram_chat_id=telegram_chat_id,
+            telegram_chat_id=(prefs.telegram_chat_id if prefs else None),
+            email_enabled=(prefs.email_enabled if prefs else True),
+            telegram_enabled=(prefs.telegram_enabled if prefs else True),
             created_at=u.created_at,
         )
 
@@ -124,6 +149,13 @@ class UserUpdate(BaseModel):
     # notifications on Telegram without going through the bot deep link.
     # `None` = leave untouched; empty string = clear.
     telegram_chat_id: Optional[str] = None
+    # Per-channel opt-in. `None` = leave untouched. Writes go to
+    # user_notification_preferences (created on demand).
+    email_enabled: Optional[bool] = None
+    telegram_enabled: Optional[bool] = None
+    # Avatar URL — managed here so an admin can set it without going
+    # through the user's own profile page.
+    avatar_url: Optional[str] = None
 
     @field_validator("password")
     @classmethod
@@ -182,18 +214,7 @@ async def list_users(
     if current_user.user_role == UserRole.admin:
         query = query.filter(User.user_role != UserRole.admin)
     rows = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
-
-    # One extra query for all prefs, so the client gets the current chat id
-    # alongside each user without N+1 round-trips.
-    user_ids = [u.id for u in rows]
-    prefs_by_id: dict = {}
-    if user_ids:
-        prefs_by_id = {
-            p.user_id: p.telegram_chat_id
-            for p in db.query(UserNotificationPreference)
-            .filter(UserNotificationPreference.user_id.in_(user_ids))
-            .all()
-        }
+    prefs_by_id = _load_prefs_map(db, [u.id for u in rows])
     return [UserOut.from_user(u, prefs_by_id.get(u.id)) for u in rows]
 @router.get("/users/{user_id}", response_model=UserOut)
 async def get_user(
@@ -207,7 +228,7 @@ async def get_user(
     if current_user.user_role == UserRole.admin and user.user_role == UserRole.admin:
         raise HTTPException(403, "Admins cannot view other admins")
     prefs = db.get(UserNotificationPreference, user.id)
-    return UserOut.from_user(user, prefs.telegram_chat_id if prefs else None)
+    return UserOut.from_user(user, prefs)
 @router.post("/users", response_model=UserOut, status_code=201)
 async def create_user(
     data: UserCreate,
@@ -255,39 +276,51 @@ async def update_user(
     if user.id == current_user.id and data.role is not None and data.role != UserRole.root and current_user.user_role == UserRole.root:
         raise HTTPException(403, "Root cannot demote themselves")
     update = data.model_dump(exclude_unset=True)
-    # Password lives on the ORM as a hash, so pop it out before the generic
-    # setattr loop and handle it separately.
+
+    # --- Split out fields that don't live on the User row ---
     new_password = update.pop("password", None)
-    # Telegram chat id lives on user_notification_preferences, not users.
-    # `exclude_unset` means its presence in the dict is meaningful: only
-    # patch it when the client actually sent the key.
+
+    # Notification fields live on user_notification_preferences.
+    # `exclude_unset` means we only touch them when the client sent the key.
     telegram_chat_id_was_sent = "telegram_chat_id" in update
     telegram_chat_id = update.pop("telegram_chat_id", None)
+    email_enabled_was_sent = "email_enabled" in update
+    email_enabled = update.pop("email_enabled", None)
+    telegram_enabled_was_sent = "telegram_enabled" in update
+    telegram_enabled = update.pop("telegram_enabled", None)
 
+    # Everything left (name, surname, email, phone, role, verified,
+    # blocked, avatar_url, ...) is a plain User column.
     for key, value in update.items():
         setattr(user, key, value)
     if new_password:
         user.password = hash_password(new_password)
 
-    if telegram_chat_id_was_sent:
+    # --- Apply notification prefs (create the row lazily) ---
+    if telegram_chat_id_was_sent or email_enabled_was_sent or telegram_enabled_was_sent:
         prefs = db.get(UserNotificationPreference, user.id)
         if not prefs:
             prefs = UserNotificationPreference(user_id=user.id)
             db.add(prefs)
-        cleaned = (telegram_chat_id or "").strip() or None
-        prefs.telegram_chat_id = cleaned
-        if cleaned and not prefs.linked_at:
-            # Match the bot's behaviour — the link time is used in the
-            # admin UI to show when a user got wired up.
-            prefs.linked_at = datetime.utcnow()
-        if not cleaned:
-            prefs.telegram_username = None
-            prefs.linked_at = None
+
+        if telegram_chat_id_was_sent:
+            cleaned = (telegram_chat_id or "").strip() or None
+            prefs.telegram_chat_id = cleaned
+            if cleaned and not prefs.linked_at:
+                prefs.linked_at = datetime.utcnow()
+            if not cleaned:
+                prefs.telegram_username = None
+                prefs.linked_at = None
+
+        if email_enabled_was_sent and email_enabled is not None:
+            prefs.email_enabled = bool(email_enabled)
+        if telegram_enabled_was_sent and telegram_enabled is not None:
+            prefs.telegram_enabled = bool(telegram_enabled)
 
     db.commit()
     db.refresh(user)
     prefs = db.get(UserNotificationPreference, user.id)
-    return UserOut.from_user(user, prefs.telegram_chat_id if prefs else None)
+    return UserOut.from_user(user, prefs)
 @router.delete("/users/{user_id}")
 async def delete_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_admin_user)):
     user = db.get(User, user_id)

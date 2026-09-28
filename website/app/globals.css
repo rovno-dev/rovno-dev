@@ -606,6 +606,36 @@
   }
 }
 
+/* Thin, themed scrollbar used by admin surfaces (dialogs, tables).
+   Webkit-only for Chromium/Safari; Firefox gets scrollbar-width: thin.
+   Colours track the theme so light and dark modes both stay quiet. */
+.scrollbar-admin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline) transparent;
+}
+.scrollbar-admin::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scrollbar-admin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-admin::-webkit-scrollbar-thumb {
+  background: var(--outline);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.15s;
+}
+.scrollbar-admin::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--on-bg-low), transparent 30%);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
+.scrollbar-admin::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* marker highlight utility */
 @utility marker-highlight {
   position: relative;
