@@ -12,6 +12,7 @@ from app.models.article import Article
 from app.models.project import Project
 from app.models.team_member import TeamMember
 from app.models.client import Client
+from app.models.notification import UserNotificationPreference
 from database.database import get_db
 from uuid import UUID
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -73,6 +74,10 @@ class UserOut(BaseModel):
     The ORM model stores the role as `user_role` and the frontend expects
     `role`; this schema bridges the two so the JSON is stable regardless of
     the model's internal field name.
+
+    `telegram_chat_id` lives on `user_notification_preferences`, not on
+    `users`. Callers that already loaded prefs pass it in; when it isn't
+    supplied the field comes back null.
     """
     id: UUID
     email: str
@@ -83,10 +88,11 @@ class UserOut(BaseModel):
     role: str
     verified: bool = False
     blocked: bool = False
+    telegram_chat_id: Optional[str] = None
     created_at: Optional[datetime] = None
 
     @classmethod
-    def from_user(cls, u: User) -> "UserOut":
+    def from_user(cls, u: User, telegram_chat_id: Optional[str] = None) -> "UserOut":
         return cls(
             id=u.id,
             email=u.email,
@@ -97,6 +103,7 @@ class UserOut(BaseModel):
             role=(u.user_role.value if u.user_role else "user"),
             verified=bool(u.verified),
             blocked=bool(u.blocked),
+            telegram_chat_id=telegram_chat_id,
             created_at=u.created_at,
         )
 
@@ -113,6 +120,10 @@ class UserUpdate(BaseModel):
     # satisfy the same strength rules as registration; the endpoint hashes
     # it before writing. Leave unset to leave the password untouched.
     password: Optional[str] = Field(None, min_length=8)
+    # Set/clear the user's Telegram chat id so they can receive order
+    # notifications on Telegram without going through the bot deep link.
+    # `None` = leave untouched; empty string = clear.
+    telegram_chat_id: Optional[str] = None
 
     @field_validator("password")
     @classmethod
@@ -171,7 +182,19 @@ async def list_users(
     if current_user.user_role == UserRole.admin:
         query = query.filter(User.user_role != UserRole.admin)
     rows = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
-    return [UserOut.from_user(u) for u in rows]
+
+    # One extra query for all prefs, so the client gets the current chat id
+    # alongside each user without N+1 round-trips.
+    user_ids = [u.id for u in rows]
+    prefs_by_id: dict = {}
+    if user_ids:
+        prefs_by_id = {
+            p.user_id: p.telegram_chat_id
+            for p in db.query(UserNotificationPreference)
+            .filter(UserNotificationPreference.user_id.in_(user_ids))
+            .all()
+        }
+    return [UserOut.from_user(u, prefs_by_id.get(u.id)) for u in rows]
 @router.get("/users/{user_id}", response_model=UserOut)
 async def get_user(
     user_id: UUID,
@@ -183,7 +206,8 @@ async def get_user(
         raise HTTPException(404, "User not found")
     if current_user.user_role == UserRole.admin and user.user_role == UserRole.admin:
         raise HTTPException(403, "Admins cannot view other admins")
-    return UserOut.from_user(user)
+    prefs = db.get(UserNotificationPreference, user.id)
+    return UserOut.from_user(user, prefs.telegram_chat_id if prefs else None)
 @router.post("/users", response_model=UserOut, status_code=201)
 async def create_user(
     data: UserCreate,
@@ -234,13 +258,36 @@ async def update_user(
     # Password lives on the ORM as a hash, so pop it out before the generic
     # setattr loop and handle it separately.
     new_password = update.pop("password", None)
+    # Telegram chat id lives on user_notification_preferences, not users.
+    # `exclude_unset` means its presence in the dict is meaningful: only
+    # patch it when the client actually sent the key.
+    telegram_chat_id_was_sent = "telegram_chat_id" in update
+    telegram_chat_id = update.pop("telegram_chat_id", None)
+
     for key, value in update.items():
         setattr(user, key, value)
     if new_password:
         user.password = hash_password(new_password)
+
+    if telegram_chat_id_was_sent:
+        prefs = db.get(UserNotificationPreference, user.id)
+        if not prefs:
+            prefs = UserNotificationPreference(user_id=user.id)
+            db.add(prefs)
+        cleaned = (telegram_chat_id or "").strip() or None
+        prefs.telegram_chat_id = cleaned
+        if cleaned and not prefs.linked_at:
+            # Match the bot's behaviour — the link time is used in the
+            # admin UI to show when a user got wired up.
+            prefs.linked_at = datetime.utcnow()
+        if not cleaned:
+            prefs.telegram_username = None
+            prefs.linked_at = None
+
     db.commit()
     db.refresh(user)
-    return UserOut.from_user(user)
+    prefs = db.get(UserNotificationPreference, user.id)
+    return UserOut.from_user(user, prefs.telegram_chat_id if prefs else None)
 @router.delete("/users/{user_id}")
 async def delete_user(user_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_admin_user)):
     user = db.get(User, user_id)

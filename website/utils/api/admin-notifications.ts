@@ -3,7 +3,12 @@ import { $fetch } from "@/utils/fetch";
 export interface AdminNotificationSettings {
   order_notify_email: boolean;
   order_notify_telegram: boolean;
+  /** Legacy single list — kept for backward compatibility. */
   order_recipient_ids: string[];
+  /** Who receives new-order notifications by email. */
+  order_email_recipient_ids: string[];
+  /** Who receives new-order notifications via Telegram. */
+  order_telegram_recipient_ids: string[];
   order_template_subject: string;
   order_template_body: string;
   default_subject: string;
@@ -30,6 +35,8 @@ export async function updateAdminNotificationSettings(
       order_notify_email: payload.order_notify_email,
       order_notify_telegram: payload.order_notify_telegram,
       order_recipient_ids: payload.order_recipient_ids,
+      order_email_recipient_ids: payload.order_email_recipient_ids,
+      order_telegram_recipient_ids: payload.order_telegram_recipient_ids,
       order_template_subject: payload.order_template_subject,
       order_template_body: payload.order_template_body,
     }),

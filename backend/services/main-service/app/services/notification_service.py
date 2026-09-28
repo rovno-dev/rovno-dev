@@ -5,8 +5,7 @@ import asyncio
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid, formatdate
-from typing import Any, Dict, List
-
+from typing import Any, Dict, List, Iterable
 import httpx
 from sqlalchemy.orm import Session
 
@@ -53,15 +52,15 @@ def get_or_create_prefs(db: Session, user: User) -> UserNotificationPreference:
     return p
 
 
-def resolve_recipients(db: Session, settings: NotificationSettings) -> List[User]:
-    """Explicit recipient list, else every unblocked admin/root."""
-    ids = settings.order_recipient_ids or []
-    if ids:
-        users = (
-            db.query(User)
-            .filter(User.id.in_([str(i) for i in ids]))
-            .all()
-        )
+def _resolve_recipients(db: Session, ids: Iterable | None) -> List[User]:
+    """Explicit recipient list, else every unblocked admin/root.
+
+    Shared between the email and telegram channels — each one passes in
+    its own id list. Empty/None collapses to the admin/root default.
+    """
+    id_list = [str(i) for i in (ids or [])]
+    if id_list:
+        users = db.query(User).filter(User.id.in_(id_list)).all()
         return [u for u in users if not u.blocked]
     return (
         db.query(User)
@@ -71,6 +70,21 @@ def resolve_recipients(db: Session, settings: NotificationSettings) -> List[User
     )
 
 
+def resolve_email_recipients(db: Session, settings: NotificationSettings) -> List[User]:
+    # Prefer the channel-specific list; fall back to the legacy shared one.
+    ids = settings.order_email_recipient_ids
+    if not ids:
+        ids = settings.order_recipient_ids
+    return _resolve_recipients(db, ids)
+
+
+def resolve_telegram_recipients(db: Session, settings: NotificationSettings) -> List[User]:
+    ids = settings.order_telegram_recipient_ids
+    if not ids:
+        ids = settings.order_recipient_ids
+    return _resolve_recipients(db, ids)
+
+
 def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
     c = order.client
     company_name = ""
@@ -78,7 +92,6 @@ def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
         company = db.get(Company, c.company_id)
         if company:
             company_name = company.name or ""
-
     return {
         "order_id": str(order.id),
         "short_id": str(order.id)[:8],
@@ -110,7 +123,6 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
     if not (sender and password and server):
         logger.error("Email config incomplete for notification")
         return False
-
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = formataddr(("Rovno.dev", sender))
@@ -122,14 +134,20 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
     msg["Auto-Submitted"] = "auto-generated"
     msg["X-Auto-Response-Suppress"] = "All"
     msg.set_content(body)
-
     try:
-        with smtplib.SMTP(server, port, timeout=15) as s:
-            s.ehlo()
-            s.starttls()
-            s.ehlo()
-            s.login(sender, password)
-            s.send_message(msg)
+        # Port 465 requires implicit TLS; 25/587/2525 use STARTTLS.
+        if port == 465:
+            with smtplib.SMTP_SSL(server, port, timeout=15) as s:
+                s.ehlo()
+                s.login(sender, password)
+                s.send_message(msg)
+        else:
+            with smtplib.SMTP(server, port, timeout=15) as s:
+                s.ehlo()
+                s.starttls()
+                s.ehlo()
+                s.login(sender, password)
+                s.send_message(msg)
         return True
     except Exception as e:
         logger.error("Notification email to %s failed: %s", to_email, e, exc_info=True)
@@ -165,13 +183,25 @@ async def _send_telegram(chat_id: str, text: str) -> bool:
 async def notify_new_order(db: Session, order: OrderRequest) -> None:
     """Fan out a new-order notification to every subscribed recipient.
 
+    Email and telegram have independent recipient lists: a user may receive
+    one channel, the other, both, or neither. Per-channel user preferences
+    (email_enabled / telegram_enabled) are applied on top of the list.
+
     Called from orders.create_order immediately after commit. Failures are
     logged and swallowed — the order has already been persisted, and a
     notification outage must not surface as a 500 to the customer.
     """
     settings = get_or_create_settings(db)
-    recipients = resolve_recipients(db, settings)
-    if not recipients:
+
+    email_recipients = (
+        resolve_email_recipients(db, settings) if settings.order_notify_email else []
+    )
+    telegram_recipients = (
+        resolve_telegram_recipients(db, settings)
+        if settings.order_notify_telegram else []
+    )
+
+    if not email_recipients and not telegram_recipients:
         logger.info("Order %s: no notification recipients configured", order.id)
         return
 
@@ -179,16 +209,26 @@ async def notify_new_order(db: Session, order: OrderRequest) -> None:
     subject = render_template(settings.order_template_subject, context)
     body = render_template(settings.order_template_body, context)
 
+    # Dedupe across channels: a user who appears in both lists should get
+    # one email and one telegram, not one of each per list entry. SQLAlchemy
+    # may hand back the same User instance from the identity map, so keying
+    # on id is the safe way to collapse them.
+    email_ids = {u.id for u in email_recipients}
+    telegram_ids = {u.id for u in telegram_recipients}
+    by_id: Dict[Any, User] = {}
+    for u in email_recipients + telegram_recipients:
+        by_id[u.id] = u
+
     tasks = []
-    for user in recipients:
+    for uid, user in by_id.items():
         prefs = get_or_create_prefs(db, user)
-        if settings.order_notify_email and prefs.email_enabled:
-            tasks.append(asyncio.to_thread(_send_email_sync, user.email, subject, body))
-        if (
-            settings.order_notify_telegram
-            and prefs.telegram_enabled
-            and prefs.telegram_chat_id
-        ):
+
+        if uid in email_ids and prefs.email_enabled:
+            tasks.append(
+                asyncio.to_thread(_send_email_sync, user.email, subject, body)
+            )
+
+        if uid in telegram_ids and prefs.telegram_enabled and prefs.telegram_chat_id:
             telegram_text = f"{subject}\n\n{body}"
             tasks.append(_send_telegram(prefs.telegram_chat_id, telegram_text))
 
@@ -199,6 +239,5 @@ async def notify_new_order(db: Session, order: OrderRequest) -> None:
     results = await asyncio.gather(*tasks, return_exceptions=True)
     ok = sum(1 for r in results if r is True)
     logger.info(
-        "Order %s notification: %d/%d delivered",
-        order.id, ok, len(tasks),
+        "Order %s notification: %d/%d delivered", order.id, ok, len(tasks),
     )

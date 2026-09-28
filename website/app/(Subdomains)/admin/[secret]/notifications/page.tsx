@@ -32,6 +32,8 @@ interface UserRow {
   surname?: string | null;
   user_role?: string;
   role?: string;
+  telegram_chat_id?: string | null;
+  blocked?: boolean;
 }
 
 // Variables the backend renderer understands. Kept in sync with
@@ -99,28 +101,42 @@ export default function AdminNotificationsPage() {
     loadUsers();
   }, [user, load, loadUsers, router]);
 
-  // Only admins and roots are meaningful recipients — filter the pool so the
-  // picker doesn't show normal users.
+  // Any unblocked user can be a recipient. Meta shows what the recipient
+  // actually is (admin/root/tg-linked) so an admin can see at a glance
+  // who is eligible for which channel.
   const recipientItems: MultiPickerItem[] = useMemo(() => {
     return users
-      .filter((u) => u.user_role === "admin" || u.user_role === "root")
+      .filter((u) => !u.blocked)
       .map((u) => {
         const full = `${u.name ?? ""} ${u.surname ?? ""}`.trim();
+        const bits: string[] = [];
+        if (u.user_role === "root") bits.push("root");
+        else if (u.user_role === "admin") bits.push("admin");
+        if (u.telegram_chat_id) bits.push("TG");
         return {
           id: u.id,
           label: full || u.email,
-          meta: u.user_role === "root" ? "root" : "admin",
+          meta: bits.length ? bits.join(" · ") : null,
         };
       });
   }, [users]);
 
-  const selectedRecipients: MultiPickerItem[] = useMemo(() => {
+  const makeSelected = (ids: string[] | undefined): MultiPickerItem[] => {
     if (!settings) return [];
     const map = new Map(recipientItems.map((i) => [i.id, i]));
-    return settings.order_recipient_ids.map(
+    return (ids ?? []).map(
       (id) => map.get(id) ?? { id, label: id, meta: "unknown" },
     );
-  }, [settings, recipientItems]);
+  };
+
+  const selectedEmailRecipients: MultiPickerItem[] = useMemo(
+    () => makeSelected(settings?.order_email_recipient_ids),
+    [settings, recipientItems],
+  );
+  const selectedTelegramRecipients: MultiPickerItem[] = useMemo(
+    () => makeSelected(settings?.order_telegram_recipient_ids),
+    [settings, recipientItems],
+  );
 
   const update = <K extends keyof AdminNotificationSettings>(
     k: K,
@@ -253,19 +269,49 @@ export default function AdminNotificationsPage() {
               </div>
             </Card>
 
-            {/* Recipients */}
+            {/* Email recipients */}
             <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
               <div className="flex items-center gap-2">
-                <Users className="size-5 text-(--primary)" />
-                <h2 className="text-heading-3">Получатели</h2>
+                <EnvelopeSimple className="size-5 text-(--primary)" />
+                <h2 className="text-heading-3">Получатели email</h2>
               </div>
               <p className="text-body-4 text-(--on-bg-medium)">
-                Уведомления получат выбранные пользователи.{" "}
+                Кому уходит письмо о новом заказе.{" "}
                 <b>Если список пуст — все администраторы и root-пользователи.</b>
               </p>
               <EntityMultiPicker
-                value={selectedRecipients}
-                onChange={(next) => update("order_recipient_ids", next.map((n) => n.id))}
+                value={selectedEmailRecipients}
+                onChange={(next) =>
+                  update("order_email_recipient_ids", next.map((n) => n.id))
+                }
+                items={recipientItems}
+                placeholder="Начните вводить имя или email…"
+                maxItems={50}
+              />
+            </Card>
+            {/* Telegram recipients */}
+            <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
+              <div className="flex items-center gap-2">
+                <TelegramLogo className="size-5 text-(--primary)" />
+                <h2 className="text-heading-3">Получатели Telegram</h2>
+              </div>
+              <p className="text-body-4 text-(--on-bg-medium)">
+                Кому уходит сообщение в Telegram. Учитываются только те, у
+                кого указан chat&nbsp;id в разделе{" "}
+                <a
+                  href="?tab=users"
+                  className="text-(--primary) underline underline-offset-2"
+                >
+                  Пользователи
+                </a>
+                .{" "}
+                <b>Если список пуст — все администраторы и root-пользователи.</b>
+              </p>
+              <EntityMultiPicker
+                value={selectedTelegramRecipients}
+                onChange={(next) =>
+                  update("order_telegram_recipient_ids", next.map((n) => n.id))
+                }
                 items={recipientItems}
                 placeholder="Начните вводить имя или email…"
                 maxItems={50}

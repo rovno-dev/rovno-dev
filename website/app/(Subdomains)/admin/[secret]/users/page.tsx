@@ -27,6 +27,8 @@ interface User {
   role: string;
   verified: boolean;
   blocked: boolean;
+  /** Telegram chat id from user_notification_preferences; null when unset. */
+  telegram_chat_id?: string | null;
 }
 
 const ROLE_OPTIONS = [
@@ -53,6 +55,7 @@ export default function AdminUsersPage() {
     role: "user",
     verified: false,
     blocked: false,
+    telegram_chat_id: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   // Map of user_id -> team member role, for the "Team" column
@@ -109,6 +112,7 @@ export default function AdminUsersPage() {
       role: "user",
       verified: false,
       blocked: false,
+      telegram_chat_id: "",
     });
     setFormErrors({});
     setIsCreateMode(true);
@@ -126,6 +130,7 @@ export default function AdminUsersPage() {
       role: user.role,
       verified: user.verified,
       blocked: user.blocked,
+      telegram_chat_id: user.telegram_chat_id || "",
     });
     setFormErrors({});
     setIsCreateMode(false);
@@ -162,6 +167,8 @@ export default function AdminUsersPage() {
           role: formData.role,
           verified: formData.verified,
           blocked: formData.blocked,
+          // Send even when empty — the backend treats "" as "clear".
+          telegram_chat_id: formData.telegram_chat_id,
         };
         if (formData.password) patchData.password = formData.password;
         res = await $fetch(`/api/v1/admin/users/${editingUser!.id}`, {
@@ -256,6 +263,18 @@ export default function AdminUsersPage() {
     { key: "role", header: "Роль" },
     { key: "verified", header: "Подтверждён", render: (u: User) => (u.verified ? "✅" : "❌") },
     { key: "blocked", header: "Заблокирован", render: (u: User) => (u.blocked ? "🚫" : "—") },
+    {
+      key: "telegram_chat_id",
+      header: "TG ID",
+      render: (u: User) =>
+        u.telegram_chat_id ? (
+          <span className="font-mono text-[11px] text-(--on-bg-medium)">
+            {u.telegram_chat_id}
+          </span>
+        ) : (
+          <span className="text-(--on-bg-low) text-xs">—</span>
+        ),
+    },
     {
       key: "team",
       header: "Команда",
@@ -403,6 +422,30 @@ export default function AdminUsersPage() {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </Field>
+            {/* Only meaningful for existing users — creation has no prefs row
+                yet, and the backend only patches prefs on PATCH. */}
+            {!isCreateMode && (
+              <Field>
+                <FieldLabel>
+                  Telegram Chat ID
+                  <span className="text-body-6 text-(--on-bg-low) font-normal ml-2">
+                    для уведомлений о заказах
+                  </span>
+                </FieldLabel>
+                <Input
+                  value={formData.telegram_chat_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, telegram_chat_id: e.target.value })
+                  }
+                  placeholder="123456789 или -1001234567890"
+                />
+                <p className="text-body-6 text-(--on-bg-low) mt-1">
+                  Отправьте пользователю бота и попросите его нажать Start —
+                  chat_id придёт в логах бота. Оставьте пустым, чтобы отключить
+                  Telegram-уведомления для этого пользователя.
+                </p>
+              </Field>
+            )}
             <Field>
               <FieldLabel>Роль</FieldLabel>
               <Select

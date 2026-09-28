@@ -47,7 +47,13 @@ class NotificationSettings(Base):
     order_notify_telegram = Column(Boolean, default=True, nullable=False)
 
     # JSON array of user UUID strings. Empty list → all admins/roots.
+    # Kept for backward compatibility; the two channel-specific lists
+    # below are what the service actually reads now.
     order_recipient_ids = Column(JSON, nullable=True, default=list)
+    # Per-channel recipient overrides. Both fall back to
+    # `order_recipient_ids`, and then to "all admins/roots" when empty.
+    order_email_recipient_ids = Column(JSON, nullable=True, default=list)
+    order_telegram_recipient_ids = Column(JSON, nullable=True, default=list)
 
     order_template_subject = Column(
         String(200), nullable=False, default=DEFAULT_ORDER_SUBJECT
