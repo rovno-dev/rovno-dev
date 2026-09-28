@@ -28,6 +28,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.main-service.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/health`)"
+      # Priority 100 — higher than the frontend's priority 1 — so the
+      # more specific path-based routes always win. Relying on Traefik's
+      # default priority (rule-string length) is fragile: adding a 5th
+      # Host() to the frontend rule would silently flip the ordering.
+      - "traefik.http.routers.main-service.priority=100"
+      # Same entrypoint and TLS settings as the frontend so HTTPS works
+      # on the shared domain without relying on Traefik defaults.
+      - "traefik.http.routers.main-service.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.routers.main-service.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.main-service.tls.certresolver=${CERT_RESOLVER}"
       - "traefik.http.services.main-service.loadbalancer.server.port=8000"
   main-db:
     image: postgres:15-alpine

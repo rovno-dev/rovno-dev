@@ -2,6 +2,6 @@ aiogram==3.10.0
 python-dotenv
 openpyxl
 Pillow
-sqlalchemy
-psycopg2-binary
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
 httpx==0.28.1

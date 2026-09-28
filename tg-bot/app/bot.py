@@ -56,8 +56,14 @@ ALLOWED_USERS = [
     if x.strip()
 ]
 
+# Explicit driver: `postgresql+psycopg2://`. A bare `postgresql://` makes
+# SQLAlchemy try psycopg2 first, then psycopg (v3), then raise if neither
+# is importable — and the resulting ModuleNotFoundError names whichever
+# it tried last, which is confusing when the real problem is a missing
+# or half-installed driver package. Pinning the driver here means the
+# error message, if any, is unambiguous.
 DB_URL = (
-    f"postgresql://{os.getenv('MAIN_DB_USER')}:{os.getenv('MAIN_DB_PASSWORD')}"
+    f"postgresql+psycopg2://{os.getenv('MAIN_DB_USER')}:{os.getenv('MAIN_DB_PASSWORD')}"
     f"@{os.getenv('MAIN_DB_HOST')}:{os.getenv('MAIN_DB_PORT')}/{os.getenv('MAIN_DB_NAME')}"
 )
 MAIN_SERVICE_URL = os.getenv("MAIN_SERVICE_URL", "http://main-service:8000").rstrip("/")

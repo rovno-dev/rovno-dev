@@ -22,6 +22,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.rule=${DOMAIN}"
+      # Priority 1 — explicit catch-all. Backend routers declare higher
+      # priorities (see backend/docker-compose.yml) so that /api, /docs,
+      # and /health never fall through to Next.js. Setting both sides
+      # explicitly means neither depends on rule-string length.
+      - "traefik.http.routers.frontend.priority=1"
       - "traefik.http.routers.frontend.entrypoints=${ENTRYPOINT}"
       - "traefik.http.routers.frontend.tls=${TLS_ENABLED}"
       - "traefik.http.routers.frontend.tls.certresolver=${CERT_RESOLVER}"
