@@ -19,9 +19,41 @@ export const Geist = localFont({
   variable: '--font-sans',
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_ROOT_DOMAIN
+  ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+  : 'http://localhost:3000';
+
 export const metadata: Metadata = {
-  title: "Цифровое агентство полного цикла Rovno.dev",
-  description: "Digital-агентство полного цикла Rovno.dev - дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D",
+  // Absolute-URL anchor for every relative metadata path (canonical, og:image,
+  // icons…). Without it, Next.js emits those URLs as root-relative and Yandex
+  // resolves them against the wrong origin.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Цифровое агентство полного цикла Rovno.dev',
+    template: '%s · Rovno.dev',
+  },
+  description:
+    'Digital-агентство полного цикла Rovno.dev — дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
+  applicationName: 'Rovno.dev',
+  keywords: ['rovno.dev', 'digital-агентство', 'веб-разработка', 'дизайн', 'айдентика', '3D', 'LLM'],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ru_RU',
+    siteName: 'Rovno.dev',
+    title: 'Цифровое агентство полного цикла Rovno.dev',
+    description: 'Дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
+  },
 };
 
 export default function RootLayout({
