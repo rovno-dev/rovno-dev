@@ -1,23 +1,49 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, BookOpenIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeftIcon, BookOpenIcon } from "@phosphor-icons/react";
 import { fetchPublishedArticlesServer } from "@/utils/api/articles";
 
-// HardDrives component so it can pull the recent-articles list without an
-// extra client fetch. Wrapped in try/catch — a 404 page that itself 500s
-// is the worst possible outcome.
-async function getRecentArticles() {
-  try {
-    const all = await fetchPublishedArticlesServer({ limit: 4 });
-    return all;
-  } catch {
-    return [];
-  }
+/**
+ * Blog 404 page. Deliberately a Client Component with a client-side
+ * fetch, NOT an async RSC.
+ *
+ * Next.js renders `not-found.tsx` in a fallback context where its internal
+ * performance marker is captured before the file's async work runs. Any
+ * `await` inside `not-found.tsx` therefore triggers "Failed to execute
+ * 'measure' on 'Performance': '<ComponentName>' cannot have a negative
+ * time stamp" from Turbopack. Doing the fetch in `useEffect` keeps the
+ * server render synchronous and side-steps the bug entirely.
+ */
+
+interface ArticleRef {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
 }
 
-export default async function BlogArticleNotFound() {
-  const recent = await getRecentArticles();
+export default function BlogArticleNotFound() {
+  const [recent, setRecent] = useState<ArticleRef[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublishedArticlesServer({ limit: 4 })
+      .then((all) => {
+        if (!cancelled) setRecent(all as ArticleRef[]);
+      })
+      .catch(() => {
+        // Silent — the "maybe you were looking for" section simply won't
+        // render if the fetch fails. A 404 page that itself errors is the
+        // worst possible outcome.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-(--bg) flex items-center justify-center py-20">
@@ -30,7 +56,8 @@ export default async function BlogArticleNotFound() {
             Такой статьи нет
           </h1>
           <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-10 max-w-md mx-auto">
-            Возможно, ссылка устарела, статья была переименована или её никогда не существовало.
+            Возможно, ссылка устарела, статья была переименована или её никогда не
+            существовало.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
             <Button variant="filled" size="large" asChild>
@@ -41,7 +68,7 @@ export default async function BlogArticleNotFound() {
             </Button>
             <Button variant="outlined" size="large" asChild>
               <Link href="/">
-                <ArrowLeft className="size-4" />
+                <ArrowLeftIcon className="size-4" />
                 На главную
               </Link>
             </Button>
@@ -63,7 +90,9 @@ export default async function BlogArticleNotFound() {
                         <span className="text-body-3 text-(--on-bg-high) truncate group-hover:text-(--primary) transition-colors">
                           {a.title}
                         </span>
-                        <span className="text-body-5 text-(--on-bg-low) shrink-0">→</span>
+                        <span className="text-body-5 text-(--on-bg-low) shrink-0">
+                          →
+                        </span>
                       </div>
                       {a.description && (
                         <p className="text-body-5 text-(--on-bg-medium) mt-1 line-clamp-1">
