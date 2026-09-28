@@ -11,6 +11,7 @@ import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { useLanguage } from "@/providers/language-provider"
+import { extractErrorMessage } from "@/lib/error-message"
 const registerSchema = z.object({
   email: z.string().email("errors.email_invalid"),
   password: z.string()
@@ -68,13 +69,12 @@ export default function RegisterPage() {
           })
           setErrors(fieldErrors)
         } else if (detail) {
-          toast.error(detail)
+          toast.error(extractErrorMessage(response?.json, t("errors.register_failed")))
         }
         setIsLoading(false); return
       }
       if (!response?.response?.ok) {
-        const detail = response?.json?.detail || response?.json?.message || t("errors.register_failed")
-        toast.error(detail)
+        toast.error(extractErrorMessage(response?.json, t("errors.register_failed")))
         setIsLoading(false); return
       }
       toast.success(t("errors.code_sent"), { duration: 5000 })

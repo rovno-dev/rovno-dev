@@ -11,6 +11,7 @@ import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { useUser } from "@/entities/user/model/user-context"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { extractErrorMessage } from "@/lib/error-message"
 
 const loginSchema = z.object({
   email: z.string().email("Некорректный email"),
@@ -68,7 +69,7 @@ export default function LoginPage() {
             }
           })
           setErrors(fieldErrors)
-        } else if (detail) toast.error(detail)
+        } else if (detail) toast.error(extractErrorMessage(response?.json, "Ошибка при входе"))
         setIsLoading(false); return
       }
       if (response?.response?.status === 403) {
@@ -81,7 +82,7 @@ export default function LoginPage() {
         setIsLoading(false); return
       }
       if (!response?.response?.ok) {
-        toast.error(response?.json?.message || "Ошибка при входе")
+        toast.error(extractErrorMessage(response?.json, "Ошибка при входе"))
         setIsLoading(false); return
       }
       const access_token = response?.json?.access_token

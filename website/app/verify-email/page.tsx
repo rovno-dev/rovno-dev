@@ -13,6 +13,7 @@ import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { useLanguage } from "@/providers/language-provider"
 import { EnvelopeIcon } from "@phosphor-icons/react"
+import { extractErrorMessage } from "@/lib/error-message"
 const verifySchema = z.object({
   code: z.string().length(6, "errors.code_length"),
 })
@@ -48,7 +49,7 @@ function VerifyEmailInner() {
       const response = await $fetch("/api/v1/verify-email", {
         method: "POST",
         body: JSON.stringify({ email: formData.email, code: formData.code }),
-        headers: { "Content-TextT": "application/json" },
+        headers: { "Content-Type": "application/json" },
         onLoadingChange: setIsLoading,
         isToast: false,
       })
@@ -64,11 +65,11 @@ function VerifyEmailInner() {
             }
           })
           setErrors(fieldErrors)
-        } else if (detail) toast.error(detail)
+        } else if (detail) toast.error(extractErrorMessage(response?.json, t("errors.verify_failed")))
         setIsLoading(false); return
       }
       if (!response?.response?.ok) {
-        toast.error(response?.json?.detail || response?.json?.message || t("errors.verify_failed"))
+        toast.error(extractErrorMessage(response?.json, t("errors.verify_failed")))
         setIsLoading(false); return
       }
       const access_token = response?.json?.access_token
@@ -97,15 +98,14 @@ function VerifyEmailInner() {
       const response = await $fetch("/api/v1/resend-verification", {
         method: "POST",
         body: JSON.stringify({ email: formData.email, lang }),
-        headers: { "Content-TextT": "application/json" },
+        headers: { "Content-Type": "application/json" },
         onLoadingChange: setIsResending,
         isToast: false,
       })
       if (response?.response?.ok) {
         toast.success(t("errors.code_sent_again"))
       } else {
-        const message = response?.json?.detail || response?.json?.message || t("errors.code_send_failed")
-        toast.error(message)
+        toast.error(extractErrorMessage(response?.json, t("errors.code_send_failed")))
       }
     } catch (err) {
       toast.error(t("errors.connection"))

@@ -119,11 +119,23 @@ async def create_order(
         errors = [{"loc": err["loc"], "msg": str(err["msg"])} for err in e.errors()]
         raise HTTPException(status_code=422, detail=errors)
 
-    # 2. Company (optional, only if company_name provided)
+    # 2. Company (optional, only if company_name provided).
+    # `slug` is NOT NULL as of migration 20260929000000, so we have to
+    # generate a unique one here. Reuse the shared transliterator so a
+    # Cyrillic company name lands on an ASCII URL like `sadovod`, not
+    # percent-encoded garbage.
     company = None
     if valid_data.company_name:
+        from app.shared.slugify import slugify
+        base = slugify(valid_data.company_name, max_len=60, fallback="client")
+        slug, n = base, 2
+        while db.query(Company.id).filter(Company.slug == slug).first():
+            slug = f"{base}-{n}"
+            n += 1
         company = Company(
-            name=valid_data.company_name, lifecycle_stage=LifecycleStage.lead
+            name=valid_data.company_name,
+            slug=slug,
+            lifecycle_stage=LifecycleStage.lead,
         )
         db.add(company)
         db.flush()

@@ -23,7 +23,7 @@ export function CreateCompanyDialog({ onSuccess }: { onSuccess?: () => void }) {
     try {
       const res = await fetch("/api/v1/admin/companies", {
         method: "POST",
-        headers: { "Content-TextT": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
       if (!res.ok) {

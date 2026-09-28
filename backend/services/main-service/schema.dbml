@@ -1,197 +1,345 @@
-
 Project rovno_dev_main_db {
   database_type: 'PostgreSQL'
-  Note: 'Rovno.dev main service db'
+  Note: 'Rovno.dev main service DB — reflects the current schema after all Alembic migrations.'
 }
 
-Enum lifecycle_stage {
-  lead
-  prospect
-  customer
-  regular
-}
+// ═══════════════════════════════════════════════════════════════════════
+// Enums
+// ═══════════════════════════════════════════════════════════════════════
+Enum lifecycle_stage      { lead  prospect  customer  regular }
+Enum estimate_deadline    { asap  under_1_month  "1_3_months"  flexible }
+Enum estimate_budget      { "30k_75k"  "75k_150k"  "150k_500k"  "500k_1kk"  over_1kk  need_consultation }
+Enum order_status         { new  negotiating  work  done  canceled }
+Enum user_role            { client  user  admin  root }
+Enum user_status          { pending_verification  verificated  blocked }
+Enum publication_status   { draft  pending_review  published  rejected  deleted }
+Enum client_status        { from_order  manual  partner }
+Enum project_tag_kind     { from_chief  license  github  custom }
+Enum project_media_type   { image  video }
+Enum tag_kind             { tag  category  brand }
 
-Table companies {
-  id bigint [pk, increment]
-  name varchar [not null, note: 'Client name, e.g. Apple, Anthropic, Google, Yandex']
-  website varchar [note: 'Website URL']
-  logotype_url varchar [note: 'URL to company logo asset']
-  industry varchar
-  lifecycle_stage lifecycle_stage [default: 'lead']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
-}
-
-Table contacts {
-  id bigint [pk, increment]
-  company_id bigint [ref: > companies.id, note: 'Associated company account']
-  user_id bigint [ref: > users.id] // if contact is signed up
-  role_title varchar [note: 'e.g. Marketing Director']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
-  phone varchar [unique]
-  telegram_username varchar
-  email varchar [unique]
-  name varchar
-}
-
-Enum estimate_deadline {
-  asap
-  under_1_month
-  1_3_months
-  flexible
-}
-
-Enum estimate_budget {
-  30k_75k
-  75k_150k
-  150k_500k
-  500k_1kk
-  over_1kk
-  need_consultation
-}
-
-Table order_requests {
-  id bigint [pk, increment]
-  contact_id bigint [ref: > contacts.id]
-  service_types_json jsonb [note: 'Array of services objects string[]']
-  agreement bool [not null]
-  about varchar
-  estimate_deadline estimate_deadline
-  estimate_budget estimate_budget
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
-}
-
-Enum user_role {
-  client, // can only get notifications
-  user, // can make user articles, have and profile (in future)
-  admin, // user + can make crud of all users (except admins), articles, projects, etc.
-  root, // admin + can make crud of all users
-}
-
-Enum user_status { 
-  pending_verification
-  verificated
-  blocked
-}
-
+// ═══════════════════════════════════════════════════════════════════════
+// Core identity
+// ═══════════════════════════════════════════════════════════════════════
 Table users {
-  id bigint [pk, increment]
-  username varchar [note: 'Slug-based string ID like niyazgim']
-  name varchar
-  surname varchar
-  email varchar [unique]
-  phone varchar [unique]
-  password varchar [not null]
-  description text [note: 'Short bio/description']
-  avatar_url varchar
-  telegram_username varchar 
-  linkedin_username varchar 
-  github_username varchar 
-  behance_username varchar
-  youtube_username varchar
-  vk_username varchar 
-  telegram_channel_username varchar
-  vk_public_username varchar
-  user_role user_role [default: 'user']
-  user_status user_status [default: 'pending_verification']
-  other_socials_json jsonb [note: 'Array of other social objects {title: string, url: string}']
-  tags_json jsonb [note: 'Array of tags with optional icon mappings {title: string, icon?: string}[]']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  id                         uuid [pk]
+  username                   varchar [unique]
+  name                       varchar
+  surname                    varchar
+  email                      varchar [unique, not null]
+  phone                      varchar [unique]
+  password                   varchar [not null]
+  description                text
+  // Short bio (max 64 chars) shown next to author bylines.
+  bio                        varchar(64)
+  avatar_url                 varchar
+  telegram_username          varchar [unique]
+  linkedin_username          varchar [unique]
+  github_username            varchar [unique]
+  behance_username           varchar [unique]
+  youtube_username           varchar [unique]
+  vk_username                varchar [unique]
+  telegram_channel_username  varchar [unique]
+  vk_public_username         varchar [unique]
+  user_role                  user_role     [default: 'user']
+  user_status                user_status   [default: 'pending_verification']
+  other_socials_json         json
+  tags_json                  json
+  blocked                    boolean [default: false]
+  verified                   boolean [default: false]
+  created_at                 timestamp [default: `now()`]
+  updated_at                 timestamp [default: `now()`]
 }
 
 Table team_members {
-  id bigint [pk, increment]
-  user_id bigint [ref: > users.id]
-  role varchar [not null, note: 'Internal role description']
-  sort_order int [default: 0]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  id          uuid [pk]
+  user_id     uuid [ref: > users.id]
+  role        varchar [not null, note: 'Internal role label, e.g. "Co-founder & CTO"']
+  bio         text    [note: 'Long-form bio for the /[username] expert page']
+  cover_url   varchar [note: '21:8 banner for the expert hero']
+  sort_order  int     [default: 0]
+  is_active   boolean [default: true, note: 'Soft-remove — keeps historical attribution on articles']
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp [default: `now()`]
 }
 
-Enum publication_status {
-  draft
-  published
-  rejected
-  deleted
+// ═══════════════════════════════════════════════════════════════════════
+// CRM: companies (organizations) & clients (order submitters)
+// ═══════════════════════════════════════════════════════════════════════
+Table companies {
+  id               uuid [pk]
+  name             varchar [not null]
+  slug             varchar [unique, not null]
+  website          varchar
+  logotype_url     varchar
+  industry         varchar
+  description      text
+  lifecycle_stage  lifecycle_stage [default: 'lead']
+  created_at       timestamp [default: `now()`]
+  updated_at       timestamp [default: `now()`]
+}
+
+Table clients {
+  id                 uuid [pk]
+  company_id         uuid [ref: > companies.id]
+  user_id            uuid [ref: > users.id]
+  role_title         varchar
+  // Not unique: two people at the same org may share a company inbox.
+  phone              varchar
+  telegram_username  varchar
+  email              varchar
+  name               varchar
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Orders
+// ═══════════════════════════════════════════════════════════════════════
+Table order_requests {
+  id                   uuid [pk]
+  client_id            uuid [ref: > clients.id]
+  service_types_json   json   [note: 'Array of service strings']
+  about                varchar
+  estimate_deadline    estimate_deadline
+  estimate_budget      estimate_budget
+  naming_help          varchar
+  status               order_status [default: 'new', not null]
+  cancellation_reason  varchar
+  created_at           timestamp [default: `now()`]
+  updated_at           timestamp [default: `now()`]
+}
+
+Table order_request_files {
+  id                uuid [pk]
+  order_request_id  uuid [ref: > order_requests.id, not null]
+  file_path         varchar [not null, note: 'Web URL: /order_files/<uuid>_<name>']
+  filename          varchar [not null]
+  created_at        timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Projects
+// ═══════════════════════════════════════════════════════════════════════
+Table project_categories {
+  id      uuid [pk]
+  code    varchar [unique, not null]
+  label   varchar [not null, note: 'Legacy single-language label — mirrors labels[en]']
+  labels  json    [note: '{lang_code: display_string}; "en" is required']
+}
+
+Table project_roles {
+  id          uuid [pk]
+  code        varchar(60) [unique, not null]
+  labels      json        [not null, default: `'{"en": ""}'::json`]
+  created_at  timestamp   [default: `now()`]
 }
 
 Table projects {
-  id varchar [pk, increment]
-  slug varchar [unique, not null]
-  title varchar [not null]
-  client_id bigint [ref: > companies.id]
-  category varchar
-  platform varchar
-  period varchar [note: 'e.g. 2025 - Present']
-  short_description text
-  description text
-  cover_image_src varchar [not null]
-  cover_video_src varchar
-  href varchar
-  seo_title varchar
-  meta_description varchar
-  tech_stack jsonb [note: 'Array of strings representing tech stack string[]']
-  mdx_content text [note: 'Raw MDX payload managed from MDXEditor']
-  is_featured boolean [default: false]
+  id                 varchar [pk, note: 'Short slug-like id, e.g. "alx"']
+  slug               varchar [unique, not null]
+  title              varchar [not null]
+  client_id          uuid    [ref: > companies.id]
+  category_id        uuid    [ref: > project_categories.id]
+  platform           varchar
+  period             varchar
+  short_description  text
+  description        text
+  cover_image_src    varchar [not null]
+  cover_video_src    varchar
+  href               varchar
+  seo_title          varchar
+  meta_description   varchar
+  mdx_content        text
+  is_featured        boolean [default: false]
   publication_status publication_status [default: 'draft']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  custom_page        varchar(60) [note: 'Bespoke renderer key, e.g. "alx", "bread" — or NULL']
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
 }
 
 Table project_team_assignments {
-  project_id varchar [ref: > projects.id]
-  team_member_id bigint [ref: > team_members.id]
-  role_on_project varchar
-  
+  project_id       varchar [ref: > projects.id]
+  team_member_id   uuid    [ref: > team_members.id]
+  role_on_project  varchar [note: 'Legacy free-text role — retained for pre-migration rows']
+  role_id          uuid    [ref: > project_roles.id, note: 'Preferred; when set, labels resolve from project_roles.labels']
+
   indexes {
     (project_id, team_member_id) [pk]
   }
 }
 
-Table project_categories {
-  id varchar [pk, increment]
-  name varchar [not null]
+Table project_tags {
+  id          uuid [pk]
+  project_id  varchar [ref: > projects.id]
+  kind        project_tag_kind [not null]
+  label       varchar [not null]
+  value       json    [note: 'Shape depends on kind — {author}, {type}, {repo, branch}…']
+  sort_order  int     [default: 0, not null]
 }
 
-Table projects_categories {
-  project_id varchar [ref: > projects.id]
-  project_category_id bigint [ref: > project_categories.id]
-  
+Table project_media {
+  id             uuid [pk]
+  project_id     varchar [ref: > projects.id]
+  type           project_media_type [not null]
+  url            varchar [not null]
+  thumbnail_url  varchar
+  caption        varchar
+  sort_order     int     [default: 0, not null]
+  created_at     timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Tech stack (many-to-many with projects)
+// ═══════════════════════════════════════════════════════════════════════
+Table stack_items {
+  id          uuid [pk]
+  name        varchar(60) [not null]
+  slug        varchar(60) [not null]
+  icon_url    varchar
+  created_at  timestamp [default: `now()`]
+}
+
+Table project_stack_items {
+  project_id    varchar [ref: > projects.id]
+  stack_item_id uuid    [ref: > stack_items.id]
+
   indexes {
-    (project_id, project_category_id) [pk]
+    (project_id, stack_item_id) [pk]
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Tags (shared by articles and events)
+// ═══════════════════════════════════════════════════════════════════════
+Table tags {
+  id          uuid [pk]
+  name        varchar [not null]
+  slug        varchar [not null]
+  kind        tag_kind [not null, default: 'tag']
+  created_at  timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Articles
+// ═══════════════════════════════════════════════════════════════════════
+Table article_categories {
+  id     uuid [pk]
+  code   varchar [unique, not null]
+  label  varchar [not null]
+}
+
 Table articles {
-  id bigint [pk, increment]
-  slug varchar [unique, not null]
-  title varchar [not null]
-  description varchar [not null, note: 'Short description']
-  image_url varchar [not null]
-  date timestamp [not null]
-  tags jsonb [note: 'Array of tag strings string[]']
-  author_id bigint [ref: > team_members.id]
-  mdx_content text [not null, note: 'Raw MDX body payload for blog posts']
-  seo_title varchar
-  meta_description varchar
-  publication_status publication_status [default: 'draft']
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  id                  uuid [pk]
+  slug                varchar [unique, not null]
+  title               varchar [not null]
+  description         varchar [not null, default: '']
+  image_url           varchar [not null, default: '']
+  date                timestamp [not null, default: `now()`]
+  author_id           uuid    [ref: > users.id, note: 'Blog authors are users; FK repointed from team_members']
+  mdx_content         text    [not null, default: '']
+  raw_json            json    [note: 'Unstructured AI-tool payload, stored verbatim']
+  attachments         json    [note: 'Array of {type, url, caption, sort_order}']
+  seo_title           varchar
+  meta_description    varchar
+  publication_status  publication_status [default: 'draft']
+  category_id         uuid    [ref: > article_categories.id, note: 'Legacy — unused by the API']
+  // Review workflow (only for non-team authors).
+  review_note         text
+  reviewed_by_id      uuid    [ref: > users.id]
+  reviewed_at         timestamp
+  created_at          timestamp [default: `now()`]
+  updated_at          timestamp [default: `now()`]
 }
 
-Table articles_categories {
-  id varchar [pk, increment]
-  name varchar [not null]
-}
+Table article_tags {
+  article_id  uuid [ref: > articles.id]
+  tag_id      uuid [ref: > tags.id]
 
-Table articles_categories {
-  article_id varchar [ref: > articles.id]
-  article_category_id bigint [ref: > articles_categories.id]
-  
   indexes {
-    (article_id, article_category_id) [pk]
+    (article_id, tag_id) [pk]
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Events
+// ═══════════════════════════════════════════════════════════════════════
+Table events {
+  id                 varchar [pk]
+  slug               varchar [unique, not null]
+  title              varchar [not null]
+  short_description  text
+  description        text
+  cover_image_src    varchar [not null, default: '']
+  cover_video_src    varchar
+  start_at           timestamp
+  end_at             timestamp
+  location_name      varchar
+  address            varchar
+  metro              varchar
+  city               varchar [default: 'Москва']
+  price              varchar
+  registration_url   varchar
+  capacity           int
+  custom_page        varchar(60)
+  is_featured        boolean [not null, default: false]
+  publication_status varchar [not null, default: 'draft']
+  mdx_content        text
+  seo_title          varchar
+  meta_description   varchar
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+Table event_tags {
+  event_id  varchar [ref: > events.id]
+  tag_id    uuid    [ref: > tags.id]
+
+  indexes {
+    (event_id, tag_id) [pk]
+  }
+}
+
+Table event_requests {
+  id                 uuid [pk]
+  event_id           varchar [ref: > events.id, not null]
+  name               varchar
+  surname            varchar
+  patronymic         varchar
+  phone              varchar
+  email              varchar
+  telegram_username  varchar
+  age                int
+  status             varchar(20) [not null, default: 'new', note: 'new | approved | declined | canceled']
+  decline_reason     varchar
+  meta               json    [note: 'Free-form extra fields from the landing form — mirrors Twenty CRM custom fields']
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Notifications
+// ═══════════════════════════════════════════════════════════════════════
+Table notification_settings {
+  id                       int [pk, note: 'Singleton row — always id=1']
+  order_notify_email       boolean [not null, default: true]
+  order_notify_telegram    boolean [not null, default: true]
+  order_recipient_ids      json    [note: 'Array of user UUIDs. Empty → every unblocked admin/root is notified.']
+  order_template_subject   varchar(200) [not null]
+  order_template_body      text    [not null, note: 'Simple {{var}} interpolation, not Jinja']
+  updated_at               timestamp [default: `now()`]
+}
+
+Table user_notification_preferences {
+  user_id            uuid [pk, ref: > users.id]
+  email_enabled      boolean [not null, default: true]
+  telegram_enabled   boolean [not null, default: true]
+  telegram_chat_id   varchar [note: 'Set when the user completes /start <code> in the bot; NULL = no active binding']
+  telegram_username  varchar
+  linked_at          timestamp
+  updated_at         timestamp [default: `now()`]
+
+  indexes {
+    telegram_chat_id [name: 'ix_user_notif_prefs_chat_id']
   }
 }

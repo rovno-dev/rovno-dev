@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
       const res = await $fetch(`/api/v1/admin/order-requests/${order.id}`, {
         method: "PATCH",
         body: JSON.stringify({ status, cancellation_reason: reason ?? null }),
-        headers: { "Content-TextT": "application/json" },
+        headers: { "Content-Type": "application/json" },
         isToast: false,
       });
       if (!res.response?.ok) {

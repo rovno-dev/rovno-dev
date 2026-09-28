@@ -1,11 +1,18 @@
 "use client"
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
+import { useRouter } from "next/navigation"
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react"
 import { fetchMe } from "@/entities/user/api/fetch-me"
 import { getTokenExpiration } from "@/utils/get-token-expiration"
 import { $fetch } from "@/utils/fetch"
 import { safeCookieStorage } from "@/utils/safe-cookie-storage"
-import { useRouter } from "next/navigation"
 
 interface UserContextType {
   user: any
@@ -25,44 +32,96 @@ export default function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
 
+  // ── Session bootstrap ──────────────────────────────────────────────
+  // Every path through `init` MUST end with `setIsLoading(false)`. If it
+  // doesn't, `isLoading` stays true forever, `CheckUser`/`CheckNotUser`
+  // both render null, and every gated page (including /register) blanks.
+  useEffect(() => {
+    let cancelled = false
+
+    const init = async () => {
+      const refresh_token = safeCookieStorage.getItem("refresh_token")
+      const access_token = safeCookieStorage.getItem("access_token")
+
+      if (!refresh_token || !access_token) {
+        if (!cancelled) setIsLoading(false)
+        return
+      }
+
+      const expTime = getTokenExpiration(access_token)
+      const isExpired = expTime ? Date.now() >= expTime : true
+
+      if (!isExpired) {
+        if (!cancelled) setToken(access_token)
+        return
+      }
+
+      // Access token expired — try the refresh token.
+      // isToast: false — a stale refresh token is a normal state (logout,
+      // deleted account, rotated secret). Toasting the backend's error
+      // message on every page load is noise, not signal.
+      let refreshed: string | null = null
+      try {
+        const response = await $fetch("/api/v1/refresh", {
+          method: "POST",
+          body: JSON.stringify({ refresh_token }),
+          headers: { "Content-Type": "application/json" },
+          isToast: false,
+        })
+        refreshed = response?.json?.access_token || null
+      } catch {
+        refreshed = null
+      }
+
+      if (cancelled) return
+
+      if (refreshed) {
+        safeCookieStorage.setItem("access_token", refreshed)
+        setToken(refreshed)
+        // isLoading stays true — `getUser` below will clear it.
+      } else {
+        // Refresh failed. Clear both cookies so we don't retry on every
+        // navigation, and unblock the UI.
+        safeCookieStorage.removeItem("access_token")
+        safeCookieStorage.removeItem("refresh_token")
+        setIsLoading(false)
+      }
+    }
+
+    init()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // ── Fetch the user once we have a token ────────────────────────────
   const getUser = useCallback(async () => {
     setIsLoading(true)
-    const user_ = await fetchMe()
-    setUser(user_)
-    setIsLoading(false)
-  }, [])
-
-  async function init() {
-    const refresh_token = safeCookieStorage.getItem("refresh_token")
-    const access_token = safeCookieStorage.getItem("access_token")
-
-    if (!refresh_token || !access_token) {
-      setIsLoading(false)
-      return
-    }
-
-    const expTime = getTokenExpiration(access_token)
-    const isExpired = expTime ? Date.now() >= expTime : true
-
-    if (isExpired) {
-      const response = await $fetch("/api/v1/refresh", {
-        method: "POST",
-        body: JSON.stringify({ refresh_token }),
-        headers: { "Content-Type": "application/json" }
-      })
-      const new_access_token = response?.json?.access_token
-      if (new_access_token) {
-        safeCookieStorage.setItem("access_token", new_access_token)
-        setToken(new_access_token)
+    try {
+      const user_ = await fetchMe()
+      setUser(user_)
+      if (!user_) {
+        // fetchMe already cleared the cookies on a 401. Drop the in-memory
+        // token too so the app renders the signed-out state immediately
+        // instead of holding a token that no longer works.
+        setToken(null)
       }
-    } else {
-      setToken(access_token)
+    } catch (err) {
+      // Never leave isLoading stuck true — that blanks the gated pages.
+      console.error("[user-context] fetchMe failed:", err)
+      setUser(null)
+    } finally {
+      setIsLoading(false)
     }
-  }
-
-  useEffect(() => {
-    init()
   }, [])
+
+  // Auth side-effects. Runs whenever `token` changes.
+  useEffect(() => {
+    if (token) {
+      safeCookieStorage.setItem("access_token", token)
+      getUser()
+    }
+  }, [token, getUser])
 
   function clearAuth() {
     safeCookieStorage.removeItem("access_token")
@@ -72,28 +131,26 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }
 
-  useEffect(() => {
-    if (token) {
-      safeCookieStorage.setItem("access_token", token)
-      getUser()
-    } else if (token === null && !isLoading) {
-      clearAuth()
-    }
-  }, [token, getUser])
-
   async function logout() {
     const refresh_token = safeCookieStorage.getItem("refresh_token")
-    await $fetch("/api/v1/logout", {
-      method: "POST",
-      body: JSON.stringify({ refresh_token }),
-      headers: { "Content-Type": "application/json" }
-    })
+    try {
+      await $fetch("/api/v1/logout", {
+        method: "POST",
+        body: JSON.stringify({ refresh_token }),
+        headers: { "Content-Type": "application/json" },
+        isToast: false,
+      })
+    } catch {
+      /* best-effort — the local state is dropped regardless */
+    }
     clearAuth()
     router.push("/login")
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, token, setToken, isLoading, setIsLoading, logout }}>
+    <UserContext.Provider
+      value={{ user, setUser, token, setToken, isLoading, setIsLoading, logout }}
+    >
       {children}
     </UserContext.Provider>
   )

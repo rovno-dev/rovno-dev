@@ -5,6 +5,15 @@ services:
     container_name: tg-bot
     env_file:
       - ../.env
+    environment:
+      # URL of the main FastAPI service inside the shared network.
+      # The bot calls POST {MAIN_SERVICE_URL}/api/v1/bot/link when a user
+      # completes a /start <code> deep link from the site.
+      - MAIN_SERVICE_URL=http://main-service:8000
+      # Shared directory the backend writes order files to. Same host
+      # mount as backend/services/main-service (see that compose file) so
+      # the bot can attach images to the Excel export.
+      - ORDER_FILES_DIR=/app/storage/order_files
     dns:
       - 8.8.8.8
       - 1.1.1.1
@@ -16,7 +25,6 @@ services:
     networks:
       - main-network
     restart: unless-stopped
-
 networks:
   main-network:
     name: main-network

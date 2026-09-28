@@ -32,15 +32,22 @@ class DashboardStats(BaseModel):
     projects_by_category: dict[str, int]
 class CompanyCreate(BaseModel):
     name: str
+    # Optional override. When omitted the endpoint transliterates `name`
+    # into a unique ASCII slug — this is what the /companies/<slug>
+    # public page hangs off, so it can never be NULL.
+    slug: Optional[str] = None
     website: Optional[str] = None
     logotype_url: Optional[str] = None
     industry: Optional[str] = None
+    description: Optional[str] = None
     lifecycle_stage: Optional[str] = "lead"
 class CompanyUpdate(BaseModel):
     name: Optional[str] = None
+    slug: Optional[str] = None
     website: Optional[str] = None
     logotype_url: Optional[str] = None
     industry: Optional[str] = None
+    description: Optional[str] = None
     lifecycle_stage: Optional[str] = None
 # ---------- User CRUD schemas ----------
 class UserCreate(BaseModel):
