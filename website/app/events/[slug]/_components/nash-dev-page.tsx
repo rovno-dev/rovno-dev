@@ -938,8 +938,17 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
               className="mt-1 accent-[#CCFF00] size-4"
             />
             <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-              <Prompt>{">"}</Prompt>accept_pd: даю согласие на обработку моих
-              персональных данных в соответствии с{" "}
+              <Prompt>{">"}</Prompt>accept_pd: даю{" "}
+              <a
+                href="/docs/consent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+                style={{ color: LIME }}
+              >
+                согласие на обработку персональных данных
+              </a>{" "}
+              и подтверждаю ознакомление с{" "}
               <a
                 href="/docs/privacy"
                 target="_blank"
@@ -949,7 +958,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
               >
                 Политикой конфиденциальности
               </a>{" "}
-              и принимаю условия{" "}
+              и{" "}
               <a
                 href="/docs/terms"
                 target="_blank"
@@ -957,7 +966,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
                 className="underline"
                 style={{ color: LIME }}
               >
-                Пользовательского соглашения
+                Пользовательским соглашением
               </a>
               .
             </span>

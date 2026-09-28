@@ -23,6 +23,10 @@ export interface LegalDocMeta {
 
 export const LEGAL_DOC_ORDER = [
   "privacy",
+  // Separate consent document — required by 152-ФЗ for form submissions
+  // since 01.09.2025. Sits right next to the privacy policy so the two
+  // are always read together.
+  "consent",
   "cookies",
   "terms",
   "reviews-consent",

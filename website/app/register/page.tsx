@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { CheckNotUser } from "@/entities/user/model/check-not-user"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useLanguage } from "@/providers/language-provider"
 import { extractErrorMessage } from "@/lib/error-message"
 const registerSchema = z.object({
@@ -18,13 +19,21 @@ const registerSchema = z.object({
     .min(8, "errors.password_too_short")
     .regex(/\d/, "errors.password_needs_digit")
     .regex(/[A-Z]/, "errors.password_needs_upper"),
+  // Explicit consent is required to submit the form (152-ФЗ).
+  agreement: z.literal(true, {
+    errorMap: () => ({ message: "errors.agreement_required" }),
+  }),
 })
 export default function RegisterPage() {
   const router = useRouter()
   const { t, lang } = useLanguage()
   const [errors, setErrors] = useState<Record<string, any> | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formData, setFormData] = useState({ email: "", password: "" })
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    agreement: false,
+  })
   const [pageLoadTime, setPageLoadTime] = useState<number>(0)
   useEffect(() => {
     setPageLoadTime(Date.now())
@@ -107,6 +116,53 @@ export default function RegisterPage() {
               <Input name="password" type="password" placeholder={t("forms.password_placeholder")} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
               <FieldError errors={errors?.password ? [{ message: t(errors.password) }] : []} />
             </Field>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="register-agreement"
+                checked={formData.agreement}
+                onCheckedChange={(v) =>
+                  setFormData({ ...formData, agreement: v === true })
+                }
+                className="mt-0.5 shrink-0"
+              />
+              <label
+                htmlFor="register-agreement"
+                className="flex-1 text-body-4 font-normal text-(--on-bg-medium) leading-snug cursor-pointer"
+              >
+                Я даю{" "}
+                <Link
+                  href="/docs/consent"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                >
+                  согласие на обработку персональных данных
+                </Link>{" "}
+                и подтверждаю ознакомление с{" "}
+                <Link
+                  href="/docs/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                >
+                  Политикой конфиденциальности
+                </Link>{" "}
+                и{" "}
+                <Link
+                  href="/docs/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                >
+                  Пользовательским соглашением
+                </Link>
+                .
+              </label>
+            </div>
+            {errors?.agreement && (
+              <FieldError errors={[{ message: t(errors.agreement) }]} />
+            )}
+
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading && <Spinner className="size-4" />}
               {isLoading ? t("forms.register.submitting") : t("forms.register.submit")}

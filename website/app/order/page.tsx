@@ -265,7 +265,16 @@ export default function OrderPage() {
                 className="flex-1 text-body-4 font-normal text-(--on-bg-medium) leading-snug cursor-pointer items-start"
               >
                 <span>
-                  Даю согласие на обработку моих персональных данных в соответствии с{" "}
+                  Я даю{" "}
+                  <Link
+                    href="/docs/consent"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--primary) underline underline-offset-2 hover:opacity-80"
+                  >
+                    согласие на обработку персональных данных
+                  </Link>{" "}
+                  и подтверждаю, что ознакомлен(а) с{" "}
                   <Link
                     href="/docs/privacy"
                     target="_blank"
@@ -274,14 +283,14 @@ export default function OrderPage() {
                   >
                     Политикой конфиденциальности
                   </Link>{" "}
-                  и принимаю условия{" "}
+                  и{" "}
                   <Link
                     href="/docs/terms"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-(--primary) underline underline-offset-2 hover:opacity-80"
                   >
-                    Пользовательского соглашения
+                    Пользовательским соглашением
                   </Link>
                   .
                 </span>

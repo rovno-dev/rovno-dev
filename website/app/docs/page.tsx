@@ -3,19 +3,32 @@ import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LEGAL_DOCS, LEGAL_DOC_ORDER } from "@/app/_data/legal";
-import { ShieldCheckIcon, CookieIcon, ScalesIcon, QuotesIcon, ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  ShieldCheck,
+  Cookie,
+  HandshakeIcon,
+  EnvelopeIcon,
+  FileText,
+  ArrowRight,
+} from "@phosphor-icons/react/dist/ssr";
 
+// Icons are imported with their canonical names (no `Icon` suffix) and
+// referenced directly in the map — importing `ShieldCheckIcon` but using
+// `ShieldCheck` in the object body is a build error waiting to happen.
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   privacy: ShieldCheck,
+  // Consent is the newest legal doc — a file glyph next to the shield
+  // and the scale reads as "a document you actively agree to".
+  consent: FileText,
   cookies: Cookie,
-  terms: Scale,
-  "reviews-consent": MessageSquareQuote,
+  terms: HandshakeIcon,
+  "reviews-consent": EnvelopeIcon,
 };
 
 export const metadata = {
   title: "Документы · Rovno.dev",
   description:
-    "Правовая информация сайта rovno.dev: политика конфиденциальности, политика cookie, пользовательское соглашение и согласие на публикацию отзывов.",
+    "Правовая информация сайта rovno.dev: политика конфиденциальности, согласие на обработку персональных данных, политика cookie, пользовательское соглашение и согласие на публикацию отзывов.",
 };
 
 export default function DocsIndexPage() {
@@ -38,7 +51,6 @@ export default function DocsIndexPage() {
           </div>
         </Container>
       </section>
-
       <section className="py-12 md:py-20">
         <Container>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -81,7 +93,6 @@ export default function DocsIndexPage() {
           </div>
         </Container>
       </section>
-
       <section className="pb-24">
         <Container>
           <div className="rounded-3xl border border-(--outline) bg-(--card) p-8 md:p-10">

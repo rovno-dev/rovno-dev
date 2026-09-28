@@ -49,6 +49,10 @@ export default function Footer() {
       title: t("footer.legal"),
       links: [
         { title: t("footer.legal.privacy"), href: "/docs/privacy" },
+        // Separate consent doc — required by 152-ФЗ for every form that
+        // processes PD. Sits right next to the privacy policy in the
+        // footer so users see it as a first-class legal document.
+        { title: t("footer.legal.consent"), href: "/docs/consent" },
         { title: t("footer.legal.cookies"), href: "/docs/cookies" },
         { title: t("footer.legal.terms"), href: "/docs/terms" },
         { title: t("footer.legal.reviews"), href: "/docs/reviews-consent" },
