@@ -12,6 +12,10 @@ import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-i
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/language-provider";
 import { useRootHref } from "@/hooks/use-root-href";
+// Single source of truth for the services catalogue. The file is
+// pure data with no server-only imports (per its own docstring), so
+// it's safe to import into this client component.
+import { SERVICES_META } from "@/app/_data/services/meta";
 
 // Dialable phone from env. Empty when unset — the button hides.
 const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
@@ -31,11 +35,18 @@ export default function Footer() {
     {
       title: t("footer.services"),
       links: [
-        { title: t("footer.webdev"), href: ROUTES.order.href },
-        { title: t("footer.uxui"), href: ROUTES.order.href },
-        { title: t("footer.branding"), href: ROUTES.order.href },
-        { title: t("footer.motion"), href: ROUTES.order.href },
+        // Derived from SERVICES_META. Adding or renaming a service in
+        // app/_data/services/meta.ts automatically updates this column —
+        // the two can no longer drift apart the way they did when the
+        // hrefs were hand-written /order placeholders.
+        ...SERVICES_META.map((s) => ({
+          title: s.shortTitle,
+          href: `/services/${s.slug}`,
+        })),
+        // The "Не нашли услугу" path is a business enquiry, not a
+        // catalogue entry — keep it pointing at the order form.
         { title: t("footer.other"), href: ROUTES.order.href },
+
       ],
     },
     {
