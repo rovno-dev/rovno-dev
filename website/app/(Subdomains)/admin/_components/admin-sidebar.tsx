@@ -2,6 +2,7 @@
 import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { useLanguage } from "@/providers/language-provider";
+import { crossSubdomainUrl } from "@/utils/root-domain";
 import {
   Handshake,
   Newspaper,
@@ -17,11 +18,18 @@ import {
 } from "@phosphor-icons/react";
 
 export function AdminSidebar() {
-  const { secret } = useAdminSecret();
+  const { secret, loading } = useAdminSecret();
   const { t } = useLanguage();
 
-  const NAV: SidebarItem[] = [
-    { label: t("admin.dashboard"), href: "", icon: ChartLineUp, exact: true },
+  // While the secret is loading, render nothing to avoid flashing
+  // path-based links that would 404 on admin.rovno.dev.
+  if (loading) return null;
+
+  // Without a secret there is no valid admin route.
+  if (!secret) return null;
+
+  const items: SidebarItem[] = [
+    { label: t("admin.dashboard"), href: "/", icon: ChartLineUp, exact: true },
     { label: t("admin.users"), href: "/users", icon: Users },
     { label: t("admin.orders"), href: "/orders", icon: Receipt },
     { label: t("admin.companies"), href: "/companies", icon: Buildings },
@@ -34,13 +42,23 @@ export function AdminSidebar() {
     { label: t("admin.catalog"), href: "/catalog", icon: FolderSimple },
   ];
 
-  const basePath = secret ? `/admin/${secret}` : "/admin";
+  // crossSubdomainUrl returns:
+  //   Prod: https://admin.rovno.dev/<secret>/<href>
+  //   Dev:  /admin/<secret>/<href>
+  //
+  // The <Sidebar> component normally treats `basePath` as a path prefix,
+  // but in production the basePath is a full URL. We therefore pass an
+  // empty basePath and bake the full URL into each item's href.
+  const enriched: SidebarItem[] = items.map((item) => ({
+    ...item,
+    href: crossSubdomainUrl("admin", `/${secret}${item.href === "/" ? "" : item.href}`),
+  }));
 
   return (
     <Sidebar
-      items={NAV}
-      basePath={basePath}
-      title="Админ-панель"
+      items={enriched}
+      basePath=""
+      title={t("admin.sidebar_title")}
       storageKey="admin-sidebar-collapsed"
       className="mb-6"
     />

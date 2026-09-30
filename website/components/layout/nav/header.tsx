@@ -31,9 +31,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -43,12 +41,13 @@ export default function Header() {
   const isFullWidth =
     pathname?.startsWith("/admin") || pathname?.startsWith("/app/profile");
 
+  // Full URL in prod, path in dev.
   const adminHref = adminSecret
     ? crossSubdomainUrl("admin", `/${adminSecret}`)
     : null;
   const profileHref = crossSubdomainUrl("app", "/profile");
 
-  // Root-level links always go to the main domain
+  // Root-level links always go to the main domain.
   const rootLink = (path: string) => rootDomainUrl(path);
 
   return (
@@ -75,7 +74,6 @@ export default function Header() {
             <Logo className="!h-[24px] sm:h-[40px]" />
           </Link>
 
-          {/* Desktop nav — only appears at lg and above */}
           <nav className="hidden lg:flex gap-4 text-sm">
             <NavLink href={rootLink(ROUTES.projects.href)}>
               {t("nav.projects")}

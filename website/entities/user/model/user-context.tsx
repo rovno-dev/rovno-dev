@@ -8,7 +8,6 @@ import {
   useState,
 } from "react"
 import { useRouter } from "next/navigation"
-
 import { fetchMe } from "@/entities/user/api/fetch-me"
 import { getTokenExpiration } from "@/utils/get-token-expiration"
 import { $fetch } from "@/utils/fetch"
@@ -32,10 +31,6 @@ export default function UserProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const router = useRouter()
 
-  // ── Session bootstrap ──────────────────────────────────────────────
-  // Every path through `init` MUST end with `setIsLoading(false)`. If it
-  // doesn't, `isLoading` stays true forever, `CheckUser`/`CheckNotUser`
-  // both render null, and every gated page (including /register) blanks.
   useEffect(() => {
     let cancelled = false
 
@@ -57,10 +52,8 @@ export default function UserProvider({ children }: { children: ReactNode }) {
       }
 
       // Access token expired — try the refresh token.
-      // isToast: false — a stale refresh token is a normal state (logout,
-      // deleted account, rotated secret). Toasting the backend's error
-      // message on every page load is noise, not signal.
       let refreshed: string | null = null
+      let refreshStatus: number | null = null
       try {
         const response = await $fetch("/api/v1/refresh", {
           method: "POST",
@@ -68,9 +61,12 @@ export default function UserProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           isToast: false,
         })
+        refreshStatus = response?.response?.status ?? null
         refreshed = response?.json?.access_token || null
       } catch {
-        refreshed = null
+        // Network error — backend not reachable. Do NOT clear cookies.
+        if (!cancelled) setIsLoading(false)
+        return
       }
 
       if (cancelled) return
@@ -78,14 +74,17 @@ export default function UserProvider({ children }: { children: ReactNode }) {
       if (refreshed) {
         safeCookieStorage.setItem("access_token", refreshed)
         setToken(refreshed)
-        // isLoading stays true — `getUser` below will clear it.
-      } else {
-        // Refresh failed. Clear both cookies so we don't retry on every
-        // navigation, and unblock the UI.
+        return
+      }
+
+      // Only clear when the refresh endpoint explicitly rejected the
+      // token (401/403). A 5xx or a null response is transient — keep
+      // the cookies and let the next page load retry.
+      if (refreshStatus === 401 || refreshStatus === 403) {
         safeCookieStorage.removeItem("access_token")
         safeCookieStorage.removeItem("refresh_token")
-        setIsLoading(false)
       }
+      setIsLoading(false)
     }
 
     init()
@@ -94,20 +93,15 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // ── Fetch the user once we have a token ────────────────────────────
   const getUser = useCallback(async () => {
     setIsLoading(true)
     try {
       const user_ = await fetchMe()
       setUser(user_)
       if (!user_) {
-        // fetchMe already cleared the cookies on a 401. Drop the in-memory
-        // token too so the app renders the signed-out state immediately
-        // instead of holding a token that no longer works.
         setToken(null)
       }
     } catch (err) {
-      // Never leave isLoading stuck true — that blanks the gated pages.
       console.error("[user-context] fetchMe failed:", err)
       setUser(null)
     } finally {
@@ -115,7 +109,6 @@ export default function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Auth side-effects. Runs whenever `token` changes.
   useEffect(() => {
     if (token) {
       safeCookieStorage.setItem("access_token", token)
@@ -141,7 +134,7 @@ export default function UserProvider({ children }: { children: ReactNode }) {
         isToast: false,
       })
     } catch {
-      /* best-effort — the local state is dropped regardless */
+      /* best-effort */
     }
     clearAuth()
     router.push("/login")

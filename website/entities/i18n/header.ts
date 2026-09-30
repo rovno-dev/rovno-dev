@@ -16,7 +16,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.projects': 'Projects',
     'nav.services': 'Services',
     'nav.events': 'Events',
-    // Admin panel labels
+    'admin.sidebar_title': 'Admin Panel',
     'admin.dashboard': 'Dashboard',
     'admin.users': 'Users',
     'admin.orders': 'Orders',
@@ -28,11 +28,6 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'admin.events': 'Events',
     'admin.event_requests': 'Event Requests',
     'admin.catalog': 'Catalog',
-    // Profile sidebar labels
-    'profile.profile': 'Profile',
-    'profile.articles': 'Articles',
-    'profile.settings': 'Settings',
-    'profile.security': 'Security',
   },
   ru: {
     'nav.about': 'О нас',
@@ -49,7 +44,7 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.projects': 'Проекты',
     'nav.services': 'Услуги',
     'nav.events': 'События',
-    // Admin panel labels
+    'admin.sidebar_title': 'Админ-панель',
     'admin.dashboard': 'Дашборд',
     'admin.users': 'Пользователи',
     'admin.orders': 'Заявки',
@@ -61,10 +56,5 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'admin.events': 'События',
     'admin.event_requests': 'Заявки на события',
     'admin.catalog': 'Каталоги',
-    // Profile sidebar labels
-    'profile.profile': 'Профиль',
-    'profile.articles': 'Статьи',
-    'profile.settings': 'Настройки',
-    'profile.security': 'Безопасность',
   },
 };
