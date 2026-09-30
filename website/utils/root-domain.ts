@@ -23,7 +23,7 @@ function normalizeRootDomain(raw: string | undefined | null): string {
 }
 
 const ROOT_DOMAIN = normalizeRootDomain(process.env.NEXT_PUBLIC_ROOT_DOMAIN);
-const CONFIGURED_PROTOCOL = (process.env.NEXT_PUBLIC_PROTOCOL || "").trim().toLowerCase();
+const CONFIGURED_PROTOCOL = (process.env.NEXT_PUBLIC_HTTP_PROTOCOL || "").trim().toLowerCase();
 
 function resolvedScheme(): "http" | "https" {
   if (CONFIGURED_PROTOCOL === "http" || CONFIGURED_PROTOCOL === "https") {

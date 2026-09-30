@@ -11,7 +11,7 @@ function normalizeRootDomain(raw?: string): string {
 }
 
 const ROOT_DOMAIN = normalizeRootDomain(process.env.NEXT_PUBLIC_ROOT_DOMAIN);
-const PROTOCOL = (process.env.NEXT_PUBLIC_PROTOCOL || "").trim().toLowerCase() || "https";
+const PROTOCOL = (process.env.NEXT_PUBLIC_HTTP_PROTOCOL || "").trim().toLowerCase() || "https";
 
 /**
  * Returns the href the logo click should navigate to.

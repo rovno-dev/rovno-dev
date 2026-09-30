@@ -1,13 +1,33 @@
 name: Deploy to prod
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Execute remote command via SSH
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            website:
+              - 'website/**'
+            backend:
+              - 'backend/services/main-service/**'
+            compose:
+              - 'docker-compose.yml'
+              - 'website/docker-compose.yml'
+              - 'backend/docker-compose.yml'
+              - '.env.example'
+
+      - name: SSH deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -16,15 +36,28 @@ jobs:
           port: ${{ secrets.PORT }}
           command_timeout: 30m
           script: |
+            set -e
             cd ${{ secrets.PROJECT_PATH }}
             git fetch origin main && git reset --hard origin/main
-            docker compose --profile prod up -d --build --force-recreate
-            # Fail the deploy if any service never reaches healthy.
-            for i in $(seq 1 40); do
-              unhealthy=$(docker compose ps --format json | grep -c '"Health":"starting"' || true)
-              if [ "$unhealthy" = "0" ]; then break; fi
-              sleep 5
-            done
+
+            SERVICES=""
+            if [ "${{ steps.filter.outputs.website }}" = "true" ] \
+              || [ "${{ steps.filter.outputs.compose }}" = "true" ]; then
+              SERVICES="$SERVICES next-js"
+            fi
+            if [ "${{ steps.filter.outputs.backend }}" = "true" ] \
+              || [ "${{ steps.filter.outputs.compose }}" = "true" ]; then
+              SERVICES="$SERVICES main-service"
+            fi
+
+            if [ -n "$SERVICES" ]; then
+              echo "==> Build: $SERVICES"
+              docker compose build $SERVICES
+              echo "==> Restart: $SERVICES"
+              docker compose up -d --no-build $SERVICES
+            else
+              echo "==> No service changes — nothing to do."
+            fi
+
+            docker image prune -f
             docker compose ps
-            docker compose logs --tail=200 main-service
-            docker system prune -f
