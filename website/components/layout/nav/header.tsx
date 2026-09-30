@@ -17,7 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { useRootHref } from "@/hooks/use-root-href";
-import { crossSubdomainUrl } from "@/utils/root-domain";
+import { crossSubdomainUrl, rootDomainUrl } from "@/utils/root-domain";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
@@ -48,6 +48,9 @@ export default function Header() {
     : null;
   const profileHref = crossSubdomainUrl("app", "/profile");
 
+  // Root-level links always go to the main domain
+  const rootLink = (path: string) => rootDomainUrl(path);
+
   return (
     <header
       className={cn(
@@ -72,26 +75,39 @@ export default function Header() {
             <Logo className="!h-[24px] sm:h-[40px]" />
           </Link>
 
-          {/* Desktop nav — only appears at lg and above, so the burger has
-              the entire sm/md range to itself without conflict. */}
+          {/* Desktop nav — only appears at lg and above */}
           <nav className="hidden lg:flex gap-4 text-sm">
-            <NavLink href={ROUTES.projects.href}>{t("nav.projects")}</NavLink>
-            <NavLink href={ROUTES.services.href}>Услуги</NavLink>
-            <NavLink href={ROUTES.events.href}>События</NavLink>
-            <NavLink href={ROUTES.companies.href}>{t("nav.companies")}</NavLink>
-            <NavLink href={ROUTES.about.href}>{t("nav.about")}</NavLink>
-            <NavLink href={ROUTES.blog.href}>{t("nav.blog")}</NavLink>
+            <NavLink href={rootLink(ROUTES.projects.href)}>
+              {t("nav.projects")}
+            </NavLink>
+            <NavLink href={rootLink(ROUTES.services.href)}>
+              {t("nav.services")}
+            </NavLink>
+            <NavLink href={rootLink(ROUTES.events.href)}>
+              {t("nav.events")}
+            </NavLink>
+            <NavLink href={rootLink(ROUTES.companies.href)}>
+              {t("nav.companies")}
+            </NavLink>
+            <NavLink href={rootLink(ROUTES.about.href)}>
+              {t("nav.about")}
+            </NavLink>
+            <NavLink href={rootLink(ROUTES.blog.href)}>
+              {t("nav.blog")}
+            </NavLink>
           </nav>
         </div>
 
         <div className="flex items-center gap-1">
           <Button size={"small"} className="hidden md:flex" asChild>
-            <Link href={ROUTES.order.href}>
+            <Link href={rootLink(ROUTES.order.href)}>
               <Lightbulb />
               {t("nav.order")}
             </Link>
           </Button>
+
           <LanguageSwitcher />
+
           {isLoading ? (
             <div className="ml-2 flex items-center">
               <Skeleton className="size-8 rounded-full" />
@@ -109,17 +125,19 @@ export default function Header() {
                     {t("nav.profile")}
                   </Link>
                 </DropdownMenuItem>
-                {(user?.role === "admin" || user?.role === "root") && adminHref && (
-                  <DropdownMenuItem asChild>
-                    <Link href={adminHref}>{t("nav.admin")}</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={logout}>{t("nav.logout")}</DropdownMenuItem>
+                {(user?.role === "admin" || user?.role === "root") &&
+                  adminHref && (
+                    <DropdownMenuItem asChild>
+                      <Link href={adminHref}>{t("nav.admin")}</Link>
+                    </DropdownMenuItem>
+                  )}
+                <DropdownMenuItem onClick={logout}>
+                  {t("nav.logout")}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null}
-          {/* Burger spans sm → md. Hidden at lg, where the desktop nav
-              takes over. */}
+
           <FloatingMenu
             position="top"
             triggerClassName="hidden sm:flex lg:hidden"

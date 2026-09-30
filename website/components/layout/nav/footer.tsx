@@ -1,6 +1,11 @@
-"use client"
+"use client";
 import { ROUTES } from "@/utils/constants/routes";
-import { DprofileLogotypeMonoIcon, PinterestLogotypeMonoIcon, TelegramLogotypeMonoIcon, VKLogotypeMonoIcon } from "@/components/icons";
+import {
+  DprofileLogotypeMonoIcon,
+  PinterestLogotypeMonoIcon,
+  TelegramLogotypeMonoIcon,
+  VKLogotypeMonoIcon,
+} from "@/components/icons";
 import { PhoneCall } from "@phosphor-icons/react";
 import { Button } from "../../ui/button";
 import { Container } from "../../ui/container";
@@ -12,72 +17,71 @@ import { GithubLogotypeMonoIcon } from "../../icons/logotypes/github-logo-mono-i
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/language-provider";
 import { useRootHref } from "@/hooks/use-root-href";
-// Single source of truth for the services catalogue. The file is
-// pure data with no server-only imports (per its own docstring), so
-// it's safe to import into this client component.
+import { rootDomainUrl } from "@/utils/root-domain";
 import { SERVICES_META } from "@/app/_data/services/meta";
 
-// Dialable phone from env. Empty when unset — the button hides.
 const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
 
 export default function Footer() {
   const { t } = useLanguage();
   const logoHref = useRootHref();
+
+  // Root-level links always go to the main domain
+  const rootLink = (path: string) => rootDomainUrl(path);
+
   const sections = [
     {
       title: t("footer.agency"),
       links: [
-        { title: t("footer.projects"), href: ROUTES.projects.href },
-        { title: t("footer.about"), href: ROUTES.about.href },
-        { title: t("footer.careers"), href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df" },
+        { title: t("footer.projects"), href: rootLink(ROUTES.projects.href) },
+        { title: t("footer.about"), href: rootLink(ROUTES.about.href) },
+        {
+          title: t("footer.careers"),
+          href: "https://forms.yandex.com/u/69975d0849af47b15b4c80df",
+        },
       ],
     },
     {
       title: t("footer.services"),
       links: [
-        // Derived from SERVICES_META. Adding or renaming a service in
-        // app/_data/services/meta.ts automatically updates this column —
-        // the two can no longer drift apart the way they did when the
-        // hrefs were hand-written /order placeholders.
         ...SERVICES_META.map((s) => ({
           title: s.shortTitle,
-          href: `/services/${s.slug}`,
+          href: rootLink(`/services/${s.slug}`),
         })),
-        // The "Не нашли услугу" path is a business enquiry, not a
-        // catalogue entry — keep it pointing at the order form.
-        { title: t("footer.other"), href: ROUTES.order.href },
-
+        { title: t("footer.other"), href: rootLink(ROUTES.order.href) },
       ],
     },
     {
       title: t("footer.media"),
       links: [
-        { title: t("footer.journal"), href: ROUTES.blog.href },
+        { title: t("footer.journal"), href: rootLink(ROUTES.blog.href) },
         { title: t("footer.suggest"), href: "https://t.me/rovno_dev?direct" },
       ],
     },
     {
       title: t("footer.legal"),
       links: [
-        { title: t("footer.legal.privacy"), href: "/docs/privacy" },
-        // Separate consent doc — required by 152-ФЗ for every form that
-        // processes PD. Sits right next to the privacy policy in the
-        // footer so users see it as a first-class legal document.
-        { title: t("footer.legal.consent"), href: "/docs/consent" },
-        { title: t("footer.legal.cookies"), href: "/docs/cookies" },
-        { title: t("footer.legal.terms"), href: "/docs/terms" },
-        { title: t("footer.legal.reviews"), href: "/docs/reviews-consent" },
+        { title: t("footer.legal.privacy"), href: rootLink("/docs/privacy") },
+        { title: t("footer.legal.consent"), href: rootLink("/docs/consent") },
+        { title: t("footer.legal.cookies"), href: rootLink("/docs/cookies") },
+        { title: t("footer.legal.terms"), href: rootLink("/docs/terms") },
+        {
+          title: t("footer.legal.reviews"),
+          href: rootLink("/docs/reviews-consent"),
+        },
       ],
     },
   ];
+
   const pathname = usePathname();
-  const isFullWidth = pathname?.startsWith('/admin') || pathname?.startsWith('/app/profile');
+  const isFullWidth =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/app/profile");
   const year = new Date().getFullYear();
+
   return (
     <footer className="bg-(--bg) pt-20 pb-32 border-t border-(--outline)">
-      <Container variant={isFullWidth ? 'full-width' : 'default'}>
+      <Container variant={isFullWidth ? "full-width" : "default"}>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
-          {/* Brand Column */}
           <div className="flex flex-col gap-6 max-w-sm">
             <Link href={logoHref} className="w-fit">
               <RovnoLogotypeWordmark className="h-8! w-auto" />
@@ -89,13 +93,28 @@ export default function Footer() {
                   icon={<PhoneCall />}
                 />
               )}
-              <SocialButton href={process.env.NEXT_PUBLIC_CONTACT_TELEGRAM || "https://t.me/rovno_dev"} icon={<TelegramLogotypeMonoIcon />} />
-              <SocialButton href="https://vk.com/rovno_dev" icon={<VKLogotypeMonoIcon />} />
-              <SocialButton href="https://github.com/rovno-dev" icon={<GithubLogotypeMonoIcon />} />
-              <SocialButton href="https://dprofile.ru/rovno_dev" icon={<DprofileLogotypeMonoIcon />} />
+              <SocialButton
+                href={
+                  process.env.NEXT_PUBLIC_CONTACT_TELEGRAM ||
+                  "https://t.me/rovno_dev"
+                }
+                icon={<TelegramLogotypeMonoIcon />}
+              />
+              <SocialButton
+                href="https://vk.com/rovno_dev"
+                icon={<VKLogotypeMonoIcon />}
+              />
+              <SocialButton
+                href="https://github.com/rovno-dev"
+                icon={<GithubLogotypeMonoIcon />}
+              />
+              <SocialButton
+                href="https://dprofile.ru/rovno_dev"
+                icon={<DprofileLogotypeMonoIcon />}
+              />
             </div>
           </div>
-          {/* Links Grid */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 sm:gap-10">
             {sections.map((section) => (
               <div key={section.title} className="flex flex-col gap-4">
@@ -118,7 +137,7 @@ export default function Footer() {
             ))}
           </div>
         </div>
-        {/* Bottom Row */}
+
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <span className="text-body-5 text-(--on-bg-low)">
@@ -138,7 +157,12 @@ export default function Footer() {
 
 function SocialButton({ href, icon }: { href: string; icon: React.ReactNode }) {
   return (
-    <Button variant="text" size="icon-small" asChild className="hover:bg-(--primary-glass)! group">
+    <Button
+      variant="text"
+      size="icon-small"
+      asChild
+      className="hover:bg-(--primary-glass)! group"
+    >
       <a href={href} target="_blank" rel="noopener noreferrer">
         {icon}
       </a>

@@ -1,10 +1,12 @@
-"use client"
+"use client";
 import { ROUTES } from "@/utils/constants/routes";
 import { Container } from "../../ui/container";
 import { Button } from "../../ui/button";
 import Link from "next/link";
 import { FloatingMenu } from "./floating-menu";
 import { useLanguage } from "@/providers/language-provider";
+import { rootDomainUrl } from "@/utils/root-domain";
+
 export default function BottomAppBar() {
   const { t } = useLanguage();
   return (
@@ -13,11 +15,11 @@ export default function BottomAppBar() {
         <div className="p-4 grid grid-cols-[1fr_60px] gap-1 rounded-full bg-(--primary-glass) backdrop-blur-glass border border-(--primary-glass) items-center">
           <Button
             asChild
-            shape={'round'}
+            shape={"round"}
             className="flex w-full h-[60px] gap-2"
             size="medium"
           >
-            <Link href={ROUTES.order.href}>
+            <Link href={rootDomainUrl(ROUTES.order.href)}>
               <span className="text-heading-5">{t("nav.order")}</span>
             </Link>
           </Button>

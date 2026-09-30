@@ -1,8 +1,8 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useUser } from "@/entities/user/model/user-context";
+import { useLanguage } from "@/providers/language-provider";
 import { Button } from "@/components/ui/button";
 import {
   SignOutIcon,
@@ -12,19 +12,36 @@ import {
   NewspaperIcon,
 } from "@phosphor-icons/react";
 
-// Profile routes resolve to /app/* (the (Subdomains) folder is a route
-// group and contributes nothing to the URL), so basePath is "/app" and
-// each item.href is a suffix.
-const NAV_ITEMS: SidebarItem[] = [
-  { label: "Профиль",      href: "/profile",            icon: UserIcon,              exact: true },
-  { label: "Статьи",       href: "/profile/articles",   icon: NewspaperIcon },
-  { label: "Настройки",    href: "/profile/settings",   icon: GearIcon,          exact: true },
-  { label: "Безопасность", href: "/profile/security",   icon: BriefcaseIcon, exact: true },
-];
-
 export function ProfileSidebar() {
   const router = useRouter();
   const { logout } = useUser();
+  const { t } = useLanguage();
+
+  const NAV_ITEMS: SidebarItem[] = [
+    {
+      label: t("profile.profile"),
+      href: "/profile",
+      icon: UserIcon,
+      exact: true,
+    },
+    {
+      label: t("profile.articles"),
+      href: "/profile/articles",
+      icon: NewspaperIcon,
+    },
+    {
+      label: t("profile.settings"),
+      href: "/profile/settings",
+      icon: GearIcon,
+      exact: true,
+    },
+    {
+      label: t("profile.security"),
+      href: "/profile/security",
+      icon: BriefcaseIcon,
+      exact: true,
+    },
+  ];
 
   const handleLogout = async () => {
     await logout();

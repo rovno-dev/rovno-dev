@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
 import { useUser } from "@/entities/user/model/user-context";
-import { rootDomainUrl, isAbsoluteUrl } from "@/utils/root-domain";
-import { crossSubdomainUrl } from "@/utils/root-domain";
+import {
+  rootDomainUrl,
+  isAbsoluteUrl,
+  crossSubdomainUrl,
+} from "@/utils/root-domain";
 import { cn } from "@/lib/utils";
 
 interface FloatingMenuProps {
@@ -60,16 +63,17 @@ export function FloatingMenu({
     };
   }, [open]);
 
+  // All root-level links go to the main domain
+  const rootLink = (path: string) => rootDomainUrl(path);
+
   const links = [
-    { href: ROUTES.projects.href, label: t("nav.projects") },
-    { href: ROUTES.services.href, label: "Услуги" },
-    { href: ROUTES.events.href, label: "События" },
-    { href: ROUTES.about.href, label: t("nav.about") },
-    { href: ROUTES.blog.href, label: t("nav.blog") },
+    { href: rootLink(ROUTES.projects.href), label: t("nav.projects") },
+    { href: rootLink(ROUTES.services.href), label: t("nav.services") },
+    { href: rootLink(ROUTES.events.href), label: t("nav.events") },
+    { href: rootLink(ROUTES.about.href), label: t("nav.about") },
+    { href: rootLink(ROUTES.blog.href), label: t("nav.blog") },
   ];
 
-  // Cross-subdomain URLs to the auth pages on the root domain. On localhost
-  // these collapse to plain paths via isPathMode().
   const loginHref = rootDomainUrl("/login");
   const registerHref = rootDomainUrl("/register");
   const loginIsAbsolute = isAbsoluteUrl(loginHref);
@@ -129,9 +133,6 @@ export function FloatingMenu({
             })}
           </nav>
 
-          {/* Auth footer. The order CTA lives in the header (desktop) and
-              the bottom app bar (mobile) — never duplicated here. Signed-out
-              users get Login + Register; signed-in users get a Profile link. */}
           {!isLoading && (
             <div className="mt-1.5 pt-2 border-t border-(--outline)">
               {user ? (

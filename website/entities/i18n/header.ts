@@ -1,4 +1,5 @@
 import type { Language } from './translations';
+
 export const headerTranslations: Record<Language, Record<string, string>> = {
   en: {
     'nav.about': 'About',
@@ -13,6 +14,25 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.profile': 'Profile',
     'nav.register': 'Sign Up',
     'nav.projects': 'Projects',
+    'nav.services': 'Services',
+    'nav.events': 'Events',
+    // Admin panel labels
+    'admin.dashboard': 'Dashboard',
+    'admin.users': 'Users',
+    'admin.orders': 'Orders',
+    'admin.companies': 'Companies',
+    'admin.clients': 'Clients',
+    'admin.projects': 'Projects',
+    'admin.articles': 'Articles',
+    'admin.team': 'Team',
+    'admin.events': 'Events',
+    'admin.event_requests': 'Event Requests',
+    'admin.catalog': 'Catalog',
+    // Profile sidebar labels
+    'profile.profile': 'Profile',
+    'profile.articles': 'Articles',
+    'profile.settings': 'Settings',
+    'profile.security': 'Security',
   },
   ru: {
     'nav.about': 'О нас',
@@ -27,5 +47,24 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'nav.profile': 'Профиль',
     'nav.register': 'Регистрация',
     'nav.projects': 'Проекты',
+    'nav.services': 'Услуги',
+    'nav.events': 'События',
+    // Admin panel labels
+    'admin.dashboard': 'Дашборд',
+    'admin.users': 'Пользователи',
+    'admin.orders': 'Заявки',
+    'admin.companies': 'Компании',
+    'admin.clients': 'Клиенты',
+    'admin.projects': 'Проекты',
+    'admin.articles': 'Статьи',
+    'admin.team': 'Команда',
+    'admin.events': 'События',
+    'admin.event_requests': 'Заявки на события',
+    'admin.catalog': 'Каталоги',
+    // Profile sidebar labels
+    'profile.profile': 'Профиль',
+    'profile.articles': 'Статьи',
+    'profile.settings': 'Настройки',
+    'profile.security': 'Безопасность',
   },
 };

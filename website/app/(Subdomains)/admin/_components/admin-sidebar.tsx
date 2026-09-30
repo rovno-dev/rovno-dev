@@ -1,6 +1,7 @@
 "use client";
 import { Sidebar, type SidebarItem } from "@/components/layout/nav/sidebar";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { useLanguage } from "@/providers/language-provider";
 import {
   Handshake,
   Newspaper,
@@ -15,23 +16,26 @@ import {
   Ticket,
 } from "@phosphor-icons/react";
 
-const NAV: SidebarItem[] = [
-  { label: "Дашборд",       href: "",            icon: ChartLineUp, exact: true },
-  { label: "Пользователи",  href: "/users",      icon: Users },
-  { label: "Заявки",        href: "/orders",     icon: Receipt },
-  { label: "Компании",      href: "/companies",  icon: Buildings },
-  { label: "Клиенты",       href: "/clients",    icon: Handshake },
-  { label: "Проекты",       href: "/projects",   icon: Cube },
-  { label: "Статьи",        href: "/articles",   icon: Newspaper },
-  { label: "Команда",       href: "/team",       icon: UsersThree },
-  { label: "События",       href: "/events",     icon: CalendarBlank },
-  { label: "Заявки на события", href: "/event-requests", icon: Ticket },
-  { label: "Каталоги",      href: "/catalog",    icon: FolderSimple },
-];
-
 export function AdminSidebar() {
   const { secret } = useAdminSecret();
+  const { t } = useLanguage();
+
+  const NAV: SidebarItem[] = [
+    { label: t("admin.dashboard"), href: "", icon: ChartLineUp, exact: true },
+    { label: t("admin.users"), href: "/users", icon: Users },
+    { label: t("admin.orders"), href: "/orders", icon: Receipt },
+    { label: t("admin.companies"), href: "/companies", icon: Buildings },
+    { label: t("admin.clients"), href: "/clients", icon: Handshake },
+    { label: t("admin.projects"), href: "/projects", icon: Cube },
+    { label: t("admin.articles"), href: "/articles", icon: Newspaper },
+    { label: t("admin.team"), href: "/team", icon: UsersThree },
+    { label: t("admin.events"), href: "/events", icon: CalendarBlank },
+    { label: t("admin.event_requests"), href: "/event-requests", icon: Ticket },
+    { label: t("admin.catalog"), href: "/catalog", icon: FolderSimple },
+  ];
+
   const basePath = secret ? `/admin/${secret}` : "/admin";
+
   return (
     <Sidebar
       items={NAV}
