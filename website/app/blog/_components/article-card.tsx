@@ -52,14 +52,7 @@ export function ArticleCard({
                   key={tag.id}
                   variant="glass-static"
                   size="chip-small"
-                  className={
-                    "text-white border-white/20 " +
-                    ((tag as any).kind === "category"
-                      ? "bg-violet-500/40"
-                      : (tag as any).kind === "brand"
-                      ? "bg-blue-500/40"
-                      : "")
-                  }
+                  className="text-white border-white/20"
                 >
                   {tag.name}
                 </Badge>

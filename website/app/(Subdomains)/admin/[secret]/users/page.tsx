@@ -40,6 +40,7 @@ import {
   BellIcon,
   CheckCircleIcon,
   XCircleIcon,
+  XIcon,
   EnvelopeOpenIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -127,6 +128,20 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>("cards");
   const [query, setQuery] = useState("");
+  // ── Filters ─────────────────────────────────────────────────────
+  // Each dimension is independent; "all" is a no-op pass-through.
+  const [roleFilter, setRoleFilter] = useState<
+    "all" | "client" | "user" | "admin" | "root"
+  >("all");
+  const [verifiedFilter, setVerifiedFilter] = useState<
+    "all" | "verified" | "unverified"
+  >("all");
+  const [blockedFilter, setBlockedFilter] = useState<
+    "all" | "active" | "blocked"
+  >("all");
+  const [teamFilter, setTeamFilter] = useState<
+    "all" | "team" | "external"
+  >("all");
 
   // teamUserId → role. Loaded once, refreshed with the user list.
   const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
@@ -184,23 +199,45 @@ export default function AdminUsersPage() {
     return u.role !== "admin";
   };
 
-  // ── Search filtering ────────────────────────────────────────────
-
+    // ── Filtering ───────────────────────────────────────────────────
+  // All dimensions AND together: text search + role + verified +
+  // blocked + team membership. Team membership is derived from the
+  // teamRoles map loaded alongside the user list.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter((u) =>
-      [
-        u.email,
-        u.name,
-        u.surname,
-        u.phone,
-        u.username,
-      ]
-        .filter(Boolean)
-        .some((v) => String(v).toLowerCase().includes(q)),
-    );
-  }, [users, query]);
+    return users.filter((u) => {
+      if (q) {
+        const hit = [u.email, u.name, u.surname, u.phone, u.username]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q));
+        if (!hit) return false;
+      }
+      if (roleFilter !== "all" && u.role !== roleFilter) return false;
+      if (verifiedFilter === "verified" && !u.verified) return false;
+      if (verifiedFilter === "unverified" && u.verified) return false;
+      if (blockedFilter === "blocked" && !u.blocked) return false;
+      if (blockedFilter === "active" && u.blocked) return false;
+      const isTeam = !!teamRoles[u.id];
+      if (teamFilter === "team" && !isTeam) return false;
+      if (teamFilter === "external" && isTeam) return false;
+      return true;
+    });
+  }, [users, query, roleFilter, verifiedFilter, blockedFilter, teamFilter, teamRoles]);
+
+  const hasActiveFilters =
+    !!query.trim() ||
+    roleFilter !== "all" ||
+    verifiedFilter !== "all" ||
+    blockedFilter !== "all" ||
+    teamFilter !== "all";
+
+  const resetFilters = () => {
+    setQuery("");
+    setRoleFilter("all");
+    setVerifiedFilter("all");
+    setBlockedFilter("all");
+    setTeamFilter("all");
+  };
 
   // ── Actions ─────────────────────────────────────────────────────
 
@@ -275,7 +312,7 @@ export default function AdminUsersPage() {
             <p className="text-body-3 text-(--on-bg-medium)">
               {loading
                 ? "Загрузка…"
-                : query
+                : hasActiveFilters
                   ? `${filtered.length} из ${users.length}`
                   : `${users.length} пользователей`}
             </p>
@@ -295,8 +332,8 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        {/* Search */}
-        <Card className="rounded-3xl border-(--outline) p-4">
+                {/* Search + filters */}
+        <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
           <div className="relative">
             <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
             <Input
@@ -306,6 +343,56 @@ export default function AdminUsersPage() {
               className="pl-9"
             />
           </div>
+          <FilterRow
+            label="Роль"
+            value={roleFilter}
+            options={[
+              { value: "all", label: "Все" },
+              { value: "client", label: "Клиент" },
+              { value: "user", label: "Пользователь" },
+              { value: "admin", label: "Админ" },
+              { value: "root", label: "Root" },
+            ]}
+            onChange={(v) => setRoleFilter(v as any)}
+          />
+          <FilterRow
+            label="Подтверждение"
+            value={verifiedFilter}
+            options={[
+              { value: "all", label: "Все" },
+              { value: "verified", label: "Подтверждён" },
+              { value: "unverified", label: "Не подтверждён" },
+            ]}
+            onChange={(v) => setVerifiedFilter(v as any)}
+          />
+          <FilterRow
+            label="Доступ"
+            value={blockedFilter}
+            options={[
+              { value: "all", label: "Все" },
+              { value: "active", label: "Активные" },
+              { value: "blocked", label: "Заблокированные" },
+            ]}
+            onChange={(v) => setBlockedFilter(v as any)}
+          />
+          <FilterRow
+            label="Команда"
+            value={teamFilter}
+            options={[
+              { value: "all", label: "Все" },
+              { value: "team", label: "В команде" },
+              { value: "external", label: "Не в команде" },
+            ]}
+            onChange={(v) => setTeamFilter(v as any)}
+          />
+          {hasActiveFilters && (
+            <div className="flex justify-end pt-1">
+              <Button variant="text" size="small" onClick={resetFilters}>
+                <XIcon className="size-3.5" />
+                Сбросить фильтры
+              </Button>
+            </div>
+          )}
         </Card>
 
         {/* Loading */}
@@ -1340,3 +1427,39 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
     </h3>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// FilterRow — one labelled row of single-select chips. Presentational
+// only; the parent owns the filter state.
+// ─────────────────────────────────────────────────────────────────────
+function FilterRow({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-body-5 uppercase tracking-wider text-(--on-bg-low) shrink-0 min-w-[130px]">
+        {label}:
+      </span>
+      {options.map((o) => (
+        <Button
+          key={o.value}
+          size="chip-small"
+          shape="round"
+          variant={value === o.value ? "filled" : "tonal-card"}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+

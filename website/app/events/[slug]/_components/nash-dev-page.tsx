@@ -171,7 +171,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
               {history.map((h, i) => (
                 <div key={i} className="mb-2">
                   <div>
-                    <Prompt>{">"}</Prompt>
+                    <Prompt>{"$"}</Prompt>
                     {h.cmd}
                   </div>
                   {h.out.map((line, j) => (
@@ -182,7 +182,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
                 </div>
               ))}
               <div className="flex items-center">
-                <Prompt>{">"}</Prompt>
+                <Prompt>{"$"}</Prompt>
                 <input
                   ref={inputRef}
                   value={draft}
@@ -253,7 +253,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
     <section id="about" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6 font-mono">
         <p className="text-base md:text-lg mb-10" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>cat about.txt
+          <Prompt>{"$"}</Prompt>cat about.md
         </p>
         <p className="text-xl md:text-3xl leading-snug mb-10 max-w-[900px]" style={{ color: WHITE }}>
           НАШ.DEV — это ивент для тех, кто:
@@ -271,7 +271,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
           ))}
         </ul>
         <p className="text-base md:text-lg mb-4" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>ls -la
+          <Prompt>{"$"}</Prompt>ls -la
         </p>
         <p className="text-base md:text-xl" style={{ color: WHITE }}>
           15 мин доклад&nbsp;&nbsp;|&nbsp;&nbsp;15 мин интерактив&nbsp;&nbsp;|&nbsp;&nbsp;0% канцелярщины
@@ -311,7 +311,7 @@ function Audience() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>whoami --target
+          <Prompt>{"$"}</Prompt>whoami --target
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#222" }}>
@@ -410,7 +410,7 @@ function Speakers() {
     <section id="speakers" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>list_speakers --show-details
+          <Prompt>{"$"}</Prompt>cat ./speakers.json
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -526,7 +526,7 @@ function AiSlider() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-4" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>compare --ai-knowledge
+          <Prompt>{"$"}</Prompt>compare --ai-knowledge
         </p>
         <h2
           className="font-mono text-2xl md:text-4xl tracking-tight mb-12 max-w-[900px]"
@@ -601,7 +601,7 @@ function AiSlider() {
         </div>
 
         <p className="font-mono text-sm md:text-base mt-10" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>Want real creativity? Check Pinterest or Dprofile.
+          <Prompt>{"$"}</Prompt>Want real creativity? Check Pinterest or Dprofile.
         </p>
       </div>
     </section>
@@ -622,7 +622,7 @@ function Timeline() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>cat schedule.txt
+          <Prompt>{"$"}</Prompt>cat schedule.txt
         </p>
 
         {/* Both the vertical rail and the dots live in the same coordinate
@@ -644,7 +644,7 @@ function Timeline() {
                   [{t.time}]
                 </span>
                 <span className="font-mono text-base md:text-xl" style={{ color: WHITE }}>
-                  <Prompt>{">"}</Prompt>
+                  <Prompt>{"$"}</Prompt>
                   {t.cmd}
                 </span>
                 <span style={{ color: LIME }}>✓</span>
@@ -671,13 +671,13 @@ function Features() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>ls benefits/
+          <Prompt>{"$"}</Prompt>ls benefits/
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ background: "#222" }}>
           {FEATURES.map((f, i) => (
             <div key={i} className="p-8 md:p-10" style={{ background: BLACK }}>
               <p className="font-mono text-base md:text-lg mb-3" style={{ color: LIME }}>
-                <Prompt>{">"}</Prompt>
+                <Prompt>{"$"}</Prompt>
                 {f.cmd}
               </p>
               <p className="text-sm md:text-base" style={{ color: "#aaa" }}>{f.desc}</p>
@@ -696,7 +696,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>cd /{ctx.locationName?.toLowerCase().replace(/\s+/g, "_") || "mcc_kits"}
+          <Prompt>{"$"}</Prompt>cd /{ctx.locationName?.toLowerCase().replace(/\s+/g, "_") || "mcc_kits"}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
@@ -720,7 +720,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
             <div>
               <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Parking</p>
               <p className="text-base" style={{ color: LIME }}>
-                <Prompt>{">"}</Prompt>available
+                <Prompt>{"$"}</Prompt>available
               </p>
             </div>
           </div>
@@ -763,7 +763,7 @@ function Faq() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[900px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{">"}</Prompt>help --frequently-asked
+          <Prompt>{"$"}</Prompt>help --frequently-asked
         </p>
 
         <div>
@@ -780,11 +780,11 @@ function Faq() {
                   </span>
                   <div className="flex-1">
                     <span className="text-base md:text-lg" style={{ color: WHITE }}>
-                      <Prompt>{">"}</Prompt>question: "{item.q}"
+                      <Prompt>{"$"}</Prompt>question: "{item.q}"
                     </span>
                     {isOpen && (
                       <div className="mt-4 text-sm md:text-base leading-relaxed" style={{ color: "#aaa" }}>
-                        <Prompt>{">"}</Prompt>answer: "{item.a}"
+                        <Prompt>{"$"}</Prompt>answer: "{item.a}"
                       </div>
                     )}
                   </div>
@@ -881,7 +881,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
       <div className="max-w-[900px] mx-auto px-6 font-mono">
         <p className="text-base md:text-lg mb-12" style={{ color: LIME }}>
           <Prompt>1</Prompt>
-          <Prompt>{">"}</Prompt>init_registration()
+          <Prompt>{"$"}</Prompt>init_registration()
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -892,7 +892,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
 
           <div>
             <p className="text-sm mb-3" style={{ color: LIME }}>
-              <Prompt>{">"}</Prompt>select_status:
+              <Prompt>{"$"}</Prompt>select_status:
             </p>
             <div className="flex gap-3">
               {STATUS_OPTIONS.map((opt) => (
@@ -922,7 +922,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
               className="mt-1 accent-[#CCFF00] size-4"
             />
             <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-              <Prompt>{">"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
+              <Prompt>{"$"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
             </span>
           </label>
 
@@ -938,7 +938,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
               className="mt-1 accent-[#CCFF00] size-4"
             />
             <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-              <Prompt>{">"}</Prompt>accept_pd: даю{" "}
+              <Prompt>{"$"}</Prompt>accept_pd: даю{" "}
               <a
                 href="/docs/consent"
                 target="_blank"
@@ -1008,7 +1008,7 @@ function Field({
   return (
     <div>
       <p className="text-sm mb-2" style={{ color: LIME }}>
-        <Prompt>{">"}</Prompt>
+        <Prompt>{"$"}</Prompt>
         {label}:{required && <span style={{ color: "#FF3B3B" }}> *</span>}
       </p>
       <input
@@ -1032,10 +1032,10 @@ function EventFooter() {
     <footer className="border-t py-12 font-mono" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6 flex flex-wrap items-center justify-between gap-6">
         <div className="text-sm" style={{ color: "#666" }}>
-          <Prompt>{">"}</Prompt>cd /rovno.dev
+          <Prompt>{"$"}</Prompt>cd /rovno.dev
         </div>
         <div className="text-sm" style={{ color: "#666" }}>
-          <Prompt>{">"}</Prompt>contact_us
+          <Prompt>{"$"}</Prompt>contact_us
         </div>
         <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "#444" }}>
           Rovno.dev © {new Date().getFullYear()}

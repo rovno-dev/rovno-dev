@@ -43,7 +43,7 @@ export const SERVICES_META: ServiceMeta[] = [
     description:
       "Собираем визуальную систему бренда — от логотипа до гайдлайнов, по которым команда сможет работать годами.",
     iconKey: "palette",
-    accent: "#A855F7",
+    accent: "#336DFF",
     leadTime: "3–6 недель",
     startingAt: "от 75 000 ₽",
   },
@@ -67,7 +67,7 @@ export const SERVICES_META: ServiceMeta[] = [
     description:
       "Создаём 3D-модели, анимации и CGI-графику для промо, продуктов и корпоративных презентаций.",
     iconKey: "cube",
-    accent: "#F2B441",
+    accent: "#336DFF",
     leadTime: "2–8 недель",
     startingAt: "от 90 000 ₽",
   },
@@ -79,7 +79,7 @@ export const SERVICES_META: ServiceMeta[] = [
     description:
       "Полный цикл видеопродакшна: сценарий, съёмка, монтаж, цветокоррекция и звук. Один мастер-ролик — три версии под площадки.",
     iconKey: "film",
-    accent: "#EF4444",
+    accent: "#336DFF",
     leadTime: "2–6 недель",
     startingAt: "от 120 000 ₽",
   },
@@ -91,7 +91,7 @@ export const SERVICES_META: ServiceMeta[] = [
     description:
       "Настраиваем платный и органический трафик. Работаем с Яндекс Директ, таргетом и SEO — с прозрачной аналитикой.",
     iconKey: "megaphone",
-    accent: "#10B981",
+    accent: "#336DFF",
     leadTime: "постоянно",
     startingAt: "от 60 000 ₽/мес",
   },
@@ -103,7 +103,7 @@ export const SERVICES_META: ServiceMeta[] = [
     description:
       "Проектируем интерфейсы на основе исследований. Собираем дизайн-системы, по которым команда сможет расти без нас.",
     iconKey: "sparkle",
-    accent: "#EC4899",
+    accent: "#336DFF",
     leadTime: "3–10 недель",
     startingAt: "от 120 000 ₽",
   },

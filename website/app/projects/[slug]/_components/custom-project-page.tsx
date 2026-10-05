@@ -48,13 +48,14 @@ export interface RelatedRef {
 }
 
 /**
- * Per-category accent. Falls back to brand blue for anything unknown so a
- * mis-categorised project still renders with a coherent palette.
+ * Shared case-study layout uses a single brand accent. Bespoke per-slug
+ * templates (alx, bread) still carry their own palettes — they are
+ * intentional one-off identities, not the general case.
  */
 const ACCENT: Record<string, string> = {
   "e-commerce": "#336DFF",
-  identity: "#C7FF3C",
-  corporative: "#F59E0B",
+  identity: "#336DFF",
+  corporative: "#336DFF",
 };
 
 export function CustomProjectPage({

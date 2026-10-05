@@ -113,28 +113,28 @@ export default function NumbersSection() {
       description: t("home.stats_team_experience"),
       buttonText: t("home.stats_team_btn"),
       href: "/team",
-      color: "#3b82f6",
+      color: "var(--primary)",
     },
     {
       number: "42",
       description: t("home.stats_projects_done"),
       buttonText: t("home.stats_projects_btn"),
       href: "/projects",
-      color: "#f59e0b",
+      color: "var(--primary)",
     },
     {
       number: "18",
       description: t("home.stats_happy_clients"),
       buttonText: t("home.stats_clients_btn"),
       href: "/reviews",
-      color: "#ec4899",
+      color: "var(--primary)",
     },
     {
       number: "1 день",
       description: t("home.stats_spec_prep"),
       buttonText: t("home.stats_spec_btn"),
       href: "/order",
-      color: "#a855f7",
+      color: "var(--primary)",
     },
   ];
 
