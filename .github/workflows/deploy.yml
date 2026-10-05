@@ -88,12 +88,12 @@ jobs:
             fi
 
             # ── 5. Build only what changed ──────────────────────────
-            # Source the root .env so NEXT_PUBLIC_* build args resolve
-            # during `docker compose build`. Must run before build.
-            set -a
-            . ./.env
-            set +a
-
+            # No `source .env` — the file holds values with parentheses
+            # (company names, addresses) that bash tries to execute as
+            # subshell syntax. Docker Compose reads ./.env from the
+            # working directory on its own and uses it to interpolate
+            # ${VAR} in build.args and service env blocks, which is
+            # exactly what we needed the sourcing for.
             BUILD_SERVICES=""
             [ "$need_backend"  = "true" ] && BUILD_SERVICES="$BUILD_SERVICES main-service"
             [ "$need_frontend" = "true" ] && BUILD_SERVICES="$BUILD_SERVICES next-js"
@@ -139,9 +139,3 @@ jobs:
 
             echo "==> main-service logs (tail)"
             docker compose logs --tail=100 main-service
-
-            # ── 8. Prune safely ─────────────────────────────────────
-            # Dangling images only. Keep tagged images (rollback safety)
-            # and build cache (fast incremental rebuilds). No `system
-            # prune` here — that would nuke the cache we just relied on.
-            docker image prune -f >/dev/null 2>&1 || true
