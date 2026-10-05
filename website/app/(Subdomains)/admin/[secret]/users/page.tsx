@@ -5,21 +5,28 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { useUser } from "@/entities/user/model/user-context";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  Avatar, AvatarImage, AvatarFallback,
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
 } from "@/components/ui/avatar";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { ImageUploadField } from "@/components/editor/image-upload-field";
@@ -36,12 +43,8 @@ import {
   EnvelopeSimple,
   TelegramLogo,
   PhoneIcon,
-  UserIcon,
-  BellIcon,
   CheckCircleIcon,
-  XCircleIcon,
   XIcon,
-  EnvelopeOpenIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { $fetch } from "@/utils/fetch";
@@ -66,10 +69,7 @@ interface User {
   role: string;
   verified: boolean;
   blocked: boolean;
-  /** From user_notification_preferences — null when unlinked. */
   telegram_chat_id?: string | null;
-  email_enabled?: boolean;
-  telegram_enabled?: boolean;
 }
 
 const ROLE_OPTIONS = [
@@ -79,18 +79,26 @@ const ROLE_OPTIONS = [
   { value: "root", label: "Супер-администратор" },
 ];
 
-const ROLE_BADGE: Record<string, string> = {
-  root: "bg-violet-500/15 text-violet-500 border-violet-500/30",
-  admin: "bg-blue-500/15 text-blue-500 border-blue-500/30",
-  user: "bg-gray-500/15 text-gray-500 border-gray-500/30",
-  client: "bg-emerald-500/15 text-emerald-500 border-emerald-500/30",
-};
-
-const ROLE_LABEL: Record<string, string> = {
-  root: "Root",
-  admin: "Админ",
-  user: "Пользователь",
-  client: "Клиент",
+// Role treatment is deliberately quiet. Only root takes the brand accent
+// — everything else sits in the neutral outline so a role never competes
+// with the content for attention.
+const ROLE_STYLE: Record<string, { label: string; className: string }> = {
+  root: {
+    label: "Root",
+    className: "border-(--primary)/45 text-(--primary)",
+  },
+  admin: {
+    label: "Admin",
+    className: "border-(--on-bg-low)/45 text-(--on-bg-high)",
+  },
+  user: {
+    label: "User",
+    className: "border-(--outline) text-(--on-bg-medium)",
+  },
+  client: {
+    label: "Client",
+    className: "border-(--outline) text-(--on-bg-medium)",
+  },
 };
 
 type ViewMode = "cards" | "table";
@@ -102,16 +110,17 @@ type ViewMode = "cards" | "table";
 function fullName(u: User): string {
   return [u.name, u.surname].filter(Boolean).join(" ").trim();
 }
-
 function displayName(u: User): string {
   return fullName(u) || u.username || u.email.split("@")[0] || "Без имени";
 }
-
 function initials(u: User): string {
   const full = fullName(u);
   if (full) {
-    const parts = full.split(/\s+/).slice(0, 2);
-    return parts.map((p) => p[0]?.toUpperCase() ?? "").join("");
+    return full
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("");
   }
   return (u.email[0] ?? "?").toUpperCase();
 }
@@ -127,36 +136,32 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>("cards");
-  const [query, setQuery] = useState("");
-  // ── Filters ─────────────────────────────────────────────────────
-  // Each dimension is independent; "all" is a no-op pass-through.
-  const [roleFilter, setRoleFilter] = useState<
-    "all" | "client" | "user" | "admin" | "root"
-  >("all");
-  const [verifiedFilter, setVerifiedFilter] = useState<
-    "all" | "verified" | "unverified"
-  >("all");
-  const [blockedFilter, setBlockedFilter] = useState<
-    "all" | "active" | "blocked"
-  >("all");
-  const [teamFilter, setTeamFilter] = useState<
-    "all" | "team" | "external"
-  >("all");
 
-  // teamUserId → role. Loaded once, refreshed with the user list.
+  // Text search
+  const [query, setQuery] = useState("");
+
+  // Filters — every dimension is independent; "all" is a no-op pass-through.
+  const [roleFilter, setRoleFilter] =
+    useState<"all" | "client" | "user" | "admin" | "root">("all");
+  const [verifiedFilter, setVerifiedFilter] =
+    useState<"all" | "verified" | "unverified">("all");
+  const [blockedFilter, setBlockedFilter] =
+    useState<"all" | "active" | "blocked">("all");
+  const [teamFilter, setTeamFilter] =
+    useState<"all" | "team" | "external">("all");
+
+  // teamUserId → role. Loaded once alongside the user list.
   const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
 
-  // Dialog state. `null` = create mode (when open), `User` = edit.
+  // Dialog state.
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
 
-  // "Make team member" dialog
+  // "Make team member" dialog state.
   const [teamDialogUser, setTeamDialogUser] = useState<User | null>(null);
   const [teamRole, setTeamRole] = useState("");
   const [teamBio, setTeamBio] = useState("");
   const [teamSaving, setTeamSaving] = useState(false);
-
-  // ── Data loading ─────────────────────────────────────────────────
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -192,16 +197,13 @@ export default function AdminUsersPage() {
   }
 
   const isRoot = currentUser.role === "root";
-
   const canEdit = (u: User) => {
     if (isRoot) return true;
-    // Admin cannot edit other admins.
     return u.role !== "admin";
   };
 
-    // ── Filtering ───────────────────────────────────────────────────
-  // All dimensions AND together: text search + role + verified +
-  // blocked + team membership. Team membership is derived from the
+  // ── Filtering ─────────────────────────────────────────────────────
+  // Every dimension ANDs together. Team membership is derived from the
   // teamRoles map loaded alongside the user list.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -222,7 +224,15 @@ export default function AdminUsersPage() {
       if (teamFilter === "external" && isTeam) return false;
       return true;
     });
-  }, [users, query, roleFilter, verifiedFilter, blockedFilter, teamFilter, teamRoles]);
+  }, [
+    users,
+    query,
+    roleFilter,
+    verifiedFilter,
+    blockedFilter,
+    teamFilter,
+    teamRoles,
+  ]);
 
   const hasActiveFilters =
     !!query.trim() ||
@@ -239,10 +249,11 @@ export default function AdminUsersPage() {
     setTeamFilter("all");
   };
 
-  // ── Actions ─────────────────────────────────────────────────────
-
+  // ── Actions ───────────────────────────────────────────────────────
   const handleDelete = async (u: User) => {
-    if (!confirm(`Удалить пользователя ${u.email}? Действие нельзя отменить.`))
+    if (
+      !confirm(`Удалить пользователя ${u.email}? Действие нельзя отменить.`)
+    )
       return;
     try {
       const res = await $fetch(`/api/v1/admin/users/${u.id}`, {
@@ -290,26 +301,15 @@ export default function AdminUsersPage() {
     }
   };
 
-  const openCreate = () => {
-    setEditing(null);
-    setDialogOpen(true);
-  };
-
-  const openEdit = (u: User) => {
-    setEditing(u);
-    setDialogOpen(true);
-  };
-
-  // ── Render ──────────────────────────────────────────────────────
-
+  // ── Render ────────────────────────────────────────────────────────
   return (
     <CheckUser>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        {/* Header — title left, controls right on one baseline. */}
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-display-2 mb-1">Пользователи</h1>
-            <p className="text-body-3 text-(--on-bg-medium)">
+            <h1 className="text-display-2 tracking-tight">Пользователи</h1>
+            <p className="text-body-4 text-(--on-bg-low) mt-1 tabular-nums">
               {loading
                 ? "Загрузка…"
                 : hasActiveFilters
@@ -317,99 +317,116 @@ export default function AdminUsersPage() {
                   : `${users.length} пользователей`}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             <ViewSwitcher value={view} onChange={setView} />
-            <Button variant="outlined" size="small" onClick={load} disabled={loading}>
+            <Button
+              variant="outlined"
+              size="icon-small"
+              onClick={load}
+              disabled={loading}
+              aria-label="Обновить"
+            >
               <ArrowClockwiseIcon
                 className={cn("size-4", loading && "animate-spin")}
               />
-              <span className="hidden sm:inline">Обновить</span>
             </Button>
-            <Button size="small" onClick={openCreate}>
-              <PlusIcon className="size-4" />
-              <span className="hidden sm:inline">Добавить</span>
+            <Button
+              size="small"
+              onClick={() => {
+                setEditing(null);
+                setDialogOpen(true);
+              }}
+            >
+              <PlusIcon className="size-3.5" />
+              Добавить
             </Button>
           </div>
         </div>
 
-                {/* Search + filters */}
-        <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
+        {/* Search + filters. Flat input, then a compact strip of
+            segmented controls. No outer card — the strip reads as an
+            instrument rail rather than another container. */}
+        <div className="space-y-3">
           <div className="relative">
             <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Поиск по имени, email, телефону, username…"
-              className="pl-9"
+              className="pl-9 h-10"
             />
           </div>
-          <FilterRow
-            label="Роль"
-            value={roleFilter}
-            options={[
-              { value: "all", label: "Все" },
-              { value: "client", label: "Клиент" },
-              { value: "user", label: "Пользователь" },
-              { value: "admin", label: "Админ" },
-              { value: "root", label: "Root" },
-            ]}
-            onChange={(v) => setRoleFilter(v as any)}
-          />
-          <FilterRow
-            label="Подтверждение"
-            value={verifiedFilter}
-            options={[
-              { value: "all", label: "Все" },
-              { value: "verified", label: "Подтверждён" },
-              { value: "unverified", label: "Не подтверждён" },
-            ]}
-            onChange={(v) => setVerifiedFilter(v as any)}
-          />
-          <FilterRow
-            label="Доступ"
-            value={blockedFilter}
-            options={[
-              { value: "all", label: "Все" },
-              { value: "active", label: "Активные" },
-              { value: "blocked", label: "Заблокированные" },
-            ]}
-            onChange={(v) => setBlockedFilter(v as any)}
-          />
-          <FilterRow
-            label="Команда"
-            value={teamFilter}
-            options={[
-              { value: "all", label: "Все" },
-              { value: "team", label: "В команде" },
-              { value: "external", label: "Не в команде" },
-            ]}
-            onChange={(v) => setTeamFilter(v as any)}
-          />
-          {hasActiveFilters && (
-            <div className="flex justify-end pt-1">
-              <Button variant="text" size="small" onClick={resetFilters}>
-                <XIcon className="size-3.5" />
-                Сбросить фильтры
-              </Button>
-            </div>
-          )}
-        </Card>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <FilterGroup
+              label="Роль"
+              value={roleFilter}
+              options={[
+                { value: "all", label: "Все" },
+                { value: "client", label: "Клиент" },
+                { value: "user", label: "Пользователь" },
+                { value: "admin", label: "Админ" },
+                { value: "root", label: "Root" },
+              ]}
+              onChange={(v) => setRoleFilter(v as typeof roleFilter)}
+            />
+            <FilterGroup
+              label="Статус"
+              value={verifiedFilter}
+              options={[
+                { value: "all", label: "Все" },
+                { value: "verified", label: "Подтв." },
+                { value: "unverified", label: "Не подтв." },
+              ]}
+              onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
+            />
+            <FilterGroup
+              label="Доступ"
+              value={blockedFilter}
+              options={[
+                { value: "all", label: "Все" },
+                { value: "active", label: "Активные" },
+                { value: "blocked", label: "Заблок." },
+              ]}
+              onChange={(v) => setBlockedFilter(v as typeof blockedFilter)}
+            />
+            <FilterGroup
+              label="Команда"
+              value={teamFilter}
+              options={[
+                { value: "all", label: "Все" },
+                { value: "team", label: "В команде" },
+                { value: "external", label: "Вне" },
+              ]}
+              onChange={(v) => setTeamFilter(v as typeof teamFilter)}
+            />
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
+              >
+                <XIcon className="size-3" />
+                Сбросить
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Loading */}
         {loading && (
           <div
             className={cn(
               view === "cards"
-                ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
-                : "space-y-3",
+                ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"
+                : "space-y-2",
             )}
           >
             {[...Array(6)].map((_, i) => (
-              <Card
+              <div
                 key={i}
                 className={cn(
-                  "rounded-3xl border-(--outline) bg-muted/30 animate-pulse",
-                  view === "cards" ? "h-44" : "h-16",
+                  "rounded-2xl border border-(--outline) bg-(--card) animate-pulse",
+                  view === "cards" ? "h-40" : "h-14",
                 )}
               />
             ))}
@@ -418,19 +435,18 @@ export default function AdminUsersPage() {
 
         {/* Empty */}
         {!loading && filtered.length === 0 && (
-          <Card className="rounded-3xl border-(--outline) p-12 text-center">
-            <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <UsersIcon className="size-6" />
-            </div>
+          <div className="rounded-2xl border border-dashed border-(--outline) p-12 text-center">
             <p className="text-body-3 text-(--on-bg-medium)">
-              {query ? "Ничего не найдено" : "Пользователей пока нет"}
+              {hasActiveFilters
+                ? "Ничего не найдено"
+                : "Пользователей пока нет"}
             </p>
-          </Card>
+          </div>
         )}
 
-        {/* Cards view */}
+        {/* Cards */}
         {!loading && filtered.length > 0 && view === "cards" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {filtered.map((u) => (
               <UserCard
                 key={u.id}
@@ -438,7 +454,10 @@ export default function AdminUsersPage() {
                 teamRole={teamRoles[u.id]}
                 canEdit={canEdit(u)}
                 isSelf={u.id === currentUser.id}
-                onEdit={() => openEdit(u)}
+                onEdit={() => {
+                  setEditing(u);
+                  setDialogOpen(true);
+                }}
                 onDelete={() => handleDelete(u)}
                 onAddToTeam={() => {
                   setTeamDialogUser(u);
@@ -451,14 +470,17 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        {/* Table view */}
+        {/* Table */}
         {!loading && filtered.length > 0 && view === "table" && (
           <UserTable
             users={filtered}
             teamRoles={teamRoles}
             currentUserId={currentUser.id}
             canEdit={canEdit}
-            onEdit={openEdit}
+            onEdit={(u) => {
+              setEditing(u);
+              setDialogOpen(true);
+            }}
             onDelete={handleDelete}
             onAddToTeam={(u) => {
               setTeamDialogUser(u);
@@ -470,7 +492,7 @@ export default function AdminUsersPage() {
         )}
       </div>
 
-      {/* Edit / create dialog */}
+      {/* Editor */}
       <UserEditorDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -479,7 +501,7 @@ export default function AdminUsersPage() {
         onSaved={load}
       />
 
-      {/* Make team member dialog */}
+      {/* Add to team */}
       <Dialog
         open={!!teamDialogUser}
         onOpenChange={(open) => {
@@ -488,18 +510,12 @@ export default function AdminUsersPage() {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UsersIcon className="size-5 text-(--primary)" />
-              Добавить в команду
-            </DialogTitle>
+            <DialogTitle>Добавить в команду</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             {teamDialogUser && (
               <p className="text-body-4 text-(--on-bg-medium)">
-                Пользователь:{" "}
-                <b className="text-(--on-bg-high)">
-                  {displayName(teamDialogUser)}
-                </b>
+                {displayName(teamDialogUser)}
               </p>
             )}
             <Field>
@@ -523,7 +539,10 @@ export default function AdminUsersPage() {
             </Field>
           </div>
           <DialogFooter>
-            <Button variant="outlined" onClick={() => setTeamDialogUser(null)}>
+            <Button
+              variant="outlined"
+              onClick={() => setTeamDialogUser(null)}
+            >
               Отмена
             </Button>
             <Button
@@ -540,9 +559,8 @@ export default function AdminUsersPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// ViewSwitcher — segmented control for cards / table
+// ViewSwitcher — segmented control, single group
 // ─────────────────────────────────────────────────────────────────────
-
 function ViewSwitcher({
   value,
   onChange,
@@ -551,12 +569,12 @@ function ViewSwitcher({
   onChange: (v: ViewMode) => void;
 }) {
   return (
-    <div className="inline-flex items-center gap-0.5 rounded-full border border-(--outline) bg-(--card) p-0.5 h-9">
+    <div className="inline-flex items-center rounded-lg border border-(--outline) bg-(--card) p-0.5 h-9">
       {(
         [
-          { id: "cards", icon: GridFourIcon, label: "Карточки" },
-          { id: "table", icon: RowsIcon, label: "Таблица" },
-        ] as const
+          { id: "cards" as const, icon: GridFourIcon, label: "Карточки" },
+          { id: "table" as const, icon: RowsIcon, label: "Таблица" },
+        ]
       ).map((opt) => {
         const Icon = opt.icon;
         const isActive = value === opt.id;
@@ -567,10 +585,10 @@ function ViewSwitcher({
             onClick={() => onChange(opt.id)}
             title={opt.label}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-3 h-8 text-xs font-medium transition-colors",
+              "inline-flex items-center gap-1.5 rounded-md px-2.5 h-8 text-xs font-medium transition-colors",
               isActive
                 ? "bg-(--on-bg-high) text-(--bg)"
-                : "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)",
+                : "text-(--on-bg-medium) hover:text-(--on-bg-high)",
             )}
           >
             <Icon className="size-3.5" />
@@ -583,9 +601,65 @@ function ViewSwitcher({
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// FilterGroup — small-caps label + a single segmented chip row
+// ─────────────────────────────────────────────────────────────────────
+function FilterGroup({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="text-[10px] uppercase tracking-[0.16em] text-(--on-bg-low) shrink-0">
+        {label}
+      </span>
+      <div className="inline-flex items-center rounded-md border border-(--outline) bg-(--card) p-0.5 h-8">
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => onChange(o.value)}
+            className={cn(
+              "inline-flex items-center rounded px-2 h-7 text-xs font-medium transition-colors whitespace-nowrap",
+              value === o.value
+                ? "bg-(--on-bg-high) text-(--bg)"
+                : "text-(--on-bg-medium) hover:text-(--on-bg-high)",
+            )}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RoleTag — thin outline, monochrome except root
+// ─────────────────────────────────────────────────────────────────────
+function RoleTag({ role }: { role: string }) {
+  const s = ROLE_STYLE[role] ?? ROLE_STYLE.user;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded border px-1.5 h-5 text-[10px] uppercase tracking-[0.12em] font-medium",
+        s.className,
+      )}
+    >
+      {s.label}
+    </span>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // UserCard — cards view entry
 // ─────────────────────────────────────────────────────────────────────
-
 function UserCard({
   user,
   teamRole,
@@ -605,76 +679,61 @@ function UserCard({
   onAddToTeam: () => void;
   onRemoveFromTeam: () => void;
 }) {
+  // Order notifications are admin/root-only — plain users never receive
+  // them. The linked chat id is only meaningful for a user who could ever
+  // receive a notification, so we surface it only on admin-like rows.
+  const isAdminLike = user.role === "admin" || user.role === "root";
+
   return (
-    <Card
+    <div
       className={cn(
-        "group relative rounded-3xl border border-(--outline) bg-(--card) p-5 flex flex-col gap-4",
-        "transition-all hover:border-(--primary)/40 hover:shadow-lg hover:shadow-(--primary)/5",
+        "group rounded-2xl border border-(--outline) bg-(--card) flex flex-col",
+        "transition-colors hover:border-(--on-bg-low)/40",
       )}
     >
-      {/* Header: avatar + name + role */}
-      <div className="flex items-start gap-4">
-        <Avatar className="size-14 shrink-0 ring-1 ring-(--outline)">
+      {/* Identity */}
+      <div className="p-4 flex items-start gap-3">
+        <Avatar className="size-10 shrink-0 ring-1 ring-(--outline)">
           {user.avatar_url && <AvatarImage src={user.avatar_url} alt="" />}
-          <AvatarFallback className="text-heading-4 font-medium">
+          <AvatarFallback className="text-body-3 font-medium">
             {initials(user)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <h3 className="text-heading-4 truncate">{displayName(user)}</h3>
-            {user.verified ? (
+            <h3 className="text-body-2 font-medium truncate">
+              {displayName(user)}
+            </h3>
+            {user.verified && (
               <CheckCircleIcon
-                className="size-3.5 text-emerald-500 shrink-0"
+                className="size-3.5 text-(--on-bg-low) shrink-0"
                 weight="fill"
               />
-            ) : (
-              <XCircleIcon
-                className="size-3.5 text-(--on-bg-low) shrink-0"
-              />
+            )}
+            {user.blocked && (
+              <span className="text-[10px] uppercase tracking-wider text-(--on-bg-low)">
+                заблокирован
+              </span>
             )}
           </div>
-          {user.username && (
-            <p className="text-body-5 text-(--on-bg-low) truncate">
-              @{user.username}
-            </p>
-          )}
-          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-            <Badge
-              variant="tonal-card-static"
-              size="chip-small"
-              className={ROLE_BADGE[user.role] ?? ROLE_BADGE.user}
-            >
-              {ROLE_LABEL[user.role] ?? user.role}
-            </Badge>
-            {user.blocked && (
-              <Badge
-                variant="tonal-card-static"
-                size="chip-small"
-                className="bg-rose-500/15 text-rose-500 border-rose-500/30"
-              >
-                Заблокирован
-              </Badge>
-            )}
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            <RoleTag role={user.role} />
             {teamRole && (
-              <Badge
-                variant="tonal-primary-static"
-                size="chip-small"
-              >
-                {teamRole}
-              </Badge>
+              <span className="text-[10px] uppercase tracking-[0.12em] text-(--on-bg-low) truncate">
+                · {teamRole}
+              </span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Contact lines */}
-      <div className="space-y-1.5 text-body-4 text-(--on-bg-medium)">
+      {/* Contacts — plain text rows. No chips. */}
+      <div className="px-4 pb-3 space-y-1 text-body-4 text-(--on-bg-medium)">
         <a
           href={`mailto:${user.email}`}
           className="flex items-center gap-2 hover:text-(--primary) transition-colors truncate"
         >
-          <EnvelopeSimple className="size-3.5 shrink-0" />
+          <EnvelopeSimple className="size-3.5 shrink-0 text-(--on-bg-low)" />
           <span className="truncate">{user.email}</span>
         </a>
         {user.phone && (
@@ -682,13 +741,13 @@ function UserCard({
             href={`tel:${user.phone}`}
             className="flex items-center gap-2 hover:text-(--primary) transition-colors"
           >
-            <PhoneIcon className="size-3.5 shrink-0" />
+            <PhoneIcon className="size-3.5 shrink-0 text-(--on-bg-low)" />
             <span>{user.phone}</span>
           </a>
         )}
-        {user.telegram_chat_id && (
+        {isAdminLike && user.telegram_chat_id && (
           <div className="flex items-center gap-2 text-(--on-bg-low)">
-            <TelegramLogo className="size-3.5 shrink-0 text-blue-500" />
+            <TelegramLogo className="size-3.5 shrink-0" />
             <span className="font-mono text-[11px] truncate">
               {user.telegram_chat_id}
             </span>
@@ -696,109 +755,70 @@ function UserCard({
         )}
       </div>
 
-      {/* Notification chips — order notifications are an admin/root-only
-          capability (root curates recipients on /admin/notification-settings).
-          Showing the chips on a plain user's card implied they could receive
-          order alerts, which is never true. */}
-      {(user.role === "admin" || user.role === "root") && (
-        <div className="flex items-center gap-1.5 flex-wrap pt-1">
-          <NotifChip
-            on={user.email_enabled ?? true}
-            icon={<EnvelopeSimple className="size-3" />}
-            label="Email"
-          />
-          <NotifChip
-            on={user.telegram_enabled ?? true}
-            icon={<TelegramLogo className="size-3" />}
-            label="TG"
-          />
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-1 pt-3 border-t border-(--outline) mt-auto">
-        <Button
-          variant="text"
-          size="small"
+      {/* Actions — always visible, quiet. */}
+      <div className="mt-auto px-2 py-2 border-t border-(--outline) flex items-center gap-0.5">
+        <button
+          type="button"
           onClick={onEdit}
           disabled={!canEdit}
-          title={
-            !canEdit
-              ? "Нельзя редактировать администратора"
-              : "Редактировать"
-          }
+          title={canEdit ? "Редактировать" : "Нет доступа"}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded px-2 h-8 text-body-4 transition-colors",
+            canEdit
+              ? "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)"
+              : "text-(--on-bg-low) opacity-50 cursor-not-allowed",
+          )}
         >
-          <PencilSimpleIcon className="size-4" />
+          <PencilSimpleIcon className="size-3.5" />
           Изменить
-        </Button>
+        </button>
         {teamRole ? (
-          <Button
-            variant="text"
-            size="small"
+          <button
+            type="button"
             onClick={onRemoveFromTeam}
             title="Убрать из команды"
+            className="inline-flex items-center justify-center size-8 rounded text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
           >
             <UserMinusIcon className="size-4" />
-          </Button>
+          </button>
         ) : (
-          <Button
-            variant="text"
-            size="small"
+          <button
+            type="button"
             onClick={onAddToTeam}
             title="Сделать участником команды"
+            className="inline-flex items-center justify-center size-8 rounded text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
           >
             <UsersIcon className="size-4" />
-          </Button>
+          </button>
         )}
-        <Button
-          variant="text"
-          size="small"
-          className="ml-auto text-(--error) hover:bg-(--error-card)"
+        <button
+          type="button"
           onClick={onDelete}
           disabled={!canEdit || isSelf}
           title={
             isSelf
               ? "Нельзя удалить себя"
-              : !canEdit
-                ? "Нельзя удалить администратора"
-                : "Удалить"
+              : canEdit
+                ? "Удалить"
+                : "Нет доступа"
           }
+          className={cn(
+            "ml-auto inline-flex items-center justify-center size-8 rounded transition-colors",
+            !canEdit || isSelf
+              ? "text-(--on-bg-low) opacity-50 cursor-not-allowed"
+              : "text-(--on-bg-low) hover:text-(--error) hover:bg-[color-mix(in_srgb,var(--error),transparent_92%)]",
+          )}
         >
           <TrashIcon className="size-4" />
-        </Button>
+        </button>
       </div>
-    </Card>
-  );
-}
-
-function NotifChip({
-  on,
-  icon,
-  label,
-}: {
-  on: boolean;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium",
-        on
-          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          : "border-(--outline) bg-(--bg) text-(--on-bg-low) line-through",
-      )}
-    >
-      {icon}
-      {label}
-    </span>
+    </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────
 // UserTable — table view
 // ─────────────────────────────────────────────────────────────────────
-
 function UserTable({
   users,
   teamRoles,
@@ -819,16 +839,15 @@ function UserTable({
   onRemoveFromTeam: (u: User) => void;
 }) {
   return (
-    <Card className="rounded-3xl border-(--outline) bg-(--card) overflow-hidden">
+    <div className="rounded-2xl border border-(--outline) bg-(--card) overflow-hidden">
       <div className="overflow-x-auto scrollbar-admin">
         <table className="w-full min-w-[900px] text-sm">
           <thead>
-            <tr className="border-b border-(--outline) bg-(--bg)/50">
+            <tr className="border-b border-(--outline)">
               <Th>Пользователь</Th>
               <Th>Контакты</Th>
               <Th>Роль</Th>
               <Th>Статус</Th>
-              <Th>Уведомления</Th>
               <Th align="right">Действия</Th>
             </tr>
           </thead>
@@ -840,27 +859,26 @@ function UserTable({
               return (
                 <tr
                   key={u.id}
-                  className="border-b border-(--outline)/50 last:border-b-0 hover:bg-(--state-hover) transition-colors"
+                  className="border-b border-(--outline) last:border-b-0 hover:bg-(--state-hover) transition-colors"
                 >
-                  {/* User */}
                   <Td>
                     <div className="flex items-center gap-3">
-                      <Avatar className="size-9 shrink-0 ring-1 ring-(--outline)">
+                      <Avatar className="size-8 shrink-0 ring-1 ring-(--outline)">
                         {u.avatar_url && (
                           <AvatarImage src={u.avatar_url} alt="" />
                         )}
-                        <AvatarFallback className="text-body-4 font-medium">
+                        <AvatarFallback className="text-[11px] font-medium">
                           {initials(u)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-body-3 font-medium text-(--on-bg-high) truncate">
+                          <span className="text-body-3 font-medium truncate">
                             {displayName(u)}
                           </span>
                           {u.verified && (
                             <CheckCircleIcon
-                              className="size-3 text-emerald-500 shrink-0"
+                              className="size-3 text-(--on-bg-low) shrink-0"
                               weight="fill"
                             />
                           )}
@@ -873,8 +891,6 @@ function UserTable({
                       </div>
                     </div>
                   </Td>
-
-                  {/* Contacts */}
                   <Td>
                     <div className="space-y-0.5">
                       <p className="text-body-4 text-(--on-bg-medium) truncate max-w-[220px]">
@@ -887,131 +903,83 @@ function UserTable({
                       )}
                     </div>
                   </Td>
-
-                  {/* Role + team */}
                   <Td>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <Badge
-                        variant="tonal-card-static"
-                        size="chip-small"
-                        className={ROLE_BADGE[u.role] ?? ROLE_BADGE.user}
-                      >
-                        {ROLE_LABEL[u.role] ?? u.role}
-                      </Badge>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <RoleTag role={u.role} />
                       {teamRole && (
-                        <Badge
-                          variant="tonal-primary-static"
-                          size="chip-small"
-                        >
+                        <span className="text-body-5 text-(--on-bg-low) truncate">
                           {teamRole}
-                        </Badge>
+                        </span>
                       )}
                     </div>
                   </Td>
-
-                  {/* Status */}
                   <Td>
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-2 text-body-5">
                       {u.verified ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
-                          <CheckCircleIcon className="size-3" weight="fill" />
-                          Подтверждён
-                        </span>
+                        <span className="text-(--on-bg-medium)">Подтв.</span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-(--on-bg-low)">
-                          <XCircleIcon className="size-3" />
-                          Не подтверждён
-                        </span>
+                        <span className="text-(--on-bg-low)">Не подтв.</span>
                       )}
                       {u.blocked && (
-                        <Badge
-                          variant="tonal-card-static"
-                          size="chip-small"
-                          className="bg-rose-500/15 text-rose-500 border-rose-500/30"
-                        >
-                          Блок
-                        </Badge>
+                        <span className="text-(--error)">блок</span>
                       )}
                     </div>
                   </Td>
-
-                  {/* Notifications — admin/root only. Plain users never
-                      receive order notifications; render an em-dash so the
-                      column still aligns. */}
-                  <Td>
-                    {u.role === "admin" || u.role === "root" ? (
-                      <div className="flex items-center gap-1.5">
-                        <NotifChip
-                          on={u.email_enabled ?? true}
-                          icon={<EnvelopeSimple className="size-3" />}
-                          label="Email"
-                        />
-                        <NotifChip
-                          on={u.telegram_enabled ?? true}
-                          icon={<TelegramLogo className="size-3" />}
-                          label="TG"
-                        />
-                        {u.telegram_chat_id && (
-                          <span
-                            className="font-mono text-[10px] text-(--on-bg-low) truncate max-w-[80px]"
-                            title={u.telegram_chat_id}
-                          >
-                            {u.telegram_chat_id}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-body-5 text-(--on-bg-low)">—</span>
-                    )}
-                  </Td>
-
-                  {/* Actions */}
                   <Td align="right">
                     <div className="flex items-center justify-end gap-0.5">
-                      <Button
-                        variant="text"
-                        size="icon-small"
+                      <button
+                        type="button"
                         onClick={() => onEdit(u)}
                         disabled={!editable}
                         title={editable ? "Редактировать" : "Нет доступа"}
+                        className={cn(
+                          "inline-flex items-center justify-center size-8 rounded transition-colors",
+                          editable
+                            ? "text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover)"
+                            : "opacity-40 cursor-not-allowed",
+                        )}
                       >
                         <PencilSimpleIcon className="size-4" />
-                      </Button>
+                      </button>
                       {teamRole ? (
-                        <Button
-                          variant="text"
-                          size="icon-small"
+                        <button
+                          type="button"
                           onClick={() => onRemoveFromTeam(u)}
                           title="Убрать из команды"
+                          className="inline-flex items-center justify-center size-8 rounded text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                         >
                           <UserMinusIcon className="size-4" />
-                        </Button>
+                        </button>
                       ) : (
-                        <Button
-                          variant="text"
-                          size="icon-small"
+                        <button
+                          type="button"
                           onClick={() => onAddToTeam(u)}
                           title="Сделать участником команды"
+                          className="inline-flex items-center justify-center size-8 rounded text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                         >
                           <UsersIcon className="size-4" />
-                        </Button>
+                        </button>
                       )}
-                      <Button
-                        variant="text"
-                        size="icon-small"
-                        className="text-(--error) hover:bg-(--error-card)"
+                      <button
+                        type="button"
                         onClick={() => onDelete(u)}
                         disabled={!editable || isSelf}
                         title={
                           isSelf
                             ? "Нельзя удалить себя"
-                            : !editable
-                              ? "Нет доступа"
-                              : "Удалить"
+                            : editable
+                              ? "Удалить"
+                              : "Нет доступа"
                         }
+                        className={cn(
+                          "inline-flex items-center justify-center size-8 rounded transition-colors",
+                          !editable || isSelf
+                            ? "text-(--on-bg-low) opacity-40 cursor-not-allowed"
+                            : "text-(--on-bg-low) hover:text-(--error) hover:bg-[color-mix(in_srgb,var(--error),transparent_92%)]",
+                        )}
                       >
                         <TrashIcon className="size-4" />
-                      </Button>
+                      </button>
                     </div>
                   </Td>
                 </tr>
@@ -1020,7 +988,7 @@ function UserTable({
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -1042,7 +1010,6 @@ function Th({
     </th>
   );
 }
-
 function Td({
   children,
   align = "left",
@@ -1063,9 +1030,8 @@ function Td({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// UserEditorDialog — the big create/edit dialog
+// UserEditorDialog
 // ─────────────────────────────────────────────────────────────────────
-
 interface FormState {
   email: string;
   password: string;
@@ -1103,7 +1069,6 @@ function UserEditorDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** null = create mode. */
   user: User | null;
   isRoot: boolean;
   onSaved: () => void;
@@ -1113,7 +1078,6 @@ function UserEditorDialog({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
-  // Reset form whenever the dialog opens with a new target.
   useEffect(() => {
     if (!open) return;
     if (user) {
@@ -1168,8 +1132,6 @@ function UserEditorDialog({
           headers: { "Content-Type": "application/json" },
         });
       } else {
-        // Full PATCH. Backend treats "key present" as "please set this",
-        // so we send every editable field.
         const payload: Record<string, unknown> = {
           email: form.email.trim(),
           name: form.name.trim() || null,
@@ -1188,7 +1150,9 @@ function UserEditorDialog({
         });
       }
       if (res.response?.ok) {
-        toast.success(isCreate ? "Пользователь создан" : "Пользователь обновлён");
+        toast.success(
+          isCreate ? "Пользователь создан" : "Пользователь обновлён",
+        );
         onOpenChange(false);
         onSaved();
       } else {
@@ -1218,171 +1182,136 @@ function UserEditorDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto scrollbar-admin p-0 gap-0">
-        {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-(--outline) sticky top-0 bg-(--card) z-10">
-          <DialogTitle className="flex items-center gap-2">
-            {isCreate ? (
-              <>
-                <PlusIcon className="size-5 text-(--primary)" />
-                Новый пользователь
-              </>
-            ) : (
-              <>
-                <UserIcon className="size-5 text-(--primary)" />
-                Редактирование пользователя
-              </>
-            )}
+        <DialogHeader className="px-6 pt-5 pb-4 border-b border-(--outline)">
+          <DialogTitle className="text-heading-3">
+            {isCreate ? "Новый пользователь" : "Редактирование"}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Body */}
-        <div className="px-6 py-5 space-y-6">
-          {/* ── Identity: avatar + primary fields ── */}
-          <section className="space-y-4">
-            <SectionLabel>Основное</SectionLabel>
-
-            {!isCreate && (
-              <Field>
-                <FieldLabel>Аватар</FieldLabel>
-                <div className="flex items-start gap-4">
-                  <Avatar className="size-20 shrink-0 ring-1 ring-(--outline)">
-                    {form.avatar_url && (
-                      <AvatarImage src={form.avatar_url} alt="" />
-                    )}
-                    <AvatarFallback className="text-heading-2 font-medium">
-                      {initials({
-                        ...emptyForm(),
-                        email: form.email,
-                        name: form.name,
-                        surname: form.surname,
-                      } as unknown as User)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <ImageUploadField
-                      value={form.avatar_url}
-                      onChange={(v) => update("avatar_url", v)}
-                      placeholder="/uploads/images/… или https://…"
-                    />
-                    <p className="text-body-6 text-(--on-bg-low) mt-1">
-                      Квадратное изображение. Отображается в комментариях,
-                      статьях и профиле эксперта.
-                    </p>
-                  </div>
-                </div>
-              </Field>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field className="md:col-span-2" data-invalid={!!errors.email}>
-                <FieldLabel>
-                  Email <span className="text-destructive">*</span>
-                </FieldLabel>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => update("email", e.target.value)}
-                  disabled={!isCreate && !isRoot && user?.role === "admin"}
+        <div className="px-6 py-5 space-y-5">
+          {/* Avatar (edit only) */}
+          {!isCreate && (
+            <div className="flex items-start gap-4">
+              <Avatar className="size-16 shrink-0 ring-1 ring-(--outline)">
+                {form.avatar_url && (
+                  <AvatarImage src={form.avatar_url} alt="" />
+                )}
+                <AvatarFallback className="text-heading-2 font-medium">
+                  {initials({
+                    ...emptyForm(),
+                    email: form.email,
+                    name: form.name,
+                    surname: form.surname,
+                  } as unknown as User)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <FieldLabel className="mb-2">Аватар</FieldLabel>
+                <ImageUploadField
+                  value={form.avatar_url}
+                  onChange={(v) => update("avatar_url", v)}
+                  placeholder="/uploads/images/… или https://…"
                 />
-                {errors.email && <FieldError errors={[{ message: errors.email }]} />}
-              </Field>
-
-              <Field>
-                <FieldLabel>Имя</FieldLabel>
-                <Input
-                  value={form.name}
-                  onChange={(e) => update("name", e.target.value)}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>Фамилия</FieldLabel>
-                <Input
-                  value={form.surname}
-                  onChange={(e) => update("surname", e.target.value)}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>Телефон</FieldLabel>
-                <Input
-                  value={form.phone}
-                  onChange={(e) => update("phone", e.target.value)}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel>Username</FieldLabel>
-                <Input
-                  value={form.username}
-                  onChange={(e) =>
-                    update(
-                      "username",
-                      e.target.value
-                        .toLowerCase()
-                        .replace(/[^a-z0-9_-]/g, ""),
-                    )
-                  }
-                  placeholder="для публичной страницы"
-                />
-              </Field>
-            </div>
-          </section>
-
-          {/* ── Role & flags ── */}
-          <section className="space-y-4">
-            <SectionLabel>Роль и доступ</SectionLabel>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel>Роль</FieldLabel>
-                <Select
-                  value={form.role}
-                  onValueChange={(v) => update("role", v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roleOptions.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <div className="flex flex-col gap-3 justify-end">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <Switch
-                    checked={form.verified}
-                    onCheckedChange={(v) => update("verified", v)}
-                  />
-                  <span className="text-body-4">Подтверждён</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <Switch
-                    checked={form.blocked}
-                    onCheckedChange={(v) => update("blocked", v)}
-                  />
-                  <span className="text-body-4">Заблокирован</span>
-                </label>
               </div>
             </div>
-          </section>
+          )}
 
-          {/* ── Password ── */}
-          <section className="space-y-4">
-            <SectionLabel>
-              {isCreate ? "Пароль" : "Смена пароля"}
-            </SectionLabel>
+          {/* Identity */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field className="md:col-span-2" data-invalid={!!errors.email}>
+              <FieldLabel>
+                Email <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+              />
+              {errors.email && (
+                <FieldError errors={[{ message: errors.email }]} />
+              )}
+            </Field>
+            <Field>
+              <FieldLabel>Имя</FieldLabel>
+              <Input
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Фамилия</FieldLabel>
+              <Input
+                value={form.surname}
+                onChange={(e) => update("surname", e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Телефон</FieldLabel>
+              <Input
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Username</FieldLabel>
+              <Input
+                value={form.username}
+                onChange={(e) =>
+                  update(
+                    "username",
+                    e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                  )
+                }
+                placeholder="для публичной страницы"
+              />
+            </Field>
+          </div>
+
+          {/* Role + flags */}
+          <div className="pt-3 border-t border-(--outline) grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel>Роль</FieldLabel>
+              <Select
+                value={form.role}
+                onValueChange={(v) => update("role", v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <div className="flex flex-col gap-3 justify-end">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <Switch
+                  checked={form.verified}
+                  onCheckedChange={(v) => update("verified", v)}
+                />
+                <span className="text-body-4">Подтверждён</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <Switch
+                  checked={form.blocked}
+                  onCheckedChange={(v) => update("blocked", v)}
+                />
+                <span className="text-body-4">Заблокирован</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="pt-3 border-t border-(--outline)">
             <Field data-invalid={!!errors.password}>
               <FieldLabel>
-                {isCreate ? (
-                  <>
-                    Пароль <span className="text-destructive">*</span>
-                  </>
-                ) : (
-                  "Новый пароль"
+                {isCreate ? "Пароль" : "Смена пароля"}
+                {isCreate && (
+                  <span className="text-destructive ml-1">*</span>
                 )}
               </FieldLabel>
               <Input
@@ -1399,11 +1328,10 @@ function UserEditorDialog({
                 <FieldError errors={[{ message: errors.password }]} />
               )}
             </Field>
-          </section>
+          </div>
         </div>
 
-        {/* Footer */}
-        <DialogFooter className="px-6 py-4 border-t border-(--outline) sticky bottom-0 bg-(--card)">
+        <DialogFooter className="px-6 py-4 border-t border-(--outline)">
           <Button
             variant="outlined"
             onClick={() => onOpenChange(false)}
@@ -1419,47 +1347,3 @@ function UserEditorDialog({
     </Dialog>
   );
 }
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="text-body-5 uppercase tracking-[0.14em] text-(--on-bg-low)">
-      {children}
-    </h3>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// FilterRow — one labelled row of single-select chips. Presentational
-// only; the parent owns the filter state.
-// ─────────────────────────────────────────────────────────────────────
-function FilterRow({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-body-5 uppercase tracking-wider text-(--on-bg-low) shrink-0 min-w-[130px]">
-        {label}:
-      </span>
-      {options.map((o) => (
-        <Button
-          key={o.value}
-          size="chip-small"
-          shape="round"
-          variant={value === o.value ? "filled" : "tonal-card"}
-          onClick={() => onChange(o.value)}
-        >
-          {o.label}
-        </Button>
-      ))}
-    </div>
-  );
-}
-
