@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { $fetch } from "@/utils/fetch"
@@ -119,7 +120,7 @@ export default function LoginPage() {
           </div>
           <form className="space-y-5" onSubmit={handleSubmit}>
             <Field><FieldLabel>Email</FieldLabel><Input type="text" name="email" placeholder="Enter email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /><FieldError errors={errors?.email ? [{ message: errors.email }] : []} /></Field>
-            <Field><FieldLabel>Password</FieldLabel><Input name="password" type="password" placeholder="Enter password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} /><FieldError errors={errors?.password ? [{ message: errors.password }] : []} /></Field>
+            <Field><FieldLabel>Password</FieldLabel><PasswordInput name="password" placeholder="Enter password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} /><FieldError errors={errors?.password ? [{ message: errors.password }] : []} /></Field>
             <Button type="submit">Sign In</Button>
             <div className="text-center text-sm">
               <span className="text-[var(--text-secondary)]">No account? </span>

@@ -28,7 +28,6 @@ from uuid import UUID
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-
 @router.post("/register/email")
 async def register_email(
     request: Request,
@@ -56,7 +55,6 @@ async def register_email(
         )
     return EmailSendCodeResponse(sent=True)
 
-
 @router.post("/verify-email")
 async def verify_email(
     payload: VerifyEmailRequest,
@@ -73,7 +71,6 @@ async def verify_email(
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
-
 
 @router.post("/login/email")
 async def login_email_password(
@@ -111,7 +108,6 @@ async def login_email_password(
     logger.info(f"Successful login for user: {payload.email}")
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
-
 @router.post("/refresh", response_model=AccessTokenResponse)
 async def refresh_access_token(
     payload: RefreshTokenRequest,
@@ -130,20 +126,6 @@ async def refresh_access_token(
     new_access = create_access_token({"sub": str(user.id)})
     return AccessTokenResponse(access_token=new_access)
 
-
-@router.get("/me")
-async def get_me(current_user: User = Depends(get_current_user)):
-    return {
-        "id": str(current_user.id),
-        "email": current_user.email,
-        "name": current_user.name,
-        "surname": current_user.surname,
-        "role": current_user.user_role.value,
-        "verified": current_user.verified,
-        "blocked": current_user.blocked,
-    }
-
-
 @router.post("/logout")
 async def logout(
     payload: RefreshTokenRequest,
@@ -153,7 +135,6 @@ async def logout(
     if not token_data or token_data.get("type") != "refresh" or token_data.get("sub") != str(current_user.id):
         return JSONResponse(status_code=400, content={"message": "Invalid refresh token"})
     return JSONResponse(status_code=200, content={"message": "Logged out"})
-
 
 @router.post("/resend-verification")
 async def resend_verification(

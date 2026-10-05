@@ -153,6 +153,7 @@ class UserUpdate(BaseModel):
     # user_notification_preferences (created on demand).
     email_enabled: Optional[bool] = None
     telegram_enabled: Optional[bool] = None
+    marketing_enabled: Optional[bool] = None
     # Avatar URL — managed here so an admin can set it without going
     # through the user's own profile page.
     avatar_url: Optional[str] = None
@@ -288,6 +289,8 @@ async def update_user(
     email_enabled = update.pop("email_enabled", None)
     telegram_enabled_was_sent = "telegram_enabled" in update
     telegram_enabled = update.pop("telegram_enabled", None)
+    marketing_enabled_was_sent = "marketing_enabled" in update
+    marketing_enabled = update.pop("marketing_enabled", None)
 
     # Everything left (name, surname, email, phone, role, verified,
     # blocked, avatar_url, ...) is a plain User column — with one
@@ -309,7 +312,12 @@ async def update_user(
     # users — root curates the recipient list on /admin/notification-settings.
     # Allowing this endpoint to flip prefs for a plain user would silently
     # enroll them as a potential order recipient, bypassing that page.
-    if telegram_chat_id_was_sent or email_enabled_was_sent or telegram_enabled_was_sent:
+    if (
+        telegram_chat_id_was_sent
+        or email_enabled_was_sent
+        or telegram_enabled_was_sent
+        or marketing_enabled_was_sent
+    ):
         if user.user_role not in (UserRole.admin, UserRole.root):
             raise HTTPException(
                 status_code=422,
@@ -337,6 +345,8 @@ async def update_user(
             prefs.email_enabled = bool(email_enabled)
         if telegram_enabled_was_sent and telegram_enabled is not None:
             prefs.telegram_enabled = bool(telegram_enabled)
+        if marketing_enabled_was_sent and marketing_enabled is not None:
+            prefs.marketing_enabled = bool(marketing_enabled)
 
     db.commit()
     db.refresh(user)

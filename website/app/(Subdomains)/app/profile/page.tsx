@@ -1,19 +1,23 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useUser } from "@/entities/user/model/user-context";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { ImageUploadField } from "@/components/editor/image-upload-field";
+import { PhoneInputField } from "@/components/ui/phone-input";
 import { toast } from "sonner";
 import { updateProfile } from "@/utils/api/user";
-import { ImageUploadField } from "@/components/editor/image-upload-field";
-import { Field, FieldLabel } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
-import { UsersIcon, UserIcon as UserIcon } from "@phosphor-icons/react";
+import { UserIcon, ArrowUpRightIcon } from "@phosphor-icons/react";
+
+const BIO_LIMIT = 64;
 
 interface ProfileForm {
   name: string;
@@ -23,20 +27,24 @@ interface ProfileForm {
   username: string;
   bio: string;
   avatar_url: string;
-  // team-member-only
   team_role: string;
   team_bio: string;
   team_cover_url: string;
 }
 
-const BIO_LIMIT = 64;
-
 export default function ProfilePage() {
   const { user, isLoading } = useUser();
   const [form, setForm] = useState<ProfileForm>({
-    name: "", surname: "", email: "", phone: "", username: "",
-    bio: "", avatar_url: "",
-    team_role: "", team_bio: "", team_cover_url: "",
+    name: "",
+    surname: "",
+    email: "",
+    phone: "",
+    username: "",
+    bio: "",
+    avatar_url: "",
+    team_role: "",
+    team_bio: "",
+    team_cover_url: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -92,13 +100,16 @@ export default function ProfilePage() {
   const update = <K extends keyof ProfileForm>(k: K, v: ProfileForm[K]) =>
     setForm((prev) => ({ ...prev, [k]: v }));
 
+  const publicHref = form.username ? `/${form.username}` : null;
+
   return (
     <CheckUser>
-      <div className="space-y-6">
+      <div className="space-y-5">
+        {/* Header */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-display-2 mb-1">Профиль</h1>
-            <p className="text-body-3 text-(--on-bg-medium)">
+            <h1 className="text-display-2 tracking-tight">Профиль</h1>
+            <p className="text-body-4 text-(--on-bg-medium) mt-1">
               Управление личными данными
             </p>
           </div>
@@ -108,7 +119,13 @@ export default function ProfilePage() {
             </Button>
           ) : (
             <div className="flex gap-2">
-              <Button variant="text" onClick={() => setIsEditing(false)}>Отмена</Button>
+              <Button
+                variant="text"
+                onClick={() => setIsEditing(false)}
+                disabled={isSaving}
+              >
+                Отмена
+              </Button>
               <Button onClick={handleSave} disabled={isSaving}>
                 {isSaving ? "Сохранение…" : "Сохранить"}
               </Button>
@@ -116,14 +133,19 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Avatar + identity block */}
+        {/* ══════════ Island 1 — identity ══════════ */}
         <Card className="rounded-3xl border-(--outline) p-6">
           <div className="flex flex-col sm:flex-row gap-6">
-            {/* 1:1 avatar preview */}
+            {/* Avatar */}
             <div className="shrink-0 mx-auto sm:mx-0">
               <div className="relative size-32 rounded-full overflow-hidden border border-(--outline) bg-muted">
                 {form.avatar_url ? (
-                  <Image src={form.avatar_url} alt="" fill className="object-cover" />
+                  <Image
+                    src={form.avatar_url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-(--on-bg-low)">
                     <UserIcon className="size-12" />
@@ -132,23 +154,40 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex-1 space-y-4">
+            {/* Fields */}
+            <div className="flex-1 space-y-4 min-w-0">
+              <Field>
+                <FieldLabel>Никнейм</FieldLabel>
+                <Input
+                  value={form.username}
+                  onChange={(e) =>
+                    update(
+                      "username",
+                      e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                    )
+                  }
+                  disabled={!isEditing}
+                  placeholder="username"
+                />
+              </Field>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel>Никнейм</FieldLabel>
-                  <Input
-                    value={form.username}
-                    onChange={(e) => update("username", e.target.value)}
-                    disabled={!isEditing}
-                    placeholder="username"
-                  />
-                </Field>
                 <Field>
                   <FieldLabel>Имя</FieldLabel>
                   <Input
                     value={form.name}
                     onChange={(e) => update("name", e.target.value)}
                     disabled={!isEditing}
+                    placeholder="Имя"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Фамилия</FieldLabel>
+                  <Input
+                    value={form.surname}
+                    onChange={(e) => update("surname", e.target.value)}
+                    disabled={!isEditing}
+                    placeholder="Фамилия"
                   />
                 </Field>
               </div>
@@ -156,13 +195,22 @@ export default function ProfilePage() {
               <Field>
                 <FieldLabel className="flex items-center justify-between">
                   <span>Короткое био</span>
-                  <span className={cn("text-[11px] font-normal", form.bio.length > BIO_LIMIT ? "text-destructive" : "text-(--on-bg-low)")}>
+                  <span
+                    className={cn(
+                      "text-[11px] font-normal tabular-nums",
+                      form.bio.length >= BIO_LIMIT
+                        ? "text-destructive"
+                        : "text-(--on-bg-low)",
+                    )}
+                  >
                     {form.bio.length}/{BIO_LIMIT}
                   </span>
                 </FieldLabel>
                 <Input
                   value={form.bio}
-                  onChange={(e) => update("bio", e.target.value.slice(0, BIO_LIMIT))}
+                  onChange={(e) =>
+                    update("bio", e.target.value.slice(0, BIO_LIMIT))
+                  }
                   disabled={!isEditing}
                   placeholder="Одна строка о себе"
                   maxLength={BIO_LIMIT}
@@ -179,41 +227,55 @@ export default function ProfilePage() {
                   />
                 </Field>
               )}
+
+              {publicHref && (
+                <Link
+                  href={publicHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors"
+                >
+                  Публичный профиль
+                  <ArrowUpRightIcon className="size-3" />
+                </Link>
+              )}
             </div>
           </div>
         </Card>
 
-        {/* Contact info */}
+        {/* ══════════ Island 2 — contacts ══════════ */}
         <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
           <h2 className="text-heading-3">Контакты</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field>
               <FieldLabel>Email</FieldLabel>
-              <Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} disabled={!isEditing} />
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+                disabled={!isEditing}
+                placeholder="email@example.com"
+              />
             </Field>
             <Field>
-              <FieldLabel>Фамилия</FieldLabel>
-              <Input value={form.surname} onChange={(e) => update("surname", e.target.value)} disabled={!isEditing} />
-            </Field>
-            <Field className="md:col-span-2">
               <FieldLabel>Телефон</FieldLabel>
-              <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} disabled={!isEditing} />
+              <PhoneInputField
+                value={form.phone}
+                onChange={(v) => update("phone", v ?? "")}
+                disabled={!isEditing}
+              />
             </Field>
           </div>
         </Card>
 
-        {/* Team member section — only for team members */}
+        {/* ══════════ Team block — for team members only ══════════ */}
         {isTeam && (
           <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <UsersIcon className="size-5 text-(--primary)" />
-              <h2 className="text-heading-3">Команда Rovno.dev</h2>
-              <Badge variant="tonal-primary-static" size="chip-small">Активен</Badge>
-            </div>
+            <h2 className="text-heading-3">Команда Rovno.dev</h2>
             <p className="text-body-4 text-(--on-bg-medium)">
-              Эти данные показываются на странице эксперта <code>/{form.username || "username"}</code>.
+              Эти данные показываются на странице эксперта{" "}
+              <code className="font-mono">/{form.username || "username"}</code>.
             </p>
-
             <Field>
               <FieldLabel>Роль в команде</FieldLabel>
               <Input
@@ -223,7 +285,6 @@ export default function ProfilePage() {
                 placeholder="Со-основатель и CTO"
               />
             </Field>
-
             <Field>
               <FieldLabel>Профессиональное био</FieldLabel>
               <Textarea
@@ -234,12 +295,16 @@ export default function ProfilePage() {
                 className="min-h-[140px]"
               />
             </Field>
-
             <Field>
               <FieldLabel>Обложка для страницы эксперта (21:8)</FieldLabel>
               {form.team_cover_url && (
                 <div className="relative w-full aspect-[21/8] overflow-hidden rounded-2xl border border-(--outline) bg-muted mb-2">
-                  <Image src={form.team_cover_url} alt="" fill className="object-cover" />
+                  <Image
+                    src={form.team_cover_url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               )}
               {isEditing && (

@@ -78,6 +78,14 @@ class UserNotificationPreference(Base):
     email_enabled = Column(Boolean, default=True, nullable=False)
     telegram_enabled = Column(Boolean, default=True, nullable=False)
 
+    # Opt-in for non-transactional content: discounts, promotions,
+    # special offers. Default off — transactional messages (order
+    # notifications, verify codes) are governed by the channel master
+    # switches above and are not affected by this flag.
+    marketing_enabled = Column(
+        Boolean, default=False, nullable=False, server_default="false"
+    )
+
     # Set when the user links this account via /start <code> in the bot.
     # Unset (NULL) means no active binding.
     telegram_chat_id = Column(String, nullable=True)

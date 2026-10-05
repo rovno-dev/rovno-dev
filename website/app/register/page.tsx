@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { useState, useEffect } from "react"
@@ -113,7 +114,7 @@ export default function RegisterPage() {
             </Field>
             <Field>
               <FieldLabel>{t("forms.password")}</FieldLabel>
-              <Input name="password" type="password" placeholder={t("forms.password_placeholder")} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+              <PasswordInput name="password" placeholder={t("forms.password_placeholder")} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
               <FieldError errors={errors?.password ? [{ message: t(errors.password) }] : []} />
             </Field>
             <div className="flex items-start gap-3">

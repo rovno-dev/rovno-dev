@@ -1,24 +1,30 @@
 "use client";
+
 import { useCallback, useEffect, useState } from "react";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   Bell,
   EnvelopeSimple,
   TelegramLogo,
+  Tag,
   CircleNotchIcon,
   CheckCircleIcon,
   ArrowSquareOutIcon,
   ArrowClockwiseIcon,
   LinkBreakIcon,
+  Info,
 } from "@phosphor-icons/react";
 import {
   fetchNotificationPrefs,
@@ -29,14 +35,13 @@ import {
   type TelegramConnectCode,
 } from "@/utils/api/notifications";
 
+type SavingField = "email" | "telegram" | "marketing" | null;
+
 export default function SettingsPage() {
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [loading, setLoading] = useState(true);
-  // Which toggle is currently saving — used to disable the switch so the
-  // user can't fire off overlapping requests.
-  const [savingField, setSavingField] = useState<"email" | "telegram" | null>(
-    null,
-  );
+  const [savingField, setSavingField] = useState<SavingField>(null);
+
   const [linkCode, setLinkCode] = useState<TelegramConnectCode | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,37 +61,21 @@ export default function SettingsPage() {
     load();
   }, [load]);
 
-  // Optimistic toggles — flip the switch immediately, revert on failure.
-  // The request is a full PUT (both flags), so we pass the current value
-  // of the *other* channel through unchanged.
-  const toggleEmail = async (v: boolean) => {
+  // Every toggle sends the full preference set — the backend PUT replaces
+  // all fields. Optimistic locally, reverted on failure.
+  const patch = async (
+    field: Exclude<SavingField, null>,
+    next: Partial<NotificationPrefs>,
+  ) => {
     if (!prefs) return;
     const prev = prefs;
-    setPrefs({ ...prefs, email_enabled: v });
-    setSavingField("email");
+    setPrefs({ ...prefs, ...next });
+    setSavingField(field);
     try {
       const updated = await updateNotificationPrefs({
-        email_enabled: v,
-        telegram_enabled: prev.telegram_enabled,
-      });
-      setPrefs(updated);
-    } catch (err: any) {
-      setPrefs(prev);
-      toast.error(err?.message || "Ошибка сохранения");
-    } finally {
-      setSavingField(null);
-    }
-  };
-
-  const toggleTelegram = async (v: boolean) => {
-    if (!prefs) return;
-    const prev = prefs;
-    setPrefs({ ...prefs, telegram_enabled: v });
-    setSavingField("telegram");
-    try {
-      const updated = await updateNotificationPrefs({
-        email_enabled: prev.email_enabled,
-        telegram_enabled: v,
+        email_enabled: next.email_enabled ?? prev.email_enabled,
+        telegram_enabled: next.telegram_enabled ?? prev.telegram_enabled,
+        marketing_enabled: next.marketing_enabled ?? prev.marketing_enabled,
       });
       setPrefs(updated);
     } catch (err: any) {
@@ -102,8 +91,6 @@ export default function SettingsPage() {
       const code = await createTelegramLinkCode();
       setLinkCode(code);
       setLinkDialogOpen(true);
-      // Open the deep link in a new tab. The user has to press Start in
-      // Telegram; when they come back we refetch to see the new binding.
       window.open(code.url, "_blank", "noopener,noreferrer");
     } catch (err: any) {
       toast.error(err?.message || "Не удалось создать код подключения");
@@ -114,7 +101,7 @@ export default function SettingsPage() {
     if (
       !confirm(
         "Отключить Telegram? Уведомления в Telegram перестанут приходить, " +
-          "но вы сможете подключить его снова.",
+        "но вы сможете подключить его снова.",
       )
     )
       return;
@@ -131,8 +118,6 @@ export default function SettingsPage() {
     setRefreshing(true);
     await load();
     setRefreshing(false);
-    // Give the user an explicit signal so they know the button worked
-    // even when nothing changed.
     toast.info("Статус обновлён", { duration: 1500 });
   };
 
@@ -147,24 +132,25 @@ export default function SettingsPage() {
 
   return (
     <CheckUser>
-      <div className="space-y-6">
+      <div className="space-y-5">
         <div>
-          <h1 className="text-display-2 mb-1">Настройки</h1>
-          <p className="text-body-3 text-(--on-bg-medium)">
+          <h1 className="text-display-2 tracking-tight">Настройки</h1>
+          <p className="text-body-4 text-(--on-bg-medium) mt-1">
             Управление аккаунтом и уведомлениями
           </p>
         </div>
 
-        {/* ── Notifications card ─────────────────────────────────── */}
+        {/* ── Notifications card ──────────────────────────────────── */}
         <Card className="rounded-3xl border-(--outline) p-6 space-y-5">
           <div className="flex items-center gap-2">
             <Bell className="size-5 text-(--primary)" />
             <h2 className="text-heading-3">Уведомления</h2>
           </div>
-          <p className="text-body-4 text-(--on-bg-medium)">
-            Куда присылать уведомления о новых заказах, статьях и событиях.
-            Системные письма (подтверждение почты, восстановление доступа)
-            приходят всегда — их отключить нельзя.
+          <p className="text-body-4 text-(--on-bg-medium) leading-relaxed">
+            Как с вами связываться — по email, в Telegram или в обоих
+            каналах. Системные письма (подтверждение почты,
+            восстановление доступа) приходят всегда, их отключить
+            нельзя.
           </p>
 
           {loading || !prefs ? (
@@ -174,7 +160,7 @@ export default function SettingsPage() {
             </div>
           ) : (
             <>
-              {/* Email row */}
+              {/* Email — master channel switch */}
               <div className="flex items-center justify-between gap-4 py-3 border-b border-(--outline)">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary) shrink-0">
@@ -188,19 +174,21 @@ export default function SettingsPage() {
                       Email-уведомления
                     </Label>
                     <p className="text-body-5 text-(--on-bg-low)">
-                      Письма о новых заказах и активности
+                      Уведомления на {prefs ? "вашу почту" : "email"}
                     </p>
                   </div>
                 </div>
                 <Switch
                   id="email-notif"
                   checked={prefs.email_enabled}
-                  onCheckedChange={toggleEmail}
+                  onCheckedChange={(v) =>
+                    patch("email", { email_enabled: v })
+                  }
                   disabled={savingField === "email"}
                 />
               </div>
 
-              {/* Telegram row */}
+              {/* Telegram — master channel switch */}
               <div className="space-y-3 py-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
@@ -215,29 +203,29 @@ export default function SettingsPage() {
                         Telegram-уведомления
                       </Label>
                       <p className="text-body-5 text-(--on-bg-low)">
-                        Сообщения от бота Rovno.dev
+                        Сообщения от бота
                       </p>
                     </div>
                   </div>
                   <Switch
                     id="tg-notif"
                     checked={prefs.telegram_enabled}
-                    onCheckedChange={toggleTelegram}
+                    onCheckedChange={(v) =>
+                      patch("telegram", { telegram_enabled: v })
+                    }
                     disabled={savingField === "telegram"}
                   />
                 </div>
 
-                {/* Connection status sub-block. Lives under the toggle so
-                    the two concepts ("I want Telegram notifications" vs
-                    "my account is bound to a chat") read together. */}
+                {/* Connection status */}
                 {prefs.telegram_connected ? (
-                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-3 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="rounded-2xl border border-(--success)/30 bg-[color-mix(in_srgb,var(--success),transparent_94%)] p-3 flex items-center justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-2 min-w-0">
                       <CheckCircleIcon
-                        className="size-4 text-emerald-500 shrink-0"
+                        className="size-4 text-(--success) shrink-0"
                         weight="fill"
                       />
-                      <span className="text-body-4 text-(--on-bg-high) truncate">
+                      <span className="text-body-4 truncate">
                         Подключено
                         {prefs.telegram_username && (
                           <>
@@ -260,9 +248,7 @@ export default function SettingsPage() {
                 ) : (
                   <div className="rounded-2xl border border-(--outline) bg-(--bg) p-3 flex items-center justify-between gap-3 flex-wrap">
                     <div className="min-w-0">
-                      <p className="text-body-4 text-(--on-bg-high)">
-                        Telegram не подключён
-                      </p>
+                      <p className="text-body-4">Telegram не подключён</p>
                       <p className="text-body-5 text-(--on-bg-low)">
                         {prefs.bot_username
                           ? "Подключите бота, чтобы получать сообщения"
@@ -282,21 +268,55 @@ export default function SettingsPage() {
                   </div>
                 )}
               </div>
+
+              {/* ── Marketing opt-in ─────────────────────────────── */}
+              <div className="pt-3 border-t border-(--outline)">
+                <div className="flex items-center justify-between gap-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary) shrink-0">
+                      <Tag className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <Label
+                        htmlFor="marketing-notif"
+                        className="text-body-3 font-medium cursor-pointer"
+                      >
+                        Маркетинг
+                      </Label>
+                      <p className="text-body-5 text-(--on-bg-low)">
+                        Скидки, акции, специальные предложения
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="marketing-notif"
+                    checked={prefs.marketing_enabled}
+                    onCheckedChange={(v) =>
+                      patch("marketing", { marketing_enabled: v })
+                    }
+                    disabled={savingField === "marketing"}
+                  />
+                </div>
+                <p className="text-body-5 text-(--on-bg-low) leading-relaxed">
+                  Отдельная подписка — по умолчанию выключена. Включите,
+                  если хотите получать новости о промо и распродажах.
+                </p>
+              </div>
             </>
           )}
         </Card>
 
-        {/* ── Account card — untouched placeholder from before ──── */}
+        {/* ── Account card ────────────────────────────────────────── */}
         <Card className="rounded-3xl border-(--outline) p-6">
           <h2 className="text-heading-3 mb-2">Аккаунт</h2>
-          <p className="text-body-3 text-(--on-bg-medium)">
-            Управление профилем, паролем и безопасностью — в соответствующих
-            разделах бокового меню.
+          <p className="text-body-4 text-(--on-bg-medium)">
+            Управление профилем, паролем и безопасностью — в
+            соответствующих разделах бокового меню.
           </p>
         </Card>
       </div>
 
-      {/* ── Telegram link dialog ──────────────────────────────── */}
+      {/* ── Telegram link dialog ──────────────────────────────────── */}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -305,7 +325,6 @@ export default function SettingsPage() {
               Подключение Telegram
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4 py-2">
             <ol className="text-body-3 text-(--on-bg-medium) space-y-3 list-decimal pl-5">
               <li>
@@ -315,17 +334,19 @@ export default function SettingsPage() {
               </li>
               <li>
                 Вернитесь на эту страницу и нажмите{" "}
-                <b className="text-(--on-bg-high)">«Проверить подключение»</b>.
+                <b className="text-(--on-bg-high)">
+                  «Проверить подключение»
+                </b>
+                .
               </li>
             </ol>
-
             {linkCode && (
               <div className="rounded-2xl border border-(--outline) bg-(--bg) p-3 space-y-2">
                 <p className="text-body-5 uppercase tracking-wider text-(--on-bg-low)">
                   Если Telegram не открылся автоматически
                 </p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <code className="font-mono text-body-4 text-(--on-bg-high) bg-(--card) border border-(--outline) rounded-lg px-2 py-1">
+                  <code className="font-mono text-body-4 bg-(--card) border border-(--outline) rounded-lg px-2 py-1">
                     {linkCode.code}
                   </code>
                   <Button variant="outlined" size="small" asChild>
@@ -344,7 +365,6 @@ export default function SettingsPage() {
                 </p>
               </div>
             )}
-
             <Button
               variant="text"
               size="small"
@@ -355,7 +375,6 @@ export default function SettingsPage() {
               Создать новый код
             </Button>
           </div>
-
           <DialogFooter>
             <Button
               variant="outlined"

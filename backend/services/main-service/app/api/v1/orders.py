@@ -22,7 +22,27 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 # ponytail: Restricted regions for international lead gen
-ALLOWED_REGIONS = ["RU", "US", "BY", "KZ", "UZ", "TJ", "KG", "AE", "CN"]
+# Regions accepted by the phonenumbers validator. Kept in sync with
+# the client-side country list in
+# website/components/ui/phone-input.tsx. Add a country here when it
+# ships in the picker, or the backend will reject a valid submission.
+ALLOWED_REGIONS = [
+    # CIS + nearby
+    "RU", "BY", "UA", "KZ", "UZ", "TJ", "TM", "KG",
+    "AZ", "AM", "GE", "MN",
+    # Asia
+    "CN", "JP", "KR", "IN", "PK", "TR", "IL",
+    "AE", "SA", "QA", "KW",
+    # Europe
+    "RS", "ME", "BA", "HR", "SI", "MK", "AL",
+    "DE", "FR", "GB", "IT", "ES", "PT", "NL", "BE", "CH", "AT",
+    "PL", "CZ", "SK", "HU", "RO", "BG", "GR", "IE",
+    "SE", "NO", "DK", "FI", "IS", "EE", "LV", "LT",
+    # Americas
+    "US", "CA", "MX", "BR", "AR", "CL", "CO", "PE",
+    # Other
+    "AU", "NZ", "ZA",
+]
 
 
 class OrderValidation(BaseModel):

@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { useUser } from "@/entities/user/model/user-context";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -1314,8 +1315,7 @@ function UserEditorDialog({
                   <span className="text-destructive ml-1">*</span>
                 )}
               </FieldLabel>
-              <Input
-                type="password"
+              <PasswordInput
                 value={form.password}
                 onChange={(e) => update("password", e.target.value)}
                 placeholder={

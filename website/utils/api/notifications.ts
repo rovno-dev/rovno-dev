@@ -3,6 +3,8 @@ import { $fetch } from "@/utils/fetch";
 export interface NotificationPrefs {
   email_enabled: boolean;
   telegram_enabled: boolean;
+  /** Opt-in for discounts / promotions. Off by default. */
+  marketing_enabled: boolean;
   telegram_connected: boolean;
   telegram_username: string | null;
   bot_username: string | null;
@@ -25,6 +27,7 @@ export async function fetchNotificationPrefs(): Promise<NotificationPrefs> {
 export async function updateNotificationPrefs(payload: {
   email_enabled: boolean;
   telegram_enabled: boolean;
+  marketing_enabled: boolean;
 }): Promise<NotificationPrefs> {
   const res = await $fetch("/api/v1/me/notifications", {
     method: "PUT",

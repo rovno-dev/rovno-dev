@@ -33,7 +33,7 @@ function Cursor() {
 
 /* ── Hero ────────────────────────────────────────────────────────────── */
 
-const HERO_LINE = "> IT-СОБЫТИЕ ДЛЯ СВОИХ_";
+const HERO_LINE = "> IT-СОБЫТИЕ ДЛЯ СОЗДАТЕЛЕЙ БУДУЩЕГО_";
 
 function Hero({ ctx }: { ctx: EventCustomContext }) {
   const [typed, setTyped] = useState("");
@@ -154,7 +154,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
 
         <p className="font-mono text-sm md:text-base mb-12" style={{ color: "#888" }}>
           {"// "}
-          {ctx.locationName || "МЦК КИТС"} _{ctx.startAt ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }).toUpperCase() : "17 ОКТЯБРЯ 2026"}
+          {ctx.locationName || "МЦК КИТС"} _{ctx.startAt ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }).toUpperCase() : "23 ОКТЯБРЯ 2026 13:00-15:00"}
         </p>
 
         {showInput && (
@@ -232,7 +232,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
 /* ── Marquee ─────────────────────────────────────────────────────────── */
 
 function Marquee() {
-  const items = ["НАШ.DEV", "17 ОКТЯБРЯ", "МЦК КИТС", "БЕСПЛАТНО", "РЕГИСТРАЦИЯ ОТКРЫТА"];
+  const items = ["НАШ.DEV", "23 ОКТЯБРЯ", "МЦК КИТС", "БЕСПЛАТНО", "РЕГИСТРАЦИЯ ОТКРЫТА"];
   const line = items.join("  //  ") + "  //  ";
   return (
     <div className="overflow-hidden border-b" style={{ borderColor: "#222", background: LIME, color: BLACK }}>
@@ -275,7 +275,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
           <Prompt>{"$"}</Prompt>ls -la
         </p>
         <p className="text-base md:text-xl" style={{ color: WHITE }}>
-          15 мин доклад&nbsp;&nbsp;|&nbsp;&nbsp;15 мин интерактив&nbsp;&nbsp;|&nbsp;&nbsp;0% канцелярщины
+          ~15 мин доклад&nbsp;&nbsp;|&nbsp;&nbsp;интерактив&nbsp;&nbsp;|&nbsp;&nbsp;0% банальщины и скукоты
         </p>
       </div>
     </section>
@@ -604,10 +604,14 @@ function AiSlider() {
 /* ── Timeline (dots aligned to the line) ─────────────────────────────── */
 
 const TIMELINE = [
-  { time: "14:00", cmd: "run lecture_ux_mikhail" },
-  { time: "14:30", cmd: "run ai_reality_check_niyaz" },
-  { time: "15:00", cmd: "run motion_design_danil" },
-  { time: "15:30", cmd: "start networking" },
+  { time: "13:10", cmd: "sh ./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
+  { time: "13:25", cmd: "sh ./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
+  { time: "13:40", cmd: "sh ./Поддержка_проектов_от_Yandex-Cloud --speakers Janara Semenova" },
+  { time: "14:10", cmd: "break --period '10m'" },
+  { time: "14:20", cmd: "sh ./Как-начать-своё-дело --speakers 'Anastasia Pugachova'" },
+  { time: "14:35", cmd: "sh ./Волонтёрство-на-изи --speakers 'Amir Badrutdinov'" },
+  { time: "14:50", cmd: "sh ./Розыгрыш-Яндекс-Станции" },
+  { time: "15:00", cmd: "make networking" },
 ];
 
 function Timeline() {
@@ -633,10 +637,10 @@ function Timeline() {
                 style={{ left: 0, background: LIME }}
               />
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <span className="font-mono text-sm md:text-base tracking-wider" style={{ color: "#666" }}>
+                <span className="font-mono text-[0.65rem] md:text-[0.85rem] tracking-wider" style={{ color: "#666" }}>
                   [{t.time}]
                 </span>
-                <span className="font-mono text-base md:text-xl" style={{ color: WHITE }}>
+                <span className="font-mono text-base md:text-md" style={{ color: WHITE }}>
                   <Prompt>{"$"}</Prompt>
                   {t.cmd}
                 </span>
@@ -653,10 +657,10 @@ function Timeline() {
 /* ── Features ────────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { cmd: "networking_session", desc: "Найти людей, с которыми потом соберёшь проект" },
-  { cmd: "get_certificate", desc: "Официальный сертификат об участии" },
-  { cmd: "win_merch", desc: "Розыгрыш мерча Rovno.dev среди участников" },
-  { cmd: "free_wifi_coffee", desc: "Кофе, чай, Wi-Fi — всё бесплатно" },
+  { cmd: "networking", desc: "Найти людей, с которыми потом соберёшь проект." },
+  { cmd: "get_certificate", desc: "Официальный сертификат об участии (по запросу)." },
+  { cmd: "win_kolonka", desc: "Розыгрыш Яндекс Станции за лучший вопрос." },
+  { cmd: "contact_speakers", desc: "Общение со спикерами после выступления." },
 ];
 
 function Features() {
@@ -743,11 +747,11 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
 /* ── FAQ ─────────────────────────────────────────────────────────────── */
 
 const FAQ = [
-  { q: "Нужно ли уметь кодить?", a: "Нет. Объясняем так, что поймет даже гуманитарий." },
-  { q: "Сколько стоит участие?", a: "Бесплатно. Регистрация обязательна, чтобы мы знали, сколько кофе заказывать." },
-  { q: "Есть ли ограничение по возрасту?", a: "Мероприятие рассчитано на 16+. Если вам меньше — напишите нам, обсудим." },
-  { q: "Будет ли запись?", a: "Ключевые доклады выложим в Telegram-канал Rovno.dev. Но лучше приходить лично — нетворкинг не записать." },
-  { q: "Что взять с собой?", a: "Ноутбук (по желанию), документ для входа в МЦК, хорошее настроение." },
+  { q: "Нужны ли знания для понимания докладов?", a: "Нет. Объясняем так, что поймет даже тот, кто зашёл случайно." },
+  { q: "Сколько стоит участие?", a: "Бесплатно. Регистрация обязательна, чтобы мы точно тебя пропустили." },
+  { q: "Есть ли ограничение по возрасту?", a: "Мероприятие рассчитано на 16+. Если вам меньше — напишите нам, обсудим (rovno.dev@gmail.com)." },
+  { q: "Будет ли запись?", a: "Ключевые доклады выложим в ВК Видео и Youtube Вершин. Но лучше приходить лично — нетворкинг не записать." },
+  { q: "Что взять с собой?", a: "Документ подтверждающий личность, хорошее настроение." },
 ];
 
 function Faq() {
@@ -858,7 +862,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
             See you on{" "}
             {ctx.startAt
               ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
-              : "17.10.2026"}
+              : "23.10.2026"}
             .
           </p>
           <p className="text-base mt-8" style={{ color: "#666" }}>

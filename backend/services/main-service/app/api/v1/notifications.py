@@ -23,6 +23,10 @@ BOT_USERNAME = os.getenv("TELEGRAM_BOT_USERNAME", "").lstrip("@")
 class PrefsOut(BaseModel):
     email_enabled: bool
     telegram_enabled: bool
+    # Opt-in for discounts / promotions. Transactional messages (order
+    # alerts, verification codes) ignore this flag — they are gated by
+    # the channel master switches above.
+    marketing_enabled: bool
     telegram_connected: bool
     telegram_username: Optional[str] = None
     bot_username: Optional[str] = None
@@ -31,6 +35,9 @@ class PrefsOut(BaseModel):
 class PrefsIn(BaseModel):
     email_enabled: bool
     telegram_enabled: bool
+    # Defaulted so a client that does not send the field cannot
+    # accidentally opt a user into marketing.
+    marketing_enabled: bool = False
 
 
 class ConnectCodeOut(BaseModel):
@@ -53,6 +60,7 @@ def _to_out(prefs: UserNotificationPreference) -> PrefsOut:
     return PrefsOut(
         email_enabled=prefs.email_enabled,
         telegram_enabled=prefs.telegram_enabled,
+        marketing_enabled=getattr(prefs, "marketing_enabled", False),
         telegram_connected=bool(prefs.telegram_chat_id),
         telegram_username=prefs.telegram_username,
         bot_username=BOT_USERNAME or None,
@@ -76,6 +84,7 @@ def update_prefs(
     prefs = _get_or_create(db, user)
     prefs.email_enabled = payload.email_enabled
     prefs.telegram_enabled = payload.telegram_enabled
+    prefs.marketing_enabled = payload.marketing_enabled
     db.commit()
     db.refresh(prefs)
     return _to_out(prefs)
