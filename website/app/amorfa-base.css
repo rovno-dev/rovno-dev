@@ -168,16 +168,16 @@
   --margin-9: 100px;
   --margin-10: 120px;
 
-  --radius-1: 4px;
-  --radius-2: 8px;
-  --radius-3: 12px;
-  --radius-4: 16px;
-  --radius-5: 20px;
-  --radius-6: 24px;
-  --radius-7: 36px;
-  --radius-8: 48px;
-  --radius-9: 56px;
-  --radius-10: 64px;
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 6px;
+  --radius-4: 8px;
+  --radius-5: 12px;
+  --radius-6: 16px;
+  --radius-7: 20px;
+  --radius-8: 24px;
+  --radius-9: 32px;
+  --radius-10: 40px;
   --radius-round: 9999px;
 
   --screen-xs: 390px;

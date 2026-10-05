@@ -51,7 +51,7 @@ const buttonVariants = cva(
         ...chipSizes,
       },
       shape: {
-        square: "rounded-xl",
+        square: "rounded-3xl",
         round: "rounded-full",
       }
     },

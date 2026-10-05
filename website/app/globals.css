@@ -8,21 +8,21 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary: var(--brand-9);
-  --primary-gradient: linear-gradient(180deg, var(--brand-8), var(--brand-9));
-  --on-primary: var(--white);
-  --primary-card: color-mix(in srgb, var(--primary), transparent 92%);
-  --on-primary-card: var(--gray-9);
+  --primary: #0A0A0B;
+  --primary-gradient: linear-gradient(180deg, #17171A 0%, #0A0A0B 100%);
+  --on-primary: #FFFFFF;
+  --primary-card: color-mix(in srgb, var(--primary), transparent 94%);
+  --on-primary-card: #0A0A0B;
 
-  --outline: var(--gray-3);
-  --bg: var(--gray-0);
-  --bg-disabled: var(--gray-3);
-  --on-bg-disabled: var(--gray-6);
-  --card: var(--white);
+  --outline: #E6E6E4;
+  --bg: #FAFAF8;
+  --bg-disabled: #EFEFED;
+  --on-bg-disabled: #B4B4B8;
+  --card: #FFFFFF;
 
-  --on-bg-high: var(--gray-9);
-  --on-bg-medium: var(--gray-7);
-  --on-bg-low: var(--gray-6);
+  --on-bg-high: #0A0A0B;
+  --on-bg-medium: #4B4B52;
+  --on-bg-low: #86868C;
 
   --error: var(--red-9);
   --on-error: var(--white);
@@ -192,7 +192,7 @@
   --radius-7xl: var(--radius-9);
   --radius-8xl: var(--radius-10);
   --blur-glass: 10px;
-  --shadow-card: 0 1px 6px 0 rgb(0 0 0 / 0.05);
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04);
 
   --animate-reveal: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-reveal-slow: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -212,20 +212,20 @@
 
 
 .dark {
-  --primary: var(--brand-9);
-  --primary-gradient: linear-gradient(135deg, var(--brand-8), var(--brand-9));
-  --on-primary: var(--white);
+  --primary: #ECECEE;
+  --primary-gradient: linear-gradient(180deg, #FFFFFF 0%, #ECECEE 100%);
+  --on-primary: #0A0A0B;
   --primary-card: color-mix(in srgb, var(--primary), transparent 84%);
-  --on-primary-card: var(--dark-9);
-  --outline: var(--dark-6);
-  --bg: var(--dark-8);
-  --bg-disabled: var(--gray-9);
-  --on-bg-disabled: var(--gray-7);
-  --card: var(--dark-9);
+  --on-primary-card: #ECECEE;
+  --outline: #1F1F23;
+  --bg: #0A0A0B;
+  --bg-disabled: #1A1A1D;
+  --on-bg-disabled: #4B4B50;
+  --card: #111114;
   --sidebar-accent: var(--dark-7);
-  --on-bg-high: var(--white);
-  --on-bg-medium: var(--dark-1);
-  --on-bg-low: var(--dark-2);
+  --on-bg-high: #ECECEE;
+  --on-bg-medium: #A1A1A6;
+  --on-bg-low: #6B6B70;
   --error: var(--red-9);
   --on-error: var(--white);
   --error-card: var(--red-2);
@@ -649,7 +649,7 @@
     right: -0.05em;
     bottom: 0.03em;
     height: 1em;
-    background: #336dff70;
+    background: color-mix(in srgb, currentColor, transparent 56%);
     z-index: -1;
     transform: skewX(-10deg) scaleX(0);
     transform-origin: left;
