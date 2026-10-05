@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { EventCustomContext } from "./event-custom-pages";
 import { registerForEvent } from "@/utils/api/events";
+import Image from "next/image";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Наш.Dev — Terminal Brutalism landing.
@@ -351,56 +352,51 @@ interface Speaker {
   role: string;
   fact: string;
   bio: string;
+  avatar_url: string;
 }
 
 const SPEAKERS: Speaker[] = [
   {
     name: "Михаил Лапаев",
-    role: "Директор по продукту · Rovno.dev",
-    fact: "> led 30+ продуктовых запусков",
+    role: "CMO · Rovno.dev",
+    fact: "$ curl 'https://projects/done'",
     bio: "Отвечает за продуктовую стратегию агентства. Разбирает, как из идеи сделать продукт, а не презентацию.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-mikhail.png",
   },
   {
     name: "Нияз Гимадиев",
-    role: "Технический директор · Rovno.dev",
-    fact: "> built Amorfa, Unidoka, Vershiny",
+    role: "CTO · Rovno.dev, Founder Unidoka",
+    fact: "$ bash ./Amorfa, ./unidoka.com, ./Vershiny",
     bio: "Архитектор систем и автор открытого фреймворка Amorfa. Расскажет про разницу между ИИ со знаниями и без.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-niyaz.png",
   },
   {
     name: "Данил Киткин",
     role: "Арт-директор · Rovno.dev",
-    fact: "> directed ALX-9, Хлебная Страна",
+    fact: "$ cat ./design.md ./3d.md ./motion.md",
     bio: "3D-художник и моушн-дизайнер. Покажет, как рождаются ролики и 3D-сцены без бюджета Marvel.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-danil.png",
   },
   {
-    name: "Николай Бессоновский",
-    role: "Senior FullStack / DevSecOps · Rovno.dev",
-    fact: "> 10+ лет, 0 инцидентов за год",
-    bio: "Строит инфраструктуру, на которой разработка не буксует. Автоматизация, CI/CD, безопасность.",
+    name: "Жанара Семенова",
+    role: "Менеджер проектов в науке и образовании · Yandex Cloud | Преподаватель · ИТИС КФУ",
+    fact: "$ docker compose --profile no-stress up",
+    bio: "Развивает науку по всей России и СНГ. Готовит людей для светлого будущего. Всегда с улыбкой.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-janara.png",
   },
   {
-    name: "Анна Смирнова",
-    role: "Frontend Lead · Digital Studio",
-    fact: "> shipped 40+ интерфейсов в продакшн",
-    bio: "Ведёт фронтенд крупных продуктов. Расскажет, как не утонуть в дизайн-системах и зачем нужна типизация.",
+    name: "Амир Бадрутдинов",
+    role: "Активист | Журналист | Спортсмен",
+    fact: "$ sudo echo << age = 17 > /usr/user.conf",
+    bio: "Самый молодой спикер. В 17 лет делает так, чтобы мир реагировал на его действия, а не он на действия этого мира.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-amir.png",
   },
   {
-    name: "Тимур Ахметов",
-    role: "Founder · Dev Tools",
-    fact: "> raised seed за 4 месяца после MVP",
-    bio: "Основатель стартапа в dev-tools. Разбирает, как собрать MVP и найти первых пользователей без бюджета.",
-  },
-  {
-    name: "Егор Волков",
-    role: "ML Engineer · AI Platform",
-    fact: "> deployed 12 ML-моделей в прод",
-    bio: "Работает с продакшн-ML. Расскажет, где заканчивается ноутбук и начинается инфраструктура.",
-  },
-  {
-    name: "Алина Соколова",
-    role: "Product Designer · Fintech",
-    fact: "> designed for 2M+ active users",
-    bio: "Продуктовый дизайнер в финтехе. Показывает, как исследования превращаются в решения, а не в отчёты.",
+    name: "Анастасия Пугачева",
+    role: "CEO · Vizionix | Dancer | UX/UI Designer",
+    fact: "$ make --startup --get-grant",
+    bio: "Основатель стартапа Visionix. Двигается хорошо не только в бизнесе, но и на танцевальных конкурсах.",
+    avatar_url: "/images/events/nash-dev-2026/speaker-anastasia.png",
   },
 ];
 
@@ -429,19 +425,16 @@ function Speakers() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              <div
+              <Image
+                src={s.avatar_url}
+                width={1000}
+                height={1000}
                 className="aspect-square mb-6 relative overflow-hidden"
                 style={{
                   background: "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
                 }}
-              >
-                <span
-                  className="absolute inset-0 flex items-center justify-center font-mono text-3xl"
-                  style={{ color: "#444" }}
-                >
-                  {s.name.split(" ").map((w) => w[0]).join("")}
-                </span>
-              </div>
+                alt={s.name}
+              />
               <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
                 {"{"}
               </p>
