@@ -107,11 +107,18 @@ export default function AdminNotificationsPage() {
   const recipientItems: MultiPickerItem[] = useMemo(() => {
     return users
       .filter((u) => !u.blocked)
+      // Only admin/root users are eligible order-notification recipients.
+      // Root picks which subset of them actually receives anything — the
+      // candidate pool here is the full admin + root set. The admin
+      // /users endpoint returns the role under `role` (not `user_role`),
+      // so read that field; reading `user_role` was why every user was
+      // selectable.
+      .filter((u) => u.role === "admin" || u.role === "root")
       .map((u) => {
         const full = `${u.name ?? ""} ${u.surname ?? ""}`.trim();
         const bits: string[] = [];
-        if (u.user_role === "root") bits.push("root");
-        else if (u.user_role === "admin") bits.push("admin");
+        if (u.role === "root") bits.push("root");
+        else if (u.role === "admin") bits.push("admin");
         if (u.telegram_chat_id) bits.push("TG");
         return {
           id: u.id,

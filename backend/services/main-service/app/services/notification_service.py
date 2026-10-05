@@ -97,12 +97,24 @@ def _parse_ids(raw: Iterable | None) -> List[UUID]:
 def _resolve_recipients(db: Session, ids: Iterable | None, channel: str) -> List[User]:
     id_list = _parse_ids(ids)
     if id_list:
-        users = db.query(User).filter(User.id.in_(id_list)).all()
+        # Only admin/root users are valid order-notification recipients.
+        # The admin UI picker already restricts the eligible pool, but a
+        # stored id can outlive its user's role (demoted admin, id typed
+        # in manually). Filter here so a stale list can never fan out to
+        # a plain user.
+        users = (
+            db.query(User)
+            .filter(User.id.in_(id_list))
+            .filter(User.user_role.in_([UserRole.admin, UserRole.root]))
+            .all()
+        )
         found = {u.id for u in users}
         missing = [str(i) for i in id_list if i not in found]
         if missing:
-            logger.warning("%s recipients: %d unknown user id(s): %s",
-                           channel, len(missing), missing)
+            logger.warning(
+                "%s recipients: %d id(s) skipped (unknown or non-admin): %s",
+                channel, len(missing), missing,
+            )
         return [u for u in users if not u.blocked]
     users = (
         db.query(User)

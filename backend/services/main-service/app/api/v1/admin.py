@@ -290,14 +290,35 @@ async def update_user(
     telegram_enabled = update.pop("telegram_enabled", None)
 
     # Everything left (name, surname, email, phone, role, verified,
-    # blocked, avatar_url, ...) is a plain User column.
+    # blocked, avatar_url, ...) is a plain User column — with one
+    # exception: the API schema calls the field `role`, but the ORM
+    # column is `user_role`. Map the name so setattr writes the attribute
+    # SQLAlchemy actually persists; without this, role changes were
+    # silently no-ops because Python happily created a phantom
+    # `user.role` instance attribute that the DB never saw.
+    FIELD_MAP = {"role": "user_role"}
     for key, value in update.items():
-        setattr(user, key, value)
+        attr = FIELD_MAP.get(key, key)
+        if hasattr(user, attr):
+            setattr(user, attr, value)
     if new_password:
         user.password = hash_password(new_password)
 
     # --- Apply notification prefs (create the row lazily) ---
+    # Order-notification preferences are only meaningful for admin/root
+    # users — root curates the recipient list on /admin/notification-settings.
+    # Allowing this endpoint to flip prefs for a plain user would silently
+    # enroll them as a potential order recipient, bypassing that page.
     if telegram_chat_id_was_sent or email_enabled_was_sent or telegram_enabled_was_sent:
+        if user.user_role not in (UserRole.admin, UserRole.root):
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Уведомления о заказах настраиваются только для "
+                    "администраторов и root-пользователей. Используйте "
+                    "раздел «Уведомления о заказах» в админ-панели."
+                ),
+            )
         prefs = db.get(UserNotificationPreference, user.id)
         if not prefs:
             prefs = UserNotificationPreference(user_id=user.id)

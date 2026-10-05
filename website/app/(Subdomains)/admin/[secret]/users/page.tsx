@@ -609,19 +609,24 @@ function UserCard({
         )}
       </div>
 
-      {/* Notification chips */}
-      <div className="flex items-center gap-1.5 flex-wrap pt-1">
-        <NotifChip
-          on={user.email_enabled ?? true}
-          icon={<EnvelopeSimple className="size-3" />}
-          label="Email"
-        />
-        <NotifChip
-          on={user.telegram_enabled ?? true}
-          icon={<TelegramLogo className="size-3" />}
-          label="TG"
-        />
-      </div>
+      {/* Notification chips — order notifications are an admin/root-only
+          capability (root curates recipients on /admin/notification-settings).
+          Showing the chips on a plain user's card implied they could receive
+          order alerts, which is never true. */}
+      {(user.role === "admin" || user.role === "root") && (
+        <div className="flex items-center gap-1.5 flex-wrap pt-1">
+          <NotifChip
+            on={user.email_enabled ?? true}
+            icon={<EnvelopeSimple className="size-3" />}
+            label="Email"
+          />
+          <NotifChip
+            on={user.telegram_enabled ?? true}
+            icon={<TelegramLogo className="size-3" />}
+            label="TG"
+          />
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center gap-1 pt-3 border-t border-(--outline) mt-auto">
@@ -843,28 +848,34 @@ function UserTable({
                     </div>
                   </Td>
 
-                  {/* Notifications */}
+                  {/* Notifications — admin/root only. Plain users never
+                      receive order notifications; render an em-dash so the
+                      column still aligns. */}
                   <Td>
-                    <div className="flex items-center gap-1.5">
-                      <NotifChip
-                        on={u.email_enabled ?? true}
-                        icon={<EnvelopeSimple className="size-3" />}
-                        label="Email"
-                      />
-                      <NotifChip
-                        on={u.telegram_enabled ?? true}
-                        icon={<TelegramLogo className="size-3" />}
-                        label="TG"
-                      />
-                      {u.telegram_chat_id && (
-                        <span
-                          className="font-mono text-[10px] text-(--on-bg-low) truncate max-w-[80px]"
-                          title={u.telegram_chat_id}
-                        >
-                          {u.telegram_chat_id}
-                        </span>
-                      )}
-                    </div>
+                    {u.role === "admin" || u.role === "root" ? (
+                      <div className="flex items-center gap-1.5">
+                        <NotifChip
+                          on={u.email_enabled ?? true}
+                          icon={<EnvelopeSimple className="size-3" />}
+                          label="Email"
+                        />
+                        <NotifChip
+                          on={u.telegram_enabled ?? true}
+                          icon={<TelegramLogo className="size-3" />}
+                          label="TG"
+                        />
+                        {u.telegram_chat_id && (
+                          <span
+                            className="font-mono text-[10px] text-(--on-bg-low) truncate max-w-[80px]"
+                            title={u.telegram_chat_id}
+                          >
+                            {u.telegram_chat_id}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-body-5 text-(--on-bg-low)">—</span>
+                    )}
                   </Td>
 
                   {/* Actions */}
@@ -979,10 +990,6 @@ interface FormState {
   role: string;
   verified: boolean;
   blocked: boolean;
-  // notification block
-  telegram_chat_id: string;
-  email_enabled: boolean;
-  telegram_enabled: boolean;
 }
 
 function emptyForm(): FormState {
@@ -997,9 +1004,6 @@ function emptyForm(): FormState {
     role: "user",
     verified: false,
     blocked: false,
-    telegram_chat_id: "",
-    email_enabled: true,
-    telegram_enabled: true,
   };
 }
 
@@ -1037,9 +1041,6 @@ function UserEditorDialog({
         role: user.role,
         verified: user.verified,
         blocked: user.blocked,
-        telegram_chat_id: user.telegram_chat_id ?? "",
-        email_enabled: user.email_enabled ?? true,
-        telegram_enabled: user.telegram_enabled ?? true,
       });
     } else {
       setForm(emptyForm());
@@ -1091,9 +1092,6 @@ function UserEditorDialog({
           role: form.role,
           verified: form.verified,
           blocked: form.blocked,
-          telegram_chat_id: form.telegram_chat_id.trim(),
-          email_enabled: form.email_enabled,
-          telegram_enabled: form.telegram_enabled,
         };
         if (form.password) payload.password = form.password;
         res = await $fetch(`/api/v1/admin/users/${user!.id}`, {
@@ -1243,88 +1241,6 @@ function UserEditorDialog({
               </Field>
             </div>
           </section>
-
-          {/* ── Notifications (grouped) ── */}
-          {!isCreate && (
-            <section className="space-y-4">
-              <SectionLabel>Уведомления о заказах</SectionLabel>
-              <div className="rounded-2xl border border-(--outline) bg-(--bg) p-4 space-y-4">
-                {/* Email toggle */}
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary) shrink-0">
-                      <EnvelopeSimple className="size-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <Label
-                        htmlFor="notif-email"
-                        className="text-body-4 font-medium cursor-pointer"
-                      >
-                        Email-уведомления
-                      </Label>
-                      <p className="text-body-5 text-(--on-bg-low) truncate">
-                        {form.email || "—"}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="notif-email"
-                    checked={form.email_enabled}
-                    onCheckedChange={(v) => update("email_enabled", v)}
-                  />
-                </div>
-
-                <div className="border-t border-(--outline)" />
-
-                {/* Telegram toggle */}
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary) shrink-0">
-                      <TelegramLogo className="size-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <Label
-                        htmlFor="notif-tg"
-                        className="text-body-4 font-medium cursor-pointer"
-                      >
-                        Telegram-уведомления
-                      </Label>
-                      <p className="text-body-5 text-(--on-bg-low) truncate">
-                        {form.telegram_chat_id
-                          ? `Chat ID: ${form.telegram_chat_id}`
-                          : "Chat ID не указан"}
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="notif-tg"
-                    checked={form.telegram_enabled}
-                    onCheckedChange={(v) => update("telegram_enabled", v)}
-                  />
-                </div>
-
-                {/* Chat ID input, indented under the Telegram row */}
-                <Field>
-                  <FieldLabel className="text-body-5 text-(--on-bg-low)">
-                    Telegram Chat ID
-                  </FieldLabel>
-                  <Input
-                    value={form.telegram_chat_id}
-                    onChange={(e) =>
-                      update("telegram_chat_id", e.target.value.trim())
-                    }
-                    placeholder="123456789 или -1001234567890"
-                    className="font-mono text-body-4"
-                  />
-                  <p className="text-body-6 text-(--on-bg-low) mt-1">
-                    Отправьте пользователю ссылку на бота и попросите нажать
-                    Start — chat_id придёт в логах бота. Оставьте пустым,
-                    чтобы отключить Telegram-канал для этого пользователя.
-                  </p>
-                </Field>
-              </div>
-            </section>
-          )}
 
           {/* ── Role & flags ── */}
           <section className="space-y-4">
