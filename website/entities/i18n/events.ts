@@ -12,6 +12,10 @@ export const eventsTranslations: Record<Language, Record<string, string>> = {
     'events.empty_body':
       "Events will appear here as soon as they're published.",
     'events.back_home': 'Back home',
+    // Route buttons under the venue address on event landing pages.
+    'events.route_hint': 'Build a route',
+    'events.route_yandex': 'Yandex Maps',
+    'events.route_google': 'Google Maps',
   },
   ru: {
     'events.title': 'События',
@@ -24,5 +28,9 @@ export const eventsTranslations: Record<Language, Record<string, string>> = {
     'events.empty_body':
       'События появятся здесь, как только будут опубликованы.',
     'events.back_home': 'На главную',
+    // Route buttons under the venue address on event landing pages.
+    'events.route_hint': 'Построить маршрут',
+    'events.route_yandex': 'Яндекс.Карты',
+    'events.route_google': 'Google Maps',
   },
 };
