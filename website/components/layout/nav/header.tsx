@@ -36,7 +36,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const { secret: adminSecret } = useAdminSecret();
+  const { secret: adminSecret } = useAdminSecret(user?.id ?? null);
   const pathname = usePathname();
   const isFullWidth =
     pathname?.startsWith("/admin") || pathname?.startsWith("/app/profile");
