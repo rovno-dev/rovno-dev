@@ -347,43 +347,43 @@ const SPEAKERS: Speaker[] = [
   {
     name: "Михаил Лапаев",
     role: "CMO · Rovno.dev",
-    fact: "$ curl 'https://projects/done'",
+    fact: "Сделал большую часть работы по организации мероприятия",
     bio: "Отвечает за продуктовую стратегию агентства. Разбирает, как из идеи сделать продукт, а не презентацию.",
     avatar_url: "/images/events/nash-dev-2026/speaker-mikhail.png",
   },
   {
     name: "Нияз Гимадиев",
     role: "CTO · Rovno.dev, Founder Unidoka",
-    fact: "$ bash ./Amorfa, ./unidoka.com, ./Vershiny",
+    fact: "Сделал этот сайт за 5 минут, а с текстовкой возился 1 час",
     bio: "Архитектор систем и автор открытого фреймворка Amorfa. Расскажет про разницу между ИИ со знаниями и без.",
     avatar_url: "/images/events/nash-dev-2026/speaker-niyaz.png",
   },
   {
     name: "Данил Киткин",
     role: "Арт-директор · Rovno.dev",
-    fact: "$ cat ./design.md ./3d.md ./motion.md",
-    bio: "3D-художник и моушн-дизайнер. Покажет, как рождаются ролики и 3D-сцены без бюджета Marvel.",
+    fact: "Именно он сделал весь 3D дизайн для мероприятия",
+    bio: "3D-художник и моушн-дизайнер. Покажет, как рождаются ролики и 3D-сцены без космических бюджетов.",
     avatar_url: "/images/events/nash-dev-2026/speaker-danil.png",
   },
   {
     name: "Жанара Семенова",
     role: "Менеджер проектов в науке и образовании · Yandex Cloud | Преподаватель · ИТИС КФУ",
-    fact: "$ docker compose --profile no-stress up",
+    fact: "Успевает совмещать преподавание в КФУ с работой в Яндекс",
     bio: "Развивает науку по всей России и СНГ. Готовит людей для светлого будущего. Всегда с улыбкой.",
     avatar_url: "/images/events/nash-dev-2026/speaker-janara.png",
   },
   {
     name: "Амир Бадрутдинов",
     role: "Активист | Журналист | Спортсмен",
-    fact: "$ sudo echo << age = 17 > /usr/user.conf",
-    bio: "Самый молодой спикер. В 17 лет делает так, чтобы мир реагировал на его действия, а не он на действия этого мира.",
+    fact: "Самый молодой спикер",
+    bio: "В 17 лет делает так, чтобы мир реагировал на его действия, а не он на действия этого мира.",
     avatar_url: "/images/events/nash-dev-2026/speaker-amir.png",
   },
   {
     name: "Анастасия Пугачева",
-    role: "CEO · Vizionix | Dancer | UX/UI Designer",
-    fact: "$ make --startup --get-grant",
-    bio: "Основатель стартапа Visionix. Двигается хорошо не только в бизнесе, но и на танцевальных конкурсах.",
+    role: "CEO · ООО 'ВИЗИОНИКС' | Бизнес-аналитик | Веб-дизайнер",
+    fact: "До того как стать CEO она 6 лет работала веб-дизайнером",
+    bio: "6+ лет в веб-дизайне, преподаватель школы веб-дизайна Стилетика, 30+ проектов, 2+ года в бизнес-аналитике. Ей есть что рассказать.",
     avatar_url: "/images/events/nash-dev-2026/speaker-anastasia.png",
   },
 ];
@@ -709,9 +709,9 @@ function AiSlider() {
 const TIMELINE = [
   { time: "13:10", cmd: "./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
   { time: "13:25", cmd: "./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
-  { time: "13:40", cmd: "./Поддержка_проектов_от_Yandex-Cloud --speakers Janara Semenova" },
+  { time: "13:40", cmd: "./Доклад_от_сотрудника Yandex_Cloud-Жанары_Семеновой" },
   { time: "14:10", cmd: "./Перерыв --period '10min'" },
-  { time: "14:20", cmd: "./Как-начать-своё-дело --speakers 'Анастасия Пугачёва'" },
+  { time: "14:20", cmd: "./Секретный_доклад" },
   { time: "14:35", cmd: "./Что такое активность, и что это дает? --speakers 'Амир Батрутдинов'" },
   { time: "14:50", cmd: "./Розыгрыш-Яндекс-Станции" },
   { time: "15:00", cmd: "make networking" },
@@ -760,7 +760,7 @@ function Timeline() {
 /* ── Features ────────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { cmd: "networking", desc: "Найти людей, с которыми потом соберёшь проект." },
+  { cmd: "networking", desc: "Событие где можно найти людей с которыми можно начать проект." },
   { cmd: "get_certificate", desc: "Официальный сертификат об участии (по запросу)." },
   { cmd: "win_kolonka", desc: "Розыгрыш Яндекс Станции за лучший вопрос." },
   { cmd: "contact_speakers", desc: "Общение со спикерами после выступления." },
@@ -997,6 +997,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
     name: "",
     surname: "",
     phone: "",
+    email: "",
     telegram_username: "",
     status: "STUDENT" as (typeof STATUS_OPTIONS)[number],
     confirm_age_18: false,
@@ -1029,6 +1030,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
         name: form.name.trim(),
         surname: form.surname.trim() || undefined,
         phone: form.phone.trim(),
+        email: form.email.trim() || undefined,
         telegram_username: form.telegram_username.trim() || undefined,
         meta: {
           status: form.status,
@@ -1052,14 +1054,14 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
             ✓ Registration successful.
           </p>
           <p className="text-lg md:text-2xl" style={{ color: WHITE }}>
-            See you on{" "}
+            Увидимся на событии{" "}
             {ctx.startAt
               ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
-              : "23.10.2026"}
+              : "23 октября 2026"}
             .
           </p>
           <p className="text-base mt-8" style={{ color: "#666" }}>
-            Мы отправим подтверждение в Telegram, если вы указали ник.
+            Мы отправим напоминание на почту за 3 дня до события
           </p>
         </div>
       </section>
@@ -1077,6 +1079,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
           <Field label="enter_name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="Иван" required />
           <Field label="enter_surname" value={form.surname} onChange={(v) => setForm({ ...form, surname: v })} placeholder="Иванов" />
           <Field label="enter_phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+7 ___ ___-__-__" required />
+          <Field label="enter_email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@example.com" />
           <Field label="enter_telegram" value={form.telegram_username} onChange={(v) => setForm({ ...form, telegram_username: v })} placeholder="@username" />
 
           <div>
