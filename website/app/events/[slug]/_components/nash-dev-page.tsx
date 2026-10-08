@@ -341,6 +341,7 @@ interface Speaker {
   fact: string;
   bio: string;
   avatar_url: string;
+  link?: string;
 }
 
 const SPEAKERS: Speaker[] = [
@@ -350,6 +351,7 @@ const SPEAKERS: Speaker[] = [
     fact: "Сделал большую часть работы по организации мероприятия",
     bio: "Отвечает за продуктовую стратегию агентства. Разбирает, как из идеи сделать продукт, а не презентацию.",
     avatar_url: "/images/events/nash-dev-2026/speaker-mikhail.png",
+    link: "https://rovno_dev/RovnoMikhail",
   },
   {
     name: "Нияз Гимадиев",
@@ -357,6 +359,7 @@ const SPEAKERS: Speaker[] = [
     fact: "Сделал этот сайт за 5 минут, а с текстовкой возился 1 час",
     bio: "Архитектор систем и автор открытого фреймворка Amorfa. Расскажет про разницу между ИИ со знаниями и без.",
     avatar_url: "/images/events/nash-dev-2026/speaker-niyaz.png",
+    link: "https://rovno.dev/niyazgim",
   },
   {
     name: "Данил Киткин",
@@ -364,6 +367,7 @@ const SPEAKERS: Speaker[] = [
     fact: "Именно он сделал весь 3D дизайн для мероприятия",
     bio: "3D-художник и моушн-дизайнер. Покажет, как рождаются ролики и 3D-сцены без космических бюджетов.",
     avatar_url: "/images/events/nash-dev-2026/speaker-danil.png",
+    link: "https://rovno_dev/RovnoDanil",
   },
   {
     name: "Жанара Семенова",
@@ -371,6 +375,7 @@ const SPEAKERS: Speaker[] = [
     fact: "Успевает совмещать преподавание в КФУ с работой в Яндекс",
     bio: "Развивает науку по всей России и СНГ. Готовит людей для светлого будущего. Всегда с улыбкой.",
     avatar_url: "/images/events/nash-dev-2026/speaker-janara.png",
+    // link: "https://",
   },
   {
     name: "Амир Бадрутдинов",
@@ -378,6 +383,7 @@ const SPEAKERS: Speaker[] = [
     fact: "Самый молодой спикер",
     bio: "В 17 лет делает так, чтобы мир реагировал на его действия, а не он на действия этого мира.",
     avatar_url: "/images/events/nash-dev-2026/speaker-amir.png",
+    link: "https://t.me/BADRAmir24",
   },
   {
     name: "Анастасия Пугачева",
@@ -385,6 +391,7 @@ const SPEAKERS: Speaker[] = [
     fact: "До того как стать CEO она 6 лет работала веб-дизайнером",
     bio: "6+ лет в веб-дизайне, преподаватель школы веб-дизайна Стилетика, 30+ проектов, 2+ года в бизнес-аналитике. Ей есть что рассказать.",
     avatar_url: "/images/events/nash-dev-2026/speaker-anastasia.png",
+    // link: "https://",
   },
 ];
 
@@ -397,12 +404,20 @@ function Speakers() {
           <Prompt>{"$"}</Prompt>Спикеры
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {SPEAKERS.map((s, i) => (
-            <button
+            <div
               key={i}
+              role="button"
+              tabIndex={0}
               onClick={() => setOpen(s)}
-              className="text-left p-6 border transition-all duration-200"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpen(s);
+                }
+              }}
+              className="group cursor-pointer text-left p-6 border transition-all duration-200 flex flex-col h-full w-full outline-none focus-visible:border-[#CCFF00]"
               style={{ borderColor: "#222", background: BLACK }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = LIME;
@@ -413,14 +428,11 @@ function Speakers() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              {/* Square frame owns the layout — every card's image is the
-                  same height regardless of the source file's natural
-                  dimensions, and stays fluid on resize. `fill` + a sized
-                  parent is the correct next/image pattern here: width/
-                  height props alone only set intrinsic dimensions and
-                  let the rendered box drift with the source aspect. */}
+              {/* Image — fixed aspect + shrink-0. Its height never varies
+                  with the text below, so every photo in a row starts at
+                  the same Y regardless of how long the role string is. */}
               <div
-                className="relative aspect-square w-full mb-6 overflow-hidden"
+                className="relative aspect-square w-full mb-6 overflow-hidden shrink-0"
                 style={{
                   background:
                     "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
@@ -435,19 +447,44 @@ function Speakers() {
                   className="object-cover"
                 />
               </div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
-                {"{"}
-              </p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>name:</p>
-              <p className="font-mono text-lg mb-4" style={{ color: WHITE }}>"{s.name}"</p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>role:</p>
-              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.role}"</p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>short_fact:</p>
-              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.fact}"</p>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] mt-6" style={{ color: "#666" }}>
-                {"}"}
-              </p>
-            </button>
+              {/* flex-1 + flex flex-col: the text block fills whatever
+                  height is left in the grid cell, so every card in a row
+                  ends on the same baseline. `mt-auto` on the closing brace
+                  pins it to the bottom for a consistent frame. */}
+              <div className="flex-1 flex flex-col min-w-0">
+                <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
+                  {"{"}
+                </p>
+                <p className="font-mono text-sm mb-1" style={{ color: LIME }}>name:</p>
+                <p className="font-mono text-lg mb-4" style={{ color: WHITE }}>"{s.name}"</p>
+                <p className="font-mono text-sm mb-1" style={{ color: LIME }}>role:</p>
+                <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.role}"</p>
+                <p className="font-mono text-sm mb-1" style={{ color: LIME }}>short_fact:</p>
+                <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.fact}"</p>
+                {s.link && (
+                  <>
+                    <p className="font-mono text-sm mb-1" style={{ color: LIME }}>link:</p>
+                    <p className="font-mono text-sm mb-4">
+                      <a
+                        href={s.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 underline underline-offset-2 transition-opacity hover:opacity-70 break-all"
+                        style={{ color: WHITE }}
+                      >
+                        "{s.link.replace(/^https?:\/\//, "")}"
+                        <ArrowUpRight size={12} weight="bold" />
+                      </a>
+                    </p>
+                  </>
+                )}
+                <p className="font-mono text-xs uppercase tracking-[0.2em] mt-auto pt-6" style={{ color: "#666" }}>
+                  {"}"}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -474,7 +511,25 @@ function Speakers() {
             <h3 className="text-2xl mb-2" style={{ color: WHITE }}># {open.name}</h3>
             <p className="text-sm mb-6" style={{ color: LIME }}>## {open.role}</p>
             <p className="text-base leading-relaxed mb-4" style={{ color: "#ddd" }}>{open.bio}</p>
-            <p className="text-sm" style={{ color: "#666" }}>{open.fact}</p>
+            <p className="text-sm mb-6" style={{ color: "#666" }}>{open.fact}</p>
+            <a
+              href={open.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+              style={{ borderColor: "#333", color: WHITE }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = LIME;
+                e.currentTarget.style.color = LIME;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#333";
+                e.currentTarget.style.color = WHITE;
+              }}
+            >
+              contact
+              <ArrowUpRight size={14} weight="bold" />
+            </a>
           </div>
         </div>
       )}
