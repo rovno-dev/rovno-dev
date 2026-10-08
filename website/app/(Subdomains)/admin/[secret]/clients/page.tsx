@@ -16,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import { $fetch } from "@/utils/fetch";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 
 interface ClientRow {
   id: string;
@@ -224,7 +225,7 @@ export default function AdminClientsPage() {
 
                 <div className="flex items-center gap-2 shrink-0">
                   <Button variant="outlined" size="small" asChild>
-                    <Link href={`/admin/${secret || "secret"}/orders`}>
+                    <Link href={adminUrl(secret, "orders")}>
                       <ArrowSquareOutIcon className="size-3.5" />
                       Заявки
                     </Link>

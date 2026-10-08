@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, ArrowClockwiseIcon, WarningIcon, CircleNotchIcon, ArrowLeft } from "@phosphor-icons/react";
 import { fetchAdminProject, type ProjectDetail } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 
 export default function EditProjectPage({
   params,
@@ -27,7 +28,7 @@ export default function EditProjectPage({
   }
 
   const { secret } = useAdminSecret();
-  const listHref = secret ? `/admin/${secret}/projects` : "/admin";
+  const listHref = adminUrl(secret, "projects");
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);

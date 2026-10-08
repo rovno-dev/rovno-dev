@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { fetchAdminProjects, type ProjectListAdmin } from "@/utils/api/projects";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 import { findCustomPageMeta } from "@/app/projects/[slug]/_components/custom-pages-meta";
 
 type LoadState =
@@ -57,7 +58,7 @@ export default function AdminProjectsPage() {
     return null;
   }
 
-  const base = `/admin/${secret}/projects`;
+  const base = adminUrl(secret, "projects");
   const projects = state.kind === "ready" ? state.projects : [];
 
   return (

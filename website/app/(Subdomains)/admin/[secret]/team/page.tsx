@@ -21,6 +21,7 @@ import {
   type TeamMemberAdmin,
 } from "@/utils/api/team";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 import { TeamMemberEditorDialog } from "./_components/team-member-editor-dialog";
 
 type LoadState =
@@ -71,7 +72,7 @@ export default function AdminTeamPage() {
   };
 
   const members = state.kind === "ready" ? state.members : [];
-  const usersHref = secret ? `/admin/${secret}/users` : "/admin";
+  const usersHref = adminUrl(secret, "users");
 
   return (
     <CheckUser>

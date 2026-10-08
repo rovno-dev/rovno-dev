@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { fetchAdminEvents, type EventListItem } from "@/utils/api/events";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 import { findEventCustomPageMeta } from "@/app/events/[slug]/_components/event-custom-pages-meta";
 
 export default function AdminEventsPage() {
@@ -54,8 +55,8 @@ export default function AdminEventsPage() {
     return null;
   }
 
-  const base = `/admin/${secret}/events`;
-  const requestsHref = `/admin/${secret}/event-requests`;
+  const base = adminUrl(secret, "events");
+  const requestsHref = adminUrl(secret, "event-requests");
 
   return (
     <CheckUser>
