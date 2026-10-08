@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import type { EventCustomContext } from "./event-custom-pages";
 import { registerForEvent } from "@/utils/api/events";
 import Image from "next/image";
+import { NashDevLogo } from "@/components/icons/logotypes/nash-dev-logo";
+import { useLanguage } from "@/providers/language-provider";
+import { ArrowUpRight } from "@phosphor-icons/react";
+import Link from "next/link";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Наш.Dev — Terminal Brutalism landing.
@@ -33,7 +37,7 @@ function Cursor() {
 
 /* ── Hero ────────────────────────────────────────────────────────────── */
 
-const HERO_LINE = "> IT-СОБЫТИЕ ДЛЯ СОЗДАТЕЛЕЙ БУДУЩЕГО_";
+const HERO_LINE = "> КОНФЕРЕНЦИЯ ДЛЯ СОЗДАТЕЛЕЙ БУДУЩЕГО_";
 
 function Hero({ ctx }: { ctx: EventCustomContext }) {
   const [typed, setTyped] = useState("");
@@ -119,26 +123,14 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
     >
       <div className="max-w-[1200px] mx-auto px-6">
         <div
-          className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] font-mono uppercase tracking-[0.2em] mb-16"
+          className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] font-mono uppercase tracking-[0.2em] mb-8"
           style={{ color: LIME }}
         >
-          <span>Rovno.dev</span>
+          <span>events</span>
           <span style={{ color: "#444" }}>{"//"}</span>
-          <span>EVENTS</span>
-          <span style={{ color: "#444" }}>{"//"}</span>
-          <span>NASH.DEV</span>
         </div>
 
-        <div className="mb-10">
-          <div
-            className="inline-flex items-baseline gap-1 font-mono text-2xl md:text-3xl tracking-wider"
-            style={{ color: WHITE }}
-          >
-            <span>НАШ</span>
-            <span className="inline-block w-3 h-3" style={{ background: LIME, marginBottom: "-2px" }} />
-            <span>DEV</span>
-          </div>
-        </div>
+        <NashDevLogo className="h-auto w-full sm:h-18 sm:w-auto mb-10" />
 
         <h1
           className="font-mono text-[2rem] md:text-[3.5rem] lg:text-[4.5rem] leading-[1.05] tracking-tight mb-8"
@@ -147,10 +139,6 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
           {typed}
           {!showInput && <Cursor />}
         </h1>
-
-        <p className="font-mono text-lg md:text-2xl tracking-[0.2em] mb-6" style={{ color: LIME }}>
-          КОД / ЛЮДИ / ПРАКТИКА
-        </p>
 
         <p className="font-mono text-sm md:text-base mb-12" style={{ color: "#888" }}>
           {"// "}
@@ -254,7 +242,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
     <section id="about" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6 font-mono">
         <p className="text-base md:text-lg mb-10" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>cat about.md
+          <Prompt>{"$"}</Prompt>О событии
         </p>
         <p className="text-xl md:text-3xl leading-snug mb-10 max-w-[900px]" style={{ color: WHITE }}>
           НАШ.DEV — это ивент для тех, кто:
@@ -312,7 +300,7 @@ function Audience() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>whoami --target
+          <Prompt>{"$"}</Prompt>Кто может участвовать?
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#222" }}>
@@ -406,10 +394,10 @@ function Speakers() {
     <section id="speakers" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>cat ./speakers.json
+          <Prompt>{"$"}</Prompt>Спикеры
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {SPEAKERS.map((s, i) => (
             <button
               key={i}
@@ -425,25 +413,37 @@ function Speakers() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              <Image
-                src={s.avatar_url}
-                width={1000}
-                height={1000}
-                className="aspect-square mb-6 relative overflow-hidden"
+              {/* Square frame owns the layout — every card's image is the
+                  same height regardless of the source file's natural
+                  dimensions, and stays fluid on resize. `fill` + a sized
+                  parent is the correct next/image pattern here: width/
+                  height props alone only set intrinsic dimensions and
+                  let the rendered box drift with the source aspect. */}
+              <div
+                className="relative aspect-square w-full mb-6 overflow-hidden"
                 style={{
-                  background: "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
+                  background:
+                    "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
                 }}
-                alt={s.name}
-              />
+              >
+                <Image
+                  src={s.avatar_url}
+                  alt={s.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
               <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
                 {"{"}
               </p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>NAME:</p>
-              <p className="font-mono text-lg mb-4" style={{ color: WHITE }}>{s.name}</p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>ROLE:</p>
-              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>{s.role}</p>
-              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>FACT:</p>
-              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>{s.fact}</p>
+              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>name:</p>
+              <p className="font-mono text-lg mb-4" style={{ color: WHITE }}>"{s.name}"</p>
+              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>role:</p>
+              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.role}"</p>
+              <p className="font-mono text-sm mb-1" style={{ color: LIME }}>short_fact:</p>
+              <p className="font-mono text-sm mb-4" style={{ color: "#aaa" }}>"{s.fact}"</p>
               <p className="font-mono text-xs uppercase tracking-[0.2em] mt-6" style={{ color: "#666" }}>
                 {"}"}
               </p>
@@ -488,7 +488,6 @@ function AiSlider() {
   const [pos, setPos] = useState(50);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
-
   const update = (clientX: number) => {
     const el = trackRef.current;
     if (!el) return;
@@ -496,7 +495,6 @@ function AiSlider() {
     const pct = ((clientX - r.left) / r.width) * 100;
     setPos(Math.max(0, Math.min(100, pct)));
   };
-
   useEffect(() => {
     const onUp = () => (dragging.current = false);
     const onMove = (e: MouseEvent) => dragging.current && update(e.clientX);
@@ -514,69 +512,178 @@ function AiSlider() {
       window.removeEventListener("touchmove", onTouch);
     };
   }, []);
-
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-4" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>compare --ai-knowledge
+          <Prompt>{"$"}</Prompt>Один инструмент. Два принципиально разных результата.
         </p>
-        <h2
-          className="font-mono text-2xl md:text-4xl tracking-tight mb-12 max-w-[900px]"
-          style={{ color: WHITE }}
-        >
-          ИИ без знаний vs ИИ со знаниями
-        </h2>
-
         <div
           ref={trackRef}
           className="relative w-full aspect-[16/9] border select-none overflow-hidden touch-none"
           style={{ borderColor: "#222" }}
         >
-          {/* LEFT (grey) — always underneath, covers the whole frame */}
+          {/* LEFT (muted) — baseline. Full frame, so it is what shows through
+              when the split sits at 0%. */}
           <div
-            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end"
+            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end overflow-hidden"
             style={{ background: "#111" }}
           >
-            <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
-              AI_WITHOUT_KNOWLEDGE
-            </p>
-            <p className="font-mono text-xl md:text-3xl mb-3" style={{ color: "#888" }}>
-              Уязвимости.
-              <br />
-              Нулевая масштабируемость.
-            </p>
-            <p className="text-sm md:text-base max-w-[420px]" style={{ color: "#555" }}>
-              Код собирается быстро, но ломается на первом реальном сценарии.
-            </p>
+            {/* Ambient iconography — reads as a warning schematic sitting
+                behind the copy. Kept under 0.2 opacity so it never competes
+                with the text. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none select-none"
+              style={{ color: "#444" }}
+            >
+              {/* Warning triangle, top-right */}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                className="absolute top-6 right-6 size-24 md:size-40"
+                style={{ opacity: 0.16 }}
+              >
+                <path d="M12 3 2 20h20L12 3Z" />
+                <path d="M12 9v5" />
+                <circle cx="12" cy="17" r="0.7" fill="currentColor" />
+              </svg>
+              {/* Broken chain, bottom-right */}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="absolute bottom-10 right-6 size-20 md:size-28"
+                style={{ opacity: 0.12 }}
+              >
+                <path d="M9 15 6 18a3 3 0 0 1-4-4l3-3" />
+                <path d="M15 9l3-3a3 3 0 0 1 4 4l-3 3" />
+                <path d="M3 3l18 18" />
+              </svg>
+              {/* Monospace fragment, top-left */}
+              <span
+                className="absolute top-8 left-8 font-mono text-[3rem] md:text-[5rem] leading-none"
+                style={{ opacity: 0.10 }}
+              >
+                /ERR
+              </span>
+              {/* Faint schematic lines */}
+              <svg
+                viewBox="0 0 200 200"
+                className="absolute -bottom-10 -left-10 w-[240px] h-[240px] md:w-[360px] md:h-[360px]"
+                style={{ opacity: 0.08 }}
+              >
+                {[40, 70, 100, 130, 160].map((y) => (
+                  <line
+                    key={y}
+                    x1="0"
+                    y1={y}
+                    x2="200"
+                    y2={y}
+                    stroke="currentColor"
+                    strokeWidth="0.5"
+                    strokeDasharray="2 6"
+                  />
+                ))}
+              </svg>
+            </div>
+            <div className="relative">
+              <p
+                className="font-mono text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3"
+                style={{ color: "#666" }}
+              >
+                AI_WITHOUT_ARCHITECTURE
+              </p>
+              <p
+                className="font-mono text-xl md:text-3xl mb-3 leading-snug"
+                style={{ color: "#8a8a8a" }}
+              >
+                Технический долг.
+                <br />
+                Нулевая поддерживаемость.
+              </p>
+              <p
+                className="text-sm md:text-base max-w-[420px] leading-relaxed"
+                style={{ color: "#555" }}
+              >
+                Код компилируется, но не выдерживает нагрузку реальных сценариев.
+              </p>
+            </div>
           </div>
-
           {/* RIGHT (lime) — full-size, clipped to reveal only the right portion */}
           <div
-            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end"
+            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end overflow-hidden"
             style={{
               background: LIME,
               color: BLACK,
               clipPath: `inset(0 0 0 ${pos}%)`,
             }}
           >
-            {/* Content stays anchored to the right edge so it doesn't slide as
-                the split moves. Without this the text reflows on every drag. */}
-            <div className="ml-auto text-right max-w-[520px]">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#333" }}>
-                AI_WITH_FULLSTACK
+            {/* Ambient iconography — validated / shipped signals. */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none select-none"
+              style={{ color: "#2b2b00" }}
+            >
+              {/* Shield with check, top-right */}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                className="absolute top-6 right-6 size-24 md:size-40"
+                style={{ opacity: 0.18 }}
+              >
+                <path d="M12 2 4 5v7c0 5 3.6 9 8 10 4.4-1 8-5 8-10V5l-8-3Z" />
+                <path d="m8.5 12 2.4 2.4 4.6-4.6" />
+              </svg>
+              {/* Terminal OK, bottom-right */}
+              <span
+                className="absolute bottom-10 right-6 font-mono text-[2.5rem] md:text-[4.5rem] leading-none"
+                style={{ opacity: 0.14 }}
+              >
+                $ _OK
+              </span>
+              {/* Compliance checklist, top-left */}
+              <div
+                className="absolute top-8 left-8 flex flex-col gap-1.5 font-mono text-xs md:text-sm"
+                style={{ opacity: 0.34 }}
+              >
+                <span>{"\u2713"} production-ready</span>
+                <span>{"\u2713"} horizontal scaling</span>
+                <span>{"\u2713"} maintainable surface</span>
+              </div>
+            </div>
+            {/* Content pinned to the right so it doesn't reflow on drag. */}
+            <div className="ml-auto text-right max-w-[520px] relative">
+              <p
+                className="font-mono text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3"
+                style={{ color: "#2b2b00" }}
+              >
+                AI_PLUS_ENGINEERING
               </p>
-              <p className="font-mono text-xl md:text-3xl mb-3">
-                ИИ как черновик.
+              <p className="font-mono text-xl md:text-3xl mb-3 leading-snug">
+                Черновик модели.
                 <br />
-                Ручной контроль.
+                Промышленное качество.
               </p>
-              <p className="text-sm md:text-base" style={{ color: "#333" }}>
-                Модель пишет первую версию. Инженер доводит до продакшена.
+              <p
+                className="text-sm md:text-base leading-relaxed"
+                style={{ color: "#2b2b00" }}
+              >
+                Модель ускоряет старт. Инженер обеспечивает надёжность и масштаб.
               </p>
             </div>
           </div>
-
           {/* Handle */}
           <div
             className="absolute top-0 bottom-0 w-1 cursor-ew-resize z-10"
@@ -588,14 +695,10 @@ function AiSlider() {
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-10 flex items-center justify-center font-mono text-sm select-none"
               style={{ background: WHITE, color: BLACK }}
             >
-              ⇄
+              {"\u21C4"}
             </div>
           </div>
         </div>
-
-        <p className="font-mono text-sm md:text-base mt-10" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Want real creativity? Check Pinterest or Dprofile.
-        </p>
       </div>
     </section>
   );
@@ -604,13 +707,13 @@ function AiSlider() {
 /* ── Timeline (dots aligned to the line) ─────────────────────────────── */
 
 const TIMELINE = [
-  { time: "13:10", cmd: "sh ./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
-  { time: "13:25", cmd: "sh ./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
-  { time: "13:40", cmd: "sh ./Поддержка_проектов_от_Yandex-Cloud --speakers Janara Semenova" },
-  { time: "14:10", cmd: "break --period '10m'" },
-  { time: "14:20", cmd: "sh ./Как-начать-своё-дело --speakers 'Anastasia Pugachova'" },
-  { time: "14:35", cmd: "sh ./Волонтёрство-на-изи --speakers 'Amir Badrutdinov'" },
-  { time: "14:50", cmd: "sh ./Розыгрыш-Яндекс-Станции" },
+  { time: "13:10", cmd: "./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
+  { time: "13:25", cmd: "./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
+  { time: "13:40", cmd: "./Поддержка_проектов_от_Yandex-Cloud --speakers Janara Semenova" },
+  { time: "14:10", cmd: "./Перерыв --period '10min'" },
+  { time: "14:20", cmd: "./Как-начать-своё-дело --speakers 'Анастасия Пугачёва'" },
+  { time: "14:35", cmd: "./Что такое активность, и что это дает? --speakers 'Амир Батрутдинов'" },
+  { time: "14:50", cmd: "./Розыгрыш-Яндекс-Станции" },
   { time: "15:00", cmd: "make networking" },
 ];
 
@@ -619,7 +722,7 @@ function Timeline() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>cat schedule.txt
+          <Prompt>{"$"}</Prompt>Таймлайн
         </p>
 
         {/* Both the vertical rail and the dots live in the same coordinate
@@ -668,7 +771,7 @@ function Features() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>ls benefits/
+          <Prompt>{"$"}</Prompt>Преимущества
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ background: "#222" }}>
           {FEATURES.map((f, i) => (
@@ -687,42 +790,136 @@ function Features() {
 }
 
 /* ── Location ────────────────────────────────────────────────────────── */
-
+// Yandex Map embed for the venue. If the iframe never fires `onLoad`
+// (blocked by a corporate proxy, DNS failure, embed endpoint down), we
+// swap to Google Maps after a short grace period. We can't rely on
+// `onError` for cross-origin iframes — it fires for network errors but
+// not for blocked frames — so the timeout is the real trigger.
+const YANDEX_MAP_SRC =
+  "https://yandex.ru/map-widget/v1/?um=constructor%3Ac65a3696f6811e8fdf9a467d8657d05efab313aee6808b886bebb2138cf28370&source=constructor";
+const GOOGLE_MAP_SRC =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2242.5166000790605!2d49.17465141284107!3d55.80163137299019!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x415eb281ef8e4d65%3A0x5b12cc06fe4a5dfe!2z0JrQsNC30LDQvdGB0LrQuNC5INGC0LXRhdC90LjQutGD0Lwg0LjQvdGE0L7RgNC80LDRhtC40L7QvdC90YvRhSDRgtC10YXQvdC-0LvQvtCz0LjQuSDQuCDRgdCy0Y_Qt9C4!5e0!3m2!1sen!2sru!4v1791396027142!5m2!1sen!2sru";
+const MAP_FALLBACK_MS = 4000;
+// Venue coordinates extracted from the Google Maps embed. Shared by
+// both “build a route” deep links below so a venue move is a
+// one-line edit here.
+const VENUE_LAT = 55.801339;
+const VENUE_LON = 49.177800;
+function MapEmbed() {
+  // `provider` flips to "google" the moment the Yandex frame is judged
+  // dead. `loaded` guards against a late onLoad from a Yandex frame that
+  // was already replaced — once we've fallen back, we ignore it.
+  const [provider, setProvider] = useState<"yandex" | "google">("yandex");
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    if (provider !== "yandex" || loaded) return;
+    const t = setTimeout(() => {
+      // Double-check: if onLoad already fired we would have bailed, but a
+      // race between the timer and the load event is possible on slow
+      // connections. Reading the ref-free `loaded` state here is fine —
+      // the closure captures the value at effect-run time, and the effect
+      // re-runs whenever `loaded` changes.
+      setProvider("google");
+    }, MAP_FALLBACK_MS);
+    return () => clearTimeout(t);
+  }, [provider, loaded]);
+  const src = provider === "yandex" ? YANDEX_MAP_SRC : GOOGLE_MAP_SRC;
+  return (
+    <iframe
+      key={provider}
+      src={src}
+      width="100%"
+      height="100%"
+      style={{ border: 0 }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="strict-origin-when-cross-origin"
+      title="Карта — место проведения"
+      onLoad={() => setLoaded(true)}
+      onError={() => setProvider("google")}
+      className="rounded-xl!"
+    />
+  );
+}
 function Location({ ctx }: { ctx: EventCustomContext }) {
+  const { t, lang } = useLanguage();
+  // Yandex takes a full locale (ru_RU / en_US); Google takes a bare
+  // two-letter code. Both route deep-links point at the same coordinates
+  // the map embed uses, so the two never drift out of sync.
+  const yandexLang = lang === "ru" ? "ru_RU" : "en_US";
+  const yandexRouteUrl = `https://yandex.ru/maps/?rtext=~${VENUE_LAT},${VENUE_LON}&rtt=auto&lang=${yandexLang}`;
+  const googleRouteUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_LAT},${VENUE_LON}&hl=${lang}`;
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>cd /{ctx.locationName?.toLowerCase().replace(/\s+/g, "_") || "mcc_kits"}
+          <Prompt>{"$"}</Prompt>Локация {ctx.locationName?.toLowerCase().replace(/\s+/g, "_") || "{mcc_kits}"}
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
           <div className="font-mono space-y-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Location</p>
-              <p className="text-xl" style={{ color: WHITE }}>{ctx.locationName || "МЦК КИТС"}</p>
+              <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Адрес</p>
+              <p className="text-xl" style={{ color: WHITE }}>Казань, ул. Бари Галеева, 3а</p>
             </div>
-            {ctx.address && (
+            {ctx.locationName && (
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Address</p>
-                <p className="text-base" style={{ color: WHITE }}>{ctx.address}</p>
-              </div>
-            )}
-            {ctx.metro && (
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Metro</p>
-                <p className="text-base" style={{ color: WHITE }}>{ctx.metro}</p>
+                <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Место</p>
+                <p className="text-base" style={{ color: WHITE }}>{ctx.locationName}</p>
               </div>
             )}
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Parking</p>
-              <p className="text-base" style={{ color: LIME }}>
-                <Prompt>{"$"}</Prompt>available
+              <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Остановка</p>
+              <p className="text-base" style={{ color: WHITE }}>Советская Площадь</p>
+            </div>
+            {/* Route buttons — two providers, one row. Terminal-style
+                outlined pills that light up in LIME on hover, matching the
+                rest of the page's interactive language. Both open in a new
+                tab so the reader doesn't lose their place on the landing. */}
+            <div className="pt-4 mt-2 border-t space-y-3" style={{ borderColor: "#222" }}>
+              <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "#666" }}>
+                <Prompt>{"$"}</Prompt>{t("events.route_hint")}
               </p>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={yandexRouteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+                  style={{ borderColor: "#333", color: WHITE }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = LIME;
+                    e.currentTarget.style.color = LIME;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#333";
+                    e.currentTarget.style.color = WHITE;
+                  }}
+                >
+                  {t("events.route_yandex")}
+                  <ArrowUpRight size={14} weight="bold" />
+                </a>
+                <a
+                  href={googleRouteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+                  style={{ borderColor: "#333", color: WHITE }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = LIME;
+                    e.currentTarget.style.color = LIME;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#333";
+                    e.currentTarget.style.color = WHITE;
+                  }}
+                >
+                  {t("events.route_google")}
+                  <ArrowUpRight size={14} weight="bold" />
+                </a>
+              </div>
             </div>
           </div>
-
-          <div className="aspect-video border relative overflow-hidden" style={{ borderColor: "#222", background: "#0a0a0a" }}>
+          <div className="aspect-4/3 border relative overflow-hidden rounded-xl!" style={{ borderColor: "#222", background: "#0a0a0a" }}>
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -731,11 +928,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center font-mono">
-                <div className="inline-flex items-center justify-center size-4 mb-4" style={{ background: LIME }} />
-                <p className="text-sm" style={{ color: LIME }}>MARKER: {ctx.locationName || "МЦК КИТС"}</p>
-                <p className="text-xs mt-1" style={{ color: "#666" }}>lat, lng — on request</p>
-              </div>
+              <MapEmbed />
             </div>
           </div>
         </div>
@@ -760,7 +953,7 @@ function Faq() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[900px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>help --frequently-asked
+          <Prompt>{"$"}</Prompt>Вопрос-ответ
         </p>
 
         <div>
@@ -877,7 +1070,6 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
     <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
       <div className="max-w-[900px] mx-auto px-6 font-mono">
         <p className="text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>1</Prompt>
           <Prompt>{"$"}</Prompt>init_registration()
         </p>
 
@@ -889,7 +1081,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
 
           <div>
             <p className="text-sm mb-3" style={{ color: LIME }}>
-              <Prompt>{"$"}</Prompt>select_status:
+              <Prompt>{"$"}</Prompt>Кто ты?:
             </p>
             <div className="flex gap-3">
               {STATUS_OPTIONS.map((opt) => (
@@ -1032,10 +1224,10 @@ function EventFooter() {
           <Prompt>{"$"}</Prompt>cd /rovno.dev
         </div>
         <div className="text-sm" style={{ color: "#666" }}>
-          <Prompt>{"$"}</Prompt>contact_us
+          <Prompt>{"$"}</Prompt>make event --type "cool"
         </div>
         <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "#444" }}>
-          Rovno.dev © {new Date().getFullYear()}
+          Rovno.dev x <span><Link href='https://unidoka.com'>Юнидока</Link></span> x <span><Link href='https://unidoka.com/vershiny'>Вершины</Link></span> © {new Date().getFullYear()}
         </div>
       </div>
     </footer>
