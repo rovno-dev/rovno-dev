@@ -46,6 +46,7 @@ import {
   PhoneIcon,
   CheckCircleIcon,
   XIcon,
+  FunnelSimpleIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { $fetch } from "@/utils/fetch";
@@ -140,6 +141,29 @@ export default function AdminUsersPage() {
 
   // Text search
   const [query, setQuery] = useState("");
+
+  // Filter panel is collapsed by default; the toggle persists state in
+  // localStorage so an admin who expands it once keeps it open across
+  // navigations and reloads.
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  useEffect(() => {
+    try {
+      setFiltersOpen(localStorage.getItem("admin-users-filters-open") === "1");
+    } catch {
+      /* private mode / disabled storage */
+    }
+  }, []);
+  const toggleFilters = () => {
+    setFiltersOpen((v) => {
+      const next = !v;
+      try {
+        localStorage.setItem("admin-users-filters-open", next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
 
   // Filters — every dimension is independent; "all" is a no-op pass-through.
   const [roleFilter, setRoleFilter] =
@@ -241,6 +265,15 @@ export default function AdminUsersPage() {
     verifiedFilter !== "all" ||
     blockedFilter !== "all" ||
     teamFilter !== "all";
+
+  // Count of active chips (query excluded — it is visible in the input).
+  // Drives the badge on the collapsed toggle button so an admin sees at a
+  // glance that filters are narrowing the list.
+  const activeFilterCount =
+    (roleFilter !== "all" ? 1 : 0) +
+    (verifiedFilter !== "all" ? 1 : 0) +
+    (blockedFilter !== "all" ? 1 : 0) +
+    (teamFilter !== "all" ? 1 : 0);
 
   const resetFilters = () => {
     setQuery("");
@@ -344,76 +377,105 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        {/* Search + filters. Flat input, then a compact strip of
-            segmented controls. No outer card — the strip reads as an
-            instrument rail rather than another container. */}
-        <div className="space-y-3">
-          <div className="relative">
-            <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Поиск по имени, email, телефону, username…"
-              className="pl-9 h-10"
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <FilterGroup
-              label="Роль"
-              value={roleFilter}
-              options={[
-                { value: "all", label: "Все" },
-                { value: "client", label: "Клиент" },
-                { value: "user", label: "Пользователь" },
-                { value: "admin", label: "Админ" },
-                { value: "root", label: "Root" },
-              ]}
-              onChange={(v) => setRoleFilter(v as typeof roleFilter)}
-            />
-            <FilterGroup
-              label="Статус"
-              value={verifiedFilter}
-              options={[
-                { value: "all", label: "Все" },
-                { value: "verified", label: "Подтв." },
-                { value: "unverified", label: "Не подтв." },
-              ]}
-              onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
-            />
-            <FilterGroup
-              label="Доступ"
-              value={blockedFilter}
-              options={[
-                { value: "all", label: "Все" },
-                { value: "active", label: "Активные" },
-                { value: "blocked", label: "Заблок." },
-              ]}
-              onChange={(v) => setBlockedFilter(v as typeof blockedFilter)}
-            />
-            <FilterGroup
-              label="Команда"
-              value={teamFilter}
-              options={[
-                { value: "all", label: "Все" },
-                { value: "team", label: "В команде" },
-                { value: "external", label: "Вне" },
-              ]}
-              onChange={(v) => setTeamFilter(v as typeof teamFilter)}
-            />
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
-              >
-                <XIcon className="size-3" />
-                Сбросить
-              </button>
-            )}
-          </div>
-        </div>
+        {/* Search + filters. The search input is always visible; the
+    chip strip folds away behind a toggle so the header stays
+    compact when it isn't needed. */}
+<div className="space-y-3">
+  <div className="flex items-center gap-2">
+    <div className="relative flex-1">
+      <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+      <Input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Поиск по имени, email, телефону, username…"
+        className="pl-9 h-10"
+      />
+    </div>
+    <button
+      type="button"
+      onClick={toggleFilters}
+      aria-expanded={filtersOpen}
+      aria-controls="admin-users-filters"
+      title={filtersOpen ? "Свернуть фильтры" : "Развернуть фильтры"}
+      className={cn(
+        "inline-flex items-center gap-1.5 shrink-0 h-10 rounded-lg border border-(--outline) bg-(--card) px-3 text-body-4 font-medium transition-colors",
+        "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--on-bg-low)/40",
+        filtersOpen && "bg-(--state-hover) text-(--on-bg-high)",
+      )}
+    >
+      <FunnelSimpleIcon className="size-4" />
+      <span className="hidden sm:inline">
+        {filtersOpen ? "Скрыть" : "Фильтры"}
+      </span>
+      {!filtersOpen && activeFilterCount > 0 && (
+        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-(--primary) text-(--on-primary) text-[10px] font-semibold tabular-nums">
+          {activeFilterCount}
+        </span>
+      )}
+    </button>
+  </div>
+  {filtersOpen && (
+    <div
+      id="admin-users-filters"
+      className="flex flex-wrap items-center gap-x-5 gap-y-2"
+    >
+      <FilterGroup
+        label="Роль"
+        value={roleFilter}
+        options={[
+          { value: "all", label: "Все" },
+          { value: "client", label: "Клиент" },
+          { value: "user", label: "Пользователь" },
+          { value: "admin", label: "Админ" },
+          { value: "root", label: "Root" },
+        ]}
+        onChange={(v) => setRoleFilter(v as typeof roleFilter)}
+      />
+      <FilterGroup
+        label="Статус"
+        value={verifiedFilter}
+        options={[
+          { value: "all", label: "Все" },
+          { value: "verified", label: "Подтв." },
+          { value: "unverified", label: "Не подтв." },
+        ]}
+        onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
+      />
+      <FilterGroup
+        label="Доступ"
+        value={blockedFilter}
+        options={[
+          { value: "all", label: "Все" },
+          { value: "active", label: "Активные" },
+          { value: "blocked", label: "Заблок." },
+        ]}
+        onChange={(v) => setBlockedFilter(v as typeof blockedFilter)}
+      />
+      <FilterGroup
+        label="Команда"
+        value={teamFilter}
+        options={[
+          { value: "all", label: "Все" },
+          { value: "team", label: "В команде" },
+          { value: "external", label: "Вне" },
+        ]}
+        onChange={(v) => setTeamFilter(v as typeof teamFilter)}
+      />
+      {hasActiveFilters && (
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
+        >
+          <XIcon className="size-3" />
+          Сбросить
+        </button>
+      )}
+    </div>
+  )}
+</div>
 
-        {/* Loading */}
+{/* Loading */}
         {loading && (
           <div
             className={cn(
