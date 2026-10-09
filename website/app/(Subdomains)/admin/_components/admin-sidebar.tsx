@@ -30,16 +30,38 @@ export function AdminSidebar() {
 
   const items: SidebarItem[] = [
     { label: t("admin.dashboard"), href: "/", icon: ChartLineUp, exact: true },
-    { label: t("admin.users"), href: "/users", icon: Users },
-    { label: t("admin.orders"), href: "/orders", icon: Receipt },
-    { label: t("admin.companies"), href: "/companies", icon: Buildings },
-    { label: t("admin.clients"), href: "/clients", icon: Handshake },
+    {
+      label: t("admin.users"),
+      href: "/users",
+      icon: Users,
+      children: [
+        { label: t("admin.team"), href: "/team", icon: UsersThree },
+      ],
+    },
+    {
+      label: t("admin.orders"),
+      href: "/orders",
+      icon: Receipt,
+      children: [
+        { label: t("admin.companies"), href: "/companies", icon: Buildings },
+        { label: t("admin.clients"), href: "/clients", icon: Handshake },
+      ],
+    },
+    {
+      label: t("admin.events"),
+      href: "/events",
+      icon: CalendarBlank,
+      children: [
+        {
+          label: t("admin.event_requests"),
+          href: "/event-requests",
+          icon: Ticket,
+        },
+      ],
+    },
     { label: t("admin.projects"), href: "/projects", icon: Cube },
-    { label: t("admin.articles"), href: "/articles", icon: Newspaper },
-    { label: t("admin.team"), href: "/team", icon: UsersThree },
-    { label: t("admin.events"), href: "/events", icon: CalendarBlank },
-    { label: t("admin.event_requests"), href: "/event-requests", icon: Ticket },
     { label: t("admin.catalog"), href: "/catalog", icon: FolderSimple },
+    { label: t("admin.articles"), href: "/articles", icon: Newspaper },
   ];
 
   // crossSubdomainUrl returns:
@@ -49,9 +71,12 @@ export function AdminSidebar() {
   // The <Sidebar> component normally treats `basePath` as a path prefix,
   // but in production the basePath is a full URL. We therefore pass an
   // empty basePath and bake the full URL into each item's href.
+  const enrich = (href: string) =>
+    crossSubdomainUrl("admin", `/${secret}${href === "/" ? "" : href}`);
   const enriched: SidebarItem[] = items.map((item) => ({
     ...item,
-    href: crossSubdomainUrl("admin", `/${secret}${item.href === "/" ? "" : item.href}`),
+    href: enrich(item.href),
+    children: item.children?.map((c) => ({ ...c, href: enrich(c.href) })),
   }));
 
   return (
