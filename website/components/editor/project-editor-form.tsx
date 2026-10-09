@@ -213,8 +213,12 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         : await createProject(payload);
       toast.success(status === "published" ? "Проект опубликован" : "Проект сохранён");
       await revalidateTags(["projects"]);
-      if (!isEdit) router.replace(`/admin/secret-placeholder/projects/${saved.slug}/edit`);
-      else router.refresh();
+        if (!isEdit) {
+          const basePath = window.location.pathname.replace(/\/new\/?$/, "");
+          router.replace(`${basePath}/${saved.slug}/edit`);
+        } else {
+          router.refresh();
+        }
     } catch (err: any) {
       toast.error(err?.message || "Ошибка сохранения");
     } finally {

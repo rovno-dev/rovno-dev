@@ -23,7 +23,6 @@ Add the following entries to your `/etc/hosts` (Linux/macOS) or `C:\Windows\Syst
 
 ```text
 127.0.0.1  localhost
-127.0.0.1  crm.localhost
 127.0.0.1  i.localhost
 127.0.0.1  admin.localhost
 127.0.0.1  app.localhost
@@ -64,6 +63,12 @@ docker stop $(docker ps -aq)
 docker rm $(docker ps -aq)
 
 docker volume rm $(docker volume ls -q)
+```
+
+### 5. Checking frontend on ts errors (optional)
+
+```bash
+./website/node_modules/.bin/tsc --noEmit -p website/tsconfig.json
 ```
 
 ## Infrastructure Details

@@ -45,6 +45,7 @@ import {
 import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 
 export const revalidate = 60;
+export const dynamicParams = true;
 
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||
@@ -89,7 +90,7 @@ async function fetchDbProject(slug: string): Promise<DBProject | null> {
   try {
     const res = await fetch(
       `${API_BASE}/api/v1/projects/${encodeURIComponent(slug)}`,
-      { next: { revalidate: 60 } } as any,
+      { next: { revalidate: 60, tags: ["projects"] } } as any,
     );
     if (!res.ok) return null;
     return (await res.json()) as DBProject;

@@ -162,11 +162,12 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
       // the change on the next request. Await is intentional — we want the
       // user to know the site is updated before we navigate.
       await revalidateTags(["events"]);
-      if (!isEdit) {
-        router.replace(`../${saved.slug}/edit`);
-      } else {
-        router.refresh();
-      }
+        if (!isEdit) {
+          const basePath = window.location.pathname.replace(/\/new\/?$/, "");
+          router.replace(`${basePath}/${saved.slug}/edit`);
+        } else {
+          router.refresh();
+        }
     } catch (err: any) {
       toast.error(err?.message || "Ошибка сохранения");
     } finally {

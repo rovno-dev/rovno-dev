@@ -48,7 +48,11 @@ def _serialize_member(tm: TeamMember, user: Optional[User], count: int = 0):
 
 
 def _resolve_member(db: Session, username: str) -> tuple[User, TeamMember]:
-    user = db.query(User).filter(User.username == username).first()
+    user = (
+        db.query(User)
+        .filter(func.lower(User.username) == username.lower())
+        .first()
+    )
     if not user:
         raise HTTPException(404, "User not found")
     tm = (

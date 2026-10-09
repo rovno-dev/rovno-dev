@@ -1,6 +1,8 @@
+import re
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 
 from app.models.user import User
@@ -27,6 +29,20 @@ class UserUpdateRequest(BaseModel):
     team_role: Optional[str] = Field(None, min_length=1, max_length=120)
     team_bio: Optional[str] = None
     team_cover_url: Optional[str] = None
+
+    @field_validator("username")
+    @classmethod
+    def _validate_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        if not re.match(r"^[A-Za-z0-9_]+$", v):
+            raise ValueError("Username may only contain A-Z, a-z, 0-9 and _")
+        if len(v) < 2 or len(v) > 60:
+            raise ValueError("Username must be 2-60 characters")
+        return v
 
 
 class PasswordChangeRequest(BaseModel):
@@ -90,7 +106,10 @@ async def update_me(
         if new_username:
             clash = (
                 db.query(User.id)
-                .filter(User.username == new_username, User.id != current_user.id)
+                .filter(
+                    func.lower(User.username) == new_username.lower(),
+                    User.id != current_user.id,
+                )
                 .first()
             )
             if clash:

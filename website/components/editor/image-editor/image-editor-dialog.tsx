@@ -49,6 +49,7 @@ export function ImageEditorDialog({
   // Crop state
   const [aspect, setAspect] = useState<AspectPresetId>(defaultAspect ?? "free");
   const [crop, setCrop] = useState<CropRect>({ x: 0, y: 0, width: 1, height: 1 });
+  const [zoom, setZoom] = useState(1);
 
   // Draw state
   const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -68,6 +69,7 @@ export function ImageEditorDialog({
         setImg(im);
         const preset = ASPECT_PRESETS.find((p) => p.id === aspect);
         setCrop(fitRectForAspect(im.naturalWidth, im.naturalHeight, preset?.ratio ?? null));
+        setZoom(1);
       })
       .catch(() => { })
       .finally(() => setLoading(false));
@@ -78,6 +80,7 @@ export function ImageEditorDialog({
     if (!img) return;
     const preset = ASPECT_PRESETS.find((p) => p.id === aspect);
     setCrop(fitRectForAspect(img.naturalWidth, img.naturalHeight, preset?.ratio ?? null));
+    setZoom(1);
   }, [aspect, img]);
 
   // Init draw canvas when tab first opens
@@ -97,39 +100,24 @@ export function ImageEditorDialog({
     setHistoryIdx(0);
   }, [tab, img]);
 
-  // ---------- Crop interactions ----------
-  // Pan the crop rect within the image by dragging the frame.
-  const dragRef = useRef<{ startX: number; startY: number; startCrop: CropRect; mode: "pan" } | null>(null);
-
-  const onCropPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  // ---------- Zoom (frame fixed, image zooms underneath) ----------
+  const handleZoom = (nextZoom: number) => {
     if (!img) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
-    dragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      startCrop: { ...crop },
-      mode: "pan",
-    };
+    const z = Math.max(1, Math.min(8, nextZoom));
+    if (Math.abs(z - zoom) < 0.001) return;
+    const ratio = zoom / z;
+    const cx = crop.x + crop.width / 2;
+    const cy = crop.y + crop.height / 2;
+    let w = crop.width * ratio;
+    let h = crop.height * ratio;
+    if (w > 1) { h *= 1 / w; w = 1; }
+    if (h > 1) { w *= 1 / h; h = 1; }
+    const x = Math.max(0, Math.min(1 - w, cx - w / 2));
+    const y = Math.max(0, Math.min(1 - h, cy - h / 2));
+    setCrop({ x, y, width: w, height: h });
+    setZoom(z);
   };
 
-  const onCropPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = dragRef.current;
-    if (!d || !img) return;
-    const container = e.currentTarget.getBoundingClientRect();
-    const dx = (e.clientX - d.startX) / container.width;
-    const dy = (e.clientY - d.startY) / container.height;
-    setCrop({
-      x: Math.max(0, Math.min(1 - d.startCrop.width, d.startCrop.x + dx)),
-      y: Math.max(0, Math.min(1 - d.startCrop.height, d.startCrop.y + dy)),
-      width: d.startCrop.width,
-      height: d.startCrop.height,
-    });
-  };
-
-  const onCropPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.releasePointerCapture(e.pointerId);
-    dragRef.current = null;
-  };
 
   // ---------- Draw interactions ----------
   const drawingRef = useRef(false);
@@ -303,11 +291,11 @@ export function ImageEditorDialog({
             <CropTab
               img={img}
               crop={crop}
+              onCropChange={setCrop}
               aspect={aspect}
               setAspect={setAspect}
-              onPointerDown={onCropPointerDown}
-              onPointerMove={onCropPointerMove}
-              onPointerUp={onCropPointerUp}
+              zoom={zoom}
+              onZoom={handleZoom}
             />
           ) : (
             <DrawTab
@@ -347,27 +335,75 @@ export function ImageEditorDialog({
 // ---------------------------------------------------------------------------
 
 function CropTab({
-  img, crop, aspect, setAspect,
-  onPointerDown, onPointerMove, onPointerUp,
+  img, crop, onCropChange, aspect, setAspect, zoom, onZoom,
 }: {
   img: HTMLImageElement;
   crop: CropRect;
+  onCropChange: (next: CropRect) => void;
   aspect: AspectPresetId;
   setAspect: (a: AspectPresetId) => void;
-  onPointerDown: React.PointerEventHandler<HTMLDivElement>;
-  onPointerMove: React.PointerEventHandler<HTMLDivElement>;
-  onPointerUp: React.PointerEventHandler<HTMLDivElement>;
+  zoom: number;
+  onZoom: (nextZoom: number) => void;
 }) {
-  // Compute display size — cap the long side so the container stays manageable.
-  const maxSide = 620;
-  const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-  const w = img.naturalWidth * scale;
-  const h = img.naturalHeight * scale;
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ startX: number; startY: number; startCrop: CropRect } | null>(null);
+
+  const presetRatio = ASPECT_PRESETS.find((p) => p.id === aspect)?.ratio ?? null;
+  const frameAspect = presetRatio ?? (crop.width / crop.height || 1);
+  const maxFrameW = 560;
+  const maxFrameH = 460;
+  let fw = maxFrameW;
+  let fh = fw / frameAspect;
+  if (fh > maxFrameH) {
+    fh = maxFrameH;
+    fw = fh * frameAspect;
+  }
+
+  const dw = fw / crop.width;
+  const dh = fh / crop.height;
+
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const factor = 1 + (-e.deltaY * 0.002);
+      onZoom(zoom * factor);
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [onZoom, zoom]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startCrop: { ...crop },
+    };
+  };
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const dnx = (e.clientX - d.startX) / dw;
+    const dny = (e.clientY - d.startY) / dh;
+    const nextX = Math.max(0, Math.min(1 - d.startCrop.width, d.startCrop.x - dnx));
+    const nextY = Math.max(0, Math.min(1 - d.startCrop.height, d.startCrop.y - dny));
+    onCropChange({
+      x: nextX,
+      y: nextY,
+      width: d.startCrop.width,
+      height: d.startCrop.height,
+    });
+  };
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    dragRef.current = null;
+  };
 
   return (
     <div className="p-5 space-y-4">
-      {/* Aspect presets */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {ASPECT_PRESETS.map((p) => (
           <button
             key={p.id}
@@ -383,72 +419,83 @@ function CropTab({
             {p.label}
           </button>
         ))}
+        <div className="ml-auto inline-flex items-center gap-0.5 rounded-full border border-(--outline) bg-(--card) px-1 py-0.5 h-8">
+          <button
+            type="button"
+            onClick={() => onZoom(zoom / 1.25)}
+            disabled={zoom <= 1.001}
+            className="inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-high) hover:bg-(--state-hover) disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
+            title="Уменьшить"
+          >
+            -
+          </button>
+          <button
+            type="button"
+            onClick={() => onZoom(1)}
+            className="px-2 text-xs font-mono tabular-nums text-(--on-bg-medium) hover:text-(--on-bg-high) min-w-[3.5ch]"
+            title="Сбросить масштаб"
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            onClick={() => onZoom(zoom * 1.25)}
+            disabled={zoom >= 7.999}
+            className="inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-high) hover:bg-(--state-hover) disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
+            title="Увеличить"
+          >
+            +
+          </button>
+        </div>
       </div>
 
-      {/* Viewport */}
-      <div className="flex justify-center">
+      <div ref={viewportRef} className="flex justify-center">
         <div
-          className="relative select-none touch-none cursor-move"
-          style={{ width: w, height: h }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
+          className="relative overflow-hidden select-none touch-none cursor-move rounded-lg border-2 border-white"
+          style={{
+            width: fw,
+            height: fh,
+            boxShadow:
+              "0 0 0 1px rgba(0,0,0,0.35), 0 8px 32px rgba(0,0,0,0.25)",
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
         >
           <img
             src={img.src}
             alt=""
             draggable={false}
-            style={{ width: w, height: h }}
-            className="block rounded-lg"
-          />
-          {/* Dark mask outside crop */}
-          <div className="absolute inset-0 pointer-events-none">
-            <svg
-              viewBox={`0 0 ${w} ${h}`}
-              className="absolute inset-0 w-full h-full"
-            >
-              <defs>
-                <mask id="crop-mask">
-                  <rect width={w} height={h} fill="white" />
-                  <rect
-                    x={crop.x * w}
-                    y={crop.y * h}
-                    width={crop.width * w}
-                    height={crop.height * h}
-                    fill="black"
-                  />
-                </mask>
-              </defs>
-              <rect
-                width={w}
-                height={h}
-                fill="rgba(0,0,0,0.55)"
-                mask="url(#crop-mask)"
-              />
-            </svg>
-          </div>
-          {/* Crop border */}
-          <div
-            className="absolute border-2 border-white pointer-events-none rounded-sm"
+            className="absolute pointer-events-none"
             style={{
-              left: crop.x * w,
-              top: crop.y * h,
-              width: crop.width * w,
-              height: crop.height * h,
-              boxShadow: "0 0 0 1px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.25)",
+              left: -crop.x * dw,
+              top: -crop.y * dh,
+              width: dw,
+              height: dh,
+              maxWidth: "none",
+              maxHeight: "none",
             }}
           />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/20" />
+            <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/20" />
+            <div className="absolute top-1/3 left-0 right-0 h-px bg-white/20" />
+            <div className="absolute top-2/3 left-0 right-0 h-px bg-white/20" />
+          </div>
+          <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-white/90 pointer-events-none" />
+          <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-white/90 pointer-events-none" />
+          <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-white/90 pointer-events-none" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/90 pointer-events-none" />
         </div>
       </div>
 
       <p className="text-[11px] text-(--on-bg-low) text-center">
-        Перетащите рамку, чтобы выбрать область · выберите формат сверху
+        Перетащите изображение - колёсико мыши или +/− для масштаба - выберите формат сверху
       </p>
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
 
 function DrawTab({
   img, canvasRef, color, size, setColor, setSize,

@@ -2,6 +2,7 @@
 from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.api.v1.admin import get_admin_user
 from app.models.team_member import TeamMember
@@ -118,7 +119,10 @@ def update_team_member(
         if new_username and new_username != user.username:
             clash = (
                 db.query(User.id)
-                .filter(User.username == new_username, User.id != user.id)
+                .filter(
+                    func.lower(User.username) == new_username.lower(),
+                    User.id != user.id,
+                )
                 .first()
             )
             if clash:

@@ -96,6 +96,12 @@ export function rootDomainUrl(path: string): string {
  */
 export function crossSubdomainUrl(subdomain: string, path: string = "/"): string {
   const p = path.startsWith("/") ? path : "/" + path;
+  // Already on the target subdomain — return a same-origin path so the
+  // browser doesn't route through the proxy a second time. Without this,
+  // admin.rovno.dev + "/admin/secret/events" hits proxy.ts which prepends
+  // the subdomain prefix again → /admin/admin/secret/events → 404.
+  const h = currentHostname();
+  if (h && h.startsWith(subdomain + ".")) return p;
   if (isPathMode()) return `/${subdomain}${p}`;
   return `${resolvedScheme()}://${subdomain}.${ROOT_DOMAIN}${currentPort()}${p}`;
 }

@@ -1,3 +1,4 @@
+import re
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case
@@ -138,6 +139,7 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     surname: Optional[str] = None
     phone: Optional[str] = None
+    username: Optional[str] = None
     role: Optional[UserRole] = None
     verified: Optional[bool] = None
     blocked: Optional[bool] = None
@@ -167,6 +169,20 @@ class UserUpdate(BaseModel):
             raise ValueError("Password must contain at least one digit")
         if not any(c.isupper() for c in v):
             raise ValueError("Password must contain at least one uppercase letter")
+        return v
+
+    @field_validator("username")
+    @classmethod
+    def _validate_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        if not re.match(r"^[A-Za-z0-9_]+$", v):
+            raise ValueError("Username may only contain A-Z, a-z, 0-9 and _")
+        if len(v) < 2 or len(v) > 60:
+            raise ValueError("Username must be 2-60 characters")
         return v
 # ---------- Dashboard ----------
 @router.get("/dashboard", response_model=DashboardStats)
@@ -300,6 +316,21 @@ async def update_user(
     # silently no-ops because Python happily created a phantom
     # `user.role` instance attribute that the DB never saw.
     FIELD_MAP = {"role": "user_role"}
+    # Username uniqueness is case-insensitive — Telegram-style.
+    if "username" in update:
+        new_uname = (update["username"] or "").strip() or None
+        if new_uname and new_uname != user.username:
+            clash = (
+                db.query(User.id)
+                .filter(
+                    func.lower(User.username) == new_uname.lower(),
+                    User.id != user.id,
+                )
+                .first()
+            )
+            if clash:
+                raise HTTPException(409, "Username already taken")
+        update["username"] = new_uname
     for key, value in update.items():
         attr = FIELD_MAP.get(key, key)
         if hasattr(user, attr):

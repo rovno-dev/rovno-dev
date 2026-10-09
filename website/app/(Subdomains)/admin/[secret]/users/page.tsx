@@ -1138,6 +1138,7 @@ function UserEditorDialog({
           name: form.name.trim() || null,
           surname: form.surname.trim() || null,
           phone: form.phone.trim() || null,
+          username: form.username.trim() || null,
           avatar_url: form.avatar_url.trim() || null,
           role: form.role,
           verified: form.verified,

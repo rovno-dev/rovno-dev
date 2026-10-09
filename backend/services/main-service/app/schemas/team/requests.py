@@ -1,5 +1,8 @@
+import re
+import re
+import re
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, field_validator, field_validator
 
 
 class TeamMemberCreate(BaseModel):
@@ -21,3 +24,39 @@ class TeamMemberUpdate(BaseModel):
     # Required for the member to appear on the public /about page and to
     # have a working /<username> expert profile.
     username: Optional[str] = Field(None, min_length=2, max_length=60)
+
+    @field_validator("username")
+    @classmethod
+    def _validate_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        if not re.match(r"^[A-Za-z0-9_]+$", v):
+            raise ValueError("Username may only contain A-Z, a-z, 0-9 and _")
+        return v
+
+    @field_validator("username")
+    @classmethod
+    def _validate_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        if not re.match(r"^[A-Za-z0-9_]+$", v):
+            raise ValueError("Username may only contain A-Z, a-z, 0-9 and _")
+        return v
+
+    @field_validator("username")
+    @classmethod
+    def _validate_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        if not re.match(r"^[A-Za-z0-9_]+$", v):
+            raise ValueError("Username may only contain A-Z, a-z, 0-9 and _")
+        return v
