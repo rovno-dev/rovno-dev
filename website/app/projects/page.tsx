@@ -1,27 +1,25 @@
 import { Container } from "@/components/ui/container";
-import { getAllProjects } from "@/app/_data/projects/parser";
-import { PROJECTS } from "@/app/_data/projects";
 import { FilterBar } from "./filter-bar";
-import { fetchProjectCategories } from "@/utils/api/taxonomies";
+import {
+  fetchProjectCategories,
+  type Taxonomy,
+} from "@/utils/api/taxonomies";
+import {
+  fetchPublishedProjectsServer,
+  dbRowToProject,
+} from "@/utils/api/projects";
 
 export const revalidate = 60;
 
 export default async function ProjectsPage() {
-  const mdxProjects = getAllProjects();
-  const fallbackProjects = Object.values(PROJECTS);
-  const seen = new Set<string>();
-  const projects = [...mdxProjects, ...fallbackProjects].filter((p) => {
-    if (seen.has(p.slug)) return false;
-    seen.add(p.slug);
-    return true;
-  });
+  // Fetch projects and categories in parallel. Categories fail-soft to
+  // an empty list — the filter bar just shows the "Все" chip then.
+  const [dbRows, categories] = await Promise.all([
+    fetchPublishedProjectsServer(),
+    fetchProjectCategories().catch(() => [] as Taxonomy[]),
+  ]);
 
-  let categories: Awaited<ReturnType<typeof fetchProjectCategories>> = [];
-  try {
-    categories = await fetchProjectCategories();
-  } catch {
-    /* backend unreachable — client refetch will populate */
-  }
+  const projects = dbRows.map(dbRowToProject);
 
   const categoryMap = Object.fromEntries(
     categories.map((c) => [c.code, c.labels.en || c.label || c.code]),
@@ -35,11 +33,10 @@ export default async function ProjectsPage() {
           Проекты
         </h1>
       </Container>
-
       <FilterBar
+        projects={projects}
         categories={categories}
         categoryMap={categoryMap}
-        projects={projects as any}
       />
     </main>
   );

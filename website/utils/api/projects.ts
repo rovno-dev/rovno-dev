@@ -134,12 +134,17 @@ export async function fetchGithubReadme(repo: string, branch?: string): Promise<
 
 
 /**
- * Minimal shape of a row returned by GET /api/v1/projects. Only the
- * fields `fetchPublishedProjectsClient` actually consumes are declared —
- * the endpoint returns more, but keeping this narrow keeps the client
- * surface honest.
+ * Minimal shape of a row returned by GET /api/v1/projects. Exported so the
+ * /projects RSC page can type its DB fetch without re-declaring the shape.
  */
-interface DbProjectList {
+export interface DbProjectTag {
+  id: string;
+  kind: string;
+  label: string;
+  value?: any;
+}
+
+export interface DbProjectList {
   id: string;
   slug: string;
   title: string;
@@ -153,6 +158,8 @@ interface DbProjectList {
     labels?: Record<string, string>;
   } | null;
   period?: string | null;
+  is_featured?: boolean;
+  tags?: DbProjectTag[] | null;
 }
 
 /**
@@ -168,4 +175,57 @@ export async function fetchPublishedProjectsClient(): Promise<DbProjectList[]> {
   } catch {
     return [];
   }
+}
+
+/**
+ * Server-side fetch of the public project list. Uses the internal API base
+ * and Next's ISR cache, tagged "projects" so admin mutations can invalidate
+ * the list with a single `revalidateTags(["projects"])` call.
+ *
+ * Fails soft: a backend blip returns an empty list rather than 500-ing the
+ * whole /projects route.
+ */
+export async function fetchPublishedProjectsServer(): Promise<DbProjectList[]> {
+  try {
+    const res = await fetch(`${SERVER_API_BASE}/api/v1/projects`, {
+      next: { revalidate: 60, tags: ["projects"] },
+    } as any);
+    if (!res.ok) return [];
+    const body = await res.json();
+    return Array.isArray(body) ? (body as DbProjectList[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Row → card-shape mapper. Kept here so the home featured section and
+// the /projects list page render off exactly the same transformation.
+// ─────────────────────────────────────────────────────────────────────
+import type { Project } from "@/app/_data/projects";
+
+export function dbRowToProject(r: DbProjectList): Project {
+  const tags = (r.tags || [])
+    .map((t) => ({ title: (t.label || "").trim() }))
+    .filter((t) => t.title.length > 0);
+
+  return {
+    id: r.id,
+    slug: r.slug,
+    title: r.title,
+    shortDescription: r.short_description || "",
+    description: r.short_description || "",
+    tags,
+    cover: {
+      imageSrc: r.cover_image_src || "",
+      videoSrc: r.cover_video_src || undefined,
+    },
+    href: "",
+    category: ((r.category?.code as Project["category"]) ??
+      "corporative") as Project["category"],
+    clientId: "",
+    period: r.period || "",
+    techStack: [],
+  };
 }

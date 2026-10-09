@@ -1,15 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import ProjectCard from "@/components/layout/projects/project-card";
-import { Project } from "@/app/_data/projects";
-import { PROJECT_TAGS } from "@/app/_data/project-tags";
-import {
-  fetchProjectCategories,
-  type Taxonomy,
-} from "@/utils/api/taxonomies";
-import { fetchPublishedProjectsClient } from "@/utils/api/projects";
+import type { Project } from "@/app/_data/projects";
+import type { Taxonomy } from "@/utils/api/taxonomies";
 import {
   MagnifyingGlassIcon,
   XIcon,
@@ -17,47 +12,27 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
-interface DbProjectRow {
-  id: string;
-  slug: string;
-  title: string;
-  short_description?: string | null;
-  cover_image_src: string;
-  cover_video_src?: string | null;
-  category?: {
-    id: string;
-    code: string;
-    label?: string;
-    labels?: Record<string, string>;
-  } | null;
-  period?: string | null;
-  tags?: Array<{ id?: string; kind?: string; label?: string; name?: string }> | null;
+/**
+ * Extract the visible tag labels from a project. Tag records come from the
+ * backend; the RSC page maps DB rows to `{ title }` entries, so this stays
+ * agnostic of the source shape.
+ */
+function tagsOf(p: Project): string[] {
+  return (p.tags || [])
+    .map((t) => (t.title || "").trim())
+    .filter((v): v is string => v.length > 0);
 }
 
-function tagsForProject(
-  slug: string,
-  dbTags: DbProjectRow["tags"],
-): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  const push = (s: string) => {
-    const v = s.trim();
-    if (!v || seen.has(v)) return;
-    seen.add(v);
-    out.push(v);
-  };
-  for (const t of PROJECT_TAGS[slug] ?? []) if (t.label) push(t.label);
-  for (const t of dbTags ?? []) {
-    const label = t.label || t.name;
-    if (label) push(label);
-  }
-  return out;
-}
-
+/**
+ * Filter bar + project grid. Purely presentational: every project comes
+ * down as a prop from the RSC page, which fetches them from the DB with an
+ * ISR tag. No client-side fetch, no merge with local data — the grid shows
+ * exactly what the database returns, subject to the active filters.
+ */
 export function FilterBar({
   projects,
-  categories: initialCategories,
-  categoryMap: initialCategoryMap,
+  categories,
+  categoryMap,
 }: {
   projects: Project[];
   categories: Taxonomy[];
@@ -68,107 +43,31 @@ export function FilterBar({
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const [dbProjects, setDbProjects] = useState<Project[]>([]);
-  const [dbTagsBySlug, setDbTagsBySlug] = useState<Record<string, string[]>>({});
-  const [loadingDb, setLoadingDb] = useState(true);
-
-  const [categories, setCategories] = useState<Taxonomy[]>(initialCategories);
-  const [categoryMap, setCategoryMap] =
-    useState<Record<string, string>>(initialCategoryMap);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetchProjectCategories()
-      .then((cats) => {
-        if (cancelled || cats.length === 0) return;
-        setCategories(cats);
-        setCategoryMap(
-          Object.fromEntries(
-            cats.map((c) => [c.code, c.labels.en || c.label || c.code]),
-          ),
-        );
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const existing = new Set(projects.map((p) => p.slug));
-    fetchPublishedProjectsClient()
-      .then((rows) => {
-        if (cancelled) return;
-        const tagMap: Record<string, string[]> = {};
-        const mapped: Project[] = (rows as DbProjectRow[])
-          .filter((r) => !existing.has(r.slug))
-          .map((r) => {
-            const tags = tagsForProject(r.slug, r.tags);
-            if (tags.length) tagMap[r.slug] = tags;
-            return {
-              id: r.id,
-              slug: r.slug,
-              title: r.title,
-              description: "",
-              shortDescription: r.short_description || "",
-              cover: {
-                imageSrc: r.cover_image_src,
-                videoSrc: r.cover_video_src || undefined,
-              },
-              href: "",
-              category: (r.category?.code || "corporative") as Project["category"],
-              clientId: "",
-              platform: "",
-              period: r.period || "",
-              techStack: [],
-            };
-          });
-        setDbProjects(mapped);
-        setDbTagsBySlug(tagMap);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoadingDb(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+  // Cache tag labels per slug so filtering doesn't recompute on each render.
+  const tagsBySlug = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const p of projects) m.set(p.slug, tagsOf(p));
+    return m;
   }, [projects]);
-
-  const allProjects = useMemo(
-    () => [...projects, ...dbProjects],
-    [projects, dbProjects],
-  );
-
-  const tagsOf = useMemo(() => {
-    const cache = new Map<string, string[]>();
-    return (slug: string): string[] => {
-      const hit = cache.get(slug);
-      if (hit) return hit;
-      const computed = dbTagsBySlug[slug] ?? tagsForProject(slug, null);
-      cache.set(slug, computed);
-      return computed;
-    };
-  }, [dbTagsBySlug]);
+  const tagListForSlug = (slug: string) => tagsBySlug.get(slug) ?? [];
 
   const allTags = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const p of allProjects) {
-      for (const t of tagsOf(p.slug)) {
+    for (const p of projects) {
+      for (const t of tagsBySlug.get(p.slug) ?? []) {
         counts.set(t, (counts.get(t) ?? 0) + 1);
       }
     }
     return Array.from(counts.entries())
       .map(([label, count]) => ({ label, count }))
       .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-  }, [allProjects, tagsOf]);
+  }, [projects, tagsBySlug]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return allProjects.filter((p) => {
+    return projects.filter((p) => {
       if (activeCategory && p.category !== activeCategory) return false;
-      if (activeTag && !tagsOf(p.slug).includes(activeTag)) return false;
+      if (activeTag && !tagListForSlug(p.slug).includes(activeTag)) return false;
       if (q) {
         const haystack = [p.title, p.shortDescription, p.description]
           .filter(Boolean)
@@ -178,12 +77,12 @@ export function FilterBar({
       }
       return true;
     });
-  }, [allProjects, activeCategory, activeTag, search, tagsOf]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects, activeCategory, activeTag, search, tagsBySlug]);
 
   const hasActiveFilters =
     !!search.trim() || activeCategory !== null || activeTag !== null;
-  const activeFilterCount =
-    (activeCategory ? 1 : 0) + (activeTag ? 1 : 0);
+  const activeFilterCount = (activeCategory ? 1 : 0) + (activeTag ? 1 : 0);
 
   const resetAll = () => {
     setSearch("");
@@ -193,25 +92,30 @@ export function FilterBar({
 
   const liveCategoryCount = (code: string | null) => {
     const q = search.trim().toLowerCase();
-    return allProjects.filter((p) => {
+    return projects.filter((p) => {
       if (code !== null && p.category !== code) return false;
-      if (activeTag && !tagsOf(p.slug).includes(activeTag)) return false;
+      if (activeTag && !tagListForSlug(p.slug).includes(activeTag)) return false;
       if (q) {
         const h = [p.title, p.shortDescription, p.description]
-          .filter(Boolean).join(" ").toLowerCase();
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         if (!h.includes(q)) return false;
       }
       return true;
     }).length;
   };
+
   const liveTagCount = (label: string) => {
     const q = search.trim().toLowerCase();
-    return allProjects.filter((p) => {
-      if (!tagsOf(p.slug).includes(label)) return false;
+    return projects.filter((p) => {
+      if (!tagListForSlug(p.slug).includes(label)) return false;
       if (activeCategory && p.category !== activeCategory) return false;
       if (q) {
         const h = [p.title, p.shortDescription, p.description]
-          .filter(Boolean).join(" ").toLowerCase();
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         if (!h.includes(q)) return false;
       }
       return true;
@@ -232,8 +136,7 @@ export function FilterBar({
 
   return (
     <>
-      {/* Floating pill — same visual language as the header:
-          rounded-full, backdrop blur, hairline border, one row. */}
+      {/* Floating pill — same visual language as the header. */}
       <div className="sticky top-[68px] md:top-[92px] z-40 mt-4 mb-5">
         <Container>
           <div
@@ -243,7 +146,6 @@ export function FilterBar({
               "shadow-[0_1px_2px_rgba(0,0,0,0.04)] pl-4 pr-1.5",
             )}
           >
-            {/* Search — fixed width on desktop, flexible on mobile. */}
             <div className="relative flex-1 md:flex-initial md:w-[200px] h-full flex items-center">
               <MagnifyingGlassIcon className="absolute left-0 size-4 text-(--on-bg-low) pointer-events-none" />
               <input
@@ -267,8 +169,6 @@ export function FilterBar({
                 </button>
               )}
             </div>
-
-            {/* Desktop: chips inline, all in one scrollable strip. */}
             <div className="hidden md:flex flex-1 min-w-0 items-center gap-1.5 pl-3 ml-2 border-l border-(--outline) h-8">
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar h-full">
                 {categoryChips.map((c) => {
@@ -281,20 +181,16 @@ export function FilterBar({
                       count={count}
                       active={c.active}
                       disabled={count === 0 && !c.active}
-                      onClick={() =>
-                        setActiveCategory(c.active ? null : code)
-                      }
+                      onClick={() => setActiveCategory(c.active ? null : code)}
                     />
                   );
                 })}
-
                 {allTags.length > 0 && (
                   <span
                     aria-hidden
                     className="shrink-0 mx-1 size-1 rounded-full bg-(--on-bg-low)/50"
                   />
                 )}
-
                 {allTags.map((t) => {
                   const count = liveTagCount(t.label);
                   return (
@@ -311,25 +207,18 @@ export function FilterBar({
                   );
                 })}
               </div>
-
               {hasActiveFilters && (
                 <button
                   type="button"
                   onClick={resetAll}
                   aria-label="Сбросить фильтры"
-                  className={cn(
-                    "shrink-0 inline-flex items-center justify-center size-7 rounded-full",
-                    "text-(--on-bg-low) hover:text-(--on-bg-high)",
-                    "hover:bg-(--state-hover) transition-colors",
-                  )}
+                  className="shrink-0 inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                   title="Сбросить"
                 >
                   <XIcon className="size-3.5" />
                 </button>
               )}
             </div>
-
-            {/* Mobile: filter toggle. */}
             <button
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
@@ -357,9 +246,6 @@ export function FilterBar({
               )}
             </button>
           </div>
-
-          {/* Mobile chips panel — a small card below the pill. Hidden on
-              md+, where the chips already live inside the pill. */}
           {mobileOpen && (
             <div
               className={cn(
@@ -376,8 +262,7 @@ export function FilterBar({
                     label: c.label,
                     active: c.active,
                     count: liveCategoryCount(code),
-                    onClick: () =>
-                      setActiveCategory(c.active ? null : code),
+                    onClick: () => setActiveCategory(c.active ? null : code),
                   };
                 })}
               />
@@ -397,7 +282,7 @@ export function FilterBar({
               {hasActiveFilters && (
                 <div className="flex items-center justify-between pt-1 border-t border-(--outline)">
                   <span className="text-body-5 text-(--on-bg-low) tabular-nums">
-                    {filtered.length} из {allProjects.length}
+                    {filtered.length} из {projects.length}
                   </span>
                   <button
                     type="button"
@@ -416,10 +301,12 @@ export function FilterBar({
 
       <section className="pb-24 md:pb-32">
         <Container>
-          {filtered.length === 0 && !loadingDb ? (
+          {filtered.length === 0 ? (
             <div className="py-20 text-center">
               <p className="text-body-2 text-(--on-bg-medium) mb-3">
-                Ничего не найдено
+                {projects.length === 0
+                  ? "Здесь пока нет проектов"
+                  : "Ничего не найдено"}
               </p>
               {hasActiveFilters && (
                 <button
@@ -439,21 +326,12 @@ export function FilterBar({
                   project={project}
                   index={idx}
                   categoryMap={categoryMap}
-                  tags={tagsOf(project.slug).map((label, i) => ({
+                  tags={tagListForSlug(project.slug).map((label, i) => ({
                     id: `${project.slug}-tag-${i}`,
                     label,
                   }))}
                 />
               ))}
-              {loadingDb &&
-                Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={`sk-${i}`}
-                    className="relative aspect-[16/9] rounded-2xl border border-(--outline) bg-(--bg-disabled) overflow-hidden"
-                  >
-                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-(--state-hover) to-transparent" />
-                  </div>
-                ))}
             </div>
           )}
         </Container>
