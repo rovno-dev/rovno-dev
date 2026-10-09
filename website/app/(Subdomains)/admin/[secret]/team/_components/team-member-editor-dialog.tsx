@@ -264,11 +264,7 @@ export function TeamMemberEditorDialog({
             <Input
               value={username}
               onChange={(e) =>
-                setUsername(
-                  e.target.value
-                    .toLowerCase()
-                    .replace(/[^a-z0-9_-]/g, ""),
-                )
+                setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, ""))
               }
               placeholder="niyazgim"
             />

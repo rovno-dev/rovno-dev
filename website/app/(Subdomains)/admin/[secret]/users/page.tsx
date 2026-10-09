@@ -1261,7 +1261,7 @@ function UserEditorDialog({
                 onChange={(e) =>
                   update(
                     "username",
-                    e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                    e.target.value.replace(/[^A-Za-z0-9_]/g, ""),
                   )
                 }
                 placeholder="для публичной страницы"
