@@ -15,7 +15,7 @@ import UserProvider from "@/entities/user/model/user-context";
 import ClientRootLayout from "./client-layout";
 
 export const Geist = localFont({
-  src: '../public/fonts/Geist-VariableFont_wght.woff2',
+  src: '/public/fonts/Geist-VariableFont_wght.woff2',
   variable: '--font-sans',
 });
 
