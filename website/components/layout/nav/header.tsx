@@ -106,6 +106,19 @@ export default function Header() {
 
           <LanguageSwitcher />
 
+          {/* Unauthenticated CTAs. Sign in from lg upward; sign up only
+              from xl so the row never crowds on a 1024-1279px viewport. */}
+          {!isLoading && !user && (
+            <>
+              <Button size="small" variant="text" className="hidden lg:flex" asChild>
+                <Link href={rootLink("/login")}>{t("nav.login")}</Link>
+              </Button>
+              <Button size="small" className="hidden xl:flex" asChild>
+                <Link href={rootLink("/register")}>{t("nav.register")}</Link>
+              </Button>
+            </>
+          )}
+
           {isLoading ? (
             <div className="ml-2 flex items-center">
               <Skeleton className="size-8 rounded-full" />

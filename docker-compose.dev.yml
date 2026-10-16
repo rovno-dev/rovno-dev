@@ -1,0 +1,17 @@
+name: rovno-dev-dev
+
+# Dev stack — infrastructure only.
+#
+#   docker compose -f docker-compose.dev.yml up -d   # db + valkey + api + bot
+#   cd website && npm run dev                        # frontend on the host
+#
+# The frontend is intentionally NOT containerised in dev: `next dev` on the
+# host gives the fastest HMR, keeps the node_modules cache local, and means
+# only the services you actually iterate on inside docker are here.
+#
+# Isolated from prod by project name and a dedicated network
+# (main-network-dev). Both stacks can run at once without collisions.
+
+include:
+  # - tg-bot/docker-compose.dev.yml
+  - backend/docker-compose.dev.yml

@@ -1,0 +1,32 @@
+services:
+  tg-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Build-time DNS: the daemon's build container ignores the `dns:`
+      # block below (that's runtime-only). Host network makes the build use
+      # the host's resolv.conf, which actually resolves.
+      network: host
+    container_name: tg-bot-dev
+    env_file:
+      - ../.env
+    environment:
+      - MAIN_SERVICE_URL=http://main-service:8000
+      - ORDER_FILES_DIR=/app/storage/order_files
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    depends_on:
+      main-db:
+        condition: service_healthy
+    volumes:
+      - ../backend/services/main-service/storage:/app/storage
+    networks:
+      - main-network-dev
+    restart: unless-stopped
+
+networks:
+  main-network-dev:
+    name: main-network-dev
+    external: false
+  default:

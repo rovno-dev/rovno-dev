@@ -12,11 +12,14 @@ services:
         NEXT_PUBLIC_ROOT_DOMAIN: ${NEXT_PUBLIC_ROOT_DOMAIN}
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
         NEXT_PUBLIC_HTTP_PROTOCOL: ${NEXT_PUBLIC_HTTP_PROTOCOL:-https}
-    profiles:
-      - prod
     volumes:
-      # ponytail: same host dir the backend writes uploads to — served by
-      # Next.js as static assets from /public.
+      # public/ is NOT baked into the image (see website/Dockerfile). It is
+      # mounted from the host so the image stays lean and static assets can
+      # be updated without a rebuild.
+      - ./public:/app/public
+      # Backend writes uploaded order files to the same host dir, served
+      # by Next.js under /public/order_files. This nested bind mount wins
+      # over the parent ./public mount for this specific subpath.
       - ../backend/services/main-service/storage/order_files:/app/public/order_files
     labels:
       - "traefik.enable=true"
@@ -32,7 +35,6 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=${CERT_RESOLVER}"
     networks:
       - main-network
-
 networks:
   main-network:
     name: main-network

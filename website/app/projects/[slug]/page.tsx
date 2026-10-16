@@ -44,8 +44,12 @@ import {
 } from "@/components/mdx";
 import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 
-export const revalidate = 60;
-export const dynamicParams = true;
+// On-demand projects come from the DB and change without a redeploy.
+// force-dynamic guarantees a fresh render on every request, so the first
+// hit after publishing never serves a cached 404 (the previous revalidate=60
+// setup cached the not-found on the first request, which is why a manual
+// reload was the only way to see the page).
+export const dynamic = "force-dynamic";
 
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||

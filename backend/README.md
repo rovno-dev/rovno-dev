@@ -1,73 +1,113 @@
-# Backend Template (FastAPI Microservices)
+# Backend — FastAPI services
 
-[English version](#english) | [Русская версия](#russian)
+[English](#english) | [Русская версия](#russian)
 
 ## English Version
 
 ### Project Concept
-This template provides a ready-to-use environment for developing scalable microservices using **FastAPI**. It includes infrastructure for database management (PostgreSQL), caching storage (Valkey), and reverse proxying (Nginx). The architecture supports polyglot development but is currently optimized for Python services.
+
+Scalable microservices on **FastAPI**, backed by PostgreSQL and Valkey
+(Redis-compatible), fronted by Traefik in prod. The architecture supports
+polyglot services but is currently optimised for Python.
 
 ### Tech Stack
-*   **Framework**: FastAPI
-*   **Database**: PostgreSQL
-*   **Cache/Queue**: Valkey (Redis-compatible)
-*   **ORM**: SQLAlchemy 2.0
-*   **Migrations**: Alembic
-*   **Proxy**: Nginx
-*   **Containerization**: Docker & Docker Compose
+
+- **Framework:** FastAPI
+- **Database:** PostgreSQL
+- **Cache / Queue:** Valkey
+- **ORM:** SQLAlchemy 2.0
+- **Migrations:** Alembic
+- **Proxy:** Traefik (prod only)
+- **Containerisation:** Docker & Docker Compose
 
 ## Quick Start
 
-### Clone the repository
+### Clone
 
 ```bash
 git clone git@github.com:unidoka/simplebase.git
 cd simplebase
 ```
 
-### Configure Enviroment
-
-Copy the example env file and fill in your secrets (JWT keys, DB passwords, SMTP credentials):
+### Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-### Run Services
+Fill in the secrets (JWT keys, DB password, SMTP credentials).
 
-Build and start all containers in detached mode:
+### Run — dev (hot reload)
+
+Runs `main-service` with `--reload`, source bind-mounted, port 8000 exposed
+directly. Includes `main-db` and `valkey` with isolated volumes and network
+(`main-network-dev`). The frontend is not part of this stack — run it
+separately with `npm run dev` (see `../website/README.md`).
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+- Swagger: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+- Main Service: http://localhost:8000/api/v1
+
+Tear down:
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+Add `-v` to also remove the dev database volume.
+
+### Run — production-parity
+
+Everything runs in Docker, including the frontend. Traefik routes on port 80.
 
 ```bash
 docker compose up -d --build
 ```
 
-### Access the API
 - Swagger: http://localhost/docs
-- Health check: http://localhost/health
+- Health: http://localhost/health
 - Main Service: http://localhost/api/main/v1
 
+### Running from the repo root
+
+Both files are included by the root compose:
+
+```bash
+docker compose up -d --build                          # prod
+docker compose -f docker-compose.dev.yml up -d        # dev
+```
+
+---
 
 # Шаблон бэкенда (микросервисы на FastAPI)
 
-[English version](#english) | [Русская версия](#russian)
+[English](#english) | [Русская версия](#russian)
 
 ## Русская версия
 
 ### Концепция проекта
-Этот шаблон предоставляет готовую среду для разработки масштабируемых микросервисов с использованием **FastAPI**. Он включает инфраструктуру для управления базами данных (PostgreSQL), кэширования (Valkey) и обратного проксирования (Nginx). Архитектура поддерживает полиглотную разработку, но в настоящее время оптимизирована для сервисов на Python.
+
+Масштабируемые микросервисы на **FastAPI** с PostgreSQL и Valkey
+(совместим с Redis), в проде — за Traefik. Архитектура поддерживает
+полиглотную разработку, но сейчас оптимизирована под Python.
 
 ### Технологический стек
-*   **Фреймворк**: FastAPI
-*   **База данных**: PostgreSQL
-*   **Кэш/Очередь**: Valkey (совместим с Redis)
-*   **ORM**: SQLAlchemy 2.0
-*   **Миграции**: Alembic
-*   **Прокси-сервер**: Nginx
-*   **Контейнеризация**: Docker и Docker Compose
+
+- **Фреймворк:** FastAPI
+- **БД:** PostgreSQL
+- **Кэш / Очереди:** Valkey
+- **ORM:** SQLAlchemy 2.0
+- **Миграции:** Alembic
+- **Прокси:** Traefik (только в проде)
+- **Контейнеризация:** Docker & Docker Compose
 
 ## Быстрый старт
 
-### Клонирование репозитория
+### Клонирование
 
 ```bash
 git clone git@github.com:unidoka/simplebase.git
@@ -76,21 +116,52 @@ cd simplebase
 
 ### Настройка окружения
 
-Скопируйте пример файла переменных окружения и заполните его секретными данными (ключи JWT, пароли БД, учетные данные SMTP):
-
 ```bash
 cp .env.example .env
 ```
 
-### Запуск сервисов
+Заполните секреты (JWT-ключи, пароль БД, SMTP).
 
-Соберите и запустите все контейнеры в фоновом режиме:
+### Запуск — dev (hot reload)
+
+`main-service` запускается с `--reload`, исходники монтируются, порт 8000
+публикуется напрямую. Включены `main-db` и `valkey` с изолированными
+volume и сетью (`main-network-dev`). Фронтенд в этот стек не входит —
+запускайте отдельно командой `npm run dev` (см. `../website/README.md`).
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+- Swagger: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+- Main Service: http://localhost:8000/api/v1
+
+Остановить:
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+Флаг `-v` дополнительно удалит volume с dev-базой.
+
+### Запуск — прод-режим
+
+Всё работает в Docker, включая фронтенд. Traefik слушает 80-й порт.
 
 ```bash
 docker compose up -d --build
 ```
 
-### Доступ к API
 - Swagger: http://localhost/docs
-- Health check: http://localhost/health
+- Health: http://localhost/health
 - Main Service: http://localhost/api/main/v1
+
+### Запуск из корня репозитория
+
+Оба файла подключены в корневом compose:
+
+```bash
+docker compose up -d --build                          # прод
+docker compose -f docker-compose.dev.yml up -d        # dev
+```

@@ -3,6 +3,7 @@ services:
     build:
       context: ./services/main-service
       dockerfile: Dockerfile
+      network: host
     container_name: main-service
     dns:
       - 8.8.8.8

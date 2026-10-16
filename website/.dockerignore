@@ -27,3 +27,20 @@ repomix*
 *.log
 *.tsbuildinfo
 next-env.d.ts
+
+# Static assets are mounted from the host at runtime (see docker-compose.yml).
+# Excluding from the build context speeds up `docker build` and keeps the
+# final image small.
+public
+
+# Dev-only compose and storage are never needed inside the image.
+docker-compose.dev.yml
+storage/
+
+# Static assets are mounted from the host at runtime (see docker-compose.yml).
+# Excluding from the build context speeds up `docker build` and keeps the
+# final image small.
+public
+
+# Dev-only artifacts are never needed inside the image.
+storage/

@@ -370,11 +370,11 @@ const SPEAKERS: Speaker[] = [
     link: "https://rovno_dev/RovnoDanil",
   },
   {
-    name: "Жанара Семенова",
-    role: "Менеджер проектов в науке и образовании · Yandex Cloud | Преподаватель · ИТИС КФУ",
-    fact: "Успевает совмещать преподавание в КФУ с работой в Яндекс",
-    bio: "Развивает науку по всей России и СНГ. Готовит людей для светлого будущего. Всегда с улыбкой.",
-    avatar_url: "/images/events/nash-dev-2026/speaker-janara.png",
+    name: "Секретный спикер",
+    role: "undefined",
+    fact: "undefined",
+    bio: "undefined",
+    avatar_url: "",
     // link: "https://",
   },
   {
@@ -438,14 +438,16 @@ function Speakers() {
                     "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
                 }}
               >
-                <Image
-                  src={s.avatar_url}
-                  alt={s.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized
-                  className="object-cover"
-                />
+                {s.avatar_url && (
+                  <Image
+                    src={s.avatar_url}
+                    alt={s.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized
+                    className="object-cover"
+                  />
+                )}
               </div>
               {/* flex-1 + flex flex-col: the text block fills whatever
                   height is left in the grid cell, so every card in a row
@@ -764,9 +766,9 @@ function AiSlider() {
 const TIMELINE = [
   { time: "13:10", cmd: "./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
   { time: "13:25", cmd: "./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
-  { time: "13:40", cmd: "./Доклад_от_сотрудника Yandex_Cloud-Жанары_Семеновой" },
+  { time: "13:40", cmd: "./Секретный-доклад --speakers $SECRETS.speaker.name" },
   { time: "14:10", cmd: "./Перерыв --period '10min'" },
-  { time: "14:20", cmd: "./Секретный_доклад" },
+  { time: "14:20", cmd: "./Ускорение-рабочих-процессов-через-ИИ --speakers 'Анастасия Пугачева'" },
   { time: "14:35", cmd: "./Что такое активность, и что это дает? --speakers 'Амир Батрутдинов'" },
   { time: "14:50", cmd: "./Розыгрыш-Яндекс-Станции" },
   { time: "15:00", cmd: "make networking" },

@@ -46,7 +46,14 @@ ENV NODE_ENV=production \
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# public/ is intentionally NOT copied into the image.
+# It holds every static image, favicon, and video the site serves —
+# baking it in adds tens of MB with no runtime benefit, and it would
+# need a full rebuild every time a designer swaps an asset.
+# docker-compose.yml mounts the host's ./public into /app/public at
+# runtime (see the volumes block). In dev the frontend runs on the host
+# via `npm run dev`, so public/ is served directly by Next.js with no
+# mount at all.
 
 EXPOSE 3000
 CMD ["node", "server.js"]
