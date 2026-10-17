@@ -1049,7 +1049,55 @@ function Faq() {
 
 const STATUS_OPTIONS = ["STUDENT", "GUEST"] as const;
 
+/* ── Seat counter ─────────────────────────────────────────────────────
+   Terminal-style capacity meter. Renders nothing when the event has no
+   capacity set — an uncapped event shouldn't advertise a limit. */
+function SeatCounter({ taken, total }: { taken: number; total: number }) {
+  if (total <= 0) return null;
+  const capped = Math.min(taken, total);
+  const cells = 20;
+  const filled = Math.round((capped / total) * cells);
+  const empty = cells - filled;
+  const bar = "█".repeat(filled) + "░".repeat(empty);
+  const isFull = taken >= total;
+  const remaining = Math.max(0, total - taken);
+  const remainingWord =
+    remaining === 1 ? "место" : remaining < 5 ? "места" : "мест";
+  return (
+    <div
+      className="font-mono border p-5 mb-10"
+      style={{
+        borderColor: isFull ? "#FF3B3B" : "#222",
+        background: "#0a0a0a",
+      }}
+    >
+      <p
+        className="text-xs uppercase tracking-[0.2em] mb-3"
+        style={{ color: "#666" }}
+      >
+        <Prompt>{"$"}</Prompt>status --seats
+      </p>
+      <div
+        className="text-lg md:text-2xl tracking-wider whitespace-nowrap overflow-x-auto"
+        style={{ color: isFull ? "#FF3B3B" : WHITE }}
+      >
+        [{bar}] {capped}&nbsp;/&nbsp;{total}
+      </div>
+      <p
+        className="text-sm mt-2"
+        style={{ color: isFull ? "#FF3B3B" : "#888" }}
+      >
+        {isFull
+          ? "// capacity reached — registration is closed"
+          : `// ${remaining} ${remainingWord} осталось`}
+      </p>
+    </div>
+  );
+}
 function Registration({ ctx }: { ctx: EventCustomContext }) {
+  const capacity = ctx.capacity ?? 0;
+  const registered = ctx.registeredCount ?? 0;
+  const isFull = capacity > 0 && registered >= capacity;
   const [form, setForm] = useState({
     name: "",
     surname: "",
@@ -1063,11 +1111,9 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
     if (!form.name.trim() || !form.phone.trim()) {
       setError("name и phone обязательны");
       return;
@@ -1080,7 +1126,6 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
       setError("нужно согласие на обработку персональных данных");
       return;
     }
-
     setSubmitting(true);
     try {
       await registerForEvent(ctx.slug, {
@@ -1102,18 +1147,25 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
       setSubmitting(false);
     }
   };
-
   if (done) {
     return (
       <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
         <div className="max-w-[900px] mx-auto px-6 font-mono">
+          {/* `+ 1` reflects the registration the current visitor just
+              submitted — the server response isn't refetched, so this is
+              the only accurate in-memory projection. */}
+          <SeatCounter taken={registered + 1} total={capacity} />
           <p className="text-2xl md:text-4xl mb-6" style={{ color: LIME }}>
             ✓ Registration successful.
           </p>
           <p className="text-lg md:text-2xl" style={{ color: WHITE }}>
             Увидимся на событии{" "}
             {ctx.startAt
-              ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
+              ? new Date(ctx.startAt).toLocaleDateString("ru-RU", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
               : "23 октября 2026"}
             .
           </p>
@@ -1124,123 +1176,133 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
       </section>
     );
   }
-
   return (
     <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
       <div className="max-w-[900px] mx-auto px-6 font-mono">
-        <p className="text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>init_registration()
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Field label="enter_name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="Иван" required />
-          <Field label="enter_surname" value={form.surname} onChange={(v) => setForm({ ...form, surname: v })} placeholder="Иванов" />
-          <Field label="enter_phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+7 ___ ___-__-__" required />
-          <Field label="enter_email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@example.com" />
-          <Field label="enter_telegram" value={form.telegram_username} onChange={(v) => setForm({ ...form, telegram_username: v })} placeholder="@username" />
-
-          <div>
-            <p className="text-sm mb-3" style={{ color: LIME }}>
-              <Prompt>{"$"}</Prompt>Кто ты?:
+        <SeatCounter taken={registered} total={capacity} />
+        {isFull ? (
+          <>
+            <p className="text-2xl md:text-4xl mb-4" style={{ color: "#FF3B3B" }}>
+              ✕ Registration closed
             </p>
-            <div className="flex gap-3">
-              {STATUS_OPTIONS.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setForm({ ...form, status: opt })}
-                  className="font-mono text-sm uppercase tracking-wider px-5 py-3 border"
-                  style={{
-                    borderColor: form.status === opt ? LIME : "#333",
-                    color: form.status === opt ? BLACK : WHITE,
-                    background: form.status === opt ? LIME : BLACK,
-                  }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Age confirmation — plain terminal-style toggle. */}
-          <label className="flex items-start gap-3 cursor-pointer pt-4">
-            <input
-              type="checkbox"
-              checked={form.confirm_age_18}
-              onChange={(e) => setForm({ ...form, confirm_age_18: e.target.checked })}
-              className="mt-1 accent-[#CCFF00] size-4"
-            />
-            <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-              <Prompt>{"$"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
-            </span>
-          </label>
-
-          {/* Legal consent — mirrors the site-wide order form so the consent
-              language is identical across every form on the domain. Links
-              open in a new tab; the user can read the policy without losing
-              the form state. */}
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.accept_pd}
-              onChange={(e) => setForm({ ...form, accept_pd: e.target.checked })}
-              className="mt-1 accent-[#CCFF00] size-4"
-            />
-            <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-              <Prompt>{"$"}</Prompt>accept_pd: даю{" "}
-              <a
-                href="/docs/consent"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-                style={{ color: LIME }}
-              >
-                согласие на обработку персональных данных
-              </a>{" "}
-              и подтверждаю ознакомление с{" "}
-              <a
-                href="/docs/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-                style={{ color: LIME }}
-              >
-                Политикой конфиденциальности
-              </a>{" "}
-              и{" "}
-              <a
-                href="/docs/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-                style={{ color: LIME }}
-              >
-                Пользовательским соглашением
-              </a>
-              .
-            </span>
-          </label>
-
-          {error && (
-            <p className="font-mono text-sm px-4 py-3 border" style={{ color: "#FF3B3B", borderColor: "#FF3B3B" }}>
-              ERROR: {error}
+            <p className="text-lg md:text-xl" style={{ color: WHITE }}>
+              Все {capacity}{" "}
+              {capacity === 1 ? "место" : capacity < 5 ? "места" : "мест"} заняты.
             </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full font-mono text-base uppercase tracking-widest px-8 py-5 border-2 disabled:opacity-50"
-            style={{ background: LIME, color: BLACK, borderColor: LIME }}
-          >
-            {submitting ? "executing..." : "> execute_registration [ОТПРАВИТЬ]"}
-          </button>
-        </form>
+            <p className="text-base mt-4" style={{ color: "#666" }}>
+              Если кто-то отменит участие, регистрация откроется снова.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-base md:text-lg mb-12" style={{ color: LIME }}>
+              <Prompt>{"$"}</Prompt>init_registration()
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Field label="enter_name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="Иван" required />
+              <Field label="enter_surname" value={form.surname} onChange={(v) => setForm({ ...form, surname: v })} placeholder="Иванов" />
+              <Field label="enter_phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+7 ___ ___-__-__" required />
+              <Field label="enter_email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@example.com" />
+              <Field label="enter_telegram" value={form.telegram_username} onChange={(v) => setForm({ ...form, telegram_username: v })} placeholder="@username" />
+              <div>
+                <p className="text-sm mb-3" style={{ color: LIME }}>
+                  <Prompt>{"$"}</Prompt>Кто ты?:
+                </p>
+                <div className="flex gap-3">
+                  {STATUS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setForm({ ...form, status: opt })}
+                      className="font-mono text-sm uppercase tracking-wider px-5 py-3 border"
+                      style={{
+                        borderColor: form.status === opt ? LIME : "#333",
+                        color: form.status === opt ? BLACK : WHITE,
+                        background: form.status === opt ? LIME : BLACK,
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Age confirmation — plain terminal-style toggle. */}
+              <label className="flex items-start gap-3 cursor-pointer pt-4">
+                <input
+                  type="checkbox"
+                  checked={form.confirm_age_18}
+                  onChange={(e) => setForm({ ...form, confirm_age_18: e.target.checked })}
+                  className="mt-1 accent-[#CCFF00] size-4"
+                />
+                <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
+                  <Prompt>{"$"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
+                </span>
+              </label>
+              {/* Legal consent — mirrors the site-wide order form so the consent
+                  language is identical across every form on the domain. Links
+                  open in a new tab; the user can read the policy without losing
+                  the form state. */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.accept_pd}
+                  onChange={(e) => setForm({ ...form, accept_pd: e.target.checked })}
+                  className="mt-1 accent-[#CCFF00] size-4"
+                />
+                <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
+                  <Prompt>{"$"}</Prompt>accept_pd: даю{" "}
+                  <a
+                    href="/docs/consent"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                    style={{ color: LIME }}
+                  >
+                    согласие на обработку персональных данных
+                  </a>{" "}
+                  и подтверждаю ознакомление с{" "}
+                  <a
+                    href="/docs/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                    style={{ color: LIME }}
+                  >
+                    Политикой конфиденциальности
+                  </a>{" "}
+                  и{" "}
+                  <a
+                    href="/docs/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                    style={{ color: LIME }}
+                  >
+                    Пользовательским соглашением
+                  </a>
+                  .
+                </span>
+              </label>
+              {error && (
+                <p className="font-mono text-sm px-4 py-3 border" style={{ color: "#FF3B3B", borderColor: "#FF3B3B" }}>
+                  ERROR: {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full font-mono text-base uppercase tracking-widest px-8 py-5 border-2 disabled:opacity-50"
+                style={{ background: LIME, color: BLACK, borderColor: LIME }}
+              >
+                {submitting ? "executing..." : "> execute_registration [ОТПРАВИТЬ]"}
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </section>
   );
 }
-
 function Field({
   label,
   value,

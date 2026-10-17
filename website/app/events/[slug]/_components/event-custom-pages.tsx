@@ -30,6 +30,8 @@ export interface EventCustomContext {
   price?: string;
   registrationUrl?: string;
   capacity?: number;
+  /** Server-computed: how many registrations currently occupy a seat. */
+  registeredCount?: number;
   tags: { id: string; name: string }[];
   content: React.ReactNode;
 }

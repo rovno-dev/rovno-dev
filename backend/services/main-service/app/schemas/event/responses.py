@@ -26,6 +26,11 @@ class EventListItem(BaseModel):
     city: Optional[str] = None
     price: Optional[str] = None
     capacity: Optional[int] = None
+    # Populated by the endpoint, not a DB column: how many active
+    # registrations exist for this event. `declined` and `canceled`
+    # are excluded so seats freed up by cancellations become available
+    # again.
+    registered_count: int = 0
     registration_url: Optional[str] = None
     is_featured: bool = False
     publication_status: str

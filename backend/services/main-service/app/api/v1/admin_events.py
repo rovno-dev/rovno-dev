@@ -14,6 +14,7 @@ from app.models.project import PublicationStatus
 from app.models.user import User
 from app.schemas.event.requests import EventCreate, EventRequestUpdate, EventUpdate
 from app.schemas.event.responses import EventDetail, EventListItem, EventRequestOut
+from app.api.v1.events import attach_registered_counts
 from app.services.tag_service import resolve_tags
 from app.models.tag import TagKind
 from app.shared.slugify import slugify
@@ -51,12 +52,14 @@ def list_admin_events(
         if status not in {s.value for s in PublicationStatus}:
             raise HTTPException(422, f"Unknown status: {status}")
         query = query.filter(Event.publication_status == PublicationStatus(status))
-    return (
+    events = (
         query.order_by(Event.start_at.desc().nullslast(), Event.updated_at.desc())
         .offset(offset)
         .limit(limit)
         .all()
     )
+    attach_registered_counts(db, events)
+    return events
 
 
 @router.get("/{slug}", response_model=EventDetail)
@@ -64,6 +67,7 @@ def get_admin_event(slug: str, db: Session = Depends(get_db), _: User = Depends(
     ev = db.query(Event).filter(Event.slug == slug).first()
     if not ev:
         raise HTTPException(404, "Event not found")
+    attach_registered_counts(db, [ev])
     return ev
 
 

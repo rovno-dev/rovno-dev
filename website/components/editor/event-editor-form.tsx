@@ -309,7 +309,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
             <Input value={form.metro} onChange={(e) => update("metro", e.target.value)} />
           </Field>
           <Field>
-            <FieldLabel>Вместимость</FieldLabel>
+            <FieldLabel>Лимит мест</FieldLabel>
             <Input
               type="number"
               value={form.capacity ?? ""}
