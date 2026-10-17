@@ -10,13 +10,18 @@ import {
 import { $fetch } from "@/utils/fetch";
 import { ImageEditorDialog } from "./image-editor/image-editor-dialog";
 import { readFileAsDataURL } from "./image-editor/canvas-utils";
+
 interface Props {
   value: string;
   onChange: (url: string) => void;
   placeholder?: string;
   defaultAspect?: "free" | "1:1" | "4:3" | "16:9" | "21:8";
+  fileType?: "image" | "video" | "both";
 }
-export function ImageUploadField({ value, onChange, placeholder, defaultAspect }: Props) {
+
+export function ImageUploadField({
+  value, onChange, placeholder, defaultAspect, fileType = "both",
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -24,7 +29,9 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
   const [editorAspect, setEditorAspect] = useState<"free" | "1:1" | "4:3" | "16:9" | "21:8">(
     defaultAspect ?? "free",
   );
+
   const pickFile = () => inputRef.current?.click();
+
   const uploadBlob = async (blob: Blob, filename: string): Promise<string> => {
     const fd = new FormData();
     fd.append("file", new File([blob], filename, { type: blob.type }));
@@ -38,6 +45,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
     }
     return res.json.url as string;
   };
+
   const handleFile = async (file: File) => {
     if (file.size > 20 * 1024 * 1024) {
       toast.error("Файл больше 20 МБ");
@@ -46,6 +54,10 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
     
     // Handle video upload directly (skip editor)
     if (file.type.startsWith("video/")) {
+      if (fileType === "image") {
+        toast.error("Это поле только для изображений");
+        return;
+      }
       setUploading(true);
       try {
         const fd = new FormData();
@@ -69,6 +81,11 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
       return;
     }
 
+    if (fileType === "video") {
+      toast.error("Это поле только для видео");
+      return;
+    }
+
     // Handle image
     setUploading(true);
     try {
@@ -83,12 +100,14 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
       if (inputRef.current) inputRef.current.value = "";
     }
   };
+
   const handleEditExisting = () => {
     if (!value) return;
     setEditorSrc(value);
     setEditorAspect(defaultAspect ?? "free");
     setEditorOpen(true);
   };
+
   const handleApplyEdit = async (blob: Blob, filename: string) => {
     setUploading(true);
     try {
@@ -102,18 +121,27 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
       setUploading(false);
     }
   };
+
+  const isVideoFile = value ? (value.endsWith(".webm") || value.endsWith(".mp4") || value.endsWith(".mov")) : false;
+  const isEmbed = value ? (value.includes("youtube.com") || value.includes("youtu.be") || value.includes("kinescope.io") || value.includes("vimeo.com")) : false;
+  const canEdit = !isVideoFile && !isEmbed;
+
   return (
     <div className="space-y-2">
       {value && (
         <div className="relative aspect-[16/8] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group">
-          {value.endsWith(".webm") || value.endsWith(".mp4") ? (
-             <video src={value} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+          {isVideoFile ? (
+            <video src={value} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+          ) : isEmbed ? (
+            <div className="absolute inset-0 bg-black flex items-center justify-center">
+              <span className="text-white/50 text-sm font-mono truncate px-4">{value}</span>
+            </div>
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={value} alt="" className="absolute inset-0 w-full h-full object-cover" />
           )}
           <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            {!(value.endsWith(".webm") || value.endsWith(".mp4")) && (
+            {canEdit && (
               <Button
                 type="button"
                 variant="glass"
@@ -162,7 +190,7 @@ export function ImageUploadField({ value, onChange, placeholder, defaultAspect }
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,video/mp4,video/webm,video/quicktime"
+        accept={fileType === "image" ? "image/*" : fileType === "video" ? "video/mp4,video/webm,video/quicktime" : "image/*,video/mp4,video/webm,video/quicktime"}
         className="hidden"
         onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
       />

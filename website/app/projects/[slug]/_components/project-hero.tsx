@@ -58,15 +58,27 @@ export function ProjectHero({
         {/* Video iframe – scales responsively */}
         {cover.videoSrc && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full w-auto h-auto aspect-video object-cover scale-[1.3] md:scale-100">
-            <iframe
-              src={`${cover.videoSrc}?autoplay=1&muted=1&loop=1`}
-              className={`absolute top-0 left-0 w-full h-full border-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"
-                }`}
-              allow="autoplay; encrypted-media; fullscreen; accelerometer; gyroscope; picture-in-picture"
-              allowFullScreen
-              onLoad={() => setVideoLoaded(true)}
-              title={title}
-            />
+            {cover.videoSrc.endsWith(".webm") || cover.videoSrc.endsWith(".mp4") ? (
+              <video
+                src={cover.videoSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"}`}
+                onLoadedData={() => setVideoLoaded(true)}
+              />
+            ) : (
+              <iframe
+                src={`${cover.videoSrc}?autoplay=1&muted=1&loop=1`}
+                className={`absolute top-0 left-0 w-full h-full border-0 transition-opacity duration-700 ${videoLoaded ? "opacity-100" : "opacity-0"
+                  }`}
+                allow="autoplay; encrypted-media; fullscreen; accelerometer; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={() => setVideoLoaded(true)}
+                title={title}
+              />
+            )}
           </div>
         )}
 

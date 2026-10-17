@@ -25,7 +25,7 @@ class EventListItem(BaseModel):
     location_name: Optional[str] = None
     city: Optional[str] = None
     price: Optional[str] = None
-    capacity: Optional[int] = None
+    seat_types: Optional[List[Dict[str, Any]]] = None
     # Populated by the endpoint, not a DB column: how many active
     # registrations exist for this event. `declined` and `canceled`
     # are excluded so seats freed up by cancellations become available

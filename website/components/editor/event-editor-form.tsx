@@ -14,15 +14,18 @@ import {
 } from "@/components/ui/select";
 import { ImageUploadField } from "./image-upload-field";
 import { ArticleEditor } from "./article-editor";
-import {
-  FloppyDisk, Rocket, Trash, Sparkle,
-} from "@phosphor-icons/react";
+import { FloppyDiskIcon, RocketIcon, TrashIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
 import {
   createEvent, updateEvent, deleteEvent,
   type EventDetail, type EventPayload,
 } from "@/utils/api/events";
 import { EVENT_CUSTOM_PAGES_META } from "@/app/events/[slug]/_components/event-custom-pages-meta";
 import { revalidateTags } from "@/utils/revalidate";
+
+interface SeatType {
+  type: string;
+  count: number | "";
+}
 
 interface FormState {
   slug: string;
@@ -39,7 +42,7 @@ interface FormState {
   city: string;
   price: string;
   registration_url: string;
-  capacity: number | null;
+  seat_types: SeatType[];
   custom_page: string | null;
   is_featured: boolean;
   publication_status: "draft" | "published";
@@ -62,50 +65,25 @@ function isoToLocalInput(iso?: string | null): string {
 function toFormState(e?: EventDetail | null): FormState {
   if (!e) {
     return {
-      slug: "",
-      title: "",
-      short_description: "",
-      description: "",
-      cover_image_src: "",
-      cover_video_src: "",
-      start_at: "",
-      end_at: "",
-      location_name: "",
-      address: "",
-      metro: "",
-      city: "Москва",
-      price: "Бесплатно",
-      registration_url: "",
-      capacity: null,
-      custom_page: null,
-      is_featured: false,
-      publication_status: "draft",
-      mdx_content: "",
-      seo_title: "",
-      meta_description: "",
+      slug: "", title: "", short_description: "", description: "",
+      cover_image_src: "", cover_video_src: "", start_at: "", end_at: "",
+      location_name: "", address: "", metro: "", city: "Москва",
+      price: "Бесплатно", registration_url: "", seat_types: [],
+      custom_page: null, is_featured: false, publication_status: "draft",
+      mdx_content: "", seo_title: "", meta_description: "",
     };
   }
   return {
-    slug: e.slug,
-    title: e.title || "",
-    short_description: e.short_description || "",
-    description: e.description || "",
-    cover_image_src: e.cover_image_src || "",
-    cover_video_src: e.cover_video_src || "",
-    start_at: isoToLocalInput(e.start_at),
-    end_at: isoToLocalInput(e.end_at),
-    location_name: e.location_name || "",
-    address: e.address || "",
-    metro: e.metro || "",
-    city: e.city || "Москва",
-    price: e.price || "",
-    registration_url: e.registration_url || "",
-    capacity: e.capacity ?? null,
-    custom_page: e.custom_page ?? null,
-    is_featured: e.is_featured || false,
+    slug: e.slug, title: e.title || "", short_description: e.short_description || "",
+    description: e.description || "", cover_image_src: e.cover_image_src || "",
+    cover_video_src: e.cover_video_src || "", start_at: isoToLocalInput(e.start_at),
+    end_at: isoToLocalInput(e.end_at), location_name: e.location_name || "",
+    address: e.address || "", metro: e.metro || "", city: e.city || "Москва",
+    price: e.price || "", registration_url: e.registration_url || "",
+    seat_types: (e.seat_types || []).map(s => ({ type: s.type, count: s.count })),
+    custom_page: e.custom_page ?? null, is_featured: e.is_featured || false,
     publication_status: (e.publication_status as any) || "draft",
-    mdx_content: e.mdx_content || "",
-    seo_title: e.seo_title || "",
+    mdx_content: e.mdx_content || "", seo_title: e.seo_title || "",
     meta_description: e.meta_description || "",
   };
 }
@@ -115,35 +93,58 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
   const isEdit = !!initial;
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
-
   const isCustomPage = !!form.custom_page;
 
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((p) => ({ ...p, [k]: v }));
 
-  const buildPayload = (status: "draft" | "published"): EventPayload => ({
-    title: form.title.trim(),
-    slug: form.slug.trim() || undefined,
-    short_description: form.short_description.trim(),
-    description: form.description.trim(),
-    cover_image_src: form.cover_image_src.trim(),
-    cover_video_src: form.cover_video_src.trim(),
-    start_at: form.start_at ? new Date(form.start_at).toISOString() : null,
-    end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
-    location_name: form.location_name.trim() || null,
-    address: form.address.trim() || null,
-    metro: form.metro.trim() || null,
-    city: form.city.trim() || null,
-    price: form.price.trim() || null,
-    registration_url: form.registration_url.trim() || null,
-    capacity: form.capacity,
-    custom_page: form.custom_page,
-    is_featured: form.is_featured,
-    publication_status: status,
-    mdx_content: form.mdx_content,
-    seo_title: form.seo_title.trim() || null,
-    meta_description: form.meta_description.trim() || null,
-  });
+  const addSeatType = () => {
+    update("seat_types", [...form.seat_types, { type: "", count: "" }]);
+  };
+
+  const updateSeatType = (idx: number, key: keyof SeatType, value: string) => {
+    const next = [...form.seat_types];
+    if (key === "count") {
+      next[idx].count = value ? Number(value) : "";
+    } else {
+      next[idx].type = value;
+    }
+    update("seat_types", next);
+  };
+
+  const removeSeatType = (idx: number) => {
+    update("seat_types", form.seat_types.filter((_, i) => i !== idx));
+  };
+
+  const buildPayload = (status: "draft" | "published"): EventPayload => {
+    const cleanSeats = form.seat_types
+      .filter((s) => s.type.trim() !== "" && s.count !== "")
+      .map((s) => ({ type: s.type.trim(), count: Number(s.count) }));
+
+    return {
+      title: form.title.trim(),
+      slug: form.slug.trim() || undefined,
+      short_description: form.short_description.trim(),
+      description: form.description.trim(),
+      cover_image_src: form.cover_image_src.trim(),
+      cover_video_src: form.cover_video_src.trim(),
+      start_at: form.start_at ? new Date(form.start_at).toISOString() : null,
+      end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
+      location_name: form.location_name.trim() || null,
+      address: form.address.trim() || null,
+      metro: form.metro.trim() || null,
+      city: form.city.trim() || null,
+      price: form.price.trim() || null,
+      registration_url: form.registration_url.trim() || null,
+      seat_types: cleanSeats,
+      custom_page: form.custom_page,
+      is_featured: form.is_featured,
+      publication_status: status,
+      mdx_content: form.mdx_content,
+      seo_title: form.seo_title.trim() || null,
+      meta_description: form.meta_description.trim() || null,
+    };
+  };
 
   const handleSave = async (status: "draft" | "published") => {
     if (!form.title.trim()) {
@@ -153,21 +154,15 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
     setSaving(true);
     try {
       const payload = buildPayload(status);
-      const saved =
-        isEdit && initial
-          ? await updateEvent(initial.slug, payload)
-          : await createEvent(payload);
+      const saved = isEdit && initial ? await updateEvent(initial.slug, payload) : await createEvent(payload);
       toast.success(status === "published" ? "Событие опубликовано" : "Черновик сохранён");
-      // Bust the events cache so the public list and detail page reflect
-      // the change on the next request. Await is intentional — we want the
-      // user to know the site is updated before we navigate.
       await revalidateTags(["events"]);
-        if (!isEdit) {
-          const basePath = window.location.pathname.replace(/\/new\/?$/, "");
-          router.replace(`${basePath}/${saved.slug}/edit`);
-        } else {
-          router.refresh();
-        }
+      if (!isEdit) {
+        const basePath = window.location.pathname.replace(/\/new\/?$/, "");
+        router.replace(`${basePath}/${saved.slug}/edit`);
+      } else {
+        router.refresh();
+      }
     } catch (err: any) {
       toast.error(err?.message || "Ошибка сохранения");
     } finally {
@@ -195,29 +190,24 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-display-2 mb-1">
-            {isEdit ? "Редактирование события" : "Новое событие"}
-          </h1>
+          <h1 className="text-display-2 mb-1">{isEdit ? "Редактирование события" : "Новое событие"}</h1>
           {initial && (
             <p className="text-body-4 text-(--on-bg-low)">
-              {initial.publication_status === "published" ? "Опубликовано" : "Черновик"} ·{" "}
-              <code className="font-mono">/events/{initial.slug}</code>
+              {initial.publication_status === "published" ? "Опубликовано" : "Черновик"} · <code className="font-mono">/events/{initial.slug}</code>
             </p>
           )}
         </div>
         <div className="flex flex-wrap gap-2">
           {isEdit && (
             <Button variant="glass-red" size="icon-medium" onClick={handleDelete} disabled={saving}>
-              <Trash className="size-4" />
+              <TrashIcon className="size-4" />
             </Button>
           )}
           <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-            <FloppyDisk className="size-4" />
-            Черновик
+            <FloppyDiskIcon className="size-4" /> Черновик
           </Button>
           <Button onClick={() => handleSave("published")} disabled={saving}>
-            <Rocket className="size-4" />
-            Опубликовать
+            <RocketIcon className="size-4" /> Опубликовать
           </Button>
         </div>
       </div>
@@ -232,51 +222,27 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
           </Field>
           <Field>
             <FieldLabel>Slug</FieldLabel>
-            <Input
-              value={form.slug}
-              onChange={(e) => update("slug", e.target.value)}
-              placeholder="генерируется из названия"
-            />
+            <Input value={form.slug} onChange={(e) => update("slug", e.target.value)} placeholder="генерируется из названия" />
           </Field>
           <Field>
             <FieldLabel>Цена</FieldLabel>
-            <Input
-              value={form.price}
-              onChange={(e) => update("price", e.target.value)}
-              placeholder="Бесплатно / 500 ₽"
-            />
+            <Input value={form.price} onChange={(e) => update("price", e.target.value)} placeholder="Бесплатно / 500 ₽" />
           </Field>
           <Field>
             <FieldLabel>Начало</FieldLabel>
-            <Input
-              type="datetime-local"
-              value={form.start_at}
-              onChange={(e) => update("start_at", e.target.value)}
-            />
+            <Input type="datetime-local" value={form.start_at} onChange={(e) => update("start_at", e.target.value)} />
           </Field>
           <Field>
             <FieldLabel>Конец (опционально)</FieldLabel>
-            <Input
-              type="datetime-local"
-              value={form.end_at}
-              onChange={(e) => update("end_at", e.target.value)}
-            />
+            <Input type="datetime-local" value={form.end_at} onChange={(e) => update("end_at", e.target.value)} />
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>Короткое описание</FieldLabel>
-            <Textarea
-              value={form.short_description}
-              onChange={(e) => update("short_description", e.target.value)}
-              className="min-h-[60px]"
-            />
+            <Textarea value={form.short_description} onChange={(e) => update("short_description", e.target.value)} className="min-h-[60px]" />
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>Полное описание</FieldLabel>
-            <Textarea
-              value={form.description}
-              onChange={(e) => update("description", e.target.value)}
-              className="min-h-[100px]"
-            />
+            <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} className="min-h-[100px]" />
           </Field>
         </div>
       </Card>
@@ -287,11 +253,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field>
             <FieldLabel>Название места</FieldLabel>
-            <Input
-              value={form.location_name}
-              onChange={(e) => update("location_name", e.target.value)}
-              placeholder="МЦК КИТС"
-            />
+            <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} placeholder="МЦК КИТС" />
           </Field>
           <Field>
             <FieldLabel>Город</FieldLabel>
@@ -299,31 +261,54 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>Адрес</FieldLabel>
-            <Input
-              value={form.address}
-              onChange={(e) => update("address", e.target.value)}
-            />
+            <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
           </Field>
           <Field>
             <FieldLabel>Метро</FieldLabel>
             <Input value={form.metro} onChange={(e) => update("metro", e.target.value)} />
           </Field>
-          <Field>
-            <FieldLabel>Лимит мест</FieldLabel>
-            <Input
-              type="number"
-              value={form.capacity ?? ""}
-              onChange={(e) => update("capacity", e.target.value ? Number(e.target.value) : null)}
-            />
-          </Field>
           <Field className="md:col-span-2">
             <FieldLabel>Внешняя ссылка на регистрацию (опционально)</FieldLabel>
-            <Input
-              value={form.registration_url}
-              onChange={(e) => update("registration_url", e.target.value)}
-              placeholder="https://forms.yandex.com/… — если пусто, форма на сайте"
-            />
+            <Input value={form.registration_url} onChange={(e) => update("registration_url", e.target.value)} placeholder="https://forms.yandex.com/… — если пусто, форма на сайте" />
           </Field>
+        </div>
+
+        {/* Dynamic Seat Types */}
+        <div className="pt-4 border-t border-(--outline)">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <Label className="text-body-3">Лимиты и типы мест</Label>
+              <p className="text-body-5 text-(--on-bg-low)">Если не добавить, будет отображено "no info"</p>
+            </div>
+            <Button type="button" variant="outlined" size="small" onClick={addSeatType}>
+              <PlusIcon className="size-4" /> Добавить тип
+            </Button>
+          </div>
+          
+          {form.seat_types.length > 0 && (
+            <div className="space-y-2">
+              {form.seat_types.map((seat, idx) => (
+                <div key={idx} className="flex gap-2 items-center">
+                  <Input
+                    value={seat.type}
+                    onChange={(e) => updateSeatType(idx, "type", e.target.value)}
+                    placeholder="Тип (e.g. VIP, Стандарт)"
+                    className="flex-1"
+                  />
+                  <Input
+                    type="number"
+                    value={seat.count}
+                    onChange={(e) => updateSeatType(idx, "count", e.target.value)}
+                    placeholder="Кол-во"
+                    className="w-32"
+                  />
+                  <Button type="button" variant="text" size="icon-small" onClick={() => removeSeatType(idx)}>
+                    <XIcon className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Card>
 
@@ -332,17 +317,15 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
         <h2 className="text-heading-3">Обложка</h2>
         <Field>
           <FieldLabel>Изображение</FieldLabel>
-          <ImageUploadField
-            value={form.cover_image_src}
-            onChange={(v) => update("cover_image_src", v)}
-            defaultAspect="4:3"
-          />
+          <ImageUploadField value={form.cover_image_src} onChange={(v) => update("cover_image_src", v)} defaultAspect="4:3" />
         </Field>
         <Field>
-          <FieldLabel>Видео-обложка (embed URL)</FieldLabel>
-          <Input
+          <FieldLabel>Видео-обложка (файл или embed URL)</FieldLabel>
+          <ImageUploadField
             value={form.cover_video_src}
-            onChange={(e) => update("cover_video_src", e.target.value)}
+            onChange={(v) => update("cover_video_src", v)}
+            fileType="video"
+            placeholder="https://kinescope.io/… или загрузите видео"
           />
         </Field>
       </Card>
@@ -352,43 +335,25 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
         <h2 className="text-heading-3">Кастомная страница</h2>
         <Field>
           <FieldLabel>Шаблон</FieldLabel>
-          <Select
-            value={form.custom_page || "__none__"}
-            onValueChange={(v) => update("custom_page", v === "__none__" ? null : v)}
-          >
+          <Select value={form.custom_page || "__none__"} onValueChange={(v) => update("custom_page", v === "__none__" ? null : v)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__none__">Общий шаблон события</SelectItem>
               {EVENT_CUSTOM_PAGES_META.map((m) => (
-                <SelectItem key={m.key} value={m.key}>
-                  {m.label}
-                </SelectItem>
+                <SelectItem key={m.key} value={m.key}>{m.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </Field>
-        {isCustomPage && (
-          <div className="rounded-2xl border border-violet-500/30 bg-violet-500/5 p-4 flex gap-3">
-            <Sparkle className="size-5 text-violet-500 shrink-0 mt-0.5" weight="fill" />
-            <p className="text-body-4 text-(--on-bg-medium)">
-              {EVENT_CUSTOM_PAGES_META.find((m) => m.key === form.custom_page)?.description}
-              {" "}MDX и медиа игнорируются — заполните основные поля.
-            </p>
-          </div>
-        )}
       </Card>
 
-      {/* MDX — hidden when a template owns the page */}
+      {/* MDX */}
       {!isCustomPage && (
         <div className="space-y-3">
           <h2 className="text-heading-3">Содержимое (MDX)</h2>
-          <ArticleEditor
-            value={form.mdx_content}
-            onChange={(v) => update("mdx_content", v)}
-            placeholder="Описание события…"
-          />
+          <ArticleEditor value={form.mdx_content} onChange={(v) => update("mdx_content", v)} placeholder="Описание события…" />
         </div>
       )}
 
@@ -401,26 +366,14 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
         </Field>
         <Field>
           <FieldLabel>Meta description</FieldLabel>
-          <Textarea
-            value={form.meta_description}
-            onChange={(e) => update("meta_description", e.target.value)}
-            className="min-h-[72px]"
-          />
+          <Textarea value={form.meta_description} onChange={(e) => update("meta_description", e.target.value)} className="min-h-[72px]" />
         </Field>
         <div className="flex items-center gap-3 pt-2">
-          <Switch
-            id="is_featured"
-            checked={form.is_featured}
-            onCheckedChange={(v) => update("is_featured", v)}
-          />
+          <Switch id="is_featured" checked={form.is_featured} onCheckedChange={(v) => update("is_featured", v)} />
           <Label htmlFor="is_featured">Featured на /events</Label>
         </div>
         <div className="flex items-center gap-3">
-          <Switch
-            id="published"
-            checked={form.publication_status === "published"}
-            onCheckedChange={(v) => update("publication_status", v ? "published" : "draft")}
-          />
+          <Switch id="published" checked={form.publication_status === "published"} onCheckedChange={(v) => update("publication_status", v ? "published" : "draft")} />
           <Label htmlFor="published">Опубликовано</Label>
         </div>
       </Card>

@@ -29,7 +29,7 @@ export interface EventCustomContext {
   city?: string;
   price?: string;
   registrationUrl?: string;
-  capacity?: number;
+  seatTypes?: { type: string; count: number }[];
   /** Server-computed: how many registrations currently occupy a seat. */
   registeredCount?: number;
   tags: { id: string; name: string }[];

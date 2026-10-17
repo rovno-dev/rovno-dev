@@ -145,13 +145,24 @@ export function CustomProjectPage({
           <div className="max-w-[1120px] mx-auto">
             <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-(--outline) bg-(--card)">
               {project.coverVideo ? (
-                <iframe
-                  src={`${project.coverVideo}?autoplay=1&muted=1&loop=1`}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                  title={project.title}
-                />
+                project.coverVideo.endsWith(".webm") || project.coverVideo.endsWith(".mp4") ? (
+                  <video
+                    src={project.coverVideo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <iframe
+                    src={`${project.coverVideo}?autoplay=1&muted=1&loop=1`}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    allowFullScreen
+                    title={project.title}
+                  />
+                )
               ) : (
                 <Image
                   src={project.coverImage}

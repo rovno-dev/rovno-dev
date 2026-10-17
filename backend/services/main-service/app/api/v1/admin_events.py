@@ -95,7 +95,7 @@ def create_event(payload: EventCreate, db: Session = Depends(get_db), _: User = 
         city=payload.city or "Москва",
         price=payload.price,
         registration_url=payload.registration_url,
-        capacity=payload.capacity,
+        seat_types=payload.seat_types or [],
         custom_page=payload.custom_page or None,
         is_featured=payload.is_featured or False,
         publication_status=PublicationStatus(status_val),

@@ -112,8 +112,10 @@ export default async function EventPage({
       city: ev.city || undefined,
       price: ev.price || undefined,
       registrationUrl: ev.registration_url || undefined,
-      capacity: ev.capacity || undefined,
+
       registeredCount: ev.registered_count ?? 0,
+    seatTypes: ev.seat_types || [],
+
       tags: (ev.tags || []).map((t) => ({ id: t.id, name: t.name })),
       content: mdxContent,
     };
@@ -126,7 +128,25 @@ export default async function EventPage({
       <Container variant="full-width" className="pt-4 md:pt-8">
         <div className="max-w-[1200px] mx-auto">
           <div className="relative w-full h-[480px] md:h-[600px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
-            {ev.cover_image_src ? (
+            {ev.cover_video_src ? (
+              ev.cover_video_src.endsWith(".webm") || ev.cover_video_src.endsWith(".mp4") ? (
+                <video
+                  src={ev.cover_video_src}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <iframe
+                  src={`${ev.cover_video_src}?autoplay=1&muted=1&loop=1`}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+              )
+            ) : ev.cover_image_src ? (
               <Image
                 src={ev.cover_image_src}
                 alt={ev.title}

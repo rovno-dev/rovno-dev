@@ -381,6 +381,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
               onChange={(v) => update("image_url", v)}
               placeholder={t("editor.field_image_ph")}
               defaultAspect="4:3"
+              fileType="both"
             />
           </Field>
           <Field className="md:col-span-2">

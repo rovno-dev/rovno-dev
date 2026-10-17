@@ -19,7 +19,7 @@ class EventCreate(BaseModel):
     city: Optional[str] = "Москва"
     price: Optional[str] = None
     registration_url: Optional[str] = None
-    capacity: Optional[int] = None
+    seat_types: Optional[List[Dict[str, Any]]] = None
     custom_page: Optional[str] = None
     is_featured: Optional[bool] = False
     publication_status: Optional[str] = "draft"
@@ -45,6 +45,7 @@ class EventUpdate(BaseModel):
     price: Optional[str] = None
     registration_url: Optional[str] = None
     capacity: Optional[int] = None
+    seat_type: Optional[str] = "мест"
     custom_page: Optional[str] = None
     is_featured: Optional[bool] = None
     publication_status: Optional[str] = None

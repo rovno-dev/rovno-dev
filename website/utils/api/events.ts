@@ -12,7 +12,7 @@ export interface EventListItem {
   location_name?: string | null;
   city?: string | null;
   price?: string | null;
-  capacity?: number | null;
+  seat_types?: { type: string; count: number }[] | null;
   registration_url?: string | null;
   is_featured: boolean;
   publication_status: string;
@@ -46,7 +46,7 @@ export interface EventPayload {
   city?: string | null;
   price?: string | null;
   registration_url?: string | null;
-  capacity?: number | null;
+  seat_types?: { type: string; count: number }[] | null;
   custom_page?: string | null;
   is_featured?: boolean;
   publication_status?: "draft" | "published";

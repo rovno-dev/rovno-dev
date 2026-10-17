@@ -1159,10 +1159,22 @@ function Faq() {
 const STATUS_OPTIONS = ["STUDENT", "GUEST"] as const;
 
 /* ── Seat counter ─────────────────────────────────────────────────────
-   Terminal-style capacity meter. Renders nothing when the event has no
-   capacity set — an uncapped event shouldn't advertise a limit. */
-function SeatCounter({ taken, total }: { taken: number; total: number }) {
-  if (total <= 0) return null;
+   Terminal-style capacity meter. Renders a combined progress bar and
+   a breakdown of the seat types. If no limits are set, shows "no info". */
+function SeatCounter({ taken, seatTypes }: { taken: number; seatTypes: { type: string; count: number }[] }) {
+  const total = seatTypes.reduce((sum, s) => sum + s.count, 0);
+  
+  if (total <= 0) {
+    return (
+      <div className="font-mono border border-[#222] bg-[#0a0a0a] p-5 mb-10">
+        <p className="text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
+          <Prompt>{"$"}</Prompt>status --seats
+        </p>
+        <p className="text-sm" style={{ color: "#888" }}>// no info</p>
+      </div>
+    );
+  }
+
   const capped = Math.min(taken, total);
   const cells = 20;
   const filled = Math.round((capped / total) * cells);
@@ -1170,8 +1182,9 @@ function SeatCounter({ taken, total }: { taken: number; total: number }) {
   const bar = "█".repeat(filled) + "░".repeat(empty);
   const isFull = taken >= total;
   const remaining = Math.max(0, total - taken);
-  const remainingWord =
-    remaining === 1 ? "место" : remaining < 5 ? "места" : "мест";
+  
+  const breakdown = seatTypes.map(s => `${s.count} ${s.type}`).join(", ");
+
   return (
     <div
       className="font-mono border p-5 mb-10"
@@ -1180,10 +1193,7 @@ function SeatCounter({ taken, total }: { taken: number; total: number }) {
         background: "#0a0a0a",
       }}
     >
-      <p
-        className="text-xs uppercase tracking-[0.2em] mb-3"
-        style={{ color: "#666" }}
-      >
+      <p className="text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
         <Prompt>{"$"}</Prompt>status --seats
       </p>
       <div
@@ -1192,19 +1202,18 @@ function SeatCounter({ taken, total }: { taken: number; total: number }) {
       >
         [{bar}] {capped}&nbsp;/&nbsp;{total}
       </div>
-      <p
-        className="text-sm mt-2"
-        style={{ color: isFull ? "#FF3B3B" : "#888" }}
-      >
+      <p className="text-sm mt-2" style={{ color: isFull ? "#FF3B3B" : "#888" }}>
         {isFull
           ? "// capacity reached — registration is closed"
-          : `// ${remaining} ${remainingWord} осталось`}
+          : `// ${remaining} из ${total} свободно (${breakdown})`}
       </p>
     </div>
   );
 }
+
 function Registration({ ctx }: { ctx: EventCustomContext }) {
-  const capacity = ctx.capacity ?? 0;
+  const seatTypes = ctx.seatTypes || [];
+  const capacity = seatTypes.reduce((sum, s) => sum + s.count, 0);
   const registered = ctx.registeredCount ?? 0;
   const isFull = capacity > 0 && registered >= capacity;
   const [form, setForm] = useState({
@@ -1263,7 +1272,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
           {/* `+ 1` reflects the registration the current visitor just
               submitted — the server response isn't refetched, so this is
               the only accurate in-memory projection. */}
-          <SeatCounter taken={registered + 1} total={capacity} />
+          <SeatCounter taken={registered + 1} seatTypes={seatTypes} />
           <p className="text-2xl md:text-4xl mb-6" style={{ color: LIME }}>
             ✓ Registration successful.
           </p>
@@ -1288,15 +1297,14 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
   return (
     <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
       <div className="max-w-[900px] mx-auto px-6 font-mono">
-        <SeatCounter taken={registered} total={capacity} />
+        <SeatCounter taken={registered} seatTypes={seatTypes} />
         {isFull ? (
           <>
             <p className="text-2xl md:text-4xl mb-4" style={{ color: "#FF3B3B" }}>
               ✕ Registration closed
             </p>
             <p className="text-lg md:text-xl" style={{ color: WHITE }}>
-              Все {capacity}{" "}
-              {capacity === 1 ? "место" : capacity < 5 ? "места" : "мест"} заняты.
+              Все места заняты.
             </p>
             <p className="text-base mt-4" style={{ color: "#666" }}>
               Если кто-то отменит участие, регистрация откроется снова.

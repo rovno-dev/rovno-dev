@@ -33,14 +33,25 @@ export function ArticleCard({
     >
       <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
         {article.image_url ? (
-          <Image
-            fill
-            src={article.image_url}
-            alt={article.title}
-            sizes="(max-width: 768px) 100vw, 50vw"
-            quality={90}
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
+            <video
+              src={article.image_url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          ) : (
+            <Image
+              fill
+              src={article.image_url}
+              alt={article.title}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={90}
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          )
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
         )}

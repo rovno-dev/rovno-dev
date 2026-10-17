@@ -85,7 +85,8 @@ def register_for_event(
     ev = db.query(Event).filter(Event.slug == slug).first()
     if not ev or ev.publication_status != PublicationStatus.published:
         raise HTTPException(404, "Event not found")
-    if ev.capacity is not None and ev.capacity > 0:
+    total_capacity = sum(item.get("count", 0) for item in (ev.seat_types or []))
+    if total_capacity > 0:
         taken = (
             db.query(func.count(EventRequest.id))
             .filter(
@@ -95,7 +96,7 @@ def register_for_event(
             .scalar()
             or 0
         )
-        if taken >= ev.capacity:
+        if taken >= total_capacity:
             raise HTTPException(
                 status_code=409,
                 detail="Регистрация закрыта — все места заняты",

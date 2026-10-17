@@ -288,7 +288,56 @@ export function Sidebar({
             );
           }
 
-          // ── Foldable group ─────────────────────────────────────────
+          // ── Foldable group (collapsed state) ───────────────────────
+          // When folded, we render a hover tooltip that contains the sub-items.
+          if (isCollapsed && hasChildren) {
+            return (
+              <Tooltip key={item.href} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={anyActive ? "glass" : "text"}
+                    className="justify-center p-3 w-full relative group"
+                  >
+                    <Icon className="size-5 shrink-0" />
+                    {/* Indicator dot for sub-items */}
+                    <span className="absolute bottom-2 right-2 size-1.5 rounded-full bg-(--primary) group-hover:bg-(--primary)" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  sideOffset={8}
+                  className="p-1 flex flex-col gap-0.5 min-w-[160px] bg-(--card) border-(--outline) shadow-lg"
+                >
+                  <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-(--on-bg-low)">
+                    {item.label}
+                  </div>
+                  <div className="h-px bg-(--outline) my-0.5" />
+                  {item.children!.map((child) => {
+                    const childHref = `${basePath}${child.href}`;
+                    const active = isItemActive(childHref, child);
+                    const ChildIcon = child.icon;
+                    return (
+                      <Link
+                        key={child.href}
+                        href={childHref}
+                        className={cn(
+                          "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
+                          active
+                            ? "bg-(--primary-glass) text-(--primary)"
+                            : "text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)"
+                        )}
+                      >
+                        <ChildIcon className="size-4 shrink-0" />
+                        <span>{child.label}</span>
+                      </Link>
+                    );
+                  })}
+                </TooltipContent>
+              </Tooltip>
+            );
+          }
+
+          // ── Foldable group (expanded state) ────────────────────────
           const groupOpen = !!openGroups[item.href];
           return (
             <div key={item.href} className="flex flex-col">

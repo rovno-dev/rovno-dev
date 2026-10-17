@@ -158,15 +158,26 @@ export default async function ArticlePage({
         <div className="relative w-full h-[480px] md:h-[600px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
           {/* z-0 — cover image, or gradient fallback if none is set */}
           {article.image_url ? (
-            <Image
-              src={article.image_url}
-              alt={article.title}
-              fill
-              priority
-              sizes="(max-width: 1200px) 100vw, 1400px"
-              quality={90}
-              className="object-cover object-center"
-            />
+            article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
+              <video
+                src={article.image_url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              />
+            ) : (
+              <Image
+                src={article.image_url}
+                alt={article.title}
+                fill
+                priority
+                sizes="(max-width: 1200px) 100vw, 1400px"
+                quality={90}
+                className="object-cover object-center"
+              />
+            )
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
           )}

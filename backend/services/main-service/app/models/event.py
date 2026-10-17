@@ -39,7 +39,8 @@ class Event(Base):
     # Commercials & capacity.
     price = Column(String, nullable=True)
     registration_url = Column(String, nullable=True)
-    capacity = Column(Integer, nullable=True)
+    # List of {type: str, count: int}. E.g. [{"type": "VIP", "count": 5}]
+    seat_types = Column(JSON, nullable=True, default=list)
 
     # Which bespoke renderer to use, if any.
     custom_page = Column(String(60), nullable=True)
