@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import Script from "next/script";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { CodeIcon, DiamondIcon, SignatureIcon, CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
@@ -44,10 +45,30 @@ export default function ServicesSection() {
   const [modelViewerLoaded, setModelViewerLoaded] = useState(false);
 
   // 2. Safely import <model-viewer> only on the client side
+  // Wait for the CDN-loaded <model-viewer> custom element to register.
+  //
+  // Why CDN and not `import("@google/model-viewer")`:
+  //   The npm package ships a pre-source build that still contains
+  //   `process.env.NODE_ENV` checks. When it is pulled in via a dynamic
+  //   import inside useEffect, Turbopack does not rewrite those checks
+  //   for dynamic node_modules chunks, so at runtime the value is
+  //   undefined -> Lit falls back to its dev build and logs "Lit is in
+  //   dev mode" in production. The CDN-served .min.js build has
+  //   `"production"` baked in by model-viewer's own Rollup step, so the
+  //   production Lit code path is what actually runs.
   useEffect(() => {
-    import("@google/model-viewer")
-      .then(() => setModelViewerLoaded(true))
-      .catch((err) => console.error("Failed to load <model-viewer>", err));
+    if (typeof window === "undefined") return;
+    if (customElements.get("model-viewer")) {
+      setModelViewerLoaded(true);
+      return;
+    }
+    let cancelled = false;
+    customElements.whenDefined("model-viewer").then(() => {
+      if (!cancelled) setModelViewerLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const services = [
@@ -118,6 +139,14 @@ export default function ServicesSection() {
 
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">
+      <Script
+        type="module"
+        src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"
+        strategy="afterInteractive"
+        onError={() =>
+          console.error("[model-viewer] CDN script failed to load")
+        }
+      />
       <div className="relative z-10 flex flex-col justify-between min-h-full">
         <Container className="h-full">
           <div className="h-full grid grid-cols-1 sm:grid-cols-2 gap-10">

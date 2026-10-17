@@ -33,6 +33,19 @@ services:
     networks:
       - main-network-dev
     restart: unless-stopped
+    # Same routing labels as prod (backend/docker-compose.yml). Without
+    # these, traefik-dev starts with no routers, so any request to
+    # http://localhost/api/... returns a bare 404 from traefik. That 404
+    # carries no Access-Control-Allow-Origin header, which the browser
+    # reports as a "CORS error" even though CORS was never the problem.
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.main-service.rule=PathPrefix(`/api/v1`) || PathPrefix(`/docs`) || PathPrefix(`/health`)"
+      - "traefik.http.routers.main-service.priority=100"
+      - "traefik.http.routers.main-service.entrypoints=${ENTRYPOINT}"
+      - "traefik.http.routers.main-service.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.main-service.tls.certresolver=${CERT_RESOLVER}"
+      - "traefik.http.services.main-service.loadbalancer.server.port=8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
       interval: 10s
@@ -69,6 +82,8 @@ services:
     command: valkey-server --requirepass ${CACHE_PASSWORD} --appendonly yes
     ports:
       - "6379:6379"
+    volumes:
+      - valkey_data_dev:/data
     networks:
       - main-network-dev
     healthcheck:
@@ -86,3 +101,4 @@ networks:
 
 volumes:
   main_db_data_dev:
+  valkey_data_dev:

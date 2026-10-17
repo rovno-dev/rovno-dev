@@ -19,10 +19,8 @@ import {
   type EventCustomContext,
 } from "./_components/event-custom-pages";
 
-    registeredCount: ev.registered_count ?? 0,
 export const revalidate = 60;
 
-    registeredCount: ev.registered_count ?? 0,
 export async function generateMetadata({
   params,
 }: {
@@ -37,7 +35,6 @@ export async function generateMetadata({
   };
 }
 
-    registeredCount: ev.registered_count ?? 0,
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "";
   try {
@@ -51,7 +48,6 @@ function formatDate(iso: string | null | undefined): string {
   }
 }
 
-    registeredCount: ev.registered_count ?? 0,
 function formatTime(iso: string | null | undefined): string {
   if (!iso) return "";
   try {
@@ -64,7 +60,6 @@ function formatTime(iso: string | null | undefined): string {
   }
 }
 
-    registeredCount: ev.registered_count ?? 0,
 const mdxComponents = {
   h2: (p: any) => (
     <h2
@@ -80,7 +75,6 @@ const mdxComponents = {
   ),
 };
 
-    registeredCount: ev.registered_count ?? 0,
 export default async function EventPage({
   params,
 }: {
@@ -90,7 +84,6 @@ export default async function EventPage({
   const ev = await fetchEventServer(slug);
   if (!ev) notFound();
 
-    registeredCount: ev.registered_count ?? 0,
   // Bespoke template takes priority.
   const renderer = findEventCustomPageRenderer(ev.custom_page);
   const mdxContent = ev.mdx_content
@@ -103,7 +96,6 @@ export default async function EventPage({
       ).content
     : null;
 
-    registeredCount: ev.registered_count ?? 0,
   if (renderer) {
     const ctx: EventCustomContext = {
       slug: ev.slug,
@@ -121,13 +113,13 @@ export default async function EventPage({
       price: ev.price || undefined,
       registrationUrl: ev.registration_url || undefined,
       capacity: ev.capacity || undefined,
+      registeredCount: ev.registered_count ?? 0,
       tags: (ev.tags || []).map((t) => ({ id: t.id, name: t.name })),
       content: mdxContent,
     };
     return <>{renderer.render(ctx)}</>;
   }
 
-    registeredCount: ev.registered_count ?? 0,
   // Default event layout.
   return (
     <main className="min-h-screen bg-(--bg) pb-24">
@@ -149,7 +141,6 @@ export default async function EventPage({
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
 
-    registeredCount: ev.registered_count ?? 0,
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
               <Button variant="glass" size="icon-medium" shape="round" asChild>
                 <Link href="/events" aria-label="Все события">
@@ -158,7 +149,6 @@ export default async function EventPage({
               </Button>
             </div>
 
-    registeredCount: ev.registered_count ?? 0,
             {ev.tags && ev.tags.length > 0 && (
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
                 {ev.tags.slice(0, 4).map((t) => (
@@ -174,7 +164,6 @@ export default async function EventPage({
               </div>
             )}
 
-    registeredCount: ev.registered_count ?? 0,
             <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
               <h1 className="text-display-3 md:text-display-1 text-white leading-[1.05] tracking-tight mb-4 max-w-4xl">
                 {ev.title}
@@ -210,7 +199,6 @@ export default async function EventPage({
         </div>
       </Container>
 
-    registeredCount: ev.registered_count ?? 0,
       <Container className="py-12 md:py-16">
         <div className="max-w-[760px] mx-auto">
           {mdxContent}

@@ -60,6 +60,8 @@ services:
     image: valkey/valkey:7-alpine
     container_name: valkey
     command: valkey-server --requirepass ${CACHE_PASSWORD} --appendonly yes
+    volumes:
+      - valkey_data:/data
     networks:
       - main-network
     healthcheck:
@@ -75,3 +77,4 @@ networks:
   default:
 volumes:
   main_db_data:
+  valkey_data:

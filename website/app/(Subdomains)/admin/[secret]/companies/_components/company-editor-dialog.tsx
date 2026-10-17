@@ -195,6 +195,7 @@ export function CompanyEditorDialog({ client, open, onOpenChange, onSaved }: Pro
                 value={form.logotype_url}
                 onChange={(v) => update("logotype_url", v)}
                 placeholder="/uploads/media/… или https://…"
+                defaultAspect="1:1"
               />
             </Field>
           </div>

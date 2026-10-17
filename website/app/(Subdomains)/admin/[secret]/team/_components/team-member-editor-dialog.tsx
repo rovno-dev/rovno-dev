@@ -293,6 +293,7 @@ export function TeamMemberEditorDialog({
               value={coverUrl}
               onChange={setCoverUrl}
               placeholder="/uploads/images/… или https://…"
+              defaultAspect="21:8"
             />
           </Field>
 

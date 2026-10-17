@@ -335,6 +335,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
           <ImageUploadField
             value={form.cover_image_src}
             onChange={(v) => update("cover_image_src", v)}
+            defaultAspect="4:3"
           />
         </Field>
         <Field>

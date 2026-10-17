@@ -224,6 +224,7 @@ export default function ProfilePage() {
                     value={form.avatar_url}
                     onChange={(v) => update("avatar_url", v)}
                     placeholder="/uploads/images/… или https://…"
+                    defaultAspect="1:1"
                   />
                 </Field>
               )}
@@ -312,6 +313,7 @@ export default function ProfilePage() {
                   value={form.team_cover_url}
                   onChange={(v) => update("team_cover_url", v)}
                   placeholder="/uploads/images/… — соотношение 21:8"
+                  defaultAspect="21:8"
                 />
               )}
             </Field>

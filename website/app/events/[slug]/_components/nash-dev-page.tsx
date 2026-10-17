@@ -898,6 +898,115 @@ function MapEmbed() {
     />
   );
 }
+/* ── Giveaway — Yandex Station ─────────────────────────────────────────── */
+function AsciiStation() {
+  return (
+    <pre
+      aria-hidden
+      className="font-mono text-[10px] sm:text-xs md:text-sm leading-[1.3] select-none whitespace-pre"
+      style={{ color: WHITE, textShadow: `0 0 20px ${LIME}22` }}
+    >{`        −      ◉      +
+   ╭───────────────────────╮
+   │                       │
+   │         12`}<span className="nash-colon" style={{ color: LIME }}>:</span>{`35         │
+   │                       │
+   ╰───────────────────────╯`}</pre>
+  );
+}
+function Giveaway() {
+  return (
+    <section
+      className="border-b py-20 md:py-28"
+      style={{ borderColor: "#222", background: BLACK }}
+    >
+      <div className="max-w-[1200px] mx-auto px-6">
+        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>cat prize.yaml
+        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 items-center">
+          {/* Left — metadata */}
+          <div className="font-mono space-y-6">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                prize
+              </p>
+              <p className="text-2xl md:text-3xl" style={{ color: WHITE }}>
+                Яндекс Станция Лайт
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t" style={{ borderColor: "#222" }}>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                  brand
+                </p>
+                <p className="text-base" style={{ color: WHITE }}>Yandex</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                  value
+                </p>
+                <p className="text-base" style={{ color: WHITE }}>8 999 ₽</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                  when
+                </p>
+                <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                  how_to_win
+                </p>
+                <p className="text-base" style={{ color: WHITE }}>лучший вопрос</p>
+              </div>
+            </div>
+            <div className="pt-4 border-t" style={{ borderColor: "#222" }}>
+              <p className="text-[11px] uppercase tracking-[0.24em] mb-2" style={{ color: "#666" }}>
+                rules
+              </p>
+              <ul className="text-sm md:text-base space-y-1.5" style={{ color: "#aaa" }}>
+                <li className="flex gap-2">
+                  <span style={{ color: LIME }}>→</span>
+                  задай содержательный вопрос спикеру
+                </li>
+                <li className="flex gap-2">
+                  <span style={{ color: LIME }}>→</span>
+                  спикер сам выбирает лучший после доклада
+                </li>
+                <li className="flex gap-2">
+                  <span style={{ color: LIME }}>→</span>
+                  вручение — сразу после секции вопросов
+                </li>
+              </ul>
+            </div>
+          </div>
+          {/* Right — ASCII station */}
+          <div className="flex flex-col items-center">
+            <AsciiStation />
+            <div className="font-mono text-[11px] mt-6" style={{ color: "#666" }}>
+              {">"} device: yandex_station_lite · pink · led: on
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-[11px] mt-3" style={{ color: "#666" }}>
+              <span style={{ color: LIME }}>$</span>
+              <span>voice.ping →</span>
+              <span className="inline-flex gap-[3px]">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="nash-wave inline-block w-1 text-center"
+                    style={{ color: LIME, animationDelay: `${i * 0.12}s` }}
+                  >
+                    ●
+                  </span>
+                ))}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 function Location({ ctx }: { ctx: EventCustomContext }) {
   const { t, lang } = useLanguage();
   // Yandex takes a full locale (ru_RU / en_US); Google takes a bare
@@ -1162,10 +1271,10 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
             Увидимся на событии{" "}
             {ctx.startAt
               ? new Date(ctx.startAt).toLocaleDateString("ru-RU", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
               : "23 октября 2026"}
             .
           </p>
@@ -1370,6 +1479,12 @@ export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
+        @keyframes nashWave {
+          0%, 100% { opacity: 0.25; transform: translateY(0); }
+          50% { opacity: 1; transform: translateY(-2px); }
+        }
+        .nash-wave { animation: nashWave 1.4s ease-in-out infinite; display: inline-block; }
+        .nash-colon { animation: nashBlink 1s steps(1, end) infinite; }
         .nash-dev-root *,
         .nash-dev-root *::before,
         .nash-dev-root *::after {
@@ -1386,6 +1501,7 @@ export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
         <AiSlider />
         <Timeline />
         <Features />
+        <Giveaway />
         <Location ctx={ctx} />
         <Faq />
         <Registration ctx={ctx} />

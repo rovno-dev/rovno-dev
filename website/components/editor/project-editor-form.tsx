@@ -431,6 +431,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
             value={form.cover_image_src}
             onChange={(v) => update("cover_image_src", v)}
             placeholder="/uploads/media/… или https://…"
+            defaultAspect="16:9"
           />
         </Field>
         <Field>

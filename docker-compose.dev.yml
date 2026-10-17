@@ -1,8 +1,7 @@
 name: rovno-dev-dev
-
 # Dev stack — infrastructure only.
 #
-#   docker compose -f docker-compose.dev.yml up -d   # db + valkey + api + bot
+#   docker compose -f docker-compose.dev.yml up -d   # db + valkey + api + bot + traefik
 #   cd website && npm run dev                        # frontend on the host
 #
 # The frontend is intentionally NOT containerised in dev: `next dev` on the
@@ -10,8 +9,50 @@ name: rovno-dev-dev
 # only the services you actually iterate on inside docker are here.
 #
 # Isolated from prod by project name and a dedicated network
-# (main-network-dev). Both stacks can run at once without collisions.
-
+# (main-network-dev). Both stacks can run at once without collisions —
+# EXCEPT traefik, which binds host ports 80/443 in both stacks. Only one
+# traefik may run at a time on the same machine; stop prod first if you
+# need dev's.
 include:
   # - tg-bot/docker-compose.dev.yml
   - backend/docker-compose.dev.yml
+
+services:
+  traefik:
+    image: traefik:latest
+    # Dev suffix keeps the container name from clashing with prod's
+    # `traefik` container (AGENTS.md convention: *-dev suffix).
+    container_name: traefik-dev
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Scope dev traefik to containers in THIS compose project only.
+      # Without this, traefik reads the whole Docker socket and also sees
+      # any prod containers still running (they carry traefik.enable=true
+      # labels from prod's docker-compose.yml). That causes dev traefik
+      # to route Host(localhost) requests to the PROD next-js container —
+      # the browser ends up on the wrong origin and reports CORS failures.
+      # `com.docker.compose.project` is set automatically by Docker Compose
+      # on every container it creates and equals the `name:` at the top
+      # of this file.
+      - "--providers.docker.constraints=Label(`com.docker.compose.project`,`rovno-dev-dev`)"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=rovno.dev@mail.ru"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--api.insecure=${TRAEFIK_API_INSECURE:-false}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - main-network-dev
+
+networks:
+  main-network-dev:
+    name: main-network-dev
+    external: false
+  default:

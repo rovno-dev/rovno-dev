@@ -68,6 +68,39 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/*
+          Idempotent customElements.define().
+
+          Lit (which model-viewer uses) calls customElements.define for
+          both <model-viewer> and <extra-model> on module load, and Lit
+          does NOT guard against re-registration. In dev, Turbopack HMR
+          and React StrictMode re-execute the module that triggers the
+          registration, so the second pass throws:
+
+            Failed to execute 'define' on 'CustomElementRegistry':
+            the name "extra-model" has already been used with this registry.
+
+          This guard turns the duplicate into a silent no-op. It runs as
+          a synchronous <head> script, so it is installed before any
+          module script (including next/script afterInteractive) fires —
+          the very first define call is already protected.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof window === 'undefined') return;
+                if (!window.CustomElementRegistry) return;
+                var proto = CustomElementRegistry.prototype;
+                var orig = proto.define;
+                proto.define = function(name, ctor, options) {
+                  if (this.get(name)) return;
+                  return orig.call(this, name, ctor, options);
+                };
+              })();
+            `,
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

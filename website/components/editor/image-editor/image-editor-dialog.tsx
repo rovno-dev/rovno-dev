@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -7,8 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   CropIcon, PencilIcon, ArrowClockwiseIcon,
-  TrashIcon, CheckIcon, CircleNotchIcon, EraserIcon, PaletteIcon,
-  ArrowCounterClockwiseIcon,
+  TrashIcon, CheckIcon, CircleNotchIcon, ArrowCounterClockwiseIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -19,47 +17,34 @@ import {
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Source URL or data URL to edit. */
   src: string | null;
-  /** Suggested aspect ratio for the crop tab; null = free. */
   defaultAspect?: AspectPresetId | null;
-  /** Called with the edited Blob and a suggested filename. */
+  lockedAspect?: boolean;
   onApply: (blob: Blob, filename: string) => Promise<void> | void;
 }
 
 type Tab = "crop" | "draw";
-
-const DRAW_COLORS = [
-  "#0d0d11", // ink
-  "#336dff", // brand blue
-  "#ff3b30", // apple red
-  "#ff9500", // apple orange
-  "#34c759", // apple green
-  "#ffffff", // white
-];
+const DRAW_COLORS = ["#0d0d11", "#336dff", "#ff3b30", "#ff9500", "#34c759", "#ffffff"];
 
 export function ImageEditorDialog({
-  open, onOpenChange, src, defaultAspect = null, onApply,
+  open, onOpenChange, src, defaultAspect = null, lockedAspect = false, onApply,
 }: Props) {
   const [tab, setTab] = useState<Tab>("crop");
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
-
-  // Crop state
+  
   const [aspect, setAspect] = useState<AspectPresetId>(defaultAspect ?? "free");
   const [crop, setCrop] = useState<CropRect>({ x: 0, y: 0, width: 1, height: 1 });
   const [zoom, setZoom] = useState(1);
-
-  // Draw state
+  
   const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [drawing, setDrawing] = useState(false);
   const [color, setColor] = useState(DRAW_COLORS[0]);
   const [size, setSize] = useState(4);
-  const [history, setHistory] = useState<string[]>([]); // data URLs for undo
+  const [history, setHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState(-1);
-
-  // Load image on open
+  
   useEffect(() => {
     if (!open || !src) return;
     setLoading(true);
@@ -74,16 +59,14 @@ export function ImageEditorDialog({
       .catch(() => { })
       .finally(() => setLoading(false));
   }, [open, src]);
-
-  // Recalculate crop when aspect changes
+  
   useEffect(() => {
     if (!img) return;
     const preset = ASPECT_PRESETS.find((p) => p.id === aspect);
     setCrop(fitRectForAspect(img.naturalWidth, img.naturalHeight, preset?.ratio ?? null));
     setZoom(1);
   }, [aspect, img]);
-
-  // Init draw canvas when tab first opens
+  
   useEffect(() => {
     if (tab !== "draw" || !img || !drawCanvasRef.current) return;
     const canvas = drawCanvasRef.current;
@@ -94,13 +77,11 @@ export function ImageEditorDialog({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    // Seed history with the initial state.
     const initial = canvas.toDataURL("image/png");
     setHistory([initial]);
     setHistoryIdx(0);
   }, [tab, img]);
-
-  // ---------- Zoom (frame fixed, image zooms underneath) ----------
+  
   const handleZoom = (nextZoom: number) => {
     if (!img) return;
     const z = Math.max(1, Math.min(8, nextZoom));
@@ -117,12 +98,9 @@ export function ImageEditorDialog({
     setCrop({ x, y, width: w, height: h });
     setZoom(z);
   };
-
-
-  // ---------- Draw interactions ----------
+  
   const drawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = e.currentTarget;
     const rect = canvas.getBoundingClientRect();
@@ -131,14 +109,12 @@ export function ImageEditorDialog({
       y: (e.clientY - rect.top) * (canvas.height / rect.height),
     };
   };
-
   const onDrawDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     drawingRef.current = true;
     lastPointRef.current = getPos(e);
     setDrawing(true);
   };
-
   const onDrawMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!drawingRef.current) return;
     const canvas = e.currentTarget;
@@ -147,9 +123,6 @@ export function ImageEditorDialog({
     const p = getPos(e);
     const last = lastPointRef.current;
     if (last) {
-      // Quadratic smoothing between the previous midpoint and this point
-      // — this is what gives the stroke its soft, natural feel rather
-      // than a chain of hard line segments.
       ctx.beginPath();
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -163,23 +136,18 @@ export function ImageEditorDialog({
     }
     lastPointRef.current = p;
   };
-
   const onDrawUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!drawingRef.current) return;
     drawingRef.current = false;
     lastPointRef.current = null;
     setDrawing(false);
     e.currentTarget.releasePointerCapture(e.pointerId);
-    // Snapshot for undo.
     const canvas = e.currentTarget;
     const next = canvas.toDataURL("image/png");
-    setHistory((h) => {
-      const trimmed = h.slice(0, historyIdx + 1);
-      return [...trimmed, next];
-    });
+    setHistory((h) => [...h.slice(0, historyIdx + 1), next]);
     setHistoryIdx((i) => i + 1);
   };
-
+  
   const undo = () => {
     if (historyIdx <= 0 || !drawCanvasRef.current) return;
     const idx = historyIdx - 1;
@@ -194,7 +162,6 @@ export function ImageEditorDialog({
     im.src = history[idx];
     setHistoryIdx(idx);
   };
-
   const redo = () => {
     if (historyIdx >= history.length - 1 || !drawCanvasRef.current) return;
     const idx = historyIdx + 1;
@@ -209,7 +176,6 @@ export function ImageEditorDialog({
     im.src = history[idx];
     setHistoryIdx(idx);
   };
-
   const clearDraw = () => {
     if (!img || !drawCanvasRef.current) return;
     const canvas = drawCanvasRef.current;
@@ -221,8 +187,7 @@ export function ImageEditorDialog({
     setHistory((h) => [...h.slice(0, historyIdx + 1), next]);
     setHistoryIdx((i) => i + 1);
   };
-
-  // ---------- Apply ----------
+  
   const handleApply = async () => {
     if (!img) return;
     setApplying(true);
@@ -246,22 +211,19 @@ export function ImageEditorDialog({
       setApplying(false);
     }
   };
-
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[92vh] overflow-hidden p-0 gap-0 flex flex-col">
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-(--outline) flex-row items-center justify-between space-y-0">
           <DialogTitle>Редактор изображения</DialogTitle>
-          {/* Tab switcher */}
           <div className="inline-flex items-center gap-1 rounded-full bg-(--bg) p-1">
             <button
               type="button"
               onClick={() => setTab("crop")}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                tab === "crop"
-                  ? "bg-(--card) text-(--on-bg-high) shadow-sm"
-                  : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
+                tab === "crop" ? "bg-(--card) text-(--on-bg-high) shadow-sm" : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
               <CropIcon className="size-3.5" /> Обрезка
@@ -271,21 +233,17 @@ export function ImageEditorDialog({
               onClick={() => setTab("draw")}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                tab === "draw"
-                  ? "bg-(--card) text-(--on-bg-high) shadow-sm"
-                  : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
+                tab === "draw" ? "bg-(--card) text-(--on-bg-high) shadow-sm" : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
               <PencilIcon className="size-3.5" /> Рисование
             </button>
           </div>
         </DialogHeader>
-
         <div className="flex-1 overflow-y-auto bg-(--bg)">
           {loading || !img ? (
             <div className="h-[400px] flex items-center justify-center text-(--on-bg-low)">
-              <CircleNotchIcon className="size-5 animate-spin mr-2" />
-              Загрузка…
+              <CircleNotchIcon className="size-5 animate-spin mr-2" /> Загрузка…
             </div>
           ) : tab === "crop" ? (
             <CropTab
@@ -296,6 +254,7 @@ export function ImageEditorDialog({
               setAspect={setAspect}
               zoom={zoom}
               onZoom={handleZoom}
+              locked={lockedAspect}
             />
           ) : (
             <DrawTab
@@ -317,11 +276,8 @@ export function ImageEditorDialog({
             />
           )}
         </div>
-
         <DialogFooter className="px-5 py-3 border-t border-(--outline) flex-row justify-between">
-          <Button variant="text" onClick={() => onOpenChange(false)} disabled={applying}>
-            Отмена
-          </Button>
+          <Button variant="text" onClick={() => onOpenChange(false)} disabled={applying}>Отмена</Button>
           <Button onClick={handleApply} disabled={!img || applying}>
             {applying ? <CircleNotchIcon className="size-4 animate-spin" /> : <CheckIcon className="size-4" />}
             Применить
@@ -332,10 +288,8 @@ export function ImageEditorDialog({
   );
 }
 
-// ---------------------------------------------------------------------------
-
 function CropTab({
-  img, crop, onCropChange, aspect, setAspect, zoom, onZoom,
+  img, crop, onCropChange, aspect, setAspect, zoom, onZoom, locked,
 }: {
   img: HTMLImageElement;
   crop: CropRect;
@@ -344,12 +298,17 @@ function CropTab({
   setAspect: (a: AspectPresetId) => void;
   zoom: number;
   onZoom: (nextZoom: number) => void;
+  locked?: boolean;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
-  const dragRef = useRef<{ startX: number; startY: number; startCrop: CropRect } | null>(null);
+  const [dragStart, setDragStart] = useState<{x: number, y: number} | null>(null);
+  const [offset, setOffset] = useState({x: 0, y: 0});
 
   const presetRatio = ASPECT_PRESETS.find((p) => p.id === aspect)?.ratio ?? null;
-  const frameAspect = presetRatio ?? (crop.width / crop.height || 1);
+  // Fallback to the image's natural aspect ratio for "free" instead of
+  // deriving it from `crop`, which would create a feedback loop.
+  const frameAspect = presetRatio ?? (img.naturalWidth / img.naturalHeight);
+
   const maxFrameW = 560;
   const maxFrameH = 460;
   let fw = maxFrameW;
@@ -359,8 +318,44 @@ function CropTab({
     fw = fh * frameAspect;
   }
 
-  const dw = fw / crop.width;
-  const dh = fh / crop.height;
+  useEffect(() => {
+    setOffset({ x: 0, y: 0 });
+  }, [aspect]);
+
+  const baseScale = Math.max(fw / img.naturalWidth, fh / img.naturalHeight);
+  const currentScale = baseScale * zoom;
+  const imgWidth = img.naturalWidth * currentScale;
+  const imgHeight = img.naturalHeight * currentScale;
+
+  const maxOffsetX = Math.max(0, (imgWidth - fw) / 2);
+  const maxOffsetY = Math.max(0, (imgHeight - fh) / 2);
+
+  const clampedX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offset.x));
+  const clampedY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offset.y));
+
+  useEffect(() => {
+    if (offset.x !== clampedX || offset.y !== clampedY) {
+      setOffset({x: clampedX, y: clampedY});
+    }
+  }, [clampedX, clampedY, offset.x, offset.y]);
+
+  useEffect(() => {
+    const imgLeft = (fw - imgWidth) / 2 + clampedX;
+    const imgTop = (fh - imgHeight) / 2 + clampedY;
+    const cropX = Math.max(0, Math.min(1, (0 - imgLeft) / imgWidth));
+    const cropY = Math.max(0, Math.min(1, (0 - imgTop) / imgHeight));
+    const cropW = Math.min(1, fw / imgWidth);
+    const cropH = Math.min(1, fh / imgHeight);
+    
+    if (
+      Math.abs(crop.x - cropX) > 0.001 ||
+      Math.abs(crop.y - cropY) > 0.001 ||
+      Math.abs(crop.width - cropW) > 0.001 ||
+      Math.abs(crop.height - cropH) > 0.001
+    ) {
+      onCropChange({x: cropX, y: cropY, width: cropW, height: cropH});
+    }
+  }, [clampedX, clampedY, imgWidth, imgHeight, fw, fh, crop, onCropChange]);
 
   useEffect(() => {
     const el = viewportRef.current;
@@ -376,35 +371,26 @@ function CropTab({
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      startCrop: { ...crop },
-    };
+    setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
   };
+
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = dragRef.current;
-    if (!d) return;
-    const dnx = (e.clientX - d.startX) / dw;
-    const dny = (e.clientY - d.startY) / dh;
-    const nextX = Math.max(0, Math.min(1 - d.startCrop.width, d.startCrop.x - dnx));
-    const nextY = Math.max(0, Math.min(1 - d.startCrop.height, d.startCrop.y - dny));
-    onCropChange({
-      x: nextX,
-      y: nextY,
-      width: d.startCrop.width,
-      height: d.startCrop.height,
+    if (!dragStart) return;
+    setOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
     });
   };
+
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.releasePointerCapture(e.pointerId);
-    dragRef.current = null;
+    setDragStart(null);
   };
 
   return (
     <div className="p-5 space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        {ASPECT_PRESETS.map((p) => (
+        {!locked && ASPECT_PRESETS.map((p) => (
           <button
             key={p.id}
             type="button"
@@ -412,7 +398,7 @@ function CropTab({
             className={cn(
               "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
               aspect === p.id
-                ? "bg-(--primary) text-white"
+                ? "bg-(--on-bg-high) text-(--bg)"
                 : "bg-(--card) text-(--on-bg-medium) hover:text-(--on-bg-high) border border-(--outline)"
             )}
           >
@@ -425,15 +411,13 @@ function CropTab({
             onClick={() => onZoom(zoom / 1.25)}
             disabled={zoom <= 1.001}
             className="inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-high) hover:bg-(--state-hover) disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
-            title="Уменьшить"
           >
             -
           </button>
           <button
             type="button"
-            onClick={() => onZoom(1)}
+            onClick={() => { onZoom(1); setOffset({x:0,y:0}); }}
             className="px-2 text-xs font-mono tabular-nums text-(--on-bg-medium) hover:text-(--on-bg-high) min-w-[3.5ch]"
-            title="Сбросить масштаб"
           >
             {Math.round(zoom * 100)}%
           </button>
@@ -442,21 +426,18 @@ function CropTab({
             onClick={() => onZoom(zoom * 1.25)}
             disabled={zoom >= 7.999}
             className="inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-high) hover:bg-(--state-hover) disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
-            title="Увеличить"
           >
             +
           </button>
         </div>
       </div>
-
       <div ref={viewportRef} className="flex justify-center">
         <div
           className="relative overflow-hidden select-none touch-none cursor-move rounded-lg border-2 border-white"
           style={{
             width: fw,
             height: fh,
-            boxShadow:
-              "0 0 0 1px rgba(0,0,0,0.35), 0 8px 32px rgba(0,0,0,0.25)",
+            boxShadow: "0 0 0 1px rgba(0,0,0,0.35), 0 8px 32px rgba(0,0,0,0.25)",
           }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -466,14 +447,12 @@ function CropTab({
             src={img.src}
             alt=""
             draggable={false}
-            className="absolute pointer-events-none"
+            className="absolute pointer-events-none max-w-none"
             style={{
-              left: -crop.x * dw,
-              top: -crop.y * dh,
-              width: dw,
-              height: dh,
-              maxWidth: "none",
-              maxHeight: "none",
+              width: imgWidth,
+              height: imgHeight,
+              left: (fw - imgWidth) / 2 + clampedX,
+              top: (fh - imgHeight) / 2 + clampedY,
             }}
           />
           <div className="absolute inset-0 pointer-events-none">
@@ -488,7 +467,6 @@ function CropTab({
           <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/90 pointer-events-none" />
         </div>
       </div>
-
       <p className="text-[11px] text-(--on-bg-low) text-center">
         Перетащите изображение - колёсико мыши или +/− для масштаба - выберите формат сверху
       </p>
@@ -496,36 +474,17 @@ function CropTab({
   );
 }
 
-
 function DrawTab({
   img, canvasRef, color, size, setColor, setSize,
   canUndo, canRedo, onUndo, onRedo, onClear,
   onPointerDown, onPointerMove, onPointerUp, drawing,
-}: {
-  img: HTMLImageElement;
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  color: string;
-  size: number;
-  setColor: (c: string) => void;
-  setSize: (s: number) => void;
-  canUndo: boolean;
-  canRedo: boolean;
-  onUndo: () => void;
-  onRedo: () => void;
-  onClear: () => void;
-  onPointerDown: React.PointerEventHandler<HTMLCanvasElement>;
-  onPointerMove: React.PointerEventHandler<HTMLCanvasElement>;
-  onPointerUp: React.PointerEventHandler<HTMLCanvasElement>;
-  drawing: boolean;
-}) {
+}: any) {
   const maxSide = 620;
   const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
   const displayW = img.naturalWidth * scale;
   const displayH = img.naturalHeight * scale;
-
   return (
     <div className="p-5 space-y-4">
-      {/* Canvas viewport */}
       <div className="flex justify-center">
         <canvas
           ref={canvasRef}
@@ -533,107 +492,40 @@ function DrawTab({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           style={{ width: displayW, height: displayH, touchAction: "none" }}
-          className={cn(
-            "block rounded-lg select-none",
-            drawing ? "cursor-crosshair" : "cursor-crosshair"
-          )}
+          className={cn("block rounded-lg select-none cursor-crosshair")}
         />
       </div>
-
-      {/* Apple-style floating toolbar */}
       <div className="flex justify-center">
         <div className="inline-flex items-center gap-1 rounded-full border border-(--outline) bg-(--card)/95 backdrop-blur-md px-2 py-1.5 shadow-lg">
-          {/* Color dots */}
           <div className="flex items-center gap-1 pr-1.5 border-r border-(--outline)">
             {DRAW_COLORS.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={cn(
-                  "size-6 rounded-full transition-transform hover:scale-110",
-                  color === c ? "ring-2 ring-offset-2 ring-offset-(--card)" : ""
-                )}
-                style={{
-                  background: c,
-                  boxShadow:
-                    c === "#ffffff"
-                      ? "inset 0 0 0 1px rgba(0,0,0,0.15)"
-                      : "inset 0 0 0 1px rgba(255,255,255,0.15)",
-                  // ring-color matches the swatch for the selected one
-                  ["--tw-ring-color" as any]: c,
-                }}
-                aria-label={`Цвет ${c}`}
+                className={cn("size-6 rounded-full transition-transform hover:scale-110", color === c ? "ring-2 ring-offset-2 ring-offset-(--card)" : "")}
+                style={{ background: c, boxShadow: c === "#ffffff" ? "inset 0 0 0 1px rgba(0,0,0,0.15)" : "inset 0 0 0 1px rgba(255,255,255,0.15)", ["--tw-ring-color" as any]: c }}
               />
             ))}
           </div>
-
-          {/* Size slider */}
           <div className="flex items-center gap-2 px-2 border-r border-(--outline)">
-            <div
-              className="rounded-full bg-(--on-bg-high)"
-              style={{ width: 4, height: 4 }}
-            />
-            <input
-              type="range"
-              min={1}
-              max={24}
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
-              className="w-24 accent-(--primary)"
-              aria-label="Размер кисти"
-            />
-            <div
-              className="rounded-full bg-(--on-bg-high)"
-              style={{ width: 4 + size * 0.4, height: 4 + size * 0.4 }}
-            />
+            <div className="rounded-full bg-(--on-bg-high)" style={{ width: 4, height: 4 }} />
+            <input type="range" min={1} max={24} value={size} onChange={(e) => setSize(Number(e.target.value))} className="w-24 accent-(--primary)" />
+            <div className="rounded-full bg-(--on-bg-high)" style={{ width: 4 + size * 0.4, height: 4 + size * 0.4 }} />
           </div>
-
-          {/* Actions */}
           <div className="flex items-center gap-0.5 pl-1">
-            <button
-              type="button"
-              onClick={onUndo}
-              disabled={!canUndo}
-              className={cn(
-                "size-8 rounded-full flex items-center justify-center transition-colors",
-                canUndo
-                  ? "text-(--on-bg-high) hover:bg-(--state-hover)"
-                  : "text-(--on-bg-low) opacity-40 cursor-not-allowed"
-              )}
-              title="Отменить"
-            >
+            <button type="button" onClick={onUndo} disabled={!canUndo} className={cn("size-8 rounded-full flex items-center justify-center transition-colors", canUndo ? "text-(--on-bg-high) hover:bg-(--state-hover)" : "text-(--on-bg-low) opacity-40 cursor-not-allowed")}>
               <ArrowCounterClockwiseIcon className="size-4" />
             </button>
-            <button
-              type="button"
-              onClick={onRedo}
-              disabled={!canRedo}
-              className={cn(
-                "size-8 rounded-full flex items-center justify-center transition-colors",
-                canRedo
-                  ? "text-(--on-bg-high) hover:bg-(--state-hover)"
-                  : "text-(--on-bg-low) opacity-40 cursor-not-allowed"
-              )}
-              title="Повторить"
-            >
+            <button type="button" onClick={onRedo} disabled={!canRedo} className={cn("size-8 rounded-full flex items-center justify-center transition-colors", canRedo ? "text-(--on-bg-high) hover:bg-(--state-hover)" : "text-(--on-bg-low) opacity-40 cursor-not-allowed")}>
               <ArrowClockwiseIcon className="size-4" />
             </button>
-            <button
-              type="button"
-              onClick={onClear}
-              className="size-8 rounded-full flex items-center justify-center text-(--on-bg-medium) hover:bg-(--state-hover) transition-colors"
-              title="Очистить"
-            >
+            <button type="button" onClick={onClear} className="size-8 rounded-full flex items-center justify-center text-(--on-bg-medium) hover:bg-(--state-hover) transition-colors">
               <TrashIcon className="size-4" />
             </button>
           </div>
         </div>
       </div>
-
-      <p className="text-[11px] text-(--on-bg-low) text-center">
-        Рисуйте мышью или пальцем · сглаживание включено
-      </p>
     </div>
   );
 }

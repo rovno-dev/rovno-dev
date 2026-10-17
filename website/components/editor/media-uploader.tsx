@@ -20,7 +20,7 @@ interface Props {
   onChange: (next: ProjectMedia[]) => void;
 }
 
-const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = "image/*,video/mp4,video/webm,video/quicktime";
 
 export function ProjectMediaUploader({ value, onChange }: Props) {
