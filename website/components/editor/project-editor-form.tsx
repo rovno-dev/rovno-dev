@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
 import { ImageUploadField } from "./image-upload-field";
+import { UnifiedCover } from "./unified-cover";
 import { EntityPicker, type PickerItem } from "./entity-picker";
 import { EntityMultiPicker, type MultiPickerItem } from "./entity-multi-picker";
 import { ProjectTagsEditor } from "./project-tags-editor";
@@ -425,23 +426,14 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       {/* Cover */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">Обложка</h2>
-        <Field>
-          <FieldLabel>Изображение обложки</FieldLabel>
-          <ImageUploadField
-            value={form.cover_image_src}
-            onChange={(v) => update("cover_image_src", v)}
-            placeholder="/uploads/media/… или https://…"
-            defaultAspect="16:9"
-          />
-        </Field>
-        <Field>
-          <FieldLabel>Видео-обложка (embed URL, опционально)</FieldLabel>
-          <Input
-            value={form.cover_video_src}
-            onChange={(e) => update("cover_video_src", e.target.value)}
-            placeholder="https://kinescope.io/… или https://youtube.com/embed/…"
-          />
-        </Field>
+        <UnifiedCover
+          imageUrl={form.cover_image_src}
+          videoUrl={form.cover_video_src}
+          onChange={(img, vid) => {
+            update("cover_image_src", img);
+            update("cover_video_src", vid);
+          }}
+        />
       </Card>
 
       {/* Stack */}

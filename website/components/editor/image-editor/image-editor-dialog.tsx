@@ -26,7 +26,7 @@ interface Props {
 type Tab = "crop" | "draw";
 const DRAW_COLORS = ["#0d0d11", "#336dff", "#ff3b30", "#ff9500", "#34c759", "#ffffff"];
 
-export function ImageEditorDialog({
+export const ImageEditorDialog = React.memo(function ImageEditorDialog({
   open, onOpenChange, src, defaultAspect = null, lockedAspect = false, onApply,
 }: Props) {
   const [tab, setTab] = useState<Tab>("crop");
@@ -286,7 +286,7 @@ export function ImageEditorDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
 
 function CropTab({
   img, crop, onCropChange, aspect, setAspect, zoom, onZoom, locked,

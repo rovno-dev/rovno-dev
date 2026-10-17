@@ -11,7 +11,9 @@ const EditorImpl = dynamic(() => import("./editor-impl"), {
     </div>
   ),
 });
-export function ArticleEditor({
+import React from "react";
+
+export const ArticleEditor = React.memo(function ArticleEditor({
   value,
   onChange,
   placeholder,
@@ -21,4 +23,4 @@ export function ArticleEditor({
   placeholder?: string;
 }) {
   return <EditorImpl markdown={value} onChange={onChange} placeholder={placeholder} />;
-}
+});

@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ImageUploadField } from "./image-upload-field";
+import { UnifiedCover } from "./unified-cover";
 import { ArticleEditor } from "./article-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
 import {
@@ -315,19 +316,14 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
       {/* Cover */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
         <h2 className="text-heading-3">Обложка</h2>
-        <Field>
-          <FieldLabel>Изображение</FieldLabel>
-          <ImageUploadField value={form.cover_image_src} onChange={(v) => update("cover_image_src", v)} defaultAspect="4:3" />
-        </Field>
-        <Field>
-          <FieldLabel>Видео-обложка (файл или embed URL)</FieldLabel>
-          <ImageUploadField
-            value={form.cover_video_src}
-            onChange={(v) => update("cover_video_src", v)}
-            fileType="video"
-            placeholder="https://kinescope.io/… или загрузите видео"
-          />
-        </Field>
+        <UnifiedCover
+          imageUrl={form.cover_image_src}
+          videoUrl={form.cover_video_src}
+          onChange={(img, vid) => {
+            update("cover_image_src", img);
+            update("cover_video_src", vid);
+          }}
+        />
       </Card>
 
       {/* Template */}

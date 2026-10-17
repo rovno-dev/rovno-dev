@@ -293,16 +293,19 @@ export function Sidebar({
           if (isCollapsed && hasChildren) {
             return (
               <Tooltip key={item.href} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={anyActive ? "glass" : "text"}
-                    className="justify-center p-3 w-full relative group"
-                  >
-                    <Icon className="size-5 shrink-0" />
-                    {/* Indicator dot for sub-items */}
-                    <span className="absolute bottom-2 right-2 size-1.5 rounded-full bg-(--primary) group-hover:bg-(--primary)" />
-                  </Button>
-                </TooltipTrigger>
+                            <TooltipTrigger asChild>
+              <Button
+                variant={anyActive ? "glass" : "text"}
+                className="justify-center p-3 w-full relative group"
+                asChild
+              >
+                <Link href={href}>
+                  <Icon className="size-5 shrink-0" />
+                  {/* Indicator dot for sub-items */}
+                  <span className="absolute bottom-2 right-2 size-1.5 rounded-full bg-(--primary) group-hover:bg-(--primary)" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
                 <TooltipContent
                   side="right"
                   sideOffset={8}
