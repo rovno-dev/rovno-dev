@@ -13,6 +13,7 @@ import {
   ASPECT_PRESETS, fitRectForAspect, exportCroppedImage, loadImage,
   type AspectPresetId, type CropRect,
 } from "./canvas-utils";
+import React from "react";
 
 interface Props {
   open: boolean;
@@ -33,18 +34,18 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
-  
+
   const [aspect, setAspect] = useState<AspectPresetId>(defaultAspect ?? "free");
   const [crop, setCrop] = useState<CropRect>({ x: 0, y: 0, width: 1, height: 1 });
   const [zoom, setZoom] = useState(1);
-  
+
   const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [drawing, setDrawing] = useState(false);
   const [color, setColor] = useState(DRAW_COLORS[0]);
   const [size, setSize] = useState(4);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState(-1);
-  
+
   useEffect(() => {
     if (!open || !src) return;
     setLoading(true);
@@ -59,14 +60,14 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
       .catch(() => { })
       .finally(() => setLoading(false));
   }, [open, src]);
-  
+
   useEffect(() => {
     if (!img) return;
     const preset = ASPECT_PRESETS.find((p) => p.id === aspect);
     setCrop(fitRectForAspect(img.naturalWidth, img.naturalHeight, preset?.ratio ?? null));
     setZoom(1);
   }, [aspect, img]);
-  
+
   useEffect(() => {
     if (tab !== "draw" || !img || !drawCanvasRef.current) return;
     const canvas = drawCanvasRef.current;
@@ -81,7 +82,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
     setHistory([initial]);
     setHistoryIdx(0);
   }, [tab, img]);
-  
+
   const handleZoom = (nextZoom: number) => {
     if (!img) return;
     const z = Math.max(1, Math.min(8, nextZoom));
@@ -98,7 +99,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
     setCrop({ x, y, width: w, height: h });
     setZoom(z);
   };
-  
+
   const drawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
   const getPos = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -147,7 +148,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
     setHistory((h) => [...h.slice(0, historyIdx + 1), next]);
     setHistoryIdx((i) => i + 1);
   };
-  
+
   const undo = () => {
     if (historyIdx <= 0 || !drawCanvasRef.current) return;
     const idx = historyIdx - 1;
@@ -187,7 +188,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
     setHistory((h) => [...h.slice(0, historyIdx + 1), next]);
     setHistoryIdx((i) => i + 1);
   };
-  
+
   const handleApply = async () => {
     if (!img) return;
     setApplying(true);
@@ -211,7 +212,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
       setApplying(false);
     }
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[92vh] overflow-hidden p-0 gap-0 flex flex-col">
@@ -301,8 +302,8 @@ function CropTab({
   locked?: boolean;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
-  const [dragStart, setDragStart] = useState<{x: number, y: number} | null>(null);
-  const [offset, setOffset] = useState({x: 0, y: 0});
+  const [dragStart, setDragStart] = useState<{ x: number, y: number } | null>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const presetRatio = ASPECT_PRESETS.find((p) => p.id === aspect)?.ratio ?? null;
   // Fallback to the image's natural aspect ratio for "free" instead of
@@ -335,7 +336,7 @@ function CropTab({
 
   useEffect(() => {
     if (offset.x !== clampedX || offset.y !== clampedY) {
-      setOffset({x: clampedX, y: clampedY});
+      setOffset({ x: clampedX, y: clampedY });
     }
   }, [clampedX, clampedY, offset.x, offset.y]);
 
@@ -346,14 +347,14 @@ function CropTab({
     const cropY = Math.max(0, Math.min(1, (0 - imgTop) / imgHeight));
     const cropW = Math.min(1, fw / imgWidth);
     const cropH = Math.min(1, fh / imgHeight);
-    
+
     if (
       Math.abs(crop.x - cropX) > 0.001 ||
       Math.abs(crop.y - cropY) > 0.001 ||
       Math.abs(crop.width - cropW) > 0.001 ||
       Math.abs(crop.height - cropH) > 0.001
     ) {
-      onCropChange({x: cropX, y: cropY, width: cropW, height: cropH});
+      onCropChange({ x: cropX, y: cropY, width: cropW, height: cropH });
     }
   }, [clampedX, clampedY, imgWidth, imgHeight, fw, fh, crop, onCropChange]);
 
@@ -416,7 +417,7 @@ function CropTab({
           </button>
           <button
             type="button"
-            onClick={() => { onZoom(1); setOffset({x:0,y:0}); }}
+            onClick={() => { onZoom(1); setOffset({ x: 0, y: 0 }); }}
             className="px-2 text-xs font-mono tabular-nums text-(--on-bg-medium) hover:text-(--on-bg-high) min-w-[3.5ch]"
           >
             {Math.round(zoom * 100)}%

@@ -43,6 +43,10 @@ async def upload_media(
     file: UploadFile = File(...),
     start_time: Optional[str] = Form(None),
     end_time: Optional[str] = Form(None),
+    crop_x: Optional[float] = Form(None),
+    crop_y: Optional[float] = Form(None),
+    crop_w: Optional[float] = Form(None),
+    crop_h: Optional[float] = Form(None),
     _: User = Depends(get_current_user),
 ):
     if not file.filename: raise HTTPException(400, "Missing filename")
@@ -62,7 +66,6 @@ async def upload_media(
         
     poster_url = None
     
-    # Auto-convert videos to webm using ffmpeg, trim if requested, and generate poster
     if kind == "video" and ext != ".webm":
         webm_name = f"{uuid.uuid4().hex}.webm"
         webm_path = os.path.join(UPLOAD_DIR, webm_name)
@@ -71,18 +74,21 @@ async def upload_media(
         
         try:
             logger.info("converting video to webm: %s", disk)
-            cmd = ["ffmpeg", "-i", disk]
+            cmd = ["ffmpeg"]
             if start_time: cmd.extend(["-ss", start_time])
             if end_time: cmd.extend(["-to", end_time])
-            # Ensure we don't cut off the beginning when trimming
-            if start_time or end_time:
-                cmd.extend(["-c:v", "libvpx-vp9", "-crf", "30", "-b:v", "0", "-c:a", "libopus", webm_path])
-            else:
-                cmd.extend(["-c:v", "libvpx-vp9", "-crf", "30", "-b:v", "0", "-c:a", "libopus", webm_path])
+            cmd.extend(["-i", disk])
+            
+            # Apply spatial crop if provided
+            if crop_w is not None and crop_h is not None:
+                # crop=w:h:x:y
+                cmd.extend(["-vf", f"crop=iw*{crop_w}:ih*{crop_h}:iw*{crop_x}:ih*{crop_y}"])
                 
+            cmd.extend(["-c:v", "libvpx-vp9", "-crf", "30", "-b:v", "0", "-c:a", "libopus", webm_path])
+            
             subprocess.run(cmd, check=True, capture_output=True, timeout=120)
             
-            # Generate poster at 00:00:01 of the (potentially trimmed) video
+            # Generate poster at 00:00:01 of the (potentially cropped/trimmed) video
             subprocess.run(["ffmpeg", "-i", webm_path, "-ss", "00:00:01", "-vframes", "1", poster_path], check=True, capture_output=True, timeout=30)
             
             os.remove(disk)

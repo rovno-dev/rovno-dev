@@ -62,7 +62,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
     }
   };
 
-  const handleApplyVideo = async (posterBlob: Blob, startTime: string, endTime: string) => {
+  const handleApplyVideo = async (posterBlob: Blob, startTime: string, endTime: string, crop: { x: number; y: number; w: number; h: number }) => {
     if (!videoFile) return;
     setUploading(true);
     try {
@@ -71,11 +71,15 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       posterFd.append("file", new File([posterBlob], "poster.jpg", { type: "image/jpeg" }));
       const posterRes = await $fetch("/api/v1/uploads/media", { method: "POST", body: posterFd, isToast: false });
       
-      // 2. Upload video
+      // 2. Upload video with crop
       const videoFd = new FormData();
       videoFd.append("file", videoFile);
       videoFd.append("start_time", startTime);
       videoFd.append("end_time", endTime);
+      videoFd.append("crop_x", crop.x.toString());
+      videoFd.append("crop_y", crop.y.toString());
+      videoFd.append("crop_w", crop.w.toString());
+      videoFd.append("crop_h", crop.h.toString());
       
       const videoRes = await $fetch("/api/v1/uploads/media", { method: "POST", body: videoFd, isToast: false });
       
