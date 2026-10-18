@@ -54,7 +54,7 @@ export default function Header() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 justify-center w-full flex items-center mx-auto transition-width duration-400 ease-in-out",
-        isScrolled ? "max-w-[900px]" : "max-w-full",
+        isScrolled ? "max-w-[900px] xl:max-w-[1100px]" : "max-w-full",
       )}
     >
       <Container
@@ -83,9 +83,6 @@ export default function Header() {
             </NavLink>
             <NavLink href={rootLink(ROUTES.events.href)}>
               {t("nav.events")}
-            </NavLink>
-            <NavLink href={rootLink(ROUTES.companies.href)}>
-              {t("nav.companies")}
             </NavLink>
             <NavLink href={rootLink(ROUTES.about.href)}>
               {t("nav.about")}

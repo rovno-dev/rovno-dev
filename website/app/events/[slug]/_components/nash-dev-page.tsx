@@ -123,14 +123,6 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
       style={{ borderColor: "#222", paddingBottom: "60px" }}
     >
       <div className="max-w-[1200px] mx-auto px-6">
-        <div
-          className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] font-mono uppercase tracking-[0.2em] mb-8"
-          style={{ color: LIME }}
-        >
-          <span>events</span>
-          <span style={{ color: "#444" }}>{"//"}</span>
-        </div>
-
         <NashDevLogo className="h-auto w-full sm:h-18 sm:w-auto mb-10" />
 
         <h1
@@ -796,10 +788,10 @@ function Timeline() {
             className="absolute top-2 bottom-2 w-px origin-top"
             style={{ left: "6px", background: "#222" }}
           />
-          
+
           {TIMELINE.map((t, i) => (
-            <motion.div 
-              key={i} 
+            <motion.div
+              key={i}
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-50px" }}
@@ -822,7 +814,7 @@ function Timeline() {
                   <Prompt>{"$"}</Prompt>
                   {t.cmd}
                 </span>
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   transition={{ delay: i * 0.15 + 0.5 }}
@@ -970,24 +962,26 @@ function Giveaway() {
                 <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
                   value
                 </p>
-                <p className="text-base" style={{ color: WHITE }}>8 999 ₽</p>
+                <p className="text-base" style={{ color: WHITE }}>6 700 ₽</p>
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  when
+                  timing
                 </p>
                 <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  how_to_win
+                  how_to_win???
                 </p>
                 <p className="text-base" style={{ color: WHITE }}>лучший вопрос</p>
               </div>
             </div>
-            <div className="pt-4 border-t" style={{ borderColor: "#222" }}>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-6 border-t pt-8" style={{ borderColor: "#222" }}>
+            <div className="">
               <p className="text-[11px] uppercase tracking-[0.24em] mb-2" style={{ color: "#666" }}>
-                rules
+                Правила
               </p>
               <ul className="text-sm md:text-base space-y-1.5" style={{ color: "#aaa" }}>
                 <li className="flex gap-2">
@@ -1004,27 +998,25 @@ function Giveaway() {
                 </li>
               </ul>
             </div>
-          </div>
-          {/* Right — ASCII station */}
-          <div className="flex flex-col items-center">
-            <AsciiStation />
-            <div className="font-mono text-[11px] mt-6" style={{ color: "#666" }}>
-              {">"} device: yandex_station_lite · pink · led: on
-            </div>
-            <div className="flex items-center gap-1.5 font-mono text-[11px] mt-3" style={{ color: "#666" }}>
-              <span style={{ color: LIME }}>$</span>
-              <span>voice.ping →</span>
-              <span className="inline-flex gap-[3px]">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className="nash-wave inline-block w-1 text-center"
-                    style={{ color: LIME, animationDelay: `${i * 0.12}s` }}
-                  >
-                    ●
-                  </span>
-                ))}
-              </span>
+            <div className="flex flex-col items-center">
+              <AsciiStation />
+              <div className="font-mono text-[11px] mt-6" style={{ color: "#666" }}>
+                {">"} Алиса, включи плейлист для Наш Дэв...
+              </div>
+              <div className="flex items-center gap-1.5 font-mono text-[11px] mt-3" style={{ color: "#666" }}>
+                <span className="inline-flex gap-[3px]">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className="nash-wave inline-block w-1 text-center"
+                      style={{ color: LIME, animationDelay: `${i * 0.12}s` }}
+                    >
+                      ●
+                    </span>
+                  ))}
+                </span>
+                <span>Включаю плейлист для мероприятий</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1188,7 +1180,7 @@ const STATUS_OPTIONS = ["STUDENT", "GUEST"] as const;
    a breakdown of the seat types. If no limits are set, shows "no info". */
 function SeatCounter({ taken, seatTypes }: { taken: number; seatTypes: { type: string; count: number }[] }) {
   const total = seatTypes.reduce((sum, s) => sum + s.count, 0);
-  
+
   if (total <= 0) {
     return (
       <div className="font-mono border border-[#222] bg-[#0a0a0a] p-5 mb-10">
@@ -1207,7 +1199,7 @@ function SeatCounter({ taken, seatTypes }: { taken: number; seatTypes: { type: s
   const bar = "█".repeat(filled) + "░".repeat(empty);
   const isFull = taken >= total;
   const remaining = Math.max(0, total - taken);
-  
+
   const breakdown = seatTypes.map(s => `${s.count} ${s.type}`).join(", ");
 
   return (
