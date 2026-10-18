@@ -4,6 +4,7 @@
     "filePath": "repomix-output-rd.md",
     "removeComments": false,
     "removeEmptyLines": true,
-    "showLineNumbers": false
+    "showLineNumbers": false,
+    "truncateBase64": true
   }
 }

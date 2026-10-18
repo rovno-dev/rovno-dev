@@ -31,7 +31,7 @@ export function ArticleCard({
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[600/450]">
+      <Card className="relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 transition-all active:scale-[0.99] aspect-[4/3]">
         {article.image_url ? (
           article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
             <video

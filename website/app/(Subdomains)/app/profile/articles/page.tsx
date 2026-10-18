@@ -126,7 +126,7 @@ export default function MyArticlesPage() {
             {[...Array(4)].map((_, i) => (
               <Card
                 key={i}
-                className="rounded-4xl border-(--outline) bg-muted/30 animate-pulse aspect-[600/450]"
+                className="rounded-4xl border-(--outline) bg-muted/30 animate-pulse aspect-[4/3]"
               />
             ))}
           </div>
@@ -192,7 +192,7 @@ export default function MyArticlesPage() {
               return (
                 <Card
                   key={a.id}
-                  className="group relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 aspect-[600/450]"
+                  className="group relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 aspect-[4/3]"
                 >
                   {/* z-0 — cover or gradient fallback */}
                   {a.image_url ? (

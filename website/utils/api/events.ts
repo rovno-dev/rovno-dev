@@ -13,6 +13,9 @@ export interface EventListItem {
   city?: string | null;
   price?: string | null;
   seat_types?: { type: string; count: number }[] | null;
+  /** Number of active registrations for this event. Derived from
+   *  event_requests where status is new or approved. */
+  registered_count?: number | null;
   registration_url?: string | null;
   is_featured: boolean;
   publication_status: string;

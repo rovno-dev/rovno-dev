@@ -85,6 +85,23 @@ def register_for_event(
     ev = db.query(Event).filter(Event.slug == slug).first()
     if not ev or ev.publication_status != PublicationStatus.published:
         raise HTTPException(404, "Event not found")
+
+    email_clean = (payload.email or "").strip().lower()
+    if email_clean:
+        existing_req = (
+            db.query(EventRequest)
+            .filter(
+                EventRequest.event_id == ev.id,
+                func.lower(EventRequest.email) == email_clean,
+                EventRequest.status.in_(OCCUPYING_STATUSES)
+            )
+            .first()
+        )
+        if existing_req:
+            raise HTTPException(
+                status_code=409,
+                detail="Этот email уже зарегистрирован на данное мероприятие",
+            )
     total_capacity = sum(item.get("count", 0) for item in (ev.seat_types or []))
     if total_capacity > 0:
         taken = (

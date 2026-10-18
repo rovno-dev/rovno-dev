@@ -99,13 +99,17 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
   return (
     <div className="space-y-2">
       {activeUrl ? (
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group max-w-sm">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group max-w-md">
           {videoUrl ? (
-             <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+          videoUrl.endsWith(".webm") || videoUrl.endsWith(".mp4") ? (
+            <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
           ) : (
-             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          )}
+            <iframe src={`${videoUrl}?autoplay=1&muted=1&loop=1`} className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
+          )
+        ) : (
+           /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        )}
           {videoUrl && (
             <div className="absolute top-2 left-2 bg-black/60 text-white rounded-md px-2 py-0.5 text-xs font-mono flex items-center gap-1 backdrop-blur-sm">
               <VideoCameraIcon /> Video
@@ -119,7 +123,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
         </div>
       ) : (
         <div 
-          className="w-full max-w-sm aspect-[4/3] rounded-2xl border-2 border-dashed border-(--outline) bg-(--card)/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-(--primary) hover:bg-(--primary-glass) transition-colors"
+          className="w-full max-w-md aspect-[4/3] rounded-2xl border-2 border-dashed border-(--outline) bg-(--card)/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-(--primary) hover:bg-(--primary-glass) transition-colors"
           onClick={() => inputRef.current?.click()}
         >
           <CloudArrowUpIcon className="size-8 text-(--on-bg-low)" />

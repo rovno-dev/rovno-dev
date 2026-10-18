@@ -107,7 +107,7 @@ export default function ProjectCard({
       style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
     >
       <div className="relative h-full flex flex-col overflow-hidden rounded-2xl bg-(--card) border border-(--outline) transition-all duration-300 hover:border-(--primary)/30 hover:shadow-lg hover:shadow-(--primary)/5">
-        <div className="relative aspect-[16/9] w-full overflow-hidden shrink-0">
+        <div className="relative aspect-[4/3] w-full overflow-hidden shrink-0">
           {showFallback ? (
             <CoverFallback
               label={t("projects.cover.fallback")}

@@ -255,7 +255,7 @@ export function CustomProjectPage({
                   className="group block"
                 >
                   <Card className="rounded-xl border border-(--outline) bg-(--card) ring-0 overflow-hidden">
-                    <div className="relative aspect-[16/10] bg-(--bg-disabled)">
+                    <div className="relative aspect-[4/3] bg-(--bg-disabled)">
                       {r.coverImage ? (
                         <Image
                           fill

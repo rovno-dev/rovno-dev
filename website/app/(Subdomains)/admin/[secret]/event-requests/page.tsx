@@ -19,9 +19,12 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
-  fetchAllEventRequests, updateEventRequest,
-  type EventRequestRow,
+  fetchAllEventRequests, fetchAdminEvents, updateEventRequest,
+  type EventListItem, type EventRequestRow,
 } from "@/utils/api/events";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 const STATUS_META: Record<string, { label: string; className: string }> = {
   new: { label: "Новая", className: "bg-blue-500/15 text-blue-500 border-blue-500/30" },
@@ -41,6 +44,8 @@ export default function AdminEventRequestsPage() {
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [events, setEvents] = useState<EventListItem[]>([]);
+  const [eventFilter, setEventFilter] = useState<string>("all");
   const [declineFor, setDeclineFor] = useState<EventRequestRow | null>(null);
   const [declineReason, setDeclineReason] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -56,6 +61,7 @@ export default function AdminEventRequestsPage() {
       const data = await fetchAllEventRequests({
         q: debounced || undefined,
         status: statusFilter === "all" ? undefined : statusFilter,
+        eventSlug: eventFilter === "all" ? undefined : eventFilter,
       });
       setRows(data);
     } catch (e: any) {
@@ -63,7 +69,12 @@ export default function AdminEventRequestsPage() {
     } finally {
       setLoading(false);
     }
-  }, [debounced, statusFilter]);
+  }, [debounced, statusFilter, eventFilter]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchAdminEvents().then(setEvents).catch(() => {});
+  }, [user]);
 
   useEffect(() => { if (user) load(); }, [user, load]);
 
@@ -113,16 +124,31 @@ export default function AdminEventRequestsPage() {
         </div>
 
         <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
-          <div className="relative">
-            <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low)" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Имя, email, телефон…"
-              className="pl-9"
-            />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Select value={eventFilter} onValueChange={setEventFilter}>
+              <SelectTrigger className="w-full sm:w-[240px] h-10">
+                <SelectValue placeholder="Все события" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все события</SelectItem>
+                {events.map(e => (
+                  <SelectItem key={e.slug} value={e.slug}>{e.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low)" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Имя, email, телефон…"
+                className="pl-9 h-10"
+              />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+
+          <div className="flex flex-wrap gap-2 pt-2">
             {STATUS_FILTERS.map((s) => (
               <Button
                 key={s}

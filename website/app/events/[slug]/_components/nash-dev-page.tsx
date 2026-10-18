@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import type { EventCustomContext } from "./event-custom-pages";
 import { registerForEvent } from "@/utils/api/events";
 import Image from "next/image";
@@ -786,13 +787,30 @@ function Timeline() {
             space so the dots sit centred on the line. Line at x=6px
             (left-1.5), dot 12×12 anchored at x=0 → dot centre at 6px. */}
         <div className="relative">
-          <div
-            className="absolute top-2 bottom-2 w-px"
+          {/* Animated vertical line */}
+          <motion.div
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute top-2 bottom-2 w-px origin-top"
             style={{ left: "6px", background: "#222" }}
           />
+          
           {TIMELINE.map((t, i) => (
-            <div key={i} className="relative pl-8 mb-10 last:mb-0">
-              <span
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+              className="relative pl-8 mb-10 last:mb-0"
+            >
+              <motion.span
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.15 + 0.2, type: "spring" }}
                 className="absolute top-2 size-3"
                 style={{ left: 0, background: LIME }}
               />
@@ -804,9 +822,16 @@ function Timeline() {
                   <Prompt>{"$"}</Prompt>
                   {t.cmd}
                 </span>
-                <span style={{ color: LIME }}>✓</span>
+                <motion.span 
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ delay: i * 0.15 + 0.5 }}
+                  style={{ color: LIME }}
+                >
+                  ✓
+                </motion.span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -89,9 +89,27 @@ function EventCard({
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <Card className="relative h-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card) ring-0 transition-all duration-300 hover:-translate-y-1 hover:border-(--primary)/40 hover:shadow-xl hover:shadow-(--primary)/5">
-        <div className="relative aspect-[16/10] bg-muted overflow-hidden">
-          {event.cover_image_src ? (
+      <Card className="relative h-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card) ring-0 transition-all duration-300 hover:-translate-y-1 hover:border-(--primary)/40 hover:shadow-xl hover:shadow-(--primary)/5 p-0! gap-0!">
+        <div className="relative aspect-[4/3] w-full bg-muted overflow-hidden">
+          {event.cover_video_src ? (
+            event.cover_video_src.endsWith(".webm") || event.cover_video_src.endsWith(".mp4") ? (
+              <video
+                src={event.cover_video_src}
+                poster={event.cover_image_src}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${past ? "grayscale" : ""}`}
+              />
+            ) : (
+              <iframe
+                src={`${event.cover_video_src}?autoplay=1&muted=1&loop=1`}
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              />
+            )
+          ) : event.cover_image_src ? (
             <Image
               src={event.cover_image_src}
               alt={event.title}
