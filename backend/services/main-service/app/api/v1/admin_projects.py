@@ -1,5 +1,6 @@
 """Admin CRUD for projects + GitHub README proxy."""
 import os
+import random
 import time
 from datetime import datetime
 from typing import List, Optional
@@ -30,7 +31,7 @@ from app.shared.slugify import slugify
 
 def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
     slug = base
-    suffix = 2
+    suffix = random.randint(10000, 99999)
     while True:
         q = db.query(Project.id).filter(Project.slug == slug)
         if exclude_id:
@@ -38,7 +39,7 @@ def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> st
         if not q.first():
             return slug
         slug = f"{base}-{suffix}"
-        suffix += 1
+        suffix = random.randint(10000, 99999)
 
 
 # ---------- Project picker (used by team-member editor) ------------------

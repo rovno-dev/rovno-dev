@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
@@ -48,7 +49,7 @@ def _ensure_owner_or_admin(article: Article, user: User | None) -> None:
 
 def _unique_slug(db: Session, base: str, exclude_id: Optional[UUID] = None) -> str:
     slug = base or "article"
-    suffix = 2
+    suffix = random.randint(10000, 99999)
     while True:
         q = db.query(Article.id).filter(Article.slug == slug)
         if exclude_id:
@@ -56,7 +57,7 @@ def _unique_slug(db: Session, base: str, exclude_id: Optional[UUID] = None) -> s
         if not q.first():
             return slug
         slug = f"{base}-{suffix}"
-        suffix += 1
+        suffix = random.randint(10000, 99999)
 
 
 def _resolve_publish_status(

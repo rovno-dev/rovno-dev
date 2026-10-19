@@ -19,13 +19,14 @@ from app.services.tag_service import resolve_tags
 from app.models.tag import TagKind
 from app.shared.slugify import slugify
 from database.database import get_db
+import random
 
 router = APIRouter(prefix="/admin/events", tags=["admin-events"])
 
 
 def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
     slug = base
-    n = 2
+    n = random.randint(10000, 99999)
     while True:
         q = db.query(Event.id).filter(Event.slug == slug)
         if exclude_id:
@@ -33,7 +34,7 @@ def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> st
         if not q.first():
             return slug
         slug = f"{base}-{n}"
-        n += 1
+        n = random.randint(10000, 99999)
 
 
 @router.get("", response_model=List[EventListItem])

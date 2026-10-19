@@ -4,6 +4,7 @@ import zipfile
 import io
 import shutil
 import os
+import random
 import json
 import uuid
 from typing import List, Optional
@@ -238,10 +239,10 @@ async def import_articles_zip(
                 base_slug = slugify(data.get("slug") or title)
                 
                 slug = base_slug
-                suffix = 2
+                suffix = random.randint(10000, 99999)
                 while db.query(Article.id).filter(Article.slug == slug).first():
                     slug = f"{base_slug}-{suffix}"
-                    suffix += 1
+                    suffix = random.randint(10000, 99999)
                 
                 # STRICT REQUIREMENT: All imported articles are drafts
                 article = Article(
