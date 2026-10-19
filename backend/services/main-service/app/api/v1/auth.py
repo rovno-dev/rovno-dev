@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 import logging
 from app.models.user import User
+from app.models.user_session import UserSession
 from app.schemas.auth.requests import (
     RegisterEmailRequest,
     VerifyEmailRequest,
@@ -148,8 +149,15 @@ async def login_email_password(
             status_code=403,
             content={"message": "User not verified"}
         )
-    access_token = create_access_token({"sub": str(user.id)})
-    refresh_token = create_refresh_token({"sub": str(user.id)})
+    # Create a session record
+    user_agent = request.headers.get("user-agent", "Unknown")
+    ip_addr = request.client.host if request.client else "Unknown"
+    session = UserSession(user_id=user.id, user_agent=user_agent, ip_address=ip_addr)
+    db.add(session)
+    db.commit()
+
+    access_token = create_access_token({"sub": str(user.id), "sid": str(session.id)})
+    refresh_token = create_refresh_token({"sub": str(user.id), "sid": str(session.id)})
     logger.info(f"Successful login for user: {payload.email}")
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
@@ -224,6 +232,15 @@ async def logout(
     token_data = decode_token(payload.refresh_token)
     if not token_data or token_data.get("type") != "refresh" or token_data.get("sub") != str(current_user.id):
         return JSONResponse(status_code=400, content={"message": "Invalid refresh token"})
+    
+    sid = token_data.get("sid")
+    if sid:
+        from uuid import UUID
+        session = db.get(UserSession, UUID(sid))
+        if session:
+            db.delete(session)
+            db.commit()
+
     return JSONResponse(status_code=200, content={"message": "Logged out"})
 
 @router.post("/resend-verification")

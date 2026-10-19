@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/entities/user/model/user-context";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { changePassword, deleteAccount } from "@/utils/api/user";
+import { Desktop, DeviceMobile, Globe, Trash } from "@phosphor-icons/react";
+import { safeCookieStorage } from "@/utils/safe-cookie-storage";
 import { $fetch } from "@/utils/fetch";
 import { QrCode } from "@phosphor-icons/react";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -30,6 +32,42 @@ export default function SecurityPage() {
   const [totpSetup, setTotpSetup] = useState<{ secret: string; uri: string } | null>(null);
   const [totpCode, setTotpCode] = useState("");
   const [totpLoading, setTotpLoading] = useState(false);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [currentSid, setCurrentSid] = useState<string | null>(null);
+
+  const fetchSessions = async () => {
+    try {
+      const res = await $fetch("/api/v1/me/sessions", { isToast: false });
+      if (res?.response?.ok) {
+        setSessions(res.json);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchSessions();
+    
+    // Decode token to find current session ID
+    const token = safeCookieStorage.getItem("access_token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (payload.sid) setCurrentSid(payload.sid);
+      } catch {}
+    }
+  }, [user]);
+
+  const revokeSession = async (id: string) => {
+    if (!confirm("Завершить эту сессию?")) return;
+    try {
+      await $fetch(`/api/v1/me/sessions/${id}`, { method: "DELETE" });
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Сессия завершена");
+    } catch {
+      toast.error("Ошибка при завершении сессии");
+    }
+  };
 
   if (isLoading || !user) return null;
 
@@ -122,10 +160,58 @@ export default function SecurityPage() {
       </Card>
 
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
-        <h2 className="text-heading-3 mb-2">Активные сессии</h2>
-        <p className="text-body-3 text-(--on-bg-medium)">
-          Здесь будет отображаться информация о текущих сессиях (в разработке).
-        </p>
+        <h2 className="text-heading-3 mb-4">Активные сессии</h2>
+        <div className="space-y-3">
+          {sessions.length === 0 ? (
+            <p className="text-body-3 text-(--on-bg-medium)">Нет активных сессий.</p>
+          ) : (
+            sessions.map((s) => {
+              const isCurrent = s.id === currentSid;
+              const ua = s.user_agent || "";
+              const isMobile = /mobile|android|iphone|ipad/i.test(ua);
+              const Icon = isMobile ? DeviceMobile : Desktop;
+              
+              // Simple parser for a clean device name
+              let deviceName = "Неизвестное устройство";
+              if (/windows/i.test(ua)) deviceName = "Windows";
+              else if (/macintosh|mac os x/i.test(ua)) deviceName = "macOS";
+              else if (/linux/i.test(ua)) deviceName = "Linux";
+              else if (/android/i.test(ua)) deviceName = "Android";
+              else if (/iphone|ipad/i.test(ua)) deviceName = "iOS";
+
+              let browserName = "Браузер";
+              if (/chrome|crios/i.test(ua)) browserName = "Chrome";
+              else if (/firefox|fxios/i.test(ua)) browserName = "Firefox";
+              else if (/safari/i.test(ua)) browserName = "Safari";
+              else if (/edge/i.test(ua)) browserName = "Edge";
+
+              return (
+                <div key={s.id} className={`flex items-center justify-between gap-4 p-4 rounded-xl border ${isCurrent ? 'border-(--primary)/30 bg-(--primary-glass)' : 'border-(--outline)'}`}>
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-(--bg) border border-(--outline) text-(--on-bg-medium)">
+                      <Icon className="size-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-body-3 font-medium text-(--on-bg-high) truncate">
+                        {deviceName} · {browserName} {isCurrent && <span className="text-(--primary) ml-1">(Текущая)</span>}
+                      </p>
+                      <div className="flex items-center gap-2 text-body-5 text-(--on-bg-low) mt-0.5">
+                        <span className="flex items-center gap-1"><Globe className="size-3" /> {s.ip_address}</span>
+                        <span>•</span>
+                        <span>{new Date(s.last_active_at).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {!isCurrent && (
+                    <Button variant="text" size="icon-small" onClick={() => revokeSession(s.id)} title="Завершить сессию">
+                      <Trash className="size-4 text-(--error)" />
+                    </Button>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       </Card>
 
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">

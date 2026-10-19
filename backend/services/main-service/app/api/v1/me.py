@@ -1,4 +1,6 @@
 import re
+from uuid import UUID
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -8,6 +10,7 @@ from typing import Optional
 from app.models.user import User
 from app.models.client import Client
 from app.models.team_member import TeamMember
+from app.models.user_session import UserSession
 from app.shared.auth import get_current_user, hash_password, verify_password
 from app.services.team_service import get_active_team_member
 from database.database import get_db
@@ -134,6 +137,36 @@ async def update_me(
     db.refresh(current_user)
     return _serialize_me(db, current_user)
 
+
+
+class SessionOut(BaseModel):
+    id: UUID
+    user_agent: Optional[str] = None
+    ip_address: Optional[str] = None
+    created_at: datetime
+    last_active_at: datetime
+
+    class Config:
+        from_attributes = True
+
+@router.get("/sessions", response_model=list[SessionOut])
+def get_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return db.query(UserSession).filter(UserSession.user_id == current_user.id).order_by(UserSession.last_active_at.desc()).all()
+
+@router.delete("/sessions/{session_id}")
+def delete_session(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    session = db.get(UserSession, session_id)
+    if session and session.user_id == current_user.id:
+        db.delete(session)
+        db.commit()
+    return {"status": "ok"}
 
 @router.post("/change-password")
 async def change_password(

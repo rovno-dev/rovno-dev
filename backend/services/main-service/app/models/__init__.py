@@ -17,3 +17,4 @@ from .event_request import EventRequest
 from .article import Article
 from .article_category import ArticleCategory
 from .tag import Tag, article_tags
+from .user_session import UserSession
