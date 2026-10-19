@@ -115,17 +115,50 @@ export default function AdminProjectsPage() {
         )}
 
         {state.kind === "ready" && projects.length === 0 && (
-          <Card className="rounded-3xl border-(--outline) p-10 text-center">
-            <div className="inline-flex size-14 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-4">
-              <Cube className="size-6" />
+          <Card className="rounded-4xl border border-(--outline) bg-(--card) p-12 md:p-24 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[460px] shadow-sm">
+            {/* Ambient background glow */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 60% 60% at 50% 0%, var(--primary-glass), transparent 70%)",
+              }}
+            />
+            {/* Faint grid texture */}
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-[0.03]"
+              style={{
+                backgroundImage: "linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+                maskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+                WebkitMaskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)",
+              }}
+            />
+            
+            <div className="relative z-10 flex flex-col items-center max-w-md mx-auto">
+              <div className="relative mb-8">
+                {/* Glow behind icon */}
+                <div className="absolute inset-0 bg-(--primary-glass) blur-2xl rounded-full scale-150" />
+                <div className="relative flex size-20 items-center justify-center rounded-3xl bg-(--card) border border-(--outline) shadow-lg text-(--primary)">
+                  <Cube className="size-10" weight="duotone" />
+                </div>
+              </div>
+              
+              <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) mb-3 tracking-tight">
+                Пока нет проектов
+              </h2>
+              <p className="text-body-3 text-(--on-bg-medium) mb-10 leading-relaxed max-w-[320px]">
+                Создайте свой первый кейс, чтобы он появился в портфолио на сайте и начал привлекать клиентов.
+              </p>
+              
+              <Button asChild size="large" shape="round" className="px-8 shadow-xl shadow-(--primary)/10 transition-transform hover:-translate-y-0.5">
+                <Link href={`${base}/new`}>
+                  <Plus className="mr-2 size-5" weight="bold" />
+                  Создать первый проект
+                </Link>
+              </Button>
             </div>
-            <p className="text-body-3 text-(--on-bg-medium) mb-4">Пока нет проектов.</p>
-            <Button asChild>
-              <Link href={`${base}/new`}>
-                <Plus className="size-4" />
-                Создать первый проект
-              </Link>
-            </Button>
           </Card>
         )}
 
