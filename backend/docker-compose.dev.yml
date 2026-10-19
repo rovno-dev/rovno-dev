@@ -40,7 +40,7 @@ services:
     # reports as a "CORS error" even though CORS was never the problem.
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.main-service.rule=PathPrefix(`/api/v1`) || PathPrefix(`/docs`) || PathPrefix(`/health`)"
+      - "traefik.http.routers.main-service.rule=PathPrefix(`/api/v1`) || PathPrefix(`/health`)
       - "traefik.http.routers.main-service.priority=100"
       - "traefik.http.routers.main-service.entrypoints=${ENTRYPOINT}"
       - "traefik.http.routers.main-service.tls=${TLS_ENABLED}"

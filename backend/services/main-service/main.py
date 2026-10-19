@@ -25,7 +25,18 @@ if _notif_missing:
 if not os.getenv("TELEGRAM_BOT_TOKEN"):
     logger.warning("Telegram notifications DISABLED — TELEGRAM_BOT_TOKEN not set")
 
-app = FastAPI(title="Main Service", version="1.0.0", root_path="/api")
+# Disable Swagger UI (/docs) and /openapi.json in production for security.
+# We check if the DOMAIN env var is set to something other than localhost.
+is_prod = os.getenv("DOMAIN", "localhost") != "localhost"
+
+app = FastAPI(
+    title="Main Service", 
+    version="1.0.0", 
+    root_path="/api",
+    docs_url=None if is_prod else "/docs",
+    redoc_url=None if is_prod else "/redoc",
+    openapi_url=None if is_prod else "/openapi.json"
+)
 
 # LLM context: ALLOWED_ORIGINS accepts exact origins AND wildcards like
 # "https://*.rovno.dev". Wildcard entries collapse into a single
