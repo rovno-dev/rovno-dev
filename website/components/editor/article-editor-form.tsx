@@ -84,7 +84,7 @@ function toFormState(article?: Article | null): FormState {
   };
 }
 
-export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
+export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" }: { initial?: Article | null; basePath?: string }) {
   const { t } = useLanguage();
   const { user } = useUser();
   const router = useRouter();
@@ -183,7 +183,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
         toast.success(status === "published" ? t("editor.published") : t("editor.saved"));
       }
       if (!isEdit) {
-        router.replace(`/app/profile/articles/${saved.slug}/edit`);
+        router.replace(`${basePath}/${saved.slug}/edit`);
       } else {
         router.refresh();
       }
@@ -218,7 +218,7 @@ export function ArticleEditorForm({ initial }: { initial?: Article | null }) {
     try {
       await deleteArticle(initial.slug);
       toast.success(t("editor.deleted"));
-      router.replace("/app/profile/articles");
+      router.replace(basePath);
     } catch (err: any) {
       toast.error(err.message || t("editor.save_failed"));
     } finally {

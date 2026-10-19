@@ -6,9 +6,12 @@ import { toast } from "sonner";
 import { $fetch } from "@/utils/fetch";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { useUser } from "@/entities/user/model/user-context";
+import { useAdminSecret } from "@/hooks/use-admin-secret";
+import { adminUrl } from "@/utils/admin-url";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +42,7 @@ type AuthorFilter = "all" | "team" | "external";
 export default function AdminArticlesPage() {
   const { user, isLoading: userLoading } = useUser();
   const router = useRouter();
+  const { secret } = useAdminSecret();
 
   const [articles, setArticles] = useState<AdminArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -232,10 +236,10 @@ export default function AdminArticlesPage() {
             </Button>
 
             <Button asChild size="small">
-              <a href="/app/profile/articles/new" target="_blank" rel="noopener noreferrer">
+              <Link href={adminUrl(secret, "articles/new")}>
                 <PlusIcon className="size-4" />
                 Создать статью
-              </a>
+              </Link>
             </Button>
           
           </div>
@@ -315,7 +319,20 @@ export default function AdminArticlesPage() {
         {loading && !error && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {[...Array(4)].map((_, i) => (
-              <Card key={i} className="rounded-3xl border-(--outline) h-40 animate-pulse bg-muted/30" />
+              <Card key={i} className="rounded-3xl border-(--outline) p-5 flex flex-col gap-4">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="size-16 rounded-2xl shrink-0" />
+                  <div className="flex-1 space-y-3 py-1">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+                <div className="space-y-2 mt-2">
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
+              </Card>
             ))}
           </div>
         )}
@@ -415,9 +432,9 @@ export default function AdminArticlesPage() {
                       </Button>
                     )}
                     <Button size="small" variant="outlined" asChild className="ml-auto">
-                      <Link href={`/app/profile/articles/${a.slug}/preview`} target="_blank">
-                        <ArrowSquareOutIcon className="size-4" />
-                        Открыть
+                      <Link href={adminUrl(secret, `articles/${a.slug}/edit`)}>
+                        <PencilIcon className="size-4" />
+                        Редактировать
                       </Link>
                     </Button>
                   </div>

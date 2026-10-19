@@ -7,6 +7,7 @@ import Image from "next/image";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -170,8 +171,18 @@ export default function MyArticlesPage() {
             {[...Array(4)].map((_, i) => (
               <Card
                 key={i}
-                className="rounded-4xl border-(--outline) bg-muted/30 animate-pulse aspect-[4/3]"
-              />
+                className="rounded-4xl border-(--outline) aspect-[4/3] relative overflow-hidden flex flex-col justify-end p-5"
+              >
+                <div className="absolute inset-0 bg-muted/30" />
+                <div className="relative z-10 space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-2 pt-2">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-24 rounded-full" />
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
         )}
