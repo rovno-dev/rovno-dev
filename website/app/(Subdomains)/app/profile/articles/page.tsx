@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { UploadSimpleIcon } from "@phosphor-icons/react";
+import { $fetch } from "@/utils/fetch";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckUser } from "@/entities/user/model/check-user";
@@ -66,6 +68,35 @@ type LoadState =
 export default function MyArticlesPage() {
   const { t } = useLanguage();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  const handleImportZip = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await $fetch("/api/v1/admin/articles/import-zip", {
+        method: "POST",
+        body: formData,
+        isToast: false,
+      });
+      if (!res?.response?.ok) {
+        throw new Error(res?.json?.detail || "Ошибка импорта");
+      }
+      toast.success(`Успешно импортировано статей: ${res.json.imported_count}`);
+      load();
+    } catch (err: any) {
+      toast.error(err?.message || "Ошибка импорта");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const load = useCallback(async () => {
     setState({ kind: "loading" });
@@ -111,13 +142,26 @@ export default function MyArticlesPage() {
               {t("editor.my_articles_subtitle")}
             </p>
           </div>
-          <Button asChild className="shrink-0">
-            <Link href="/app/profile/articles/new">
-              <PlusIcon className="size-4" />
-              <span className="hidden sm:inline">{t("editor.new_article")}</span>
-              <span className="sm:hidden">Новая</span>
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <input
+              type="file"
+              accept=".zip"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleImportZip}
+            />
+            <Button variant="outlined" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+              {importing ? <CircleNotchIcon className="size-4 animate-spin" /> : <UploadSimpleIcon className="size-4" />}
+              <span className="hidden sm:inline">Загрузить ZIP</span>
+            </Button>
+            <Button asChild>
+              <Link href="/app/profile/articles/new">
+                <PlusIcon className="size-4" />
+                <span className="hidden sm:inline">{t("editor.new_article")}</span>
+                <span className="sm:hidden">Новая</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* -------- Loading skeletons -------- */}

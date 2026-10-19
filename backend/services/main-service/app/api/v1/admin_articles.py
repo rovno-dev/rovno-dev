@@ -1,4 +1,11 @@
 """Admin-only article management: list with filters, approve, reject."""
+from datetime import datetime
+import zipfile
+import io
+import shutil
+import os
+import json
+import uuid
 from typing import List, Optional
 from uuid import UUID
 
@@ -9,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.models.article import Article
 from app.models.project import PublicationStatus
 from app.models.team_member import TeamMember
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.article.responses import AdminArticleListItem
 from app.shared.auth import get_current_user
 from database.database import get_db
@@ -24,6 +31,56 @@ router = APIRouter(prefix="/admin/articles", tags=["admin-articles"])
 class RejectRequest(BaseModel):
     note: str = Field(..., min_length=1, max_length=1000)
 
+
+
+from pydantic import BaseModel
+from typing import List
+
+class BulkPayload(BaseModel):
+    slugs: List[str]
+
+@router.post("/bulk/delete")
+def bulk_delete_articles(
+    payload: BulkPayload,
+    db: Session = Depends(get_db),
+    _: User = Depends(get_admin_user),
+):
+    db.query(Article).filter(Article.slug.in_(payload.slugs)).delete(synchronize_session=False)
+    db.commit()
+    return {"status": "ok", "deleted": len(payload.slugs)}
+
+@router.post("/bulk/approve")
+def bulk_approve_articles(
+    payload: BulkPayload,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_admin_user),
+):
+    from datetime import datetime
+    db.query(Article).filter(Article.slug.in_(payload.slugs)).update({
+        "publication_status": PublicationStatus.published,
+        "reviewed_by_id": admin.id,
+        "reviewed_at": datetime.utcnow(),
+        "review_note": None
+    }, synchronize_session=False)
+    db.commit()
+    return {"status": "ok", "approved": len(payload.slugs)}
+
+@router.post("/bulk/reject")
+def bulk_reject_articles(
+    payload: BulkPayload,
+    note: str = "Массовое отклонение",
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_admin_user),
+):
+    from datetime import datetime
+    db.query(Article).filter(Article.slug.in_(payload.slugs)).update({
+        "publication_status": PublicationStatus.rejected,
+        "reviewed_by_id": admin.id,
+        "reviewed_at": datetime.utcnow(),
+        "review_note": note
+    }, synchronize_session=False)
+    db.commit()
+    return {"status": "ok", "rejected": len(payload.slugs)}
 
 @router.get("", response_model=List[AdminArticleListItem])
 def list_admin_articles(
@@ -113,11 +170,16 @@ def list_admin_articles(
 
 
 @router.post("/import-zip", status_code=201)
-async def import_article_zip(
+async def import_articles_zip(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Imports 1 or multiple articles from a ZIP.
+    ZIP structure can be flat (1 article) or folder-based (N articles).
+    Each article is created as a DRAFT.
+    """
     if not (current_user.user_role in (UserRole.admin, UserRole.root) or getattr(current_user, 'can_create_articles', False)):
         raise HTTPException(403, "No permission to create articles")
 
@@ -127,70 +189,89 @@ async def import_article_zip(
     content = await file.read()
     try:
         with zipfile.ZipFile(io.BytesIO(content)) as z:
-            json_files = [f for f in z.namelist() if f.endswith('.json') and not f.startswith('__MACOSX')]
+            # Find all data.json files (ignore Mac meta files)
+            json_files = [
+                f for f in z.namelist() 
+                if f.endswith('data.json') and not f.startswith('__MACOSX') and '__MACOSX' not in f
+            ]
             if not json_files:
-                raise HTTPException(400, "No .json file found in ZIP")
-            
-            with z.open(json_files[0]) as f:
-                data = json.load(f)
+                raise HTTPException(400, "No data.json found in ZIP")
 
-            image_files = [f for f in z.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif')) and not f.startswith('__MACOSX')]
-            
             UPLOAD_DIR = os.getenv("UPLOADS_DIR", "/app/storage/uploads")
             os.makedirs(UPLOAD_DIR, exist_ok=True)
             
-            url_map = {}
-            for img_path in image_files:
-                ext = os.path.splitext(img_path)[1].lower()
-                unique_name = f"{uuid.uuid4().hex}{ext}"
-                disk_path = os.path.join(UPLOAD_DIR, unique_name)
-                
-                with z.open(img_path) as src, open(disk_path, "wb") as dst:
-                    shutil.copyfileobj(src, dst)
-                
-                url_map[img_path] = f"/uploads/images/{unique_name}"
-                url_map[os.path.basename(img_path)] = f"/uploads/images/{unique_name}"
+            imported_slugs = []
             
-            mdx = data.get("mdx_content", "")
-            for orig, new_url in url_map.items():
-                mdx = mdx.replace(f"./{orig}", new_url)
-                mdx = mdx.replace(f"./{os.path.basename(orig)}", new_url)
-                mdx = mdx.replace(orig, new_url)
+            for json_path in json_files:
+                # Determine the base directory for this article
+                base_dir = os.path.dirname(json_path)
+                prefix = f"{base_dir}/" if base_dir else ""
+                
+                with z.open(json_path) as f:
+                    data = json.load(f)
+                    
+                # Process media files belonging to this article
+                url_map = {}
+                for img_path in z.namelist():
+                    if img_path.startswith(prefix) and img_path != json_path and not img_path.endswith('/'):
+                        if img_path.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif', '.mp4', '.webm')):
+                            ext = os.path.splitext(img_path)[1].lower()
+                            unique_name = f"{uuid.uuid4().hex}{ext}"
+                            disk_path = os.path.join(UPLOAD_DIR, unique_name)
+                            
+                            with z.open(img_path) as src, open(disk_path, "wb") as dst:
+                                shutil.copyfileobj(src, dst)
+                            
+                            # Map relative paths (e.g., 'media/photo.jpg' and 'photo.jpg')
+                            rel_path = img_path[len(prefix):]
+                            public_url = f"/uploads/images/{unique_name}"
+                            url_map[rel_path] = public_url
+                            url_map[os.path.basename(img_path)] = public_url
 
-            title = data.get("title", "Untitled")
-            base_slug = slugify(data.get("slug") or title)
+                # Replace references in MDX
+                mdx = data.get("mdx_content", "")
+                for orig, new_url in url_map.items():
+                    mdx = mdx.replace(f"./{orig}", new_url)
+                    mdx = mdx.replace(orig, new_url)
+
+                title = data.get("title", "Untitled")
+                base_slug = slugify(data.get("slug") or title)
+                
+                slug = base_slug
+                suffix = 2
+                while db.query(Article.id).filter(Article.slug == slug).first():
+                    slug = f"{base_slug}-{suffix}"
+                    suffix += 1
+                
+                # STRICT REQUIREMENT: All imported articles are drafts
+                article = Article(
+                    slug=slug,
+                    title=title,
+                    description=data.get("description", ""),
+                    image_url=data.get("image_url", ""),
+                    date=datetime.utcnow(),
+                    mdx_content=mdx,
+                    seo_title=data.get("seo_title"),
+                    meta_description=data.get("meta_description"),
+                    publication_status=PublicationStatus.draft,
+                    author_id=current_user.id
+                )
+                
+                tags = data.get("tags", [])
+                if tags:
+                    article.tags = resolve_tags(db, tags, TagKind.tag)
+                
+                db.add(article)
+                db.commit()
+                db.refresh(article)
+                imported_slugs.append(slug)
+
+            return {"status": "ok", "imported_count": len(imported_slugs), "slugs": imported_slugs}
             
-            slug = base_slug
-            suffix = 2
-            while db.query(Article.id).filter(Article.slug == slug).first():
-                slug = f"{base_slug}-{suffix}"
-                suffix += 1
-            
-            article = Article(
-                slug=slug,
-                title=title,
-                description=data.get("description", ""),
-                image_url=data.get("image_url", ""),
-                date=datetime.utcnow(),
-                mdx_content=mdx,
-                seo_title=data.get("seo_title"),
-                meta_description=data.get("meta_description"),
-                publication_status=PublicationStatus.published,
-                author_id=current_user.id
-            )
-            
-            tags = data.get("tags", [])
-            if tags:
-                article.tags = resolve_tags(db, tags, TagKind.tag)
-            
-            db.add(article)
-            db.commit()
-            db.refresh(article)
-            return {"status": "ok", "slug": article.slug}
     except zipfile.BadZipFile:
         raise HTTPException(400, "Invalid ZIP file")
     except json.JSONDecodeError:
-        raise HTTPException(400, "Invalid JSON format in ZIP")
+        raise HTTPException(400, "Invalid JSON format in one of the files")
     except Exception as e:
         raise HTTPException(500, f"Import failed: {str(e)}")
 

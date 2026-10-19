@@ -3,9 +3,11 @@ import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { $fetch } from "@/utils/fetch";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { useUser } from "@/entities/user/model/user-context";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,8 +17,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  MagnifyingGlassIcon, ArrowClockwiseIcon, CheckCircleIcon, XCircleIcon, ArrowSquareOutIcon, CircleNotchIcon, UploadSimpleIcon,
-  ClockIcon, PencilIcon, BookOpenIcon, UsersIcon, UserIcon,
+  MagnifyingGlassIcon, ArrowClockwiseIcon, CheckCircleIcon, XCircleIcon, ArrowSquareOutIcon, CircleNotchIcon, UploadSimpleIcon, PlusIcon,
+  ClockIcon, PencilIcon, BookOpenIcon, UsersIcon, UserIcon, TrashIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -80,6 +82,7 @@ export default function AdminArticlesPage() {
   const [rejectNote, setRejectNote] = useState("");
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (userLoading || !user) return null;
@@ -144,6 +147,48 @@ export default function AdminArticlesPage() {
     }
   };
 
+
+  const toggleSelect = (slug: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selected.size === articles.length && articles.length > 0) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(articles.map(a => a.slug)));
+    }
+  };
+
+  const handleBulkAction = async (action: "delete" | "approve" | "reject") => {
+    if (selected.size === 0) return;
+    if (action === "delete" && !confirm(`Удалить ${selected.size} статей?`)) return;
+    
+    setLoading(true);
+    try {
+      const res = await $fetch(`/api/v1/admin/articles/bulk/${action}`, {
+        method: "POST",
+        body: JSON.stringify({ slugs: Array.from(selected) }),
+        headers: { "Content-Type": "application/json" },
+        isToast: false,
+      });
+      if (!res?.response?.ok) throw new Error(res?.json?.detail || "Ошибка");
+      
+      toast.success(`Успешно: ${selected.size} шт.`);
+      setSelected(new Set());
+      load();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const counts = useMemo(() => ({
     pending: articles.filter((a) => a.publication_status === "pending_review").length,
   }), [articles]);
@@ -179,18 +224,33 @@ export default function AdminArticlesPage() {
               disabled={importing}
             >
               {importing ? <CircleNotchIcon className="size-4 animate-spin" /> : <UploadSimpleIcon className="size-4" />}
-              Импорт ZIP
+              Загрузить ZIP
             </Button>
             <Button variant="outlined" size="small" onClick={load} disabled={loading}>
               {loading ? <CircleNotchIcon className="size-4 animate-spin" /> : <ArrowClockwiseIcon className="size-4" />}
               Обновить
             </Button>
+
+            <Button asChild size="small">
+              <a href="/app/profile/articles/new" target="_blank" rel="noopener noreferrer">
+                <PlusIcon className="size-4" />
+                Создать статью
+              </a>
+            </Button>
+          
           </div>
         </div>
 
         {/* Filters */}
         <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-2">
+              <Checkbox 
+                checked={articles.length > 0 && selected.size === articles.length}
+                onCheckedChange={toggleAll}
+              />
+              <span className="text-body-5 uppercase tracking-wider text-(--on-bg-low)">Все</span>
+            </div>
             <div className="relative flex-1">
               <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
               <Input
@@ -278,8 +338,13 @@ export default function AdminArticlesPage() {
               const canReject = a.publication_status === "pending_review" || a.publication_status === "published";
 
               return (
-                <Card key={a.id} className="rounded-3xl border-(--outline) p-5 flex flex-col gap-4">
+                <Card key={a.id} className={`rounded-3xl border-(--outline) p-5 flex flex-col gap-4 transition-colors ${selected.has(a.slug) ? 'border-(--primary)/50 bg-(--primary-glass)' : ''}`}>
                   <div className="flex items-start gap-4">
+                    <Checkbox 
+                      checked={selected.has(a.slug)} 
+                      onCheckedChange={() => toggleSelect(a.slug)}
+                      className="mt-1"
+                    />
                     {/* Cover thumb */}
                     {a.image_url ? (
                       <img
