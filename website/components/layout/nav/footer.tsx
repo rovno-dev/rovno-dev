@@ -45,7 +45,7 @@ export default function Footer() {
       title: t("footer.services"),
       links: [
         ...SERVICES_META.map((s) => ({
-          title: s.shortTitle,
+          title: t(`services.${s.slug}.short`),
           href: rootLink(`/services/${s.slug}`),
         })),
         { title: t("footer.other"), href: rootLink(ROUTES.order.href) },

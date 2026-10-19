@@ -20,7 +20,9 @@ const COOKIE_DOMAIN = ROOT_RAW && !IS_LOCAL ? '.' + ROOT_RAW : undefined
 // NEXT_PUBLIC_PROTOCOL. With the wrong name this was always false,
 // so prod cookies never got Secure, and browsers silently dropped
 // cross-subdomain same-site cookies on HTTPS.
-const isHttps = process.env.NEXT_PUBLIC_PROTOCOL === 'https'
+const isHttps =
+    process.env.NEXT_PUBLIC_PROTOCOL === 'https' ||
+    (typeof window !== 'undefined' && window.location.protocol === 'https:');
 
 export const safeCookieStorage = {
     getItem: (key: string): string | null => {

@@ -48,3 +48,6 @@ class User(Base):
     # existing fields:
     blocked = Column(Boolean, default=False)
     verified = Column(Boolean, default=False)
+    can_create_articles = Column(Boolean, default=False, nullable=False, server_default="false")
+    totp_secret = Column(String, nullable=True)
+    totp_enabled = Column(Boolean, default=False, nullable=False, server_default="false")

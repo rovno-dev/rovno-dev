@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useLanguage } from "@/providers/language-provider";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,14 +12,8 @@ import {
   Megaphone,
   Sparkle,
   ArrowUpRight,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react";
 import { SERVICES_META } from "@/app/_data/services/meta";
-
-export const metadata = {
-  title: "Услуги · Rovno.dev",
-  description:
-    "Полный цикл цифровых услуг: брендинг, разработка, 3D и моушн, видеопродакшн, продвижение, UX/UI-дизайн.",
-};
 
 const ICONS: Record<string, React.ComponentType<{ className?: string; weight?: "bold" | "fill" | "regular" }>> = {
   palette: Palette,
@@ -29,6 +25,8 @@ const ICONS: Record<string, React.ComponentType<{ className?: string; weight?: "
 };
 
 export default function ServicesIndexPage() {
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen bg-(--bg)">
       {/* Hero */}
@@ -57,14 +55,13 @@ export default function ServicesIndexPage() {
         <Container className="relative">
           <div className="max-w-[820px] animate-reveal">
             <p className="text-body-5 uppercase tracking-[0.34em] text-(--on-bg-low) mb-5">
-              Услуги
+              {t("services.page.title")}
             </p>
             <h1 className="text-display-2 md:text-display-0 text-(--on-bg-high) mb-6 leading-[1] tracking-[-0.03em]">
-              Делаем <span className="text-(--primary)">всё</span> — от логотипа до продакшена.
+              {t("services.page.hero1")} <span className="text-(--primary)">{t("services.page.hero2")}</span> {t("services.page.hero3")}
             </h1>
             <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed max-w-[640px]">
-              Шесть направлений, которые можно заказать по отдельности или
-              собрать в один проект под ключ.
+              {t("services.page.subtitle")}
             </p>
           </div>
         </Container>
@@ -88,54 +85,43 @@ export default function ServicesIndexPage() {
                       aria-hidden
                       className="absolute top-0 right-0 size-40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{
-                        background: `radial-gradient(circle at 100% 0%, ${service.accent}22, transparent 70%)`,
+                        background: `radial-gradient(circle at 100% 0%, var(--primary-glass), transparent 70%)`,
                       }}
                     />
                     <div className="relative flex flex-col h-full">
                       <div className="flex items-start justify-between mb-6">
-                        <div
-                          className="flex size-14 items-center justify-center rounded-2xl"
-                          style={{
-                            background: `${service.accent}20`,
-                            color: service.accent,
-                          }}
-                        >
-                          {Icon && <Icon className="size-6" weight="bold" />}
+                        <div className="flex size-14 items-center justify-center rounded-2xl bg-(--bg) border border-(--outline) text-(--on-bg-high) shadow-sm">
+                          {Icon && <Icon className="size-6" weight="regular" />}
                         </div>
                         <ArrowUpRight
                           className="size-5 text-(--on-bg-low) transition-all duration-300 group-hover:text-(--primary) group-hover:translate-x-1 group-hover:-translate-y-1"
                         />
                       </div>
-
                       <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) mb-2 tracking-tight">
-                        {service.title}
+                        {t(`services.${service.slug}.title`)}
                       </h2>
-                      <p
-                        className="text-body-5 uppercase tracking-[0.18em] mb-4"
-                        style={{ color: service.accent }}
-                      >
-                        {service.tagline}
+                      <p className="text-body-5 uppercase tracking-[0.18em] mb-4 text-(--on-bg-low)">
+                        {t(`services.${service.slug}.tagline`)}
                       </p>
                       <p className="text-body-3 text-(--on-bg-medium) leading-relaxed mb-8 flex-1">
-                        {service.description}
+                        {t(`services.${service.slug}.desc`)}
                       </p>
-
                       <div className="flex items-center gap-4 pt-5 border-t border-(--outline)">
                         <div>
                           <p className="text-[10px] uppercase tracking-[0.16em] text-(--on-bg-low) mb-0.5">
-                            Срок
+                            {t("services.time")}
                           </p>
                           <p className="text-body-4 text-(--on-bg-high) font-medium">
-                            {service.leadTime}
+                            {t(`services.${service.slug}.time`)}
                           </p>
                         </div>
                         <div className="w-px h-8 bg-(--outline)" />
                         <div>
                           <p className="text-[10px] uppercase tracking-[0.16em] text-(--on-bg-low) mb-0.5">
-                            Стоимость
+                            {t("services.price")}
                           </p>
                           <p className="text-body-4 text-(--on-bg-high) font-medium">
-                            {service.startingAt}
+                            {t(`services.${service.slug}.price`)}
                           </p>
                         </div>
                       </div>
@@ -162,15 +148,14 @@ export default function ServicesIndexPage() {
             />
             <div className="relative max-w-2xl mx-auto">
               <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight mb-4">
-                Не нашли то, что искали?
+                {t("services.cta.title")}
               </h2>
               <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-8">
-                Расскажите о задаче — предложим решение. Даже если это что-то,
-                чего нет в списке.
+                {t("services.cta.subtitle")}
               </p>
               <Button size="xlarge" asChild>
                 <Link href="/order">
-                  Оформить заказ
+                  {t("services.cta.button")}
                   <ArrowUpRight className="size-5" />
                 </Link>
               </Button>

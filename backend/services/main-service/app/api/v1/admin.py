@@ -106,12 +106,14 @@ class UserOut(BaseModel):
     phone: Optional[str] = None
     username: Optional[str] = None
     avatar_url: Optional[str] = None
+    can_create_articles: Optional[bool] = None
     role: str
     verified: bool = False
     blocked: bool = False
     telegram_chat_id: Optional[str] = None
     email_enabled: bool = True
     telegram_enabled: bool = True
+    can_create_articles: bool = False
     created_at: Optional[datetime] = None
 
     @classmethod
@@ -130,6 +132,7 @@ class UserOut(BaseModel):
             telegram_chat_id=(prefs.telegram_chat_id if prefs else None),
             email_enabled=(prefs.email_enabled if prefs else True),
             telegram_enabled=(prefs.telegram_enabled if prefs else True),
+            can_create_articles=bool(getattr(u, 'can_create_articles', False)),
             created_at=u.created_at,
         )
 
@@ -159,6 +162,7 @@ class UserUpdate(BaseModel):
     # Avatar URL — managed here so an admin can set it without going
     # through the user's own profile page.
     avatar_url: Optional[str] = None
+    can_create_articles: Optional[bool] = None
 
     @field_validator("password")
     @classmethod
@@ -289,6 +293,9 @@ async def update_user(
         raise HTTPException(403, "Only root can set admin role")
     if data.role is not None and user.user_role == UserRole.admin and current_user.user_role != UserRole.root:
         raise HTTPException(403, "Only root can change admin role")
+    if data.can_create_articles is not None and current_user.user_role != UserRole.root:
+        raise HTTPException(403, "Only root can change can_create_articles permission")
+
     # Prevent self-demotion from root to admin
     if user.id == current_user.id and data.role is not None and data.role != UserRole.root and current_user.user_role == UserRole.root:
         raise HTTPException(403, "Root cannot demote themselves")

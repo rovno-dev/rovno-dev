@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { changePassword, deleteAccount } from "@/utils/api/user";
+import { $fetch } from "@/utils/fetch";
+import { QrCode } from "@phosphor-icons/react";
 import { Field, FieldLabel } from "@/components/ui/field";
 
 export default function SecurityPage() {
@@ -25,6 +27,9 @@ export default function SecurityPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [totpSetup, setTotpSetup] = useState<{ secret: string; uri: string } | null>(null);
+  const [totpCode, setTotpCode] = useState("");
+  const [totpLoading, setTotpLoading] = useState(false);
 
   if (isLoading || !user) return null;
 
@@ -125,9 +130,59 @@ export default function SecurityPage() {
 
       <Card className="rounded-3xl border-(--outline) p-6 shadow-sm">
         <h2 className="text-heading-3 mb-2">Двухфакторная аутентификация</h2>
-        <p className="text-body-3 text-(--on-bg-medium)">
-          Здесь можно будет включить 2FA для дополнительной защиты (в разработке).
+        <p className="text-body-3 text-(--on-bg-medium) mb-6">
+          Защитите аккаунт с помощью приложения Google Authenticator или аналогичного.
         </p>
+        
+        {!totpSetup ? (
+          <Button
+            onClick={async () => {
+              setTotpLoading(true);
+              try {
+                const res = await $fetch("/api/v1/2fa/setup", { method: "POST" });
+                if (res?.response?.ok) setTotpSetup(res.json);
+                else toast.error("Ошибка настройки 2FA");
+              } finally {
+                setTotpLoading(false);
+              }
+            }}
+            disabled={totpLoading}
+          >
+            {totpLoading ? "Генерация..." : "Включить 2FA"}
+          </Button>
+        ) : (
+          <div className="space-y-4 max-w-sm">
+            <p className="text-body-4 text-(--on-bg-medium)">1. Отсканируйте QR-код или введите секрет вручную:</p>
+            <div className="p-4 bg-white rounded-xl flex items-center justify-center">
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(totpSetup.uri)}`} alt="QR Code" className="w-[150px] h-[150px]" />
+            </div>
+            <code className="block text-xs font-mono bg-(--bg) p-2 rounded break-all">{totpSetup.secret}</code>
+            <p className="text-body-4 text-(--on-bg-medium)">2. Введите 6-значный код из приложения:</p>
+            <div className="flex gap-2">
+              <Input value={totpCode} onChange={e => setTotpCode(e.target.value)} placeholder="000000" maxLength={6} />
+              <Button
+                onClick={async () => {
+                  setTotpLoading(true);
+                  try {
+                    const res = await $fetch(`/api/v1/2fa/enable?code=${totpCode}`, { method: "POST" });
+                    if (res?.response?.ok) {
+                      toast.success("2FA включена!");
+                      setTotpSetup(null);
+                      setTotpCode("");
+                    } else {
+                      toast.error("Неверный код");
+                    }
+                  } finally {
+                    setTotpLoading(false);
+                  }
+                }}
+                disabled={totpLoading || totpCode.length !== 6}
+              >
+                Подтвердить
+              </Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Danger zone */}

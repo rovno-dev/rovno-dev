@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  MagnifyingGlassIcon, ArrowClockwiseIcon, CheckCircleIcon, XCircleIcon, ArrowSquareOutIcon, CircleNotchIcon,
+  MagnifyingGlassIcon, ArrowClockwiseIcon, CheckCircleIcon, XCircleIcon, ArrowSquareOutIcon, CircleNotchIcon, UploadSimpleIcon,
   ClockIcon, PencilIcon, BookOpenIcon, UsersIcon, UserIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -79,6 +79,8 @@ export default function AdminArticlesPage() {
   const [rejectSlug, setRejectSlug] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState("");
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (userLoading || !user) return null;
   if (user.role !== "admin" && user.role !== "root") {
@@ -115,6 +117,33 @@ export default function AdminArticlesPage() {
     }
   };
 
+
+  const handleImportZip = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await $fetch("/api/v1/admin/articles/import-zip", {
+        method: "POST",
+        body: formData,
+        isToast: false,
+      });
+      if (!res?.response?.ok) {
+        throw new Error(res?.json?.detail || "Ошибка импорта");
+      }
+      toast.success("Статья успешно импортирована!");
+      load();
+    } catch (err: any) {
+      toast.error(err?.message || "Ошибка импорта");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const counts = useMemo(() => ({
     pending: articles.filter((a) => a.publication_status === "pending_review").length,
   }), [articles]);
@@ -135,10 +164,28 @@ export default function AdminArticlesPage() {
               )}
             </p>
           </div>
-          <Button variant="outlined" size="small" onClick={load} disabled={loading}>
-            {loading ? <CircleNotchIcon className="size-4 animate-spin" /> : <ArrowClockwiseIcon className="size-4" />}
-            Обновить
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".zip"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleImportZip}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+            >
+              {importing ? <CircleNotchIcon className="size-4 animate-spin" /> : <UploadSimpleIcon className="size-4" />}
+              Импорт ZIP
+            </Button>
+            <Button variant="outlined" size="small" onClick={load} disabled={loading}>
+              {loading ? <CircleNotchIcon className="size-4 animate-spin" /> : <ArrowClockwiseIcon className="size-4" />}
+              Обновить
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}

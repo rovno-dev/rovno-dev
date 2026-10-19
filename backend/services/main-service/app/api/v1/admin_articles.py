@@ -2,7 +2,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,10 @@ from app.models.user import User
 from app.schemas.article.responses import AdminArticleListItem
 from app.shared.auth import get_current_user
 from database.database import get_db
-from app.api.v1.admin import get_admin_user  # reuse the existing dependency
+from app.api.v1.admin import get_admin_user
+from app.services.tag_service import resolve_tags
+from app.models.tag import TagKind
+from app.shared.slugify import slugify
 
 router = APIRouter(prefix="/admin/articles", tags=["admin-articles"])
 
@@ -107,6 +110,89 @@ def list_admin_articles(
         out.append(item)
     return out
 
+
+
+@router.post("/import-zip", status_code=201)
+async def import_article_zip(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not (current_user.user_role in (UserRole.admin, UserRole.root) or getattr(current_user, 'can_create_articles', False)):
+        raise HTTPException(403, "No permission to create articles")
+
+    if not file.filename.endswith('.zip'):
+        raise HTTPException(400, "Must be a ZIP file")
+
+    content = await file.read()
+    try:
+        with zipfile.ZipFile(io.BytesIO(content)) as z:
+            json_files = [f for f in z.namelist() if f.endswith('.json') and not f.startswith('__MACOSX')]
+            if not json_files:
+                raise HTTPException(400, "No .json file found in ZIP")
+            
+            with z.open(json_files[0]) as f:
+                data = json.load(f)
+
+            image_files = [f for f in z.namelist() if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.gif')) and not f.startswith('__MACOSX')]
+            
+            UPLOAD_DIR = os.getenv("UPLOADS_DIR", "/app/storage/uploads")
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
+            
+            url_map = {}
+            for img_path in image_files:
+                ext = os.path.splitext(img_path)[1].lower()
+                unique_name = f"{uuid.uuid4().hex}{ext}"
+                disk_path = os.path.join(UPLOAD_DIR, unique_name)
+                
+                with z.open(img_path) as src, open(disk_path, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
+                
+                url_map[img_path] = f"/uploads/images/{unique_name}"
+                url_map[os.path.basename(img_path)] = f"/uploads/images/{unique_name}"
+            
+            mdx = data.get("mdx_content", "")
+            for orig, new_url in url_map.items():
+                mdx = mdx.replace(f"./{orig}", new_url)
+                mdx = mdx.replace(f"./{os.path.basename(orig)}", new_url)
+                mdx = mdx.replace(orig, new_url)
+
+            title = data.get("title", "Untitled")
+            base_slug = slugify(data.get("slug") or title)
+            
+            slug = base_slug
+            suffix = 2
+            while db.query(Article.id).filter(Article.slug == slug).first():
+                slug = f"{base_slug}-{suffix}"
+                suffix += 1
+            
+            article = Article(
+                slug=slug,
+                title=title,
+                description=data.get("description", ""),
+                image_url=data.get("image_url", ""),
+                date=datetime.utcnow(),
+                mdx_content=mdx,
+                seo_title=data.get("seo_title"),
+                meta_description=data.get("meta_description"),
+                publication_status=PublicationStatus.published,
+                author_id=current_user.id
+            )
+            
+            tags = data.get("tags", [])
+            if tags:
+                article.tags = resolve_tags(db, tags, TagKind.tag)
+            
+            db.add(article)
+            db.commit()
+            db.refresh(article)
+            return {"status": "ok", "slug": article.slug}
+    except zipfile.BadZipFile:
+        raise HTTPException(400, "Invalid ZIP file")
+    except json.JSONDecodeError:
+        raise HTTPException(400, "Invalid JSON format in ZIP")
+    except Exception as e:
+        raise HTTPException(500, f"Import failed: {str(e)}")
 
 @router.patch("/{slug}/approve")
 def approve_article(

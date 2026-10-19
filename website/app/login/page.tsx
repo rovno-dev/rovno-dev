@@ -23,7 +23,8 @@ export default function LoginPage() {
   const router = useRouter()
   const [errors, setErrors] = useState<Record<string, any> | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formData, setFormData] = useState({ email: "", password: "" })
+  const [formData, setFormData] = useState({ email: "", password: "", totp_code: "" })
+  const [requires2FA, setRequires2FA] = useState(false)
   const { setToken } = useUser()
   const [pageLoadTime, setPageLoadTime] = useState<number>(0)
 
@@ -53,7 +54,7 @@ export default function LoginPage() {
     try {
       const response = await $fetch("/api/v1/login/email", {
         method: "POST",
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({ email: formData.email, password: formData.password, totp_code: requires2FA ? formData.totp_code : undefined }),
         headers: { "Content-Type": "application/json" },
         onLoadingChange: setIsLoading,
         isToast: false,
@@ -75,6 +76,12 @@ export default function LoginPage() {
       }
       if (response?.response?.status === 403) {
         const message = response?.json?.message
+        if (message === "2FA code required") {
+          setRequires2FA(true);
+          setIsLoading(false);
+          toast.info("Введите код из приложения аутентификации");
+          return;
+        }
         if (message === "User not verified") {
           router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
           return
@@ -121,10 +128,25 @@ export default function LoginPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <Field><FieldLabel>Email</FieldLabel><Input type="text" name="email" placeholder="Enter email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} /><FieldError errors={errors?.email ? [{ message: errors.email }] : []} /></Field>
             <Field><FieldLabel>Password</FieldLabel><PasswordInput name="password" placeholder="Enter password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} /><FieldError errors={errors?.password ? [{ message: errors.password }] : []} /></Field>
+            {requires2FA && (
+              <Field>
+                <FieldLabel>2FA Code</FieldLabel>
+                <Input name="totp_code" placeholder="000000" value={formData.totp_code} onChange={(e) => setFormData({ ...formData, totp_code: e.target.value })} />
+              </Field>
+            )}
             <Button type="submit">Sign In</Button>
-            <div className="text-center text-sm">
-              <span className="text-[var(--text-secondary)]">No account? </span>
-              <Link href="/register" className="text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-medium transition-colors underline-offset-2 hover:underline">Register</Link>
+            <div className="text-center text-sm flex flex-col gap-2 mt-2">
+              <div>
+                <Link href="/forgot-password" className="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors hover:underline underline-offset-2">
+                  Forgot password?
+                </Link>
+              </div>
+              <div>
+                <span className="text-[var(--text-secondary)]">No account? </span>
+                <Link href="/register" className="text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-medium transition-colors underline-offset-2 hover:underline">
+                  Register
+                </Link>
+              </div>
             </div>
           </form>
         </div>

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
-
+from typing import Optional
 
 class RegisterEmailRequest(BaseModel):
     email: EmailStr
@@ -17,21 +17,27 @@ class RegisterEmailRequest(BaseModel):
             raise ValueError('Password must contain at least one uppercase letter')
         return v
 
-
 class VerifyEmailRequest(BaseModel):
     email: EmailStr
     code: str = Field(..., min_length=6, max_length=6)
 
-
 class EmailPasswordLoginRequest(BaseModel):
     email: EmailStr
     password: str
-
+    totp_code: Optional[str] = None
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
-
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
     lang: str = Field("ru")
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    lang: str = Field("ru")
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6)
+    new_password: str = Field(..., min_length=8)

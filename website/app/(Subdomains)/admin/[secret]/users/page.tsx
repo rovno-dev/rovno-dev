@@ -72,6 +72,7 @@ interface User {
   verified: boolean;
   blocked: boolean;
   telegram_chat_id?: string | null;
+  can_create_articles?: boolean;
 }
 
 const ROLE_OPTIONS = [
@@ -1106,6 +1107,7 @@ interface FormState {
   role: string;
   verified: boolean;
   blocked: boolean;
+  can_create_articles: boolean;
 }
 
 function emptyForm(): FormState {
@@ -1120,6 +1122,7 @@ function emptyForm(): FormState {
     role: "user",
     verified: false,
     blocked: false,
+    can_create_articles: false,
   };
 }
 
@@ -1155,6 +1158,7 @@ function UserEditorDialog({
         role: user.role,
         verified: user.verified,
         blocked: user.blocked,
+        can_create_articles: user.can_create_articles ?? false,
       });
     } else {
       setForm(emptyForm());
@@ -1191,6 +1195,7 @@ function UserEditorDialog({
             role: form.role,
             verified: form.verified,
             blocked: form.blocked,
+            can_create_articles: form.can_create_articles,
           }),
           headers: { "Content-Type": "application/json" },
         });
@@ -1205,6 +1210,7 @@ function UserEditorDialog({
           role: form.role,
           verified: form.verified,
           blocked: form.blocked,
+          can_create_articles: form.can_create_articles,
         };
         if (form.password) payload.password = form.password;
         res = await $fetch(`/api/v1/admin/users/${user!.id}`, {
@@ -1365,6 +1371,14 @@ function UserEditorDialog({
                   onCheckedChange={(v) => update("blocked", v)}
                 />
                 <span className="text-body-4">Заблокирован</span>
+              </label>
+              <label className={`flex items-center gap-3 ${isRoot ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                <Switch
+                  checked={form.can_create_articles}
+                  onCheckedChange={(v) => update("can_create_articles", v)}
+                  disabled={!isRoot}
+                />
+                <span className="text-body-4">Создание статей</span>
               </label>
             </div>
           </div>

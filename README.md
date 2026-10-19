@@ -156,3 +156,66 @@ The production server `.env` overrides:
 - `TLS_ENABLED=true`
 - `CERT_RESOLVER=myresolver`
 - `DOMAIN` should contain the full `Host` rule for every production subdomain.
+
+## Database Backups (Weekly Cron + Cloud Upload)
+
+To keep your data safe, we will dump the Postgres database weekly and upload it to cloud storage (Yandex Cloud Object Storage, AWS S3, or Google Drive) using `rclone`.
+
+### 1. Create a backup script
+
+Create a file `/usr/local/bin/backup-db.sh` on your **host machine**:
+
+```bash
+#!/bin/bash
+set -e
+
+# Configuration
+DB_USER="root"
+DB_NAME="main_db"
+BACKUP_DIR="/tmp/db-backups"
+DATE=$(date +%Y-%m-%d_%H-%M-%S)
+FILE_NAME="backup_${DB_NAME}_${DATE}.sql.gz"
+
+# Ensure directory exists
+mkdir -p "$BACKUP_DIR"
+
+# Dump database (executes pg_dump inside the running docker container)
+docker exec main-db pg_dump -U "$DB_USER" -d "$DB_NAME" | gzip > "${BACKUP_DIR}/${FILE_NAME}"
+
+# Upload to Cloud (using rclone)
+# Assuming you named your rclone remote 'cloud' (e.g., yandex, s3, gdrive)
+rclone copy "${BACKUP_DIR}/${FILE_NAME}" cloud:rovno-backups/
+
+# Keep only the last 4 backups locally
+ls -tp "${BACKUP_DIR}"/backup_*.sql.gz | tail -n +5 | xargs -I {} rm -- {}
+
+echo "Backup ${FILE_NAME} completed and uploaded to cloud."
+```
+
+### 2. Make it executable
+
+```bash
+chmod +x /usr/local/bin/backup-db.sh
+```
+
+### 3. Configure rclone
+Install `rclone` on your host machine (`curl https://rclone.org/install.sh | sudo bash`) and run:
+
+```bash
+rclone config
+```
+Follow the prompts to set up your preferred remote (Google Drive, Yandex S3, AWS, etc.). Name it `cloud` and create a bucket called `rovno-backups`.
+
+### 4. Schedule with Cron
+Open your host's crontab:
+
+```bash
+crontab -e
+```
+Add the following line to run every Sunday at 3:00 AM:
+
+```text
+0 3 * * 0 /usr/local/bin/backup-db.sh >> /var/log/db-backup.log 2>&1
+```
+
+*(Note: To run it automatically inside the docker container instead, you can set up a lightweight `alpine` cron container in `docker-compose.yml` mounted to `/var/run/docker.sock`, but the host-cron method above is the most robust.)*

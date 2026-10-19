@@ -9,7 +9,10 @@ from app.schemas.auth.requests import (
     EmailPasswordLoginRequest,
     RefreshTokenRequest,
     ResendVerificationRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
+import pyotp
 from app.schemas.auth.responses import TokenResponse, AccessTokenResponse, EmailSendCodeResponse
 from app.services.email_service import send_email
 from app.services.otp_service import generate_otp, save_otp, verify_otp
@@ -72,6 +75,48 @@ async def verify_email(
     refresh_token = create_refresh_token({"sub": str(user.id)})
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: Request,
+    payload: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+    _: None = Depends(limit_otp_send),
+):
+    user = get_user_by_email(db, payload.email)
+    if not user:
+        # Prevent email enumeration
+        return {"message": "If the email exists, a reset code has been sent."}
+
+    code = generate_otp()
+    if not save_otp(f"reset:{payload.email}", code):
+        raise HTTPException(503, "OTP storage unavailable")
+    
+    from app.services.email_service import send_email
+    sent = await send_email(payload.email, code, lang=payload.lang)
+    if not sent:
+        raise HTTPException(502, "Could not send email")
+    
+    return {"message": "Reset code sent"}
+
+@router.post("/reset-password")
+async def reset_password(
+    payload: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    user = get_user_by_email(db, payload.email)
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    if not verify_otp(f"reset:{payload.email}", payload.code):
+        raise HTTPException(401, "Invalid or expired code")
+
+    from app.shared.auth import hash_password
+    user.password = hash_password(payload.new_password)
+    db.commit()
+    
+    return {"message": "Password updated successfully"}
+
 @router.post("/login/email")
 async def login_email_password(
     request: Request,
@@ -107,6 +152,51 @@ async def login_email_password(
     refresh_token = create_refresh_token({"sub": str(user.id)})
     logger.info(f"Successful login for user: {payload.email}")
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/2fa/setup")
+async def setup_2fa(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if getattr(current_user, "totp_enabled", False):
+        raise HTTPException(400, "2FA is already enabled")
+    
+    secret = pyotp.random_base32()
+    current_user.totp_secret = secret
+    db.commit()
+
+    provisioning_uri = pyotp.TOTP(secret).provisioning_uri(
+        name=current_user.email, issuer_name="Rovno.dev"
+    )
+    return {"secret": secret, "uri": provisioning_uri}
+
+@router.post("/2fa/enable")
+async def enable_2fa(
+    code: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not current_user.totp_secret:
+        raise HTTPException(400, "Setup 2FA first")
+    
+    totp = pyotp.TOTP(current_user.totp_secret)
+    if not totp.verify(code):
+        raise HTTPException(401, "Invalid code")
+
+    current_user.totp_enabled = True
+    db.commit()
+    return {"message": "2FA enabled successfully"}
+
+@router.post("/2fa/disable")
+async def disable_2fa(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.totp_enabled = False
+    current_user.totp_secret = None
+    db.commit()
+    return {"message": "2FA disabled successfully"}
 
 @router.post("/refresh", response_model=AccessTokenResponse)
 async def refresh_access_token(
