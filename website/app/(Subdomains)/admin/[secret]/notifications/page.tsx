@@ -88,7 +88,7 @@ export default function AdminNotificationsPage() {
       if (res?.response?.ok && Array.isArray(res.json)) {
         setUsers(res.json as UserRow[]);
       }
-    } catch { /* non-fatal — picker will just be empty */ }
+    } catch { /* non-fatal - picker will just be empty */ }
   }, []);
 
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function AdminNotificationsPage() {
     return users
       .filter((u) => !u.blocked)
       // Only admin/root users are eligible order-notification recipients.
-      // Root picks which subset of them actually receives anything — the
+      // Root picks which subset of them actually receives anything - the
       // candidate pool here is the full admin + root set. The admin
       // /users endpoint returns the role under `role` (not `user_role`),
       // so read that field; reading `user_role` was why every user was
@@ -284,7 +284,7 @@ export default function AdminNotificationsPage() {
               </div>
               <p className="text-body-4 text-(--on-bg-medium)">
                 Кому уходит письмо о новом заказе.{" "}
-                <b>Если список пуст — все администраторы и root-пользователи.</b>
+                <b>Если список пуст - все администраторы и root-пользователи.</b>
               </p>
               <EntityMultiPicker
                 value={selectedEmailRecipients}
@@ -312,7 +312,7 @@ export default function AdminNotificationsPage() {
                   Пользователи
                 </a>
                 .{" "}
-                <b>Если список пуст — все администраторы и root-пользователи.</b>
+                <b>Если список пуст - все администраторы и root-пользователи.</b>
               </p>
               <EntityMultiPicker
                 value={selectedTelegramRecipients}
@@ -380,7 +380,7 @@ export default function AdminNotificationsPage() {
 
               <p className="text-body-5 text-(--on-bg-low)">
                 Используйте <code className="font-mono">**жирный**</code> и{" "}
-                <code className="font-mono">`code`</code>. Простого текста достаточно —
+                <code className="font-mono">`code`</code>. Простого текста достаточно -
                 Telegram и email отобразят переносы строк как есть.
               </p>
             </Card>

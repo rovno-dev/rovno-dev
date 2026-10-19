@@ -231,7 +231,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
               draftKind === "github" ? "owner/name"
                 : draftKind === "license" ? "MIT"
                   : draftKind === "from_chief" ? "Автор (опц.)"
-                    : "—"
+                    : "-"
             }
             className="h-9 text-sm font-mono"
             disabled={draftKind === "custom"}

@@ -5,7 +5,7 @@ import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
 
 /**
  * Normalized input handed to every bespoke renderer. This is the union of
- * every field any template might need — each renderer picks the ones it
+ * every field any template might need - each renderer picks the ones it
  * cares about and ignores the rest. Because the shape is shared, routing
  * a new project to an existing template is a one-line change in the DB.
  */
@@ -25,7 +25,7 @@ export interface CustomPageContext {
   techStack: string[];
   tags: { id: string; kind: ProjectTagKind; label: string; meta?: string | null }[];
   media: { id: string; type: "image" | "video"; url: string; caption?: string | null }[];
-  /** Compiled MDX body. ALX ignores this — its content is baked into the component. */
+  /** Compiled MDX body. ALX ignores this - its content is baked into the component. */
   content: React.ReactNode;
 }
 

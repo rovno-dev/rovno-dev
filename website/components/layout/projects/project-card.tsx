@@ -35,7 +35,7 @@ function CoverFallback({ label, hint }: { label: string; hint: string }) {
           backgroundSize: "32px 32px",
         }}
       />
-      {/* Diagonal hairlines — subtle texture under everything */}
+      {/* Diagonal hairlines - subtle texture under everything */}
       <div
         aria-hidden
         className="absolute inset-0 opacity-30"
@@ -90,7 +90,7 @@ export default function ProjectCard({
   const hasCover = Boolean(project.cover?.imageSrc?.trim());
   const showFallback = !hasCover || failed;
   const catLabel = project.category ? categoryMap[project.category] || project.category : "";
-  // Normalize whatever shape we got — some sources send {name}, others
+  // Normalize whatever shape we got - some sources send {name}, others
   // {label}, and legacy strings.
   const normalizedTags = (tags || [])
     .map((t) => {
@@ -140,7 +140,7 @@ export default function ProjectCard({
           )}
 
           {/* Tags strip. One horizontal line, no scrollbar chrome. Overflow
-              fades under the edge — the fade is what hints "there's more". */}
+              fades under the edge - the fade is what hints "there's more". */}
           {normalizedTags.length > 0 && (
             <div className="mt-1 flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1">
               {normalizedTags.map((t, i) => (

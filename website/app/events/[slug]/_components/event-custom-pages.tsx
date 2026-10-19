@@ -3,7 +3,7 @@ import { NashDevPage } from "./nash-dev-page";
 
 /**
  * Registry for bespoke event landing templates. Same pattern as
- * custom-pages.tsx for projects — the admin picks a key via the event
+ * custom-pages.tsx for projects - the admin picks a key via the event
  * editor's "Кастомная страница" dropdown, and the router dispatches to the
  * matching renderer.
  *

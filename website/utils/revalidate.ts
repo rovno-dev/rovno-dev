@@ -3,7 +3,7 @@
  * mutating a resource so the public site reflects the change immediately
  * instead of waiting out the ISR window.
  *
- * Failures are silent — a failed revalidation just means the change
+ * Failures are silent - a failed revalidation just means the change
  * appears on the next natural revalidate, which is a graceful degradation.
  */
 export async function revalidateTags(tags: string[]): Promise<void> {
@@ -15,6 +15,6 @@ export async function revalidateTags(tags: string[]): Promise<void> {
       body: JSON.stringify({ tags }),
     });
   } catch {
-    /* silent — see doc above */
+    /* silent - see doc above */
   }
 }

@@ -234,7 +234,7 @@ export function TeamMemberEditorDialog({
               )}
             </div>
             <p className="text-body-6 text-(--on-bg-low)">
-              Публичная страница: <code className="font-mono">/{member.user_username || "—"}</code>
+              Публичная страница: <code className="font-mono">/{member.user_username || "-"}</code>
             </p>
           </Card>
 
@@ -257,7 +257,7 @@ export function TeamMemberEditorDialog({
               Username (URL)
               {!username.trim() && (
                 <span className="text-destructive text-body-6 font-normal ml-2">
-                  — без него профиль не появится на сайте
+                  - без него профиль не появится на сайте
                 </span>
               )}
             </FieldLabel>
@@ -306,7 +306,7 @@ export function TeamMemberEditorDialog({
                 onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
               />
               <p className="text-body-6 text-(--on-bg-low) mt-1">
-                Меньше — выше в списке
+                Меньше - выше в списке
               </p>
             </Field>
             <Field>

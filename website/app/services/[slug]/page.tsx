@@ -63,7 +63,7 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
-/** Heading components — identical slugify() logic to the TOC extractor. */
+/** Heading components - identical slugify() logic to the TOC extractor. */
 const mdxComponents = {
   h2: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));
@@ -268,7 +268,7 @@ export default async function ServicePage({
                   Нужна {doc.shortTitle.toLowerCase()}?
                 </h2>
                 <p className="text-body-3 text-(--on-bg-medium) max-w-lg">
-                  Опишите задачу — ответим в течение 3 часов и предложим план.
+                  Опишите задачу - ответим в течение 3 часов и предложим план.
                 </p>
               </div>
               <Button size="large" asChild className="shrink-0">

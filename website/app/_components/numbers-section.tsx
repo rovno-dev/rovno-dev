@@ -22,7 +22,7 @@ function NumberDisplay({ value, active }: { value: string; active: boolean }) {
       if (!ref.current) return;
       const scrambled = original.split("").map((char, idx) => {
         // Preserve spaces, punctuation, and Cyrillic characters
-        if (char === " " || char === "." || char === "," || char === "—" || /[а-яА-Я]/.test(char)) return char;
+        if (char === " " || char === "." || char === "," || char === "-" || /[а-яА-Я]/.test(char)) return char;
         if (idx < iteration) return original[idx];
         return chars[Math.floor(Math.random() * chars.length)];
       }).join("");

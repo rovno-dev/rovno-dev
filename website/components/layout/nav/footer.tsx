@@ -19,6 +19,7 @@ import { useLanguage } from "@/providers/language-provider";
 import { useRootHref } from "@/hooks/use-root-href";
 import { rootDomainUrl } from "@/utils/root-domain";
 import { SERVICES_META } from "@/app/_data/services/meta";
+import { MadeOnAmorfa } from "@/components/made-on-amorfa";
 
 const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
 
@@ -143,6 +144,7 @@ export default function Footer() {
             <span className="text-body-5 text-(--on-bg-low)">
               {t("footer.copyright").replace("{year}", String(year))}
             </span>
+            <MadeOnAmorfa />
           </div>
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">

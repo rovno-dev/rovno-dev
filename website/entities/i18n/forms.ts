@@ -34,13 +34,13 @@ export const formsTranslations: Record<Language, Record<string, string>> = {
     'forms.verify.resend': 'Resend code',
     'forms.verify.resending': 'Sending...',
     'forms.verify.back': 'Back to sign up',
-    // order — section headings
+    // order - section headings
     'forms.order.service_heading': '1. Service type',
     'forms.order.contacts_heading': '2. Contacts',
     'forms.order.project_heading': '3. About the project',
     'forms.order.company_heading': '4. About the company',
     'forms.order.files_heading': '5. Attachments (max 10 MB)',
-    // order — service types
+    // order - service types
     'forms.order.service_1': 'Logo',
     'forms.order.service_2': 'Brand identity',
     'forms.order.service_3': 'Brand book',
@@ -51,7 +51,7 @@ export const formsTranslations: Record<Language, Record<string, string>> = {
     'forms.order.service_8': '3D modeling, 3D animation',
     'forms.order.service_9': 'Ads and promotion (SEO, targeting, contextual)',
     'forms.order.service_10': 'Something else (described in "About the project")',
-    // order — labels
+    // order - labels
     'forms.order.name': 'Your name',
     'forms.order.name_placeholder': 'Your name',
     'forms.order.phone': 'Phone',
@@ -76,19 +76,19 @@ export const formsTranslations: Record<Language, Record<string, string>> = {
     'forms.order.submitting': 'Submitting...',
     'forms.order.page_title': 'Place an order',
     'forms.order.page_subtitle': "Describe your task and we'll prepare a proposal.",
-    // order — deadline options
+    // order - deadline options
     'forms.order.deadline_asap': 'As soon as possible',
     'forms.order.deadline_1m': 'Within 1 month',
     'forms.order.deadline_1_3m': '1–3 months',
     'forms.order.deadline_flexible': 'No rush, we can discuss',
-    // order — budget options
+    // order - budget options
     'forms.order.budget_30_75': '30,000–75,000 ₽',
     'forms.order.budget_75_150': '75,000–150,000 ₽',
     'forms.order.budget_150_500': '150,000–500,000 ₽',
     'forms.order.budget_500_1k': '500,000–1,000,000 ₽',
     'forms.order.budget_over_1k': 'Over 1,000,000 ₽',
     'forms.order.budget_consult': 'Need a consultation on price',
-    // order — agreement + success
+    // order - agreement + success
     'forms.order.agreement_pre': 'I consent to the processing of my personal data in accordance with the',
     'forms.order.agreement_privacy': 'Privacy Policy',
     'forms.order.agreement_and': 'and accept the',

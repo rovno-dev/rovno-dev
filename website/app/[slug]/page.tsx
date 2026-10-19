@@ -23,7 +23,7 @@ import {
 } from "@/utils/api/team";
 
 // Render on every request. The expert page reflects admin-pinned projects
-// immediately — no ISR staleness window.
+// immediately - no ISR staleness window.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -39,7 +39,7 @@ interface RenderProject {
 
 /**
  * Merge DB-pinned projects with any hardcoded fallback list. The DB list
- * wins — hardcoded is only used when a member has no DB assignments yet.
+ * wins - hardcoded is only used when a member has no DB assignments yet.
  */
 function mergeProjects(
   fromDb: TeamMemberPublicProject[],
@@ -88,7 +88,7 @@ export default async function ExpertPage({
     fetchTeamMemberProjectsServer(slug),
   ]);
 
-  // Hardcoded enrichment — stats, skills, milestones, tags, socials. This
+  // Hardcoded enrichment - stats, skills, milestones, tags, socials. This
   // is optional; the page renders fine without it.
   const enrichment = EXPERTS_DATA[slug];
 
@@ -102,7 +102,7 @@ export default async function ExpertPage({
   const longBio = member.bio;
   const shortBio = member.short_bio;
 
-  // Projects come from project_team_assignments only — the hardcoded
+  // Projects come from project_team_assignments only - the hardcoded
   // ExpertData no longer carries a `projects` array. Empty fallback
   // keeps the merge helper's signature intact.
   const projects = mergeProjects(dbProjects, []);
@@ -110,8 +110,8 @@ export default async function ExpertPage({
     projects.length === 1
       ? "кейс"
       : projects.length < 5
-      ? "кейса"
-      : "кейсов";
+        ? "кейса"
+        : "кейсов";
 
   return (
     <main className="min-h-screen bg-(--bg) pb-24 md:pb-32">

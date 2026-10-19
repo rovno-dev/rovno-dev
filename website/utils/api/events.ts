@@ -90,7 +90,7 @@ export async function fetchEventServer(slug: string): Promise<EventDetail | null
   try {
     const res = await fetch(
       `${SERVER_API_BASE}/api/v1/events/${encodeURIComponent(slug)}`,
-      // Same tag — a single invalidateTag("events") clears the list AND
+      // Same tag - a single invalidateTag("events") clears the list AND
       // every event detail page.
       { next: { revalidate: 60, tags: ["events"] } } as any,
     );

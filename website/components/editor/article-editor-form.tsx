@@ -44,7 +44,7 @@ interface FormState {
   seo_title: string;
   meta_description: string;
   raw_json: string;
-  // Article gallery — same shape the backend stores on the row.
+  // Article gallery - same shape the backend stores on the row.
   attachments: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[];
 }
 
@@ -74,7 +74,7 @@ function toFormState(article?: Article | null): FormState {
     seo_title: article.seo_title || "",
     meta_description: article.meta_description || "",
     raw_json: article.raw_json ? JSON.stringify(article.raw_json, null, 2) : "",
-    // TagRef[] -> string[] — the tag editor works with names.
+    // TagRef[] -> string[] - the tag editor works with names.
     tags: (article.tags || []).map((t) => t.name),
     // Default sort_order so the media uploader has a stable key.
     attachments: (article.attachments || []).map((a, i) => ({
@@ -194,7 +194,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
     }
   };
 
-  // Toggle only makes sense on an already-published article — moving it back
+  // Toggle only makes sense on an already-published article - moving it back
   // to drafts. The draft → published direction is handled by the primary
   // save button (which does save + publish in one call).
   const handleUnpublish = async () => {
@@ -241,7 +241,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         </div>
 
         {/*
-          Action rules per state — exactly one primary (blue) and one
+          Action rules per state - exactly one primary (blue) and one
           secondary (outlined) button at a time. No duplicate labels.
 
             published → [Unpublish] [Delete] [FloppyDiskIcon changes]

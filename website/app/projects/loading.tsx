@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
  * Route-level fallback for /projects. Fires while the RSC awaits the DB
  * fetch on a cold navigation.
  *
- * Structured to match the final layout 1:1 — heading at the same vertical
+ * Structured to match the final layout 1:1 - heading at the same vertical
  * offset, filter pill at the same sticky position with the same height,
- * and a grid of 16:9 card shells — so the skeleton-to-content swap does
+ * and a grid of 16:9 card shells - so the skeleton-to-content swap does
  * not shift anything on the page.
  */
 export default function ProjectsLoading() {

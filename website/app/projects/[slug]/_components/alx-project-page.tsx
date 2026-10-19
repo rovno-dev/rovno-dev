@@ -30,12 +30,12 @@ const PROCESS = [
   {
     n: "01",
     title: "Логотип & айдентика",
-    body: "Разработали логотип и фирменный стиль мероприятия: типографика, цветовая система, паттерны — вся визуальная грамматика выставки.",
+    body: "Разработали логотип и фирменный стиль мероприятия: типографика, цветовая система, паттерны - вся визуальная грамматика выставки.",
   },
   {
     n: "02",
     title: "Концепт-арт маскота",
-    body: "Иллюстраторы проработали концепты будущего Чужого — главного маскота ALX-9. От первых скетчей до финального референса.",
+    body: "Иллюстраторы проработали концепты будущего Чужого - главного маскота ALX-9. От первых скетчей до финального референса.",
   },
   {
     n: "03",
@@ -352,7 +352,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
             <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
               <div className="lg:col-span-3">
                 <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40 mb-3">
-                  02 — Manifesto
+                  02 - Manifesto
                 </div>
                 <div
                   className="h-px w-16"
@@ -365,7 +365,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                   <span className="text-white/50">оформили выставку.</span>{" "}
                   Мы построили{" "}
                   <span style={{ color: ACCENT }}>вселенную</span> вокруг
-                  роботизированного Чужого — от первого скетча до интерактивного
+                  роботизированного Чужого - от первого скетча до интерактивного
                   3D-опыта и сайта с билетной системой.
                 </p>
               </div>
@@ -384,7 +384,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
               <div className="flex items-end justify-between mb-16">
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40 mb-3">
-                    03 — Process
+                    03 - Process
                   </div>
                   <h2 className="text-4xl md:text-6xl font-heading font-semibold tracking-tight text-white">
                     От брифа до сцены.
@@ -439,7 +439,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 <div className="relative aspect-[4/3] w-full overflow-hidden border border-white/10">
                   <Image
                     src="/static-images/projects/alx/alx-1.png"
-                    alt="ALX-9 — Чужой, 3D модель"
+                    alt="ALX-9 - Чужой, 3D модель"
                     fill
                     sizes="(max-width: 1024px) 100vw, 60vw"
                     className="object-cover"
@@ -467,7 +467,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
 
               <div className="lg:col-span-5 order-1 lg:order-2">
                 <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40 mb-3">
-                  04 — The Xeno
+                  04 - The Xeno
                 </div>
                 <h2 className="text-4xl md:text-6xl font-heading font-semibold tracking-tight text-white mb-6 leading-[1.05]">
                   Чужой.
@@ -476,7 +476,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 </h2>
                 <p className="text-body-2 text-white/60 leading-relaxed mb-8">
                   От первых иллюстраций до полноценной роботизированной модели.
-                  Каждый слой — это отдельная сцена: металл, механика, оптика,
+                  Каждый слой - это отдельная сцена: металл, механика, оптика,
                   свет. Модель стала центральным объектом выставки и точкой
                   взаимодействия для посетителей.
                 </p>
@@ -511,7 +511,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
               <div className="flex items-end justify-between mb-16">
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40 mb-3">
-                    05 — Gallery
+                    05 - Gallery
                   </div>
                   <h2 className="text-4xl md:text-6xl font-heading font-semibold tracking-tight text-white">
                     Кадры со сцены.
@@ -526,7 +526,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 <div className="md:col-span-8 relative aspect-[16/10] overflow-hidden border border-white/10 group">
                   <Image
                     src={GALLERY[0]}
-                    alt="ALX-9 — 01"
+                    alt="ALX-9 - 01"
                     fill
                     sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -538,7 +538,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 <div className="md:col-span-4 relative aspect-[3/4] md:aspect-auto overflow-hidden border border-white/10 group">
                   <Image
                     src={GALLERY[1]}
-                    alt="ALX-9 — 02"
+                    alt="ALX-9 - 02"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -550,7 +550,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 <div className="md:col-span-4 relative aspect-[3/4] md:aspect-auto overflow-hidden border border-white/10 group">
                   <Image
                     src={GALLERY[2]}
-                    alt="ALX-9 — 03"
+                    alt="ALX-9 - 03"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -562,7 +562,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 <div className="md:col-span-8 relative aspect-[16/10] overflow-hidden border border-white/10 group">
                   <Image
                     src={GALLERY[3]}
-                    alt="ALX-9 — 04"
+                    alt="ALX-9 - 04"
                     fill
                     sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
@@ -587,7 +587,7 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
               {/* Metric */}
               <div className="lg:col-span-5">
                 <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-white/40 mb-3">
-                  06 — Impact
+                  06 - Impact
                 </div>
                 <div className="flex items-baseline gap-4">
                   <span
@@ -627,13 +627,13 @@ export function AlxProjectPage({ project }: { project: AlxProject }) {
                 </div>
                 <blockquote className="text-2xl md:text-4xl font-heading font-medium tracking-tight text-white leading-[1.2]">
                   <span className="text-white/30">“</span>
-                  Сотрудничество с агентством дало нам главное преимущество —
+                  Сотрудничество с агентством дало нам главное преимущество -
                   качественный дизайн и грамотный маркетинг всего мероприятия.
                   Это была масштабная работа!
                   <span className="text-white/30">”</span>
                 </blockquote>
                 <div className="mt-8 font-mono text-[11px] uppercase tracking-[0.25em] text-white/50">
-                  — ALX / 2024
+                  - ALX / 2024
                 </div>
               </div>
             </div>

@@ -17,7 +17,7 @@ export default function ClientRootLayout({
   const { lang } = useLanguage();
 
   // Pages whose topmost section is designed to sit behind the fixed header
-  // — the home hero, every project case study, and every event landing
+  // - the home hero, every project case study, and every event landing
   // (the Nash.Dev terminal opens at the top of the viewport, its first
   // line painted behind the header bar).
   //

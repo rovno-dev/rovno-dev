@@ -132,7 +132,7 @@ export default function OrderPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // ponytail: capture the form element synchronously — event.currentTarget is
+    // ponytail: capture the form element synchronously - event.currentTarget is
     // nulled by React once the handler returns, and we call .reset() after await.
     const form = e.currentTarget;
     setLoading(true);
@@ -197,7 +197,7 @@ export default function OrderPage() {
               colors: ["#336dff", "#99b6ff"],
             });
           })
-          .catch(() => { /* confetti is decoration — never block success on it */ });
+          .catch(() => { /* confetti is decoration - never block success on it */ });
       } else {
         const data = await res.json();
         toast.error("Ошибка сервера", { description: data.detail?.[0]?.msg || "Попробуйте позже" });

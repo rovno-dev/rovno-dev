@@ -6,7 +6,7 @@ export const revalidate = 60;
 export const metadata = {
   title: "События · Rovno.dev",
   description:
-    "Мероприятия агентства Rovno.dev — воркшопы, митапы, конференции для IT-сообщества.",
+    "Мероприятия агентства Rovno.dev - воркшопы, митапы, конференции для IT-сообщества.",
 };
 
 export default async function EventsPage() {

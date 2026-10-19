@@ -76,7 +76,7 @@ export default function MyArticlesPage() {
   const handleImportZip = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setImporting(true);
     try {
       const formData = new FormData();
@@ -249,7 +249,7 @@ export default function MyArticlesPage() {
                   key={a.id}
                   className="group relative overflow-hidden rounded-4xl border border-(--outline) bg-card ring-0 aspect-[4/3]"
                 >
-                  {/* z-0 — cover or gradient fallback */}
+                  {/* z-0 - cover or gradient fallback */}
                   {a.image_url ? (
                     <Image
                       fill
@@ -263,17 +263,17 @@ export default function MyArticlesPage() {
                     <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
                   )}
 
-                  {/* z-1 — full-card click target */}
+                  {/* z-1 - full-card click target */}
                   <Link
                     href={`/app/profile/articles/${a.slug}/preview`}
                     className="absolute inset-0 z-[1] rounded-4xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--primary) focus-visible:ring-inset"
                     aria-label={`Открыть предпросмотр: ${a.title}`}
                   />
 
-                  {/* z-2 — bottom gradient overlay */}
+                  {/* z-2 - bottom gradient overlay */}
                   <div className="absolute inset-x-0 bottom-0 h-3/4 z-[2] bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none" />
 
-                  {/* z-3 — text, non-interactive so clicks pass to the link */}
+                  {/* z-3 - text, non-interactive so clicks pass to the link */}
                   <div className="absolute inset-x-0 bottom-0 z-[3] p-5 pointer-events-none">
                     {a.tags && a.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-2">
@@ -300,7 +300,7 @@ export default function MyArticlesPage() {
                       </p>
                     )}
 
-                    {/* Status + date now live here, on the same row — no
+                    {/* Status + date now live here, on the same row - no
                         more top-left pill colliding with top-right actions. */}
                     <div className="mt-3 flex items-center gap-2 flex-wrap">
                       <span
@@ -317,7 +317,7 @@ export default function MyArticlesPage() {
                     </div>
                   </div>
 
-                  {/* z-20 — actions, hover-reveal on desktop, always on
+                  {/* z-20 - actions, hover-reveal on desktop, always on
                       touch. Three buttons only: preview, edit, delete.
                       The external-link button was dropped because at narrow
                       card widths four buttons crowded the corner, and the

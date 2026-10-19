@@ -135,7 +135,7 @@ export default function AdminProjectsPage() {
                 WebkitMaskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)",
               }}
             />
-            
+
             <div className="relative z-10 flex flex-col items-center max-w-md mx-auto">
               <div className="relative mb-8">
                 {/* Glow behind icon */}
@@ -144,14 +144,14 @@ export default function AdminProjectsPage() {
                   <Cube className="size-10" weight="duotone" />
                 </div>
               </div>
-              
+
               <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) mb-3 tracking-tight">
                 Пока нет проектов
               </h2>
               <p className="text-body-3 text-(--on-bg-medium) mb-10 leading-relaxed max-w-[320px]">
                 Создайте свой первый кейс, чтобы он появился в портфолио на сайте и начал привлекать клиентов.
               </p>
-              
+
               <Button asChild size="large" shape="round" className="px-8 shadow-xl shadow-(--primary)/10 transition-transform hover:-translate-y-0.5">
                 <Link href={`${base}/new`}>
                   <Plus className="mr-2 size-5" weight="bold" />
@@ -194,7 +194,7 @@ export default function AdminProjectsPage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Badges — top-left. z-[2] sits above the stretched link. */}
+                    {/* Badges - top-left. z-[2] sits above the stretched link. */}
                     <div className="absolute top-3 left-3 flex gap-1 flex-wrap z-[2]">
                       <Badge
                         variant="glass-static"
@@ -219,7 +219,7 @@ export default function AdminProjectsPage() {
                           size="chip-small"
                           className="text-white border-white/20 bg-violet-500/40"
                         >
-                          {tpl.label.split(" — ")[0]}
+                          {tpl.label.split(" - ")[0]}
                         </Badge>
                       )}
                     </div>
@@ -232,7 +232,7 @@ export default function AdminProjectsPage() {
                     </div>
                   </div>
 
-                  {/* Actions row — outside the stretched link, own anchors. */}
+                  {/* Actions row - outside the stretched link, own anchors. */}
                   <div className="p-4 flex items-center justify-between gap-2 relative z-[2]">
                     <div className="text-body-5 text-(--on-bg-low) flex items-center gap-3">
                       {p.period && <span>{p.period}</span>}

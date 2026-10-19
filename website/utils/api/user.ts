@@ -33,7 +33,7 @@ export interface UpdateProfilePayload {
   username?: string;
   bio?: string;
   avatar_url?: string;
-  // Team member fields — silently ignored server-side if not a team member.
+  // Team member fields - silently ignored server-side if not a team member.
   team_role?: string;
   team_bio?: string;
   team_cover_url?: string;

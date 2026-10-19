@@ -13,11 +13,11 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 
 // Icons are imported with their canonical names (no `Icon` suffix) and
-// referenced directly in the map — importing `ShieldCheckIcon` but using
+// referenced directly in the map - importing `ShieldCheckIcon` but using
 // `ShieldCheck` in the object body is a build error waiting to happen.
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   privacy: ShieldCheck,
-  // Consent is the newest legal doc — a file glyph next to the shield
+  // Consent is the newest legal doc - a file glyph next to the shield
   // and the scale reads as "a document you actively agree to".
   consent: FileText,
   cookies: Cookie,

@@ -166,7 +166,7 @@ export default function AdminEventsPage() {
                       )}
                       {tpl && (
                         <Badge variant="glass-static" size="chip-small" className="text-white border-white/20 bg-violet-500/40">
-                          {tpl.label.split(" — ")[0]}
+                          {tpl.label.split(" - ")[0]}
                         </Badge>
                       )}
                     </div>

@@ -150,7 +150,7 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Two series bucketed independently, then zipped by index — same key
+  // Two series bucketed independently, then zipped by index - same key
   // order, so `chartData[i].date` is the same day for both.
   const chartData = useMemo(() => {
     const u = bucketByDay(usersRaw, range);

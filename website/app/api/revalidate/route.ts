@@ -6,11 +6,11 @@ import { revalidateTag } from "next/cache";
  * deleting an event so the public /events list and every /events/<slug>
  * page re-render on the next request instead of waiting out the ISR window.
  *
- * Body: { tags: string[] } — one of "events", "projects", "articles".
+ * Body: { tags: string[] } - one of "events", "projects", "articles".
  *
  * Security: rejects any request whose origin isn't the configured root
- * domain (or localhost). This isn't a public API — the admin is the only
- * caller — so origin-check + same-origin cookie is enough. If you ever
+ * domain (or localhost). This isn't a public API - the admin is the only
+ * caller - so origin-check + same-origin cookie is enough. If you ever
  * expose this publicly, gate it behind the admin secret.
  */
 const ALLOWED_TAGS = new Set(["events", "projects", "articles", "companies", "team"]);
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    /* empty body — treat as "invalidate everything allowed" */
+    /* empty body - treat as "invalidate everything allowed" */
   }
 
   const requested = Array.isArray(body.tags) ? body.tags : [];

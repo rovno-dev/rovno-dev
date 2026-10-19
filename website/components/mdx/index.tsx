@@ -41,7 +41,7 @@ export function MDXHeading({
 // -------- Image --------
 // Rendered as <span style="display:block"> rather than <div> because markdown
 // wraps standalone `![alt](src)` images inside a <p>. A <div> inside a <p> is
-// invalid HTML — the browser hoists it out, the server and client trees
+// invalid HTML - the browser hoists it out, the server and client trees
 // diverge, and React throws a hydration error. A block-display span is
 // phrasing content (legal inside <p>) but renders identically to a div.
 export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) {
@@ -287,11 +287,10 @@ export function Gallery({
                 <button
                   key={idx}
                   onClick={() => carouselApi?.scrollTo(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    carouselApi?.selectedScrollSnap() === idx
+                  className={`h-2 rounded-full transition-all ${carouselApi?.selectedScrollSnap() === idx
                       ? "w-6 bg-white"
                       : "w-2 bg-white/30"
-                  }`}
+                    }`}
                 />
               ))}
             </div>

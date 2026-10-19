@@ -45,7 +45,7 @@ export default function AdminClientsPage() {
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      // Derive the client list from order-requests — each row carries its
+      // Derive the client list from order-requests - each row carries its
       // client nested. Dedupe by client id in-memory and count orders.
       const res = await $fetch("/api/v1/admin/order-requests?limit=500", { isToast: false });
       if (!res?.response?.ok) {

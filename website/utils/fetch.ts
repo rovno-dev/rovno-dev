@@ -13,14 +13,14 @@ interface FetchOptions {
   isToast?: boolean
   headers?: Record<string, string>
   onLoadingChange?: (loading: boolean) => void
-  /** Internal — prevents infinite refresh loops. Do not pass. */
+  /** Internal - prevents infinite refresh loops. Do not pass. */
   _retried?: boolean
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
 // Auth endpoints: a 401 there is a real credential failure, not a stale
-// session. Skip the refresh-and-retry dance for those — and (see below)
+// session. Skip the refresh-and-retry dance for those - and (see below)
 // never toast their backend messages, because "User not found or blocked"
 // from /refresh or /login is a session state, not a user-action error.
 const NO_RETRY = /\/login|\/register|\/verify|\/refresh|\/logout/
@@ -42,7 +42,7 @@ async function refreshAccessToken(): Promise<string | null> {
       return token
     }
   } catch {
-    /* network failure — fall through, caller sees the original 401 */
+    /* network failure - fall through, caller sees the original 401 */
   }
   return null
 }
@@ -88,7 +88,7 @@ export async function $fetch(
   let json
   try {
     json = await response.json()
-  } catch { /* empty body — leave json undefined */ }
+  } catch { /* empty body - leave json undefined */ }
 
   const rawMessage = json?.message
   // Guard: only treat `message` as a toast payload if it's a string.
@@ -96,7 +96,7 @@ export async function $fetch(
   // crashed the Toaster with "Objects are not valid as a React child".
   const message = typeof rawMessage === "string" ? rawMessage : null
   // Backstop: never toast from an auth endpoint. A 401 there is expected
-  // state (logged out, expired, blocked) that the UI already reflects —
+  // state (logged out, expired, blocked) that the UI already reflects -
   // toasting it produces the "User not found or blocked" noise on every
   // page load.
   const fromAuthEndpoint = NO_RETRY.test(route)

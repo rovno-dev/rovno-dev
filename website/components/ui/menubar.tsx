@@ -22,7 +22,7 @@ function Menubar({
   )
 }
 
-// Radix's Menubar has no intermediate `List` component — Triggers and
+// Radix's Menubar has no intermediate `List` component - Triggers and
 // Contents sit directly under Root. This wrapper exists only so callers
 // can write `<MenubarMenu>` without restructuring; it renders children
 // inline.

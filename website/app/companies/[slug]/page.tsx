@@ -46,7 +46,7 @@ export default async function ClientProfilePage({
 
   return (
     <main className="min-h-screen bg-(--bg) pb-24">
-      {/* Hero — logo + name + meta */}
+      {/* Hero - logo + name + meta */}
       <section className="border-b border-(--outline) py-12 md:py-20">
         <Container>
           <Link
@@ -110,8 +110,8 @@ export default async function ClientProfilePage({
                   {projectCount === 1
                     ? "проект"
                     : projectCount < 5
-                    ? "проекта"
-                    : "проектов"}
+                      ? "проекта"
+                      : "проектов"}
                 </Badge>
               </div>
             </div>

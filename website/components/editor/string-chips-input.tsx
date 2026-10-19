@@ -12,7 +12,7 @@ interface Props {
 }
 
 /**
- * Freeform string chip input for values that aren't backed by a table —
+ * Freeform string chip input for values that aren't backed by a table -
  * tech stack, tags on a project, etc. Space, Enter, or comma commits.
  * Backspace on empty removes the last chip. Duplicates are dropped.
  */

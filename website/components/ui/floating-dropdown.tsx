@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 
 /**
  * Renders its children in a portal at the anchor's bottom edge. Escapes any
- * ancestor `overflow: hidden` — the reason a plain absolutely-positioned
+ * ancestor `overflow: hidden` - the reason a plain absolutely-positioned
  * dropdown inside a Card gets clipped.
  *
  * `anchorRef` is the element to attach the dropdown to (usually the input
@@ -33,7 +33,7 @@ export function FloatingDropdown({
   } | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // SSR guard — portals can only render client-side.
+  // SSR guard - portals can only render client-side.
   useEffect(() => setMounted(true), []);
 
   // Track the anchor's rect while open. Scroll uses capture phase so it fires

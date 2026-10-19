@@ -11,7 +11,7 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Наш.Dev — Terminal Brutalism landing.
+   Наш.Dev - Terminal Brutalism landing.
    ═══════════════════════════════════════════════════════════════════════ */
 
 const LIME = "#CCFF00";
@@ -66,17 +66,17 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
     switch (c) {
       case "help":
         out = [
-          "  help       — список команд",
-          "  about      — о мероприятии",
-          "  register   — открыть регистрацию",
-          "  speakers   — список спикеров",
-          "  location   — где и когда",
-          "  clear      — очистить терминал",
+          "  help       - список команд",
+          "  about      - о мероприятии",
+          "  register   - открыть регистрацию",
+          "  speakers   - список спикеров",
+          "  location   - где и когда",
+          "  clear      - очистить терминал",
         ];
         break;
       case "about":
         out = [
-          "  Наш.Dev — ивент для тех, кто устал от лекций.",
+          "  Наш.Dev - ивент для тех, кто устал от лекций.",
           "  15 мин доклад + 15 мин интерактив. 0% канцелярщины.",
         ];
         break;
@@ -146,7 +146,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
             <div className="flex items-center gap-2 px-4 py-2 border-b" style={{ borderColor: "#222" }}>
               <span className="size-2 rounded-none" style={{ background: LIME }} />
               <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#666" }}>
-                terminal — nash.dev
+                terminal - nash.dev
               </span>
             </div>
             <div className="p-4 max-h-[240px] overflow-y-auto" style={{ color: WHITE }}>
@@ -238,7 +238,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
           <Prompt>{"$"}</Prompt>О событии
         </p>
         <p className="text-xl md:text-3xl leading-snug mb-10 max-w-[900px]" style={{ color: WHITE }}>
-          НАШ.DEV — это ивент для тех, кто:
+          НАШ.DEV - это ивент для тех, кто:
         </p>
         <ul className="space-y-3 text-base md:text-xl mb-14 max-w-[900px]">
           {[
@@ -274,17 +274,17 @@ const AUDIENCE = [
   {
     code: "NEWBIE_CODER",
     title: "Начинающий разработчик",
-    desc: "Знаешь основы, но пока не понимаешь, как из этого сделать работу. Здесь — живые примеры.",
+    desc: "Знаешь основы, но пока не понимаешь, как из этого сделать работу. Здесь - живые примеры.",
   },
   {
     code: "IT_ENTHUSIAST",
     title: "IT-энтузиаст",
-    desc: "Следишь за индустрией, ходишь на митапы. Тут — люди и разговоры без пафоса и презентаций.",
+    desc: "Следишь за индустрией, ходишь на митапы. Тут - люди и разговоры без пафоса и презентаций.",
   },
   {
     code: "CAREER_SWITCHER",
     title: "Меняет профессию",
-    desc: "Работал в другой сфере, хочешь перейти в IT. Здесь — люди, которые уже это сделали.",
+    desc: "Работал в другой сфере, хочешь перейти в IT. Здесь - люди, которые уже это сделали.",
   },
 ];
 
@@ -303,7 +303,7 @@ function Audience() {
               className="p-6 md:p-8"
               style={{ background: BLACK }}
             >
-              {/* Code label — same framing as speakers */}
+              {/* Code label - same framing as speakers */}
               <p className="font-mono text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "#666" }}>
                 {"{ "}
                 {a.code}
@@ -421,7 +421,7 @@ function Speakers() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              {/* Image — fixed aspect + shrink-0. Its height never varies
+              {/* Image - fixed aspect + shrink-0. Its height never varies
                   with the text below, so every photo in a row starts at
                   the same Y regardless of how long the role string is. */}
               <div
@@ -497,7 +497,7 @@ function Speakers() {
           >
             <div className="flex items-center justify-between mb-6 pb-4 border-b" style={{ borderColor: "#222" }}>
               <span className="text-xs uppercase tracking-[0.2em]" style={{ color: "#666" }}>
-                README.md — {open.name}
+                README.md - {open.name}
               </span>
               <button onClick={() => setOpen(null)} className="text-lg" style={{ color: "#666" }}>
                 ✕
@@ -747,8 +747,8 @@ function Features() {
 // Yandex Map embed for the venue. If the iframe never fires `onLoad`
 // (blocked by a corporate proxy, DNS failure, embed endpoint down), we
 // swap to Google Maps after a short grace period. We can't rely on
-// `onError` for cross-origin iframes — it fires for network errors but
-// not for blocked frames — so the timeout is the real trigger.
+// `onError` for cross-origin iframes - it fires for network errors but
+// not for blocked frames - so the timeout is the real trigger.
 const YANDEX_MAP_SRC =
   "https://yandex.ru/map-widget/v1/?um=constructor%3Ac65a3696f6811e8fdf9a467d8657d05efab313aee6808b886bebb2138cf28370&source=constructor";
 const GOOGLE_MAP_SRC =
@@ -762,7 +762,7 @@ const VENUE_LON = 49.177800;
 function MapEmbed() {
   // `provider` flips to "google" the moment the Yandex frame is judged
   // dead. `loaded` guards against a late onLoad from a Yandex frame that
-  // was already replaced — once we've fallen back, we ignore it.
+  // was already replaced - once we've fallen back, we ignore it.
   const [provider, setProvider] = useState<"yandex" | "google">("yandex");
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
@@ -770,7 +770,7 @@ function MapEmbed() {
     const t = setTimeout(() => {
       // Double-check: if onLoad already fired we would have bailed, but a
       // race between the timer and the load event is possible on slow
-      // connections. Reading the ref-free `loaded` state here is fine —
+      // connections. Reading the ref-free `loaded` state here is fine -
       // the closure captures the value at effect-run time, and the effect
       // re-runs whenever `loaded` changes.
       setProvider("google");
@@ -788,14 +788,14 @@ function MapEmbed() {
       allowFullScreen
       loading="lazy"
       referrerPolicy="strict-origin-when-cross-origin"
-      title="Карта — место проведения"
+      title="Карта - место проведения"
       onLoad={() => setLoaded(true)}
       onError={() => setProvider("google")}
       className="rounded-xl!"
     />
   );
 }
-/* ── Giveaway — Yandex Station ─────────────────────────────────────────── */
+/* ── Giveaway - Yandex Station ─────────────────────────────────────────── */
 function AsciiStation() {
   const [frame, setFrame] = useState(0);
   useEffect(() => {
@@ -904,7 +904,7 @@ function Giveaway() {
         </p>
         <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
           <div>
-            {/* Left — metadata */}
+            {/* Left - metadata */}
             <div className="font-mono space-y-6">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
@@ -931,7 +931,7 @@ function Giveaway() {
                   <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
                     timing
                   </p>
-                  <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
+                  <p className="text-base" style={{ color: WHITE }}>14:50 - в зале</p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
@@ -1008,7 +1008,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
               <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Остановка</p>
               <p className="text-base" style={{ color: WHITE }}>Советская Площадь</p>
             </div>
-            {/* Route buttons — two providers, one row. Terminal-style
+            {/* Route buttons - two providers, one row. Terminal-style
                 outlined pills that light up in LIME on hover, matching the
                 rest of the page's interactive language. Both open in a new
                 tab so the reader doesn't lose their place on the landing. */}
@@ -1079,8 +1079,8 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
 const FAQ = [
   { q: "Нужны ли знания для понимания докладов?", a: "Нет. Объясняем так, что поймет даже тот, кто зашёл случайно." },
   { q: "Сколько стоит участие?", a: "Бесплатно. Регистрация обязательна, чтобы мы точно тебя пропустили." },
-  { q: "Есть ли ограничение по возрасту?", a: "Мероприятие рассчитано на 16+. Если вам меньше — напишите нам, обсудим (rovno.dev@gmail.com)." },
-  { q: "Будет ли запись?", a: "Ключевые доклады выложим в ВК Видео и Youtube Вершин. Но лучше приходить лично — нетворкинг не записать." },
+  { q: "Есть ли ограничение по возрасту?", a: "Мероприятие рассчитано на 16+. Если вам меньше - напишите нам, обсудим (rovno.dev@gmail.com)." },
+  { q: "Будет ли запись?", a: "Ключевые доклады выложим в ВК Видео и Youtube Вершин. Но лучше приходить лично - нетворкинг не записать." },
   { q: "Что взять с собой?", a: "Документ подтверждающий личность, хорошее настроение." },
 ];
 
@@ -1175,7 +1175,7 @@ function SeatCounter({ taken, seatTypes }: { taken: number; seatTypes: { type: s
       </div>
       <p className="text-sm mt-2" style={{ color: isFull ? "#FF3B3B" : "#888" }}>
         {isFull
-          ? "// capacity reached — registration is closed"
+          ? "// capacity reached - registration is closed"
           : `// ${remaining} из ${total} свободно (${breakdown})`}
       </p>
     </div>
@@ -1241,7 +1241,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
       <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
         <div className="max-w-[900px] mx-auto px-6 font-mono">
           {/* `+ 1` reflects the registration the current visitor just
-              submitted — the server response isn't refetched, so this is
+              submitted - the server response isn't refetched, so this is
               the only accurate in-memory projection. */}
           <SeatCounter taken={registered + 1} seatTypes={seatTypes} />
           <p className="text-2xl md:text-4xl mb-6" style={{ color: LIME }}>
@@ -1314,7 +1314,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
                   ))}
                 </div>
               </div>
-              {/* Age confirmation — plain terminal-style toggle. */}
+              {/* Age confirmation - plain terminal-style toggle. */}
               <label className="flex items-start gap-3 cursor-pointer pt-4">
                 <input
                   type="checkbox"
@@ -1326,7 +1326,7 @@ function Registration({ ctx }: { ctx: EventCustomContext }) {
                   <Prompt>{"$"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
                 </span>
               </label>
-              {/* Legal consent — mirrors the site-wide order form so the consent
+              {/* Legal consent - mirrors the site-wide order form so the consent
                   language is identical across every form on the domain. Links
                   open in a new tab; the user can read the policy without losing
                   the form state. */}

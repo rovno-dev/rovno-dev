@@ -19,8 +19,8 @@ import type { EventListItem } from "@/utils/api/events";
  * headings, empty state, and every card label need the `useLanguage` hook.
  * The RSC shell (`page.tsx`) fetches events once and hands them here.
  *
- * The header is deliberately slim — a single heading, same rhythm as the
- * blog strip — so the list gets the vertical budget.
+ * The header is deliberately slim - a single heading, same rhythm as the
+ * blog strip - so the list gets the vertical budget.
  */
 
 function formatDate(iso: string | null | undefined, lang: string): string {
@@ -32,7 +32,7 @@ function formatDate(iso: string | null | undefined, lang: string): string {
       year: "numeric",
     });
   } catch {
-    return "—";
+    return "-";
   }
 }
 
@@ -50,11 +50,11 @@ function formatMonth(iso: string | null | undefined, lang: string): string {
 }
 
 function formatDay(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   try {
     return String(new Date(iso).getDate()).padStart(2, "0");
   } catch {
-    return "—";
+    return "-";
   }
 }
 
@@ -201,7 +201,7 @@ export function EventsList({ events }: { events: EventListItem[] }) {
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Slim header — one heading, same vertical rhythm as the blog
+      {/* Slim header - one heading, same vertical rhythm as the blog
           strip. No subtitle, no eyebrow; the list below is the content. */}
       <section className="pt-8 md:pt-10 pb-5 border-b border-(--outline)">
         <Container>

@@ -82,10 +82,10 @@ export default function ProfilePage() {
         avatar_url: form.avatar_url,
         ...(isTeam
           ? {
-              team_role: form.team_role,
-              team_bio: form.team_bio,
-              team_cover_url: form.team_cover_url,
-            }
+            team_role: form.team_role,
+            team_bio: form.team_bio,
+            team_cover_url: form.team_cover_url,
+          }
           : {}),
       });
       toast.success("Профиль обновлён");
@@ -133,7 +133,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* ══════════ Island 1 — identity ══════════ */}
+        {/* ══════════ Island 1 - identity ══════════ */}
         <Card className="rounded-3xl border-(--outline) p-6">
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Avatar */}
@@ -244,7 +244,7 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* ══════════ Island 2 — contacts ══════════ */}
+        {/* ══════════ Island 2 - contacts ══════════ */}
         <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
           <h2 className="text-heading-3">Контакты</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -269,7 +269,7 @@ export default function ProfilePage() {
           </div>
         </Card>
 
-        {/* ══════════ Team block — for team members only ══════════ */}
+        {/* ══════════ Team block - for team members only ══════════ */}
         {isTeam && (
           <Card className="rounded-3xl border-(--outline) p-6 space-y-4">
             <h2 className="text-heading-3">Команда Rovno.dev</h2>
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                 <ImageUploadField
                   value={form.team_cover_url}
                   onChange={(v) => update("team_cover_url", v)}
-                  placeholder="/uploads/images/… — соотношение 21:8"
+                  placeholder="/uploads/images/… - соотношение 21:8"
                   defaultAspect="21:8"
                 />
               )}

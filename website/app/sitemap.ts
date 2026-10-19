@@ -9,7 +9,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   'http://localhost:8000';
 
-// Regenerate once an hour. The sitemap is served as a static route — it must
+// Regenerate once an hour. The sitemap is served as a static route - it must
 // not call the API on every crawler hit.
 export const revalidate = 3600;
 
@@ -17,21 +17,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${BASE_URL}/`,                       lastModified: now, changeFrequency: 'weekly',  priority: 1.0 },
-    { url: `${BASE_URL}/projects`,               lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
-    { url: `${BASE_URL}/tech`,                   lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/tech/1c`,                lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/tech/python`,            lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/tech/nextjs`,            lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/companies`,              lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    { url: `${BASE_URL}/about`,                  lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/blog`,                   lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
-    { url: `${BASE_URL}/order`,                  lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE_URL}/docs`,                   lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${BASE_URL}/docs/privacy`,           lastModified: now, changeFrequency: 'yearly',  priority: 0.4 },
-    { url: `${BASE_URL}/docs/cookies`,           lastModified: now, changeFrequency: 'yearly',  priority: 0.4 },
-    { url: `${BASE_URL}/docs/terms`,             lastModified: now, changeFrequency: 'yearly',  priority: 0.4 },
-    { url: `${BASE_URL}/docs/reviews-consent`,   lastModified: now, changeFrequency: 'yearly',  priority: 0.4 },
+    { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${BASE_URL}/projects`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/tech`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/tech/1c`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/tech/python`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/tech/nextjs`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/companies`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/order`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/docs`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE_URL}/docs/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 },
+    { url: `${BASE_URL}/docs/cookies`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 },
+    { url: `${BASE_URL}/docs/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 },
+    { url: `${BASE_URL}/docs/reviews-consent`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 },
   ];
 
   // Never let a flaky API break the sitemap. Each list degrades to [].

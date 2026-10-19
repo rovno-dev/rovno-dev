@@ -106,13 +106,13 @@ function CatalogPageInner() {
 
   const filtered = query.trim()
     ? items.filter((i) => {
-        const q = query.toLowerCase();
-        return (
-          i.labels.en?.toLowerCase().includes(q) ||
-          i.labels.ru?.toLowerCase().includes(q) ||
-          i.code.toLowerCase().includes(q)
-        );
-      })
+      const q = query.toLowerCase();
+      return (
+        i.labels.en?.toLowerCase().includes(q) ||
+        i.labels.ru?.toLowerCase().includes(q) ||
+        i.code.toLowerCase().includes(q)
+      );
+    })
     : items;
 
   const handleDelete = async (item: CatalogItem) => {
@@ -215,7 +215,7 @@ function CatalogPageInner() {
                     English
                   </div>
                   <p className="text-body-4 text-(--on-bg-high) truncate">
-                    {item.labels.en || "—"}
+                    {item.labels.en || "-"}
                   </p>
                 </div>
 
@@ -225,7 +225,7 @@ function CatalogPageInner() {
                       Русский
                     </div>
                     <p className="text-body-4 text-(--on-bg-high) truncate">
-                      {item.labels.ru || "—"}
+                      {item.labels.ru || "-"}
                     </p>
                   </div>
                   {active.supportsKind && item.kind && (
@@ -259,7 +259,7 @@ function CatalogPageInner() {
         )}
       </div>
 
-      {/* Edit dialog — driven by ?edit=<id> */}
+      {/* Edit dialog - driven by ?edit=<id> */}
       <CatalogItemDialog
         catalog={active.id}
         item={editing}
@@ -269,7 +269,7 @@ function CatalogPageInner() {
         supportsKind={active.supportsKind}
       />
 
-      {/* Create dialog — driven by ?new=new */}
+      {/* Create dialog - driven by ?new=new */}
       <CatalogItemDialog
         catalog={active.id}
         item={null}

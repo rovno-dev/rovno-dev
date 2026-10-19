@@ -128,7 +128,7 @@ export default function AdminArticlesPage() {
   const handleImportZip = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setImporting(true);
     try {
       const formData = new FormData();
@@ -172,7 +172,7 @@ export default function AdminArticlesPage() {
   const handleBulkAction = async (action: "delete" | "approve" | "reject") => {
     if (selected.size === 0) return;
     if (action === "delete" && !confirm(`Удалить ${selected.size} статей?`)) return;
-    
+
     setLoading(true);
     try {
       const res = await $fetch(`/api/v1/admin/articles/bulk/${action}`, {
@@ -182,7 +182,7 @@ export default function AdminArticlesPage() {
         isToast: false,
       });
       if (!res?.response?.ok) throw new Error(res?.json?.detail || "Ошибка");
-      
+
       toast.success(`Успешно: ${selected.size} шт.`);
       setSelected(new Set());
       load();
@@ -241,7 +241,7 @@ export default function AdminArticlesPage() {
                 Создать статью
               </Link>
             </Button>
-          
+
           </div>
         </div>
 
@@ -249,7 +249,7 @@ export default function AdminArticlesPage() {
         <Card className="rounded-3xl border-(--outline) p-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-2">
-              <Checkbox 
+              <Checkbox
                 checked={articles.length > 0 && selected.size === articles.length}
                 onCheckedChange={toggleAll}
               />
@@ -357,8 +357,8 @@ export default function AdminArticlesPage() {
               return (
                 <Card key={a.id} className={`rounded-3xl border-(--outline) p-5 flex flex-col gap-4 transition-colors ${selected.has(a.slug) ? 'border-(--primary)/50 bg-(--primary-glass)' : ''}`}>
                   <div className="flex items-start gap-4">
-                    <Checkbox 
-                      checked={selected.has(a.slug)} 
+                    <Checkbox
+                      checked={selected.has(a.slug)}
                       onCheckedChange={() => toggleSelect(a.slug)}
                       className="mt-1"
                     />
@@ -388,7 +388,7 @@ export default function AdminArticlesPage() {
                       </div>
                       <h3 className="text-heading-4 truncate">{a.title}</h3>
                       <p className="text-body-5 text-(--on-bg-low) mt-0.5">
-                        {a.author?.name || a.author?.username || "—"} ·{" "}
+                        {a.author?.name || a.author?.username || "-"} ·{" "}
                         {new Date(a.updated_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -406,7 +406,7 @@ export default function AdminArticlesPage() {
                       <p className="text-body-4 text-(--on-bg-high)">{a.review_note}</p>
                       {a.reviewed_by && (
                         <p className="text-body-6 text-(--on-bg-low) mt-1">
-                          — {a.reviewed_by.name || a.reviewed_by.username || "admin"}
+                          - {a.reviewed_by.name || a.reviewed_by.username || "admin"}
                         </p>
                       )}
                     </div>

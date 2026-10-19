@@ -66,7 +66,7 @@ interface Order {
   created_at: string;
   files: OrderFile[];
   // Backend returns this as `contact` even though the ORM field was
-  // renamed to `client` — the response schema bridges the two.
+  // renamed to `client` - the response schema bridges the two.
   contact?: {
     id: string;
     name?: string;
@@ -99,7 +99,7 @@ export default function AdminOrdersPage() {
   const [cancelFor, setCancelFor] = useState<Order | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
-  // lightbox for the big image view — carousel of every image on that order
+  // lightbox for the big image view - carousel of every image on that order
   const [lightbox, setLightbox] = useState<{ files: OrderFile[]; index: number } | null>(null);
   const [lightboxApi, setLightboxApi] = useState<CarouselApi>();
   const [lightboxCurrent, setLightboxCurrent] = useState(0);
@@ -176,7 +176,7 @@ export default function AdminOrdersPage() {
     }
     if (debouncedQuery) {
       // Accept both the full UUID and the short ID with an optional
-      // leading `#` — the admin usually copies the short form.
+      // leading `#` - the admin usually copies the short form.
       const q = debouncedQuery.replace(/^#/, "");
       list = list.filter((o) => {
         const haystack = [
@@ -355,14 +355,14 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {/* Empty — no orders at all */}
+      {/* Empty - no orders at all */}
       {!loading && orders.length === 0 && (
         <Card className="rounded-3xl border-(--outline) p-12 text-center">
           <p className="text-body-3 text-(--on-bg-medium)">Пока нет заявок</p>
         </Card>
       )}
 
-      {/* Empty — filter matched nothing */}
+      {/* Empty - filter matched nothing */}
       {!loading && orders.length > 0 && filtered.length === 0 && (
         <Card className="rounded-3xl border-(--outline) p-12 text-center">
           <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-(--primary-card) text-(--primary) mb-3">
@@ -440,13 +440,13 @@ export default function AdminOrdersPage() {
                     <div>
                       <span className="font-medium text-body-3">О проекте:</span>
                       <p className="text-muted-foreground line-clamp-2">
-                        {order.about || "—"}
+                        {order.about || "-"}
                       </p>
                     </div>
                     <div>
                       <span className="font-medium text-body-3">Услуги:</span>
                       <p className="text-muted-foreground line-clamp-2">
-                        {order.service_types_json?.join(", ") || "—"}
+                        {order.service_types_json?.join(", ") || "-"}
                       </p>
                     </div>
                   </div>
@@ -455,33 +455,33 @@ export default function AdminOrdersPage() {
                     <div className="text-body-5 space-y-1">
                       <p>
                         <span className="font-medium">Срок:</span>{" "}
-                        {order.estimate_deadline || "—"}
+                        {order.estimate_deadline || "-"}
                       </p>
                       <p>
                         <span className="font-medium">Бюджет:</span>{" "}
-                        {order.estimate_budget || "—"}
+                        {order.estimate_budget || "-"}
                       </p>
                       <p>
                         <span className="font-medium">Нейминг:</span>{" "}
-                        {order.naming_help || "—"}
+                        {order.naming_help || "-"}
                       </p>
                     </div>
                     <div className="text-body-5 space-y-1">
                       <p>
                         <span className="font-medium">Имя:</span>{" "}
-                        {order.contact?.name || "—"}
+                        {order.contact?.name || "-"}
                       </p>
                       <div className="flex gap-1 items-center">
                         <PhoneIcon className="size-3" />
-                        <p>{order.contact?.phone || "—"}</p>
+                        <p>{order.contact?.phone || "-"}</p>
                       </div>
                       <div className="flex gap-1 items-center">
                         <EnvelopeIcon className="size-3" />
-                        <p>{order.contact?.email || "—"}</p>
+                        <p>{order.contact?.email || "-"}</p>
                       </div>
                       <div className="flex gap-1 items-center">
                         <TelegramLogotypeMonoIcon className="size-3! [&>path]:fill-(--on-bg-high)" />
-                        <p>{order.contact?.telegram_username || "—"}</p>
+                        <p>{order.contact?.telegram_username || "-"}</p>
                       </div>
                     </div>
                   </div>
@@ -624,7 +624,7 @@ export default function AdminOrdersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Image lightbox — carousel mirrors the ordering flow */}
+      {/* Image lightbox - carousel mirrors the ordering flow */}
       <Dialog
         open={!!lightbox}
         onOpenChange={(open) => {
@@ -693,7 +693,7 @@ export default function AdminOrdersPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// StatusChip — status filter with a count pill
+// StatusChip - status filter with a count pill
 // ─────────────────────────────────────────────────────────────────────
 
 function StatusChip({

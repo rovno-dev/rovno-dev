@@ -349,7 +349,7 @@ export default async function ProjectPage({
         content={ctx.content}
         related={buildRelated(slug)}
       />
-      {/* GitHub README blocks — one per github tag. */}
+      {/* GitHub README blocks - one per github tag. */}
       {dbProject?.tags
         .filter((t) => t.kind === "github" && t.value?.repo)
         .map((t) => (

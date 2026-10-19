@@ -9,8 +9,8 @@ export type PasswordInputProps = Omit<React.ComponentProps<"input">, "type">;
 /**
  * Drop-in replacement for `<Input type="password" />`. Adds a small eye
  * toggle at the right edge that flips between masked and plain text.
- * Everything else — sizing, focus ring, invalid state, disabled styling,
- * hover border — mirrors the base `<Input>` so the two look identical
+ * Everything else - sizing, focus ring, invalid state, disabled styling,
+ * hover border - mirrors the base `<Input>` so the two look identical
  * side by side.
  */
 export const PasswordInput = React.forwardRef<
@@ -38,7 +38,7 @@ export const PasswordInput = React.forwardRef<
       />
       <button
         type="button"
-        // tabIndex={-1} keeps the toggle out of the tab order — it is a
+        // tabIndex={-1} keeps the toggle out of the tab order - it is a
         // convenience for the sighted user, not a form control. Keyboard
         // users can flip it with the same shortcut every OS uses (not
         // implemented here, the field is short enough to type blind).

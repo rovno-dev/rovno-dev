@@ -3,7 +3,7 @@
  * "с" in phrases like "работать с <кем>".
  *
  * This is a heuristic, not a morphological engine. It covers the common
- * shapes of Russian given names and surnames — enough for a CTA — and
+ * shapes of Russian given names and surnames - enough for a CTA - and
  * fails gracefully: unfamiliar words just get the consonant rule ("-ом"),
  * which produces a slightly-off form rather than a broken sentence.
  *
@@ -50,8 +50,8 @@ export function declineRussianWord(word: string): string {
 }
 
 /**
- * Declines the FIRST word of `name` — that's what the CTA shows.
- * A name like "Нияз Гимадиев" produces "Ниязом", not "Ниязом Гимадиевым" —
+ * Declines the FIRST word of `name` - that's what the CTA shows.
+ * A name like "Нияз Гимадиев" produces "Ниязом", not "Ниязом Гимадиевым" -
  * the surname is intentionally dropped for brevity on the CTA.
  */
 export function declineRussianFirstName(name: string): string {

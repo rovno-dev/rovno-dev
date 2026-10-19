@@ -231,7 +231,7 @@ export default function TaxonomiesPage() {
                           English
                         </div>
                         <p className="text-body-4 text-(--on-bg-high) truncate">
-                          {t.labels.en || "—"}
+                          {t.labels.en || "-"}
                         </p>
                       </div>
                       <div>
@@ -239,7 +239,7 @@ export default function TaxonomiesPage() {
                           Русский
                         </div>
                         <p className="text-body-4 text-(--on-bg-high) truncate">
-                          {t.labels.ru || "—"}
+                          {t.labels.ru || "-"}
                         </p>
                       </div>
                       <div className="flex gap-1">

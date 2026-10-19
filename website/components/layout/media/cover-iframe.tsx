@@ -1,7 +1,7 @@
 /**
  * Renders an iframe so its content covers the parent, like `object-fit: cover`
- * for <img>. iframes don't honour object-fit — they render their content at
- * whatever aspect ratio the source page decides — so we oversize the iframe
+ * for <img>. iframes don't honour object-fit - they render their content at
+ * whatever aspect ratio the source page decides - so we oversize the iframe
  * itself and let the parent clip it.
  *
  * The iframe is sized to whichever dimension is larger of:

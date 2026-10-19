@@ -19,7 +19,7 @@ export default function AdminRootClientLayout({
             otherwise force.
           - `md:sticky md:top-24` pins the sidebar below the fixed header
             while the content scrolls under it.
-          - The right column has no overflow settings — the whole page
+          - The right column has no overflow settings - the whole page
             scrolls naturally, which is the simplest, most reliable pattern
             for admin pages of any length.
         */}

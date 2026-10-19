@@ -2,7 +2,7 @@ import { BlogHeader } from "./_components/blog-header";
 import { BlogList } from "./_components/blog-list";
 import { fetchPublishedArticlesServer } from "@/utils/api/articles";
 
-// RSC page — fetches published articles at request time (ISR 60s) and
+// RSC page - fetches published articles at request time (ISR 60s) and
 // hands them to a client component that owns the tag filter. The compact
 // header is a Client Component of its own (needs the language hook).
 export const revalidate = 60;

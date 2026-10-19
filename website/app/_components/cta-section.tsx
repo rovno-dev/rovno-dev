@@ -8,7 +8,7 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import { TelegramLogotypeMonoIcon } from "@/components/icons";
 
 /**
- * Full URLs configured in .env — no interpolation. If a var is missing the
+ * Full URLs configured in .env - no interpolation. If a var is missing the
  * corresponding button is hidden entirely rather than pointing at a broken
  * URL. Order matters: the first available action becomes the primary.
  */
@@ -25,7 +25,7 @@ function isWithinWorkingHours(): boolean {
 export default function CtaSection() {
   const { t } = useLanguage();
   // null = not yet computed (SSR pass). Avoids hydration mismatch on the
-  // dot's pulse state — the pill renders neutral, then resolves on mount.
+  // dot's pulse state - the pill renders neutral, then resolves on mount.
   const [online, setOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function CtaSection() {
 
       <Container className="relative z-10">
         <div className="max-w-3xl mx-auto flex flex-col items-center text-center">
-          {/* Availability pill — dot reflects real working hours */}
+          {/* Availability pill - dot reflects real working hours */}
           <div className="inline-flex items-center gap-2 rounded-full border border-(--outline) bg-(--card)/70 backdrop-blur-sm px-3.5 py-1.5 mb-10">
             <span className="relative flex size-2 shrink-0">
               {online === true && (

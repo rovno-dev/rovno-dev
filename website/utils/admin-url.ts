@@ -10,7 +10,7 @@ import { crossSubdomainUrl } from "@/utils/root-domain";
  * Never prepend `/admin` at the call site. The subdomain (prod) or the
  * leading path segment (dev) already carries it, so a hardcoded
  * `/admin/${secret}/...` renders `admin.<root>/admin/<secret>/...` in
- * prod — which proxy.ts rewrites into a 404.
+ * prod - which proxy.ts rewrites into a 404.
  *
  * `path` may be passed with or without a leading slash.
  */

@@ -33,7 +33,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
 
   // Videos upload directly (there's nothing to crop). Images route through
   // the editor first so the admin can crop before the file ever hits the
-  // server — that's the whole point of the "Telegram-style" flow.
+  // server - that's the whole point of the "Telegram-style" flow.
   const uploadOne = async (file: File): Promise<ProjectMedia | null> => {
     if (file.size > MAX_BYTES) {
       toast.error(`${file.name}: файл больше ${MAX_BYTES / 1024 / 1024} МБ`);
@@ -41,7 +41,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
     }
     const isVideo = file.type.startsWith("video/");
     if (!isVideo) {
-      // Open the editor with the picked file. Return null — the caller
+      // Open the editor with the picked file. Return null - the caller
       // will need to await the user's apply action separately.
       const dataUrl = await readFileAsDataURL(file);
       setEditorSrc(dataUrl);

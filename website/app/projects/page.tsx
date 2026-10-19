@@ -13,7 +13,7 @@ export const revalidate = 60;
 
 export default async function ProjectsPage() {
   // Fetch projects and categories in parallel. Categories fail-soft to
-  // an empty list — the filter bar just shows the "Все" chip then.
+  // an empty list - the filter bar just shows the "Все" chip then.
   const [dbRows, categories] = await Promise.all([
     fetchPublishedProjectsServer(),
     fetchProjectCategories().catch(() => [] as Taxonomy[]),
