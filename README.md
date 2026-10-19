@@ -1,6 +1,6 @@
 # Rovno.dev
 
-Full-cycle digital agency platform. 
+Full-cycle digital agency platform. Built on top of the [Amorfa](https://unidoka.com/amorfa) framework.
 
 ## Architecture
 
@@ -16,6 +16,7 @@ The `docs/` folder is the source of truth.
 - [`docs/architecture.md`](docs/architecture.md) - How the services connect.
 - [`docs/DEV.md`](docs/DEV.md) - Local development workflow.
 - [`docs/TESTING.md`](docs/TESTING.md) - How to verify your work.
+- [`CHANGELOG.md`](CHANGELOG.md) - Major updates and versions.
 
 ## Quick Start (Dev)
 
