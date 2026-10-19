@@ -101,13 +101,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
   if (!article) return { title: "Article not found · Rovno.dev" };
+  const fallbackImage = `/api/og/article/${article.slug}`;
+  const ogImage = article.image_url || fallbackImage;
+
   return {
     title: article.seo_title || `${article.title} · Rovno.dev`,
     description: article.meta_description || article.description,
     openGraph: {
       title: article.seo_title || article.title,
       description: article.meta_description || article.description,
-      images: article.image_url ? [article.image_url] : undefined,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.seo_title || article.title,
+      description: article.meta_description || article.description,
+      images: [ogImage],
     },
   };
 }
@@ -179,7 +188,12 @@ export default async function ArticlePage({
               />
             )
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] overflow-hidden">
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "linear-gradient(to right, #336DFF 1px, transparent 1px), linear-gradient(to bottom, #336DFF 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+              <div className="relative z-10 text-[#336DFF] font-mono text-sm tracking-widest uppercase mb-4">Journal // Rovno.dev</div>
+              <div className="relative z-10 h-px w-24 bg-[#336DFF] mb-4" />
+              <div className="relative z-10 text-4xl md:text-6xl font-heading font-black text-white/20 select-none">NO IMAGE</div>
+            </div>
           )}
 
           {/* z-1 — bottom fade for text legibility */}

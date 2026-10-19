@@ -163,7 +163,7 @@ export function CustomProjectPage({
                     title={project.title}
                   />
                 )
-              ) : (
+              ) : project.coverImage ? (
                 <Image
                   src={project.coverImage}
                   alt={project.title}
@@ -172,6 +172,13 @@ export function CustomProjectPage({
                   sizes="(max-width: 1120px) 100vw, 1120px"
                   className="object-cover"
                 />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] overflow-hidden">
+                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "linear-gradient(to right, #CCFF00 1px, transparent 1px), linear-gradient(to bottom, #CCFF00 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                  <div className="relative z-10 text-[#CCFF00] font-mono text-sm tracking-widest uppercase mb-4">Project // Rovno.dev</div>
+                  <div className="relative z-10 h-px w-24 bg-[#CCFF00] mb-4" />
+                  <div className="relative z-10 text-4xl md:text-6xl font-heading font-black text-white/20 select-none">NO COVER</div>
+                </div>
               )}
             </div>
           </div>
