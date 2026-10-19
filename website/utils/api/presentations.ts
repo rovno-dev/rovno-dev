@@ -1,20 +1,18 @@
 import { $fetch } from "@/utils/fetch";
 
+export interface SlideTheme {
+  mode: "light" | "dark";
+  bg?: string;
+  brand?: string;
+}
+
 export interface Slide {
   id?: string;
   order: number;
-  type: "cover" | "text" | "question" | "image" | "quote" | "split" | "speaker" | string;
-  content: {
-    title?: string;
-    subtitle?: string;
-    text?: string;
-    image_url?: string;
-    bg_color?: string;
-    text_color?: string;
-    layout?: string;
-    caption?: string;
-  };
+  type: string; // Maps to the registry key
+  content: Record<string, any>;
   notes?: string;
+  theme?: SlideTheme;
 }
 
 export interface Presentation {
