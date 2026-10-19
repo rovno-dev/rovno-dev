@@ -115,6 +115,48 @@ export async function generateStaticParams() {
   return all.map((project) => ({ slug: project.slug }));
 }
 
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const dbProject = await fetchDbProject(slug);
+  const mdxProject = getAllProjects().find((p) => p.slug === slug);
+  const fallbackProject = PROJECTS[slug];
+
+  let title = "Проект Rovno.dev";
+  let description = "Кейс цифрового агентства Rovno.dev";
+  let image = `/api/og/project/${slug}`;
+
+  if (dbProject) {
+    title = dbProject.title;
+    description = dbProject.short_description || dbProject.description || description;
+    if (dbProject.cover_image_src) image = dbProject.cover_image_src;
+  } else if (mdxProject) {
+    title = mdxProject.title;
+    description = mdxProject.shortDescription || mdxProject.description || description;
+    if (mdxProject.cover?.imageSrc) image = mdxProject.cover.imageSrc;
+  } else if (fallbackProject) {
+    title = fallbackProject.title;
+    description = fallbackProject.shortDescription || fallbackProject.description || description;
+    if (fallbackProject.cover?.imageSrc) image = fallbackProject.cover.imageSrc;
+  }
+
+  return {
+    title: `${title} · Rovno.dev`,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
 const components = {
   h1: (props: any) => <MDXHeading level={1} {...props} />,
   h2: (props: any) => <MDXHeading level={2} {...props} />,

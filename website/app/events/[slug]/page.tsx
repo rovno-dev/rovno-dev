@@ -29,9 +29,23 @@ export async function generateMetadata({
   const { slug } = await params;
   const ev = await fetchEventServer(slug);
   if (!ev) return { title: "Событие не найдено · Rovno.dev" };
+  const fallbackImage = `/api/og/event/${ev.slug}`;
+  const ogImage = ev.cover_image_src || fallbackImage;
+
   return {
     title: ev.seo_title || `${ev.title} · Rovno.dev`,
     description: ev.meta_description || ev.short_description || ev.description,
+    openGraph: {
+      title: ev.title,
+      description: ev.short_description || ev.description,
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ev.title,
+      description: ev.short_description || ev.description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -156,7 +170,12 @@ export default async function EventPage({
                 className="object-cover"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "linear-gradient(to right, #CCFF00 1px, transparent 1px), linear-gradient(to bottom, #CCFF00 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                <div className="relative z-10 text-[#CCFF00] font-mono text-sm tracking-widest uppercase mb-4">System // Event</div>
+                <div className="relative z-10 h-px w-24 bg-[#CCFF00] mb-4" />
+                <div className="relative z-10 text-4xl md:text-6xl font-heading font-black text-white/20 select-none">NO COVER</div>
+              </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />

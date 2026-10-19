@@ -118,7 +118,14 @@ function EventCard({
               className={`object-cover transition-transform duration-700 group-hover:scale-105 ${past ? "grayscale" : ""}`}
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] overflow-hidden">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(to right, #222 1px, transparent 1px), linear-gradient(to bottom, #222 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+              <div className="relative z-10 flex flex-col items-center gap-3 text-center px-6">
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#CCFF00]">{"{ event }"}</span>
+                <h3 className="text-xl font-heading font-semibold text-white leading-tight">{event.title}</h3>
+                <span className="font-mono text-xs text-gray-500">{event.start_at ? new Date(event.start_at).toLocaleDateString("ru-RU") : "Дата уточняется"}</span>
+              </div>
+            </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
 

@@ -53,6 +53,13 @@ export const metadata: Metadata = {
     siteName: 'Rovno.dev',
     title: 'Цифровое агентство полного цикла Rovno.dev',
     description: 'Дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
+    images: ['/api/og?title=Rovno.dev&subtitle=Digital%20Agency'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Цифровое агентство полного цикла Rovno.dev',
+    description: 'Дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
+    images: ['/api/og?title=Rovno.dev&subtitle=Digital%20Agency'],
   },
 };
 
