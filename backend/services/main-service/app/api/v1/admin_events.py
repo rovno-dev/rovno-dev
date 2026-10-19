@@ -107,6 +107,7 @@ def create_event(payload: EventCreate, db: Session = Depends(get_db), _: User = 
     db.add(ev)
     db.commit()
     db.refresh(ev)
+    attach_registered_counts(db, [ev])
     return ev
 
 
@@ -139,6 +140,7 @@ def update_event(
 
     db.commit()
     db.refresh(ev)
+    attach_registered_counts(db, [ev])
     return ev
 
 

@@ -44,8 +44,7 @@ class EventUpdate(BaseModel):
     city: Optional[str] = None
     price: Optional[str] = None
     registration_url: Optional[str] = None
-    capacity: Optional[int] = None
-    seat_type: Optional[str] = "мест"
+    seat_types: Optional[List[Dict[str, Any]]] = None
     custom_page: Optional[str] = None
     is_featured: Optional[bool] = None
     publication_status: Optional[str] = None

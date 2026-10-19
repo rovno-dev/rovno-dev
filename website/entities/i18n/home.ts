@@ -4,6 +4,10 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
     'home.numbers_title': 'Sharp Numbers',
     'home.stats_team_experience': 'average experience among all Rovno.dev members in 2026',
+    'home.stats_team_number': '4.5 years',
+    'home.stats_projects_number': '42',
+    'home.stats_clients_number': '18',
+    'home.stats_spec_number': '1 day',
     'home.stats_projects_done': 'projects completed',
     'home.stats_happy_clients': 'satisfied clients',
     'home.stats_spec_prep': 'on average it takes to prepare technical specifications and documentation',
@@ -42,6 +46,10 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
   ru: {
     'home.numbers_title': 'Ровные цифры',
     'home.stats_team_experience': 'средний опыт всех участников Rovno.dev в 2026 году',
+    'home.stats_team_number': '4.5 года',
+    'home.stats_projects_number': '42',
+    'home.stats_clients_number': '18',
+    'home.stats_spec_number': '1 день',
     'home.stats_projects_done': 'проектов завершено',
     'home.stats_happy_clients': 'довольных клиентов',
     'home.stats_spec_prep': 'в среднем занимает подготовка технических заданий и документации',

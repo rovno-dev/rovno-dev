@@ -442,16 +442,29 @@ async def main():
     if not TOKEN:
         log.error("TELEGRAM_BOT_TOKEN is not set")
         sys.exit(1)
-    await bot.set_my_commands([
-        BotCommand(command="start", description="Меню / привязка уведомлений"),
-        BotCommand(command="search", description="Найти заказ по ID или имени"),
-        BotCommand(command="dump_last", description="Последние N заказов (Excel)"),
-        BotCommand(command="dump_month", description="Заказы за месяц (Excel)"),
-        BotCommand(command="notifications", description="Как настроить уведомления"),
-        BotCommand(command="cancel", description="Отменить действие"),
-    ])
+    # Wrap set_my_commands in a try/except. If Telegram is slow or unreachable
+    # on startup (e.g. network timeout), we don't want to crash the bot.
+    try:
+        await bot.set_my_commands([
+            BotCommand(command="start", description="Меню / привязка уведомлений"),
+            BotCommand(command="search", description="Найти заказ по ID или имени"),
+            BotCommand(command="dump_last", description="Последние N заказов (Excel)"),
+            BotCommand(command="dump_month", description="Заказы за месяц (Excel)"),
+            BotCommand(command="notifications", description="Как настроить уведомления"),
+            BotCommand(command="cancel", description="Отменить действие"),
+        ], request_timeout=30)  # Give it more time on cold starts
+    except Exception as e:
+        log.warning(f"Failed to set bot commands on startup: {e}. Continuing to polling...")
+
     log.info("Bot started. Admin IDs: %s", ALLOWED_USERS)
-    await dp.start_polling(bot)
+    
+    # Wrap polling in try/finally to ensure the aiohttp session is always closed cleanly,
+    # which fixes the "Unclosed client session" memory leak warning.
+    try:
+        await dp.start_polling(bot)
+    finally:
+        log.info("Shutting down bot session...")
+        await bot.session.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

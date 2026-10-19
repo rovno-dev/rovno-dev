@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useLanguage } from "@/providers/language-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,6 +91,7 @@ function toFormState(e?: EventDetail | null): FormState {
 }
 
 export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const isEdit = !!initial;
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
@@ -149,7 +151,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
 
   const handleSave = async (status: "draft" | "published") => {
     if (!form.title.trim()) {
-      toast.error("Название обязательно");
+      toast.error(t("editor.missing_title"));
       return;
     }
     setSaving(true);
@@ -191,10 +193,10 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-display-2 mb-1">{isEdit ? "Редактирование события" : "Новое событие"}</h1>
+          <h1 className="text-display-2 mb-1">{isEdit ? t("editor.event_title_edit") : t("editor.event_title_new")}</h1>
           {initial && (
             <p className="text-body-4 text-(--on-bg-low)">
-              {initial.publication_status === "published" ? "Опубликовано" : "Черновик"} · <code className="font-mono">/events/{initial.slug}</code>
+              {initial.publication_status === "published" ? t("editor.status_published") : t("editor.status_draft")} · <code className="font-mono">/events/{initial.slug}</code>
             </p>
           )}
         </div>
@@ -205,44 +207,44 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
             </Button>
           )}
           <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
-            <FloppyDiskIcon className="size-4" /> Черновик
+            <FloppyDiskIcon className="size-4" /> {t("editor.save_draft")}
           </Button>
           <Button onClick={() => handleSave("published")} disabled={saving}>
-            <RocketIcon className="size-4" /> Опубликовать
+            <RocketIcon className="size-4" /> {t("editor.publish")}
           </Button>
         </div>
       </div>
 
       {/* Basics */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-        <h2 className="text-heading-3">Основное</h2>
+        <h2 className="text-heading-3">{t("editor.event_basics")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field className="md:col-span-2">
-            <FieldLabel>Название <span className="text-destructive">*</span></FieldLabel>
+            <FieldLabel>{t("editor.field_title")} <span className="text-destructive">*</span></FieldLabel>
             <Input value={form.title} onChange={(e) => update("title", e.target.value)} />
           </Field>
           <Field>
-            <FieldLabel>Slug</FieldLabel>
+            <FieldLabel>{t("editor.field_slug")}</FieldLabel>
             <Input value={form.slug} onChange={(e) => update("slug", e.target.value)} placeholder="генерируется из названия" />
           </Field>
           <Field>
-            <FieldLabel>Цена</FieldLabel>
+            <FieldLabel>{t("editor.event_price")}</FieldLabel>
             <Input value={form.price} onChange={(e) => update("price", e.target.value)} placeholder="Бесплатно / 500 ₽" />
           </Field>
           <Field>
-            <FieldLabel>Начало</FieldLabel>
+            <FieldLabel>{t("editor.event_start")}</FieldLabel>
             <Input type="datetime-local" value={form.start_at} onChange={(e) => update("start_at", e.target.value)} />
           </Field>
           <Field>
-            <FieldLabel>Конец (опционально)</FieldLabel>
+            <FieldLabel>{t("editor.event_end")}</FieldLabel>
             <Input type="datetime-local" value={form.end_at} onChange={(e) => update("end_at", e.target.value)} />
           </Field>
           <Field className="md:col-span-2">
-            <FieldLabel>Короткое описание</FieldLabel>
+            <FieldLabel>{t("editor.event_short_desc")}</FieldLabel>
             <Textarea value={form.short_description} onChange={(e) => update("short_description", e.target.value)} className="min-h-[60px]" />
           </Field>
           <Field className="md:col-span-2">
-            <FieldLabel>Полное описание</FieldLabel>
+            <FieldLabel>{t("editor.event_full_desc")}</FieldLabel>
             <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} className="min-h-[100px]" />
           </Field>
         </div>
@@ -250,26 +252,26 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
 
       {/* Location */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-        <h2 className="text-heading-3">Место и регистрация</h2>
+        <h2 className="text-heading-3">{t("editor.event_location")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field>
-            <FieldLabel>Название места</FieldLabel>
+            <FieldLabel>{t("editor.event_venue")}</FieldLabel>
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} placeholder="МЦК КИТС" />
           </Field>
           <Field>
-            <FieldLabel>Город</FieldLabel>
+            <FieldLabel>{t("editor.event_city")}</FieldLabel>
             <Input value={form.city} onChange={(e) => update("city", e.target.value)} />
           </Field>
           <Field className="md:col-span-2">
-            <FieldLabel>Адрес</FieldLabel>
+            <FieldLabel>{t("editor.event_address")}</FieldLabel>
             <Input value={form.address} onChange={(e) => update("address", e.target.value)} />
           </Field>
           <Field>
-            <FieldLabel>Метро</FieldLabel>
+            <FieldLabel>{t("editor.event_metro")}</FieldLabel>
             <Input value={form.metro} onChange={(e) => update("metro", e.target.value)} />
           </Field>
           <Field className="md:col-span-2">
-            <FieldLabel>Внешняя ссылка на регистрацию (опционально)</FieldLabel>
+            <FieldLabel>{t("editor.event_reg_url")}</FieldLabel>
             <Input value={form.registration_url} onChange={(e) => update("registration_url", e.target.value)} placeholder="https://forms.yandex.com/… — если пусто, форма на сайте" />
           </Field>
         </div>
@@ -278,11 +280,11 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
         <div className="pt-4 border-t border-(--outline)">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <Label className="text-body-3">Лимиты и типы мест</Label>
-              <p className="text-body-5 text-(--on-bg-low)">Если не добавить, будет отображено "no info"</p>
+              <Label className="text-body-3">{t("editor.event_seats_title")}</Label>
+              <p className="text-body-5 text-(--on-bg-low)">{t("editor.event_seats_hint")}</p>
             </div>
             <Button type="button" variant="outlined" size="small" onClick={addSeatType}>
-              <PlusIcon className="size-4" /> Добавить тип
+              <PlusIcon className="size-4" /> {t("editor.event_add_seat")}
             </Button>
           </div>
           
@@ -293,14 +295,14 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
                   <Input
                     value={seat.type}
                     onChange={(e) => updateSeatType(idx, "type", e.target.value)}
-                    placeholder="Тип (e.g. VIP, Стандарт)"
+                    placeholder={t("editor.event_seat_type_ph")}
                     className="flex-1"
                   />
                   <Input
                     type="number"
                     value={seat.count}
                     onChange={(e) => updateSeatType(idx, "count", e.target.value)}
-                    placeholder="Кол-во"
+                    placeholder={t("editor.event_seat_count_ph")}
                     className="w-32"
                   />
                   <Button type="button" variant="text" size="icon-small" onClick={() => removeSeatType(idx)}>
@@ -315,7 +317,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
 
       {/* Cover */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
-        <h2 className="text-heading-3">Обложка</h2>
+        <h2 className="text-heading-3">{t("editor.event_cover")}</h2>
         <UnifiedCover
           imageUrl={form.cover_image_src}
           videoUrl={form.cover_video_src}
@@ -328,15 +330,15 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
 
       {/* Template */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-        <h2 className="text-heading-3">Кастомная страница</h2>
+        <h2 className="text-heading-3">{t("editor.event_custom_page")}</h2>
         <Field>
-          <FieldLabel>Шаблон</FieldLabel>
+          <FieldLabel>{t("editor.event_template")}</FieldLabel>
           <Select value={form.custom_page || "__none__"} onValueChange={(v) => update("custom_page", v === "__none__" ? null : v)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="__none__">Общий шаблон события</SelectItem>
+              <SelectItem value="__none__">{t("editor.event_template_default")}</SelectItem>
               {EVENT_CUSTOM_PAGES_META.map((m) => (
                 <SelectItem key={m.key} value={m.key}>{m.label}</SelectItem>
               ))}
@@ -348,29 +350,29 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
       {/* MDX */}
       {!isCustomPage && (
         <div className="space-y-3">
-          <h2 className="text-heading-3">Содержимое (MDX)</h2>
+          <h2 className="text-heading-3">{t("editor.section_content")} (MDX)</h2>
           <ArticleEditor value={form.mdx_content} onChange={(v) => update("mdx_content", v)} placeholder="Описание события…" />
         </div>
       )}
 
       {/* SEO + flags */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4">
-        <h2 className="text-heading-3">SEO и флаги</h2>
+        <h2 className="text-heading-3">{t("editor.event_flags")}</h2>
         <Field>
-          <FieldLabel>SEO заголовок</FieldLabel>
+          <FieldLabel>{t("editor.field_seo_title")}</FieldLabel>
           <Input value={form.seo_title} onChange={(e) => update("seo_title", e.target.value)} />
         </Field>
         <Field>
-          <FieldLabel>Meta description</FieldLabel>
+          <FieldLabel>{t("editor.field_seo_description")}</FieldLabel>
           <Textarea value={form.meta_description} onChange={(e) => update("meta_description", e.target.value)} className="min-h-[72px]" />
         </Field>
         <div className="flex items-center gap-3 pt-2">
           <Switch id="is_featured" checked={form.is_featured} onCheckedChange={(v) => update("is_featured", v)} />
-          <Label htmlFor="is_featured">Featured на /events</Label>
+          <Label htmlFor="is_featured">{t("editor.event_featured")}</Label>
         </div>
         <div className="flex items-center gap-3">
           <Switch id="published" checked={form.publication_status === "published"} onCheckedChange={(v) => update("publication_status", v ? "published" : "draft")} />
-          <Label htmlFor="published">Опубликовано</Label>
+          <Label htmlFor="published">{t("editor.status_published")}</Label>
         </div>
       </Card>
     </div>

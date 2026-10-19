@@ -27,6 +27,7 @@ export default function HeroSection() {
   const [containerWidth, setContainerWidth] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const extendedBadges = useMemo(() => [...BADGES, ...BADGES, ...BADGES], []);
   const activeBadge = BADGES[index % BADGES.length];
@@ -35,6 +36,18 @@ export default function HeroSection() {
   const isMobile = containerWidth < 640;
   const itemWidth = isMobile ? Math.min(300, containerWidth - 48) : 550;
   const itemGap = isMobile ? 24 : 48;
+
+  useEffect(() => {
+    const activeIdx = index % BADGES.length;
+    videoRefs.current.forEach((video, idx) => {
+      if (!video) return;
+      if (idx === activeIdx) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [index]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,22 +89,25 @@ export default function HeroSection() {
 
       {/* Background Video Layer */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {activeBadge.video && (
+        {BADGES.map((badge, idx) => (
           <video
-            key={activeBadge.video}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
-            autoPlay
+            key={badge.video}
+            ref={(el) => { videoRefs.current[idx] = el; }}
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out",
+              idx === index % BADGES.length ? "opacity-100 z-10" : "opacity-0 z-0"
+            )}
             muted
             loop
             playsInline
             preload="auto"
           >
-            <source src={activeBadge.video} type="video/webm" />
+            <source src={badge.video} type="video/webm" />
           </video>
-        )}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" />
+        ))}
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] z-20" />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-20"
           style={{ background: "radial-gradient(ellipse at top, var(--primary-glass), transparent 75%)" }}
         />
       </div>
