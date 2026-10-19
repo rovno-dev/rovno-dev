@@ -1,0 +1,322 @@
+// Rovno.dev Main Database Schema
+// Source of truth for the backend models.
+
+Project main_db {
+  database_type: 'PostgreSQL'
+  Note: 'Main database for Rovno.dev backend'
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Enums
+// ═══════════════════════════════════════════════════════════════════════
+Enum lifecycle_stage      { lead  prospect  customer  regular }
+Enum estimate_deadline    { asap  under_1_month  "1_3_months"  flexible }
+Enum estimate_budget      { "30k_75k"  "75k_150k"  "150k_500k"  "500k_1kk"  over_1kk  need_consultation }
+Enum order_status         { new  negotiating  work  done  canceled }
+Enum user_role            { client  user  admin  root }
+Enum user_status          { pending_verification  verificated  blocked }
+Enum publication_status   { draft  pending_review  published  rejected  deleted }
+Enum client_status        { from_order  manual  partner }
+Enum project_tag_kind     { from_chief  license  github  custom }
+Enum project_media_type   { image  video }
+Enum tag_kind             { tag  category  brand }
+
+// ═══════════════════════════════════════════════════════════════════════
+// Auth & Users
+// ═══════════════════════════════════════════════════════════════════════
+Table users {
+  id                         uuid [pk]
+  username                   varchar [unique]
+  name                       varchar
+  surname                    varchar
+  email                      varchar [unique, not null]
+  phone                      varchar [unique]
+  password                   varchar [not null]
+  description                text
+  bio                        varchar(64)
+  avatar_url                 varchar
+  user_role                  user_role     [default: 'user']
+  user_status                user_status   [default: 'pending_verification']
+  totp_secret                varchar       [note: '2FA secret for Google Authenticator']
+  totp_enabled               boolean       [default: false]
+  can_create_articles        boolean       [default: false, note: 'Custom permission flag']
+  blocked                    boolean       [default: false]
+  verified                   boolean       [default: false]
+  created_at                 timestamp     [default: `now()`]
+  updated_at                 timestamp     [default: `now()`]
+}
+
+Table user_sessions {
+  id             uuid [pk]
+  user_id        uuid [ref: > users.id, not null]
+  user_agent     varchar
+  ip_address     varchar
+  created_at     timestamp [default: `now()`]
+  last_active_at timestamp [default: `now()`]
+}
+
+Table team_members {
+  id          uuid [pk]
+  user_id     uuid [ref: > users.id]
+  role        varchar [not null]
+  bio         text
+  cover_url   varchar
+  sort_order  int     [default: 0]
+  is_active   boolean [default: true]
+  created_at  timestamp [default: `now()`]
+  updated_at  timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CRM & Orders
+// ═══════════════════════════════════════════════════════════════════════
+Table companies {
+  id               uuid [pk]
+  name             varchar [not null]
+  slug             varchar [unique, not null]
+  website          varchar
+  logotype_url     varchar
+  industry         varchar
+  description      text
+  lifecycle_stage  lifecycle_stage [default: 'lead']
+  created_at       timestamp [default: `now()`]
+  updated_at       timestamp [default: `now()`]
+}
+
+Table clients {
+  id                 uuid [pk]
+  company_id         uuid [ref: > companies.id]
+  user_id            uuid [ref: > users.id]
+  role_title         varchar
+  phone              varchar
+  telegram_username  varchar
+  email              varchar
+  name               varchar
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+Table order_requests {
+  id                   uuid [pk]
+  client_id            uuid [ref: > clients.id]
+  service_types_json   json
+  about                varchar
+  estimate_deadline    estimate_deadline
+  estimate_budget      estimate_budget
+  naming_help          varchar
+  status               order_status [default: 'new']
+  cancellation_reason  varchar
+  created_at           timestamp [default: `now()`]
+  updated_at           timestamp [default: `now()`]
+}
+
+Table order_request_files {
+  id                uuid [pk]
+  order_request_id  uuid [ref: > order_requests.id]
+  file_path         varchar
+  filename          varchar
+  created_at        timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Projects
+// ═══════════════════════════════════════════════════════════════════════
+Table project_categories {
+  id      uuid [pk]
+  code    varchar [unique, not null]
+  label   varchar
+  labels  json
+}
+
+Table project_roles {
+  id          uuid [pk]
+  code        varchar [unique, not null]
+  labels      json
+  created_at  timestamp [default: `now()`]
+}
+
+Table projects {
+  id                 varchar [pk]
+  slug               varchar [unique, not null]
+  title              varchar [not null]
+  client_id          uuid [ref: > companies.id]
+  category_id        uuid [ref: > project_categories.id]
+  platform           varchar
+  period             varchar
+  short_description  text
+  description        text
+  cover_image_src    varchar
+  cover_video_src    varchar
+  href               varchar
+  mdx_content        text
+  is_featured        boolean [default: false]
+  publication_status publication_status [default: 'draft']
+  custom_page        varchar(60)
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+Table project_team_assignments {
+  project_id       varchar [ref: > projects.id]
+  team_member_id   uuid    [ref: > team_members.id]
+  role_on_project  varchar
+  role_id          uuid    [ref: > project_roles.id]
+  indexes {
+    (project_id, team_member_id) [pk]
+  }
+}
+
+Table project_tags {
+  id          uuid [pk]
+  project_id  varchar [ref: > projects.id]
+  kind        project_tag_kind [not null]
+  label       varchar [not null]
+  value       json
+  sort_order  int [default: 0]
+}
+
+Table project_media {
+  id             uuid [pk]
+  project_id     varchar [ref: > projects.id]
+  type           project_media_type [not null]
+  url            varchar [not null]
+  thumbnail_url  varchar
+  caption        varchar
+  sort_order     int [default: 0]
+}
+
+Table stack_items {
+  id          uuid [pk]
+  name        varchar(60) [not null]
+  slug        varchar(60) [not null]
+  icon_url    varchar
+}
+
+Table project_stack_items {
+  project_id    varchar [ref: > projects.id]
+  stack_item_id uuid    [ref: > stack_items.id]
+  indexes {
+    (project_id, stack_item_id) [pk]
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Articles & Tags
+// ═══════════════════════════════════════════════════════════════════════
+Table tags {
+  id          uuid [pk]
+  name        varchar [not null]
+  slug        varchar [not null]
+  kind        tag_kind [default: 'tag']
+}
+
+Table article_categories {
+  id     uuid [pk]
+  code   varchar [unique, not null]
+  label  varchar [not null]
+}
+
+Table articles {
+  id                  uuid [pk]
+  slug                varchar [unique, not null]
+  title               varchar [not null]
+  description         varchar
+  image_url           varchar
+  date                timestamp
+  author_id           uuid    [ref: > users.id]
+  mdx_content         text
+  raw_json            json
+  attachments         json
+  publication_status  publication_status [default: 'draft']
+  review_note         text
+  reviewed_by_id      uuid    [ref: > users.id]
+  reviewed_at         timestamp
+  created_at          timestamp [default: `now()`]
+  updated_at          timestamp [default: `now()`]
+}
+
+Table article_tags {
+  article_id  uuid [ref: > articles.id]
+  tag_id      uuid [ref: > tags.id]
+  indexes {
+    (article_id, tag_id) [pk]
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Events
+// ═══════════════════════════════════════════════════════════════════════
+Table events {
+  id                 varchar [pk]
+  slug               varchar [unique, not null]
+  title              varchar [not null]
+  short_description  text
+  description        text
+  cover_image_src    varchar
+  cover_video_src    varchar
+  start_at           timestamp
+  end_at             timestamp
+  location_name      varchar
+  address            varchar
+  metro              varchar
+  city               varchar
+  price              varchar
+  registration_url   varchar
+  seat_types         json    [note: 'Array of {type: string, count: number}']
+  custom_page        varchar(60)
+  is_featured        boolean [default: false]
+  publication_status publication_status [default: 'draft']
+  mdx_content        text
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+Table event_tags {
+  event_id  varchar [ref: > events.id]
+  tag_id    uuid    [ref: > tags.id]
+  indexes {
+    (event_id, tag_id) [pk]
+  }
+}
+
+Table event_requests {
+  id                 uuid [pk]
+  event_id           varchar [ref: > events.id]
+  name               varchar
+  surname            varchar
+  patronymic         varchar
+  phone              varchar
+  email              varchar
+  telegram_username  varchar
+  age                int
+  status             varchar(20) [default: 'new', note: 'new | approved | declined | canceled']
+  decline_reason     varchar
+  meta               json
+  created_at         timestamp [default: `now()`]
+  updated_at         timestamp [default: `now()`]
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Notifications
+// ═══════════════════════════════════════════════════════════════════════
+Table notification_settings {
+  id                       int [pk, note: 'Singleton row, always id=1']
+  order_notify_email       boolean [default: true]
+  order_notify_telegram    boolean [default: true]
+  order_email_recipient_ids json
+  order_telegram_recipient_ids json
+  order_template_subject   varchar
+  order_template_body      text
+  updated_at               timestamp
+}
+
+Table user_notification_preferences {
+  user_id            uuid [pk, ref: > users.id]
+  email_enabled      boolean [default: true]
+  telegram_enabled   boolean [default: true]
+  marketing_enabled  boolean [default: false]
+  telegram_chat_id   varchar
+  telegram_username  varchar
+  linked_at          timestamp
+  updated_at         timestamp
+}
