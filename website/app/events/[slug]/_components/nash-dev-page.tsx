@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Ascii } from "ascii.rest/react";
 import type { EventCustomContext } from "./event-custom-pages";
 import { registerForEvent } from "@/utils/api/events";
 import Image from "next/image";
@@ -535,218 +534,98 @@ function Speakers() {
 
 /* ── AI slider (clip-path split) ─────────────────────────────────────── */
 
-function AiSlider() {
-  const [pos, setPos] = useState(50);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
-  const update = (clientX: number) => {
-    const el = trackRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const pct = ((clientX - r.left) / r.width) * 100;
-    setPos(Math.max(0, Math.min(100, pct)));
-  };
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
+
   useEffect(() => {
-    const onUp = () => (dragging.current = false);
-    const onMove = (e: MouseEvent) => dragging.current && update(e.clientX);
-    const onTouch = (e: TouchEvent) => {
-      if (dragging.current && e.touches[0]) update(e.touches[0].clientX);
+    // 23 October 2026, 12:30 Moscow time (UTC+3)
+    const target = new Date("2026-10-23T12:30:00+03:00").getTime();
+
+    const update = () => {
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) {
+        setTimeLeft({ d: 0, h: 0, m: 0, s: 0 });
+        return;
+      }
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / 1000 / 60) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      setTimeLeft({ d, h, m, s });
     };
-    window.addEventListener("mouseup", onUp);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("touchend", onUp);
-    window.addEventListener("touchmove", onTouch);
-    return () => {
-      window.removeEventListener("mouseup", onUp);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("touchend", onUp);
-      window.removeEventListener("touchmove", onTouch);
-    };
+
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
   }, []);
+
+  if (!timeLeft) return null;
+
+  return (
+    <div className="flex gap-4 font-mono items-center">
+      <div className="flex flex-col items-center">
+        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.d).padStart(2, '0')}</span>
+        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">days</span>
+      </div>
+      <span className="text-2xl text-[#666] pb-6">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.h).padStart(2, '0')}</span>
+        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">hours</span>
+      </div>
+      <span className="text-2xl text-[#666] pb-6">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.m).padStart(2, '0')}</span>
+        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">mins</span>
+      </div>
+      <span className="text-2xl text-[#666] pb-6">:</span>
+      <div className="flex flex-col items-center">
+        <span className="text-4xl md:text-5xl lg:text-6xl text-[#CCFF00]">{String(timeLeft.s).padStart(2, '0')}</span>
+        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">secs</span>
+      </div>
+    </div>
+  );
+}
+
+function StreamSection() {
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
-        <p className="font-mono text-base md:text-lg mb-4" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Один инструмент. Два принципиально разных результата.
+        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>system --status
         </p>
-        <div
-          ref={trackRef}
-          className="relative w-full aspect-[16/9] border select-none overflow-hidden touch-none"
-          style={{ borderColor: "#222" }}
-        >
-          {/* LEFT (muted) — baseline. Full frame, so it is what shows through
-              when the split sits at 0%. */}
-          <div
-            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end overflow-hidden"
-            style={{ background: "#111" }}
-          >
-            {/* Ambient iconography — reads as a warning schematic sitting
-                behind the copy. Kept under 0.2 opacity so it never competes
-                with the text. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none select-none"
-              style={{ color: "#444" }}
-            >
-              {/* Warning triangle, top-right */}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                className="absolute top-6 right-6 size-24 md:size-40"
-                style={{ opacity: 0.16 }}
-              >
-                <path d="M12 3 2 20h20L12 3Z" />
-                <path d="M12 9v5" />
-                <circle cx="12" cy="17" r="0.7" fill="currentColor" />
-              </svg>
-              {/* Broken chain, bottom-right */}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="absolute bottom-10 right-6 size-20 md:size-28"
-                style={{ opacity: 0.12 }}
-              >
-                <path d="M9 15 6 18a3 3 0 0 1-4-4l3-3" />
-                <path d="M15 9l3-3a3 3 0 0 1 4 4l-3 3" />
-                <path d="M3 3l18 18" />
-              </svg>
-              {/* Monospace fragment, top-left */}
-              <span
-                className="absolute top-8 left-8 font-mono text-[3rem] md:text-[5rem] leading-none"
-                style={{ opacity: 0.10 }}
-              >
-                /ERR
-              </span>
-              {/* Faint schematic lines */}
-              <svg
-                viewBox="0 0 200 200"
-                className="absolute -bottom-10 -left-10 w-[240px] h-[240px] md:w-[360px] md:h-[360px]"
-                style={{ opacity: 0.08 }}
-              >
-                {[40, 70, 100, 130, 160].map((y) => (
-                  <line
-                    key={y}
-                    x1="0"
-                    y1={y}
-                    x2="200"
-                    y2={y}
-                    stroke="currentColor"
-                    strokeWidth="0.5"
-                    strokeDasharray="2 6"
-                  />
-                ))}
-              </svg>
-            </div>
-            <div className="relative">
-              <p
-                className="font-mono text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3"
-                style={{ color: "#666" }}
-              >
-                AI_WITHOUT_ARCHITECTURE
-              </p>
-              <p
-                className="font-mono text-xl md:text-3xl mb-3 leading-snug"
-                style={{ color: "#8a8a8a" }}
-              >
-                Технический долг.
-                <br />
-                Нулевая поддерживаемость.
-              </p>
-              <p
-                className="text-sm md:text-base max-w-[420px] leading-relaxed"
-                style={{ color: "#555" }}
-              >
-                Код компилируется, но не выдерживает нагрузку реальных сценариев.
-              </p>
-            </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Timer */}
+          <div>
+            <p className="font-mono text-sm md:text-base uppercase tracking-[0.2em] mb-6" style={{ color: "#888" }}>
+              // ДО НАЧАЛА ОСТАЛОСЬ
+            </p>
+            <CountdownTimer />
+            <p className="font-mono text-sm md:text-base mt-8" style={{ color: WHITE }}>
+              <Prompt>{"$"}</Prompt>date: 23 октября 2026, 12:30 MSK
+            </p>
           </div>
-          {/* RIGHT (lime) — full-size, clipped to reveal only the right portion */}
-          <div
-            className="absolute inset-0 p-6 md:p-12 flex flex-col justify-end overflow-hidden"
-            style={{
-              background: LIME,
-              color: BLACK,
-              clipPath: `inset(0 0 0 ${pos}%)`,
-            }}
-          >
-            {/* Ambient iconography — validated / shipped signals. */}
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none select-none"
-              style={{ color: "#2b2b00" }}
-            >
-              {/* Shield with check, top-right */}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                className="absolute top-6 right-6 size-24 md:size-40"
-                style={{ opacity: 0.18 }}
-              >
-                <path d="M12 2 4 5v7c0 5 3.6 9 8 10 4.4-1 8-5 8-10V5l-8-3Z" />
-                <path d="m8.5 12 2.4 2.4 4.6-4.6" />
-              </svg>
-              {/* Terminal OK, bottom-right */}
-              <span
-                className="absolute bottom-10 right-6 font-mono text-[2.5rem] md:text-[4.5rem] leading-none"
-                style={{ opacity: 0.14 }}
-              >
-                $ _OK
-              </span>
-              {/* Compliance checklist, top-left */}
-              <div
-                className="absolute top-8 left-8 flex flex-col gap-1.5 font-mono text-xs md:text-sm"
-                style={{ opacity: 0.34 }}
-              >
-                <span>{"\u2713"} production-ready</span>
-                <span>{"\u2713"} horizontal scaling</span>
-                <span>{"\u2713"} maintainable surface</span>
+
+          {/* Video */}
+          <div>
+            <p className="font-mono text-sm md:text-base uppercase tracking-[0.2em] mb-4" style={{ color: "#888" }}>
+              // ТРАНСЛЯЦИЯ
+            </p>
+            <div className="relative aspect-video border border-[#222] bg-[#0a0a0a] flex items-center justify-center overflow-hidden group">
+              {/* Placeholder until link is added */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-[#444] group-hover:opacity-0 transition-opacity">
+                <span className="text-4xl mb-2">▶</span>
+                <span className="font-mono text-sm uppercase tracking-widest">iframe placeholder</span>
               </div>
-            </div>
-            {/* Content pinned to the right so it doesn't reflow on drag. */}
-            <div className="ml-auto text-right max-w-[520px] relative">
-              <p
-                className="font-mono text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3"
-                style={{ color: "#2b2b00" }}
-              >
-                AI_PLUS_ENGINEERING
-              </p>
-              <p className="font-mono text-xl md:text-3xl mb-3 leading-snug">
-                Черновик модели.
-                <br />
-                Промышленное качество.
-              </p>
-              <p
-                className="text-sm md:text-base leading-relaxed"
-                style={{ color: "#2b2b00" }}
-              >
-                Модель ускоряет старт. Инженер обеспечивает надёжность и масштаб.
-              </p>
-            </div>
-          </div>
-          {/* Handle */}
-          <div
-            className="absolute top-0 bottom-0 w-1 cursor-ew-resize z-10"
-            style={{ left: `${pos}%`, background: WHITE, transform: "translateX(-2px)" }}
-            onMouseDown={() => (dragging.current = true)}
-            onTouchStart={() => (dragging.current = true)}
-          >
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-10 flex items-center justify-center font-mono text-sm select-none"
-              style={{ background: WHITE, color: BLACK }}
-            >
-              {"\u21C4"}
+              {/* Example Iframe wrapper */}
+              <iframe
+                className="absolute inset-0 w-full h-full border-0"
+                src=""
+                title="Live stream"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>
@@ -918,19 +797,68 @@ function MapEmbed() {
 }
 /* ── Giveaway — Yandex Station ─────────────────────────────────────────── */
 function AsciiStation() {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setFrame((f) => f + 1), 100);
+    return () => clearInterval(id);
+  }, []);
+
+  const W = 24;
+  const H = 9;
+  const cx = W / 2;
+  const angle = frame * 0.08;
+
+  const lx = Math.cos(angle);
+  const lz = Math.sin(angle);
+
+  const lines = [];
+
+  // Top cap
+  let top = "";
+  for (let x = 0; x < W; x++) {
+    const nx = (x - cx + 0.5) / (W / 2);
+    if (Math.abs(nx) <= 0.8) top += "▄"; // ▄
+    else top += " ";
+  }
+  lines.push(top);
+
+  // Body (spinning cylinder shading)
+  for (let y = 1; y < H - 1; y++) {
+    let line = "";
+    for (let x = 0; x < W; x++) {
+      const nx = (x - cx + 0.5) / (W / 2);
+      if (Math.abs(nx) <= 0.92) {
+        const nz = Math.sqrt(1 - nx * nx);
+        const intensity = Math.max(0, nx * lx + nz * lz);
+        const val = (intensity + 0.2) / 1.2;
+        if (val > 0.8) line += "█"; // █
+        else if (val > 0.5) line += "▓"; // ▓
+        else if (val > 0.3) line += "▒"; // ▒
+        else line += "░"; // ░
+      } else {
+        line += " ";
+      }
+    }
+    lines.push(line);
+  }
+
+  // Bottom cap
+  let bot = "";
+  for (let x = 0; x < W; x++) {
+    const nx = (x - cx + 0.5) / (W / 2);
+    if (Math.abs(nx) <= 0.8) bot += "▀"; // ▀
+    else bot += " ";
+  }
+  lines.push(bot);
+
   return (
-    <Ascii
-      piece="analog-clock"
-      options={{ fps: 12 }}
-      style={{
-        lineHeight: 1.1,
-        margin: 0,
-        width: "100%",
-        color: LIME,
-        textShadow: `0 0 8px ${LIME}44`,
-      }}
-      className="font-mono"
-    />
+    <div className="relative font-mono" style={{ color: LIME, textShadow: `0 0 8px ${LIME}44` }}>
+      <pre className="m-0 leading-[1.1] text-[10px] sm:text-xs md:text-sm">{lines.join("\n")}</pre>
+      {/* Center play button (Yandex Station Lite) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ paddingTop: '0.2rem' }}>
+        <span className="text-heading-2 font-bold text-[#744BFF]">▲</span>
+      </div>
+    </div>
   );
 }
 
@@ -1549,7 +1477,7 @@ export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
         <Manifesto ctx={ctx} />
         <Audience />
         <Speakers />
-        <AiSlider />
+        <StreamSection />
         <Timeline />
         <Features />
         <Giveaway />
