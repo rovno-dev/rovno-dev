@@ -3,7 +3,7 @@ import { $fetch } from "@/utils/fetch";
 export interface Slide {
   id?: string;
   order: number;
-  type: "cover" | "text" | "question" | "image" | "quote";
+  type: "cover" | "text" | "question" | "image" | "quote" | "split" | "speaker" | string;
   content: {
     title?: string;
     subtitle?: string;
@@ -11,6 +11,8 @@ export interface Slide {
     image_url?: string;
     bg_color?: string;
     text_color?: string;
+    layout?: string;
+    caption?: string;
   };
   notes?: string;
 }

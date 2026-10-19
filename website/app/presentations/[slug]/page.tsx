@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Presentation, Slide } from "@/utils/api/presentations";
 import { Lock, CaretRight, CaretLeft } from "@phosphor-icons/react";
+import { SlideRenderer } from "@/components/presentation/slide-renderer";
 
 export default function PresentationViewer({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -86,64 +87,3 @@ export default function PresentationViewer({ params }: { params: Promise<{ slug:
   );
 }
 
-function SlideRenderer({ slide }: { slide: Slide }) {
-  const { type, content } = slide;
-  const lime = "#CCFF00";
-
-  if (type === "cover") {
-    return (
-      <div className="flex flex-col md:flex-row items-center gap-12">
-        <div className="flex-1 space-y-6">
-          <h1 className="text-6xl md:text-8xl font-heading font-black uppercase tracking-tighter leading-none">
-            {content.title || "TITLE"}
-          </h1>
-          <p className="text-2xl text-gray-400 font-mono">{content.subtitle}</p>
-        </div>
-        {content.image_url && (
-          <div className="flex-1 relative aspect-[3/4] w-full max-w-md rounded-3xl overflow-hidden border border-white/10">
-            <img src={content.image_url} className="object-cover w-full h-full" alt="" />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (type === "question") {
-    return (
-      <div className="bg-[#CCFF00] text-black p-12 md:p-20 rounded-3xl shadow-2xl">
-        <p className="font-mono text-sm uppercase tracking-[0.3em] mb-4 opacity-60">Question</p>
-        <h2 className="text-4xl md:text-6xl font-heading font-black leading-tight tracking-tight">
-          {content.title}
-        </h2>
-        <p className="text-xl md:text-2xl mt-8 font-medium opacity-80">{content.subtitle}</p>
-      </div>
-    );
-  }
-
-  if (type === "image") {
-    return (
-      <div className="w-full flex justify-center">
-        <img src={content.image_url} className="max-h-[75vh] object-contain rounded-xl border border-white/10" alt="" />
-      </div>
-    );
-  }
-
-  if (type === "quote") {
-    return (
-      <div className="flex items-start gap-8">
-        <span className="text-[10rem] text-[#CCFF00] leading-none font-serif opacity-50">&quot;</span>
-        <div>
-          <h2 className="text-4xl md:text-6xl font-medium leading-tight">{content.title}</h2>
-          <p className="text-2xl text-gray-400 mt-6 font-mono">{content.subtitle}</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-8">
-      <h2 className="text-5xl md:text-7xl font-heading font-bold">{content.title}</h2>
-      <p className="text-2xl md:text-3xl text-gray-300 leading-relaxed max-w-4xl whitespace-pre-wrap">{content.subtitle}</p>
-    </div>
-  );
-}
