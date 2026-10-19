@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { Ascii } from "ascii.rest/react";
 import type { EventCustomContext } from "./event-custom-pages";
 import { registerForEvent } from "@/utils/api/events";
 import Image from "next/image";
@@ -367,7 +368,7 @@ const SPEAKERS: Speaker[] = [
     role: "undefined",
     fact: "undefined",
     bio: "undefined",
-    avatar_url: "",
+    avatar_url: "/images/events/nash-dev-2026/speaker-secret.png",
     // link: "https://",
   },
   {
@@ -918,18 +919,51 @@ function MapEmbed() {
 /* ── Giveaway — Yandex Station ─────────────────────────────────────────── */
 function AsciiStation() {
   return (
-    <pre
-      aria-hidden
-      className="font-mono text-[10px] sm:text-xs md:text-sm leading-[1.3] select-none whitespace-pre"
-      style={{ color: WHITE, textShadow: `0 0 20px ${LIME}22` }}
-    >{`        −      ◉      +
-   ╭───────────────────────╮
-   │                       │
-   │         12`}<span className="nash-colon" style={{ color: LIME }}>:</span>{`35         │
-   │                       │
-   ╰───────────────────────╯`}</pre>
+    <Ascii
+      piece="analog-clock"
+      options={{ fps: 12 }}
+      style={{
+        lineHeight: 1.1,
+        margin: 0,
+        width: "100%",
+        color: LIME,
+        textShadow: `0 0 8px ${LIME}44`,
+      }}
+      className="font-mono"
+    />
   );
 }
+
+function NashWave() {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setFrame((f) => (f + 1) % 10000), 100);
+    return () => clearInterval(id);
+  }, []);
+
+  const COUNT = 3;
+  const dots = Array.from({ length: COUNT }, (_, i) => {
+    const phase = (frame * 0.35 + i * 0.9) % (Math.PI * 2);
+    const level = (Math.sin(phase) + 1) / 2;
+    const char = level > 0.75 ? "\u25CF" : level > 0.4 ? "\u2022" : "\u00B7";
+    return { char, level };
+  });
+
+  return (
+    <span className="inline-flex items-center gap-[3px] font-mono" style={{ color: LIME }} aria-hidden>
+      {dots.map((d, i) => (
+        <span
+          key={i}
+          className="inline-block w-2 text-center transition-opacity duration-100"
+          style={{ opacity: 0.35 + d.level * 0.65 }}
+        >
+          {d.char}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function Giveaway() {
   return (
     <section
@@ -940,46 +974,46 @@ function Giveaway() {
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
           <Prompt>{"$"}</Prompt>cat prize.yaml
         </p>
-        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16 items-center">
-          {/* Left — metadata */}
-          <div className="font-mono space-y-6">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                prize
-              </p>
-              <p className="text-2xl md:text-3xl" style={{ color: WHITE }}>
-                Яндекс Станция Лайт
-              </p>
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
+          <div>
+            {/* Left — metadata */}
+            <div className="font-mono space-y-6">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                  prize
+                </p>
+                <p className="text-2xl md:text-3xl" style={{ color: WHITE }}>
+                  Яндекс Станция Лайт
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t" style={{ borderColor: "#222" }}>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                    brand
+                  </p>
+                  <p className="text-base" style={{ color: WHITE }}>Yandex</p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                    value
+                  </p>
+                  <p className="text-base" style={{ color: WHITE }}>6 700 ₽</p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                    timing
+                  </p>
+                  <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
+                    how_to_win???
+                  </p>
+                  <p className="text-base" style={{ color: WHITE }}>лучший вопрос</p>
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t" style={{ borderColor: "#222" }}>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  brand
-                </p>
-                <p className="text-base" style={{ color: WHITE }}>Yandex</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  value
-                </p>
-                <p className="text-base" style={{ color: WHITE }}>6 700 ₽</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  timing
-                </p>
-                <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  how_to_win???
-                </p>
-                <p className="text-base" style={{ color: WHITE }}>лучший вопрос</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-6 border-t pt-8" style={{ borderColor: "#222" }}>
-            <div className="">
+            <div className="mt-10">
               <p className="text-[11px] uppercase tracking-[0.24em] mb-2" style={{ color: "#666" }}>
                 Правила
               </p>
@@ -990,31 +1024,23 @@ function Giveaway() {
                 </li>
                 <li className="flex gap-2">
                   <span style={{ color: LIME }}>→</span>
-                  спикер сам выбирает лучший после доклада
+                  спикер сам выбирает лучший после доклада, а мы выбираем лучший из лушчих
                 </li>
                 <li className="flex gap-2">
                   <span style={{ color: LIME }}>→</span>
-                  вручение — сразу после секции вопросов
+                  вручение - в конце мероприятия
                 </li>
               </ul>
             </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-6 border-t sm:border-none pt-8" style={{ borderColor: "#222" }}>
             <div className="flex flex-col items-center">
               <AsciiStation />
               <div className="font-mono text-[11px] mt-6" style={{ color: "#666" }}>
                 {">"} Алиса, включи плейлист для Наш Дэв...
               </div>
               <div className="flex items-center gap-1.5 font-mono text-[11px] mt-3" style={{ color: "#666" }}>
-                <span className="inline-flex gap-[3px]">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className="nash-wave inline-block w-1 text-center"
-                      style={{ color: LIME, animationDelay: `${i * 0.12}s` }}
-                    >
-                      ●
-                    </span>
-                  ))}
-                </span>
+                <NashWave />
                 <span>Включаю плейлист для мероприятий</span>
               </div>
             </div>
