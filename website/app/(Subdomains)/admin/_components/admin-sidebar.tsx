@@ -15,6 +15,7 @@ import {
   FolderSimple,
   CalendarBlank,
   Ticket,
+  Presentation,
 } from "@phosphor-icons/react";
 
 export function AdminSidebar() {
@@ -56,6 +57,11 @@ export function AdminSidebar() {
           label: t("admin.event_requests"),
           href: "/event-requests",
           icon: Ticket,
+        },
+        {
+          label: "Презентации",
+          href: "/events/presentations",
+          icon: Presentation,
         },
       ],
     },
