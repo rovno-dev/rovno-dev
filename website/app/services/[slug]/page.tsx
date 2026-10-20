@@ -33,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const doc = loadServiceDoc(slug);
+  const doc = loadServiceDoc(slug) as any;
   if (!doc) return { title: "Услуга не найдена · Rovno.dev" };
   return {
     title: `${doc.title} · Rovno.dev`,
@@ -120,7 +120,7 @@ export default async function ServicePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const doc = loadServiceDoc(slug);
+  const doc = loadServiceDoc(slug) as any;
   if (!doc) notFound();
 
   const { content } = await compileMDX({
@@ -240,7 +240,7 @@ export default async function ServicePage({
                         href={`/services/${s.slug}`}
                         className="text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
                       >
-                        {s.shortTitle}
+                        {(s as any).shortTitle}
                       </Link>
                     </li>
                   ))}

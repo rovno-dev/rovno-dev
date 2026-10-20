@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer, JSON, Boolean, ForeignKey
+from sqlalchemy import Column, String, DateTime, Integer, JSON, Boolean, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from database.database import Base
@@ -19,6 +19,7 @@ class Presentation(Base):
     ends_at = Column(DateTime, nullable=True)
     
     is_published = Column(Boolean, default=False, nullable=False)
+    custom_tsx = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -36,6 +37,7 @@ class PresentationSlide(Base):
     
     # JSON content: { title, subtitle, text, image_url, bg_color, text_color }
     content = Column(JSON, default=dict, nullable=False)
+    theme = Column(JSON, nullable=True)
     notes = Column(String, nullable=True)
 
     presentation = relationship("Presentation", back_populates="slides")

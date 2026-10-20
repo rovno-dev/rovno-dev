@@ -31,8 +31,8 @@ export function SlideRenderer({ slide, isEditing, update }: SlideRendererProps) 
     <div className="absolute inset-0 overflow-hidden" style={bgStyle}>
       <Component 
         content={slide.content} 
-        isEditing={isEditing} 
-        update={update} 
+        isEditing={!!isEditing} 
+        update={update || (() => {})} 
         theme={theme} 
       />
     </div>

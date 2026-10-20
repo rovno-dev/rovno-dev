@@ -5,6 +5,7 @@ class SlideIn(BaseModel):
     order: int
     type: str
     content: Dict[str, Any]
+    theme: Optional[Dict[str, Any]] = None
     notes: Optional[str] = None
 
 class PresentationIn(BaseModel):
@@ -15,4 +16,5 @@ class PresentationIn(BaseModel):
     starts_at: Optional[str] = None
     ends_at: Optional[str] = None
     is_published: bool = False
+    custom_tsx: Optional[str] = None
     slides: List[SlideIn] = []

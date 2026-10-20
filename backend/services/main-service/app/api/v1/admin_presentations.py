@@ -11,6 +11,38 @@ from app.shared.slugify import slugify
 from database.database import get_db
 import random
 
+
+def sanitize_tsx_code(code: str):
+    """Strict security filter to prevent XSS and malicious code execution."""
+    forbidden_tokens = [
+        "eval", "Function", "fetch", "XMLHttpRequest", "window", "document",
+        "localStorage", "sessionStorage", "dangerouslySetInnerHTML", "<script",
+        "navigator", "import(", "require(", "WebSocket", "process", "globalThis"
+    ]
+    for token in forbidden_tokens:
+        if token in code:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Security violation: The token '{token}' is not allowed in custom TSX code."
+            )
+    return code
+
+
+def sanitize_tsx_code(code: str):
+    """Strict security filter to prevent XSS and malicious code execution."""
+    forbidden_tokens = [
+        "eval", "Function", "fetch", "XMLHttpRequest", "window", "document",
+        "localStorage", "sessionStorage", "dangerouslySetInnerHTML", "<script",
+        "navigator", "import(", "require(", "WebSocket", "process", "globalThis"
+    ]
+    for token in forbidden_tokens:
+        if token in code:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Security violation: The token '{token}' is not allowed in custom TSX code."
+            )
+    return code
+
 router = APIRouter(prefix="/admin/presentations", tags=["admin-presentations"])
 
 @router.get("", response_model=List[PresentationOut])
@@ -31,7 +63,10 @@ def create_presentation(payload: PresentationIn, db: Session = Depends(get_db), 
     while db.query(Presentation.id).filter(Presentation.slug == slug).first():
         slug = f"{base_slug}-{random.randint(10000, 99999)}"
 
+    if payload.custom_tsx:
+        sanitize_tsx_code(payload.custom_tsx)
     p = Presentation(
+        custom_tsx=payload.custom_tsx,
         slug=slug,
         title=payload.title,
         description=payload.description,
@@ -41,8 +76,10 @@ def create_presentation(payload: PresentationIn, db: Session = Depends(get_db), 
         is_published=payload.is_published,
     )
     for s in payload.slides:
+        if s.type == "CustomTsx" and "code" in s.content:
+            sanitize_tsx_code(s.content["code"])
         p.slides.append(PresentationSlide(
-            order=s.order, type=s.type, content=s.content, notes=s.notes
+            order=s.order, type=s.type, content=s.content, theme=s.theme, notes=s.notes
         ))
     db.add(p)
     db.commit()
@@ -55,6 +92,9 @@ def update_presentation(id: UUID, payload: PresentationIn, db: Session = Depends
     if not p:
         raise HTTPException(404, "Presentation not found")
 
+    if payload.custom_tsx:
+        sanitize_tsx_code(payload.custom_tsx)
+    p.custom_tsx = payload.custom_tsx
     p.title = payload.title
     if payload.slug and payload.slug != p.slug:
         base = slugify(payload.slug)
@@ -71,8 +111,10 @@ def update_presentation(id: UUID, payload: PresentationIn, db: Session = Depends
     
     p.slides.clear()
     for s in payload.slides:
+        if s.type == "CustomTsx" and "code" in s.content:
+            sanitize_tsx_code(s.content["code"])
         p.slides.append(PresentationSlide(
-            order=s.order, type=s.type, content=s.content, notes=s.notes
+            order=s.order, type=s.type, content=s.content, theme=s.theme, notes=s.notes
         ))
     
     db.commit()

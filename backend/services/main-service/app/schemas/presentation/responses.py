@@ -9,6 +9,7 @@ class SlideOut(BaseModel):
     order: int
     type: str
     content: Dict[str, Any]
+    theme: Optional[Dict[str, Any]] = None
     notes: Optional[str] = None
 
 class PresentationOut(BaseModel):
@@ -21,4 +22,5 @@ class PresentationOut(BaseModel):
     starts_at: Optional[datetime] = None
     ends_at: Optional[datetime] = None
     is_published: bool
+    custom_tsx: Optional[str] = None
     slides: List[SlideOut] = []

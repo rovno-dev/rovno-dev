@@ -24,6 +24,7 @@ export interface Presentation {
   starts_at?: string;
   ends_at?: string;
   is_published: boolean;
+  custom_tsx?: string | null;
   slides: Slide[];
 }
 
