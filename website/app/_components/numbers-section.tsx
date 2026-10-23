@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -6,54 +7,43 @@ import Link from "next/link";
 import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 
-// Optimized hacker number: uses direct DOM updates (textContent) 
-// instead of React state to avoid re-rendering the entire component tree
-// 16 times per second.
 function NumberDisplay({ value, active }: { value: string; active: boolean }) {
   const ref = useRef<HTMLHeadingElement>(null);
-
   useEffect(() => {
     if (!active || !ref.current) return;
     let iteration = 0;
     const chars = "0123456789";
     const original = value;
-
     const interval = setInterval(() => {
       if (!ref.current) return;
       const scrambled = original.split("").map((char, idx) => {
-        // Preserve spaces, punctuation, and Cyrillic characters
         if (char === " " || char === "." || char === "," || char === "-" || /[а-яА-Я]/.test(char)) return char;
         if (idx < iteration) return original[idx];
         return chars[Math.floor(Math.random() * chars.length)];
       }).join("");
-
       ref.current.textContent = scrambled;
-
       iteration += 1;
       if (iteration > original.length) {
         clearInterval(interval);
         ref.current.textContent = original;
       }
     }, 60);
-
     return () => clearInterval(interval);
   }, [value, active]);
 
   return (
     <h3
       ref={ref}
-      className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-3 mix-blend-difference"
+      className="text-(--on-bg-high) text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-3"
     >
       {value}
     </h3>
   );
 }
 
-// Optimized in-view hook
 function useInView<T extends HTMLElement>(options?: IntersectionObserverInit) {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -66,15 +56,11 @@ function useInView<T extends HTMLElement>(options?: IntersectionObserverInit) {
     observer.observe(el);
     return () => observer.disconnect();
   }, [options]);
-
   return { ref, inView };
 }
 
-// Optimized SpotlightCard: uses direct style property updates 
-// instead of React state to track mouse position.
 function SpotlightCard({ children, color }: { children: React.ReactNode; color: string }) {
   const ref = useRef<HTMLDivElement>(null);
-
   const handleMouseMove = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = ref.current?.getBoundingClientRect();
     if (rect && ref.current) {
@@ -89,22 +75,13 @@ function SpotlightCard({ children, color }: { children: React.ReactNode; color: 
     <div
       ref={ref}
       onMouseMove={handleMouseMove}
-      className="group relative p-0 sm:p-8 lg:p-6 flex flex-col h-full border-(--outline) border-b last:border-b-0 md:border-b-0 md:last:border-b-0 lg:border-r lg:last:border-r-0 md:[&:nth-child(odd)]:border-r md:[&:nth-child(-n+2)]:border-b lg:border-b-0! transition-colors hover:bg-(--primary-glass) isolation-isolate"
+      className="group relative p-6 sm:p-8 flex flex-col h-full bg-(--card) border border-(--outline) rounded-3xl transition-colors hover:bg-(--state-hover) isolation-isolate overflow-hidden"
       style={{ "--spot-color": color } as React.CSSProperties}
     >
-      {/* Spotlight effect (Optimized with will-change) */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 will-change-[opacity]"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 will-change-[opacity] mix-blend-overlay dark:mix-blend-screen"
         style={{
           background: `radial-gradient(circle at var(--spot-x, 50%) var(--spot-y, 50%), var(--spot-color) 0%, transparent 40%)`,
-          mixBlendMode: "overlay",
-        }}
-      />
-      {/* Existing colorized radial hover effect */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10 will-change-[opacity]"
-        style={{
-          background: `radial-gradient(circle at center, ${color} 0%, transparent 90%)`
         }}
       />
       <div className="relative z-10 flex flex-col flex-1">
@@ -117,7 +94,7 @@ function SpotlightCard({ children, color }: { children: React.ReactNode; color: 
 export default function NumbersSection() {
   const { t } = useLanguage();
   const { ref: sectionRef, inView } = useInView({ threshold: 0.1 });
-
+  
   const stats = [
     {
       number: t("home.stats_team_number"),
@@ -152,20 +129,20 @@ export default function NumbersSection() {
   return (
     <section ref={sectionRef} className="pt-12 sm:pt-18 pb-8 sm:pb-18">
       <Container>
-        <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-left sm:text-center">
+        <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-left sm:text-center text-(--on-bg-high)">
           {t("home.numbers_title")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 [&>*:not(:first-child)]:pt-8 [&>*:not(:last-child)]:pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, idx) => (
             <SpotlightCard key={idx} color={stat.color}>
               <NumberDisplay value={stat.number} active={inView} />
-              <p className="text-white text-body-2 leading-relaxed mb-8 flex-1 mix-blend-difference">
+              <p className="text-(--on-bg-medium) text-body-2 leading-relaxed mb-8 flex-1">
                 {stat.description}
               </p>
               <Button
                 variant="outlined"
                 size="medium"
-                className="w-full mt-auto mix-blend-normal"
+                className="w-full mt-auto"
                 asChild
               >
                 <Link href={stat.href}>

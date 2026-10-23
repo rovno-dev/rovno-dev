@@ -1,5 +1,6 @@
 import React from "react";
 import { AlxProjectPage } from "./alx-project-page";
+import { CveteyaProjectPage } from "./cveteya";
 import { BreadProjectPage } from "./bread-project-page";
 import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
 
@@ -35,6 +36,10 @@ export interface CustomPageRenderer {
 }
 
 export const CUSTOM_PAGE_RENDERERS: CustomPageRenderer[] = [
+  {
+    key: "cveteya",
+    render: (ctx) => <CveteyaProjectPage project={ctx} content={ctx.content} />,
+  },
   {
     key: "alx",
     render: (ctx) => (

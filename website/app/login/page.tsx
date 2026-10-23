@@ -13,6 +13,7 @@ import { useUser } from "@/entities/user/model/user-context"
 import { z } from "zod"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { extractErrorMessage } from "@/lib/error-message"
+import { Container } from "@/components/ui/container"
 
 const loginSchema = z.object({
   email: z.string().email("Некорректный email"),
@@ -119,8 +120,8 @@ export default function LoginPage() {
 
   return (
     <CheckNotUser>
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <div className="w-full max-w-md">
+      <Container className="flex items-center justify-center min-h-[80vh]">
+        <div className="w-full max-w-md mx-auto">
           <div className="mb-8 text-center">
             <h1 className="serif-header text-4xl mb-2">Welcome</h1>
             <p className="text-[var(--text-secondary)] text-sm">Sign in to your account</p>
@@ -134,7 +135,7 @@ export default function LoginPage() {
                 <Input name="totp_code" placeholder="000000" value={formData.totp_code} onChange={(e) => setFormData({ ...formData, totp_code: e.target.value })} />
               </Field>
             )}
-            <Button type="submit">Sign In</Button>
+            <Button type="submit" className="w-full">Sign In</Button>
             <div className="text-center text-sm flex flex-col gap-2 mt-2">
               <div>
                 <Link href="/forgot-password" className="text-[var(--text-secondary)] hover:text-[var(--accent-color)] transition-colors hover:underline underline-offset-2">
@@ -150,7 +151,7 @@ export default function LoginPage() {
             </div>
           </form>
         </div>
-      </div>
+      </Container>
     </CheckNotUser>
   )
 }
