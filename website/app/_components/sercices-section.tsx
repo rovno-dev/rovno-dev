@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Script from "next/script";
-import { motion } from "motion/react";
+import { motion, useAnimationControls } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { CodeIcon, DiamondIcon, SignatureIcon } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
@@ -16,7 +16,6 @@ const serviceToModelPaths: Record<string, string> = {
   "branding": "/3d/design_icon.glb",
 };
 
-// Pushed background cards up slightly and outwards
 const cardVariants = {
   center: { x: 0, y: 0, rotateZ: 0, scale: 1, zIndex: 30, opacity: 1 },
   left: { x: -110, y: -10, rotateZ: -6, scale: 0.9, zIndex: 20, opacity: 0.6 },
@@ -32,13 +31,9 @@ function ServiceCard({
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragEnd={(e, info) => {
-        // Threshold to register a swipe
         const swipeThreshold = 80;
-        if (info.offset.x > swipeThreshold) {
-          handleSwipe("right");
-        } else if (info.offset.x < -swipeThreshold) {
-          handleSwipe("left");
-        }
+        if (info.offset.x > swipeThreshold) handleSwipe("right");
+        else if (info.offset.x < -swipeThreshold) handleSwipe("left");
       }}
       animate={position}
       variants={cardVariants}
@@ -46,13 +41,13 @@ function ServiceCard({
       onClick={onClick}
       className={cn(
         "absolute w-full max-w-[900px] h-auto min-h-[500px] md:h-[500px] rounded-[32px] cursor-grab active:cursor-grabbing select-none overflow-hidden flex flex-col",
-        "bg-[#0a0a0a] border border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.9)]",
-        // Allow vertical scrolling on mobile while dragging horizontally
+        "bg-(--card) border border-(--outline) shadow-xl",
         "touch-pan-y"
       )}
       style={{ transformOrigin: "bottom center" }}
     >
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+      {/* Paper texture overlay (adapts to light/dark) */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05] dark:opacity-[0.08] mix-blend-multiply dark:mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 
       <div className="relative z-10 flex flex-col md:flex-row h-full w-full">
         
@@ -63,17 +58,17 @@ function ServiceCard({
           </p>
           
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-(--bg) flex items-center justify-center border border-(--outline) shrink-0">
               <Icon className="w-6 h-6 md:w-7 md:h-7 text-(--primary)" />
             </div>
-            <h1 className="text-display-1 text-[2rem] sm:text-[2.5rem] md:text-[2.5rem] lg:text-[3rem] leading-tight tracking-tight">
+            <h1 className="text-display-1 text-[2rem] sm:text-[2.5rem] md:text-[2.5rem] lg:text-[3rem] leading-tight tracking-tight text-(--on-bg-high)">
               {service.title}
             </h1>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
             {service.services.map((s: string) => (
-              <Badge variant="outlined-static" key={s} className="bg-white/5 border-white/10 text-white/80">
+              <Badge variant="outlined-static" key={s} className="bg-(--bg) border-(--outline) text-(--on-bg-medium)">
                 {s}
               </Badge>
             ))}
@@ -81,18 +76,18 @@ function ServiceCard({
 
           <div className="flex flex-row items-center gap-8 md:gap-12 mt-auto pb-4">
             <div className="flex flex-col">
-              <span className="text-xs uppercase tracking-widest text-(--on-bg-medium) mb-1">{t("services.from")}</span>
-              <span className="text-xl md:text-2xl font-semibold">{service.price.from} ₽</span>
+              <span className="text-xs uppercase tracking-widest text-(--on-bg-low) mb-1">{t("services.from")}</span>
+              <span className="text-xl md:text-2xl font-semibold text-(--on-bg-high)">{service.price.from} ₽</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs uppercase tracking-widest text-(--on-bg-medium) mb-1">{t("services.avg_label")}</span>
-              <span className="text-xl md:text-2xl font-semibold">{service.price.avg} ₽</span>
+              <span className="text-xs uppercase tracking-widest text-(--on-bg-low) mb-1">{t("services.avg_label")}</span>
+              <span className="text-xl md:text-2xl font-semibold text-(--on-bg-high)">{service.price.avg} ₽</span>
             </div>
           </div>
         </div>
 
         {/* Bottom / Right Side: 3D Viewer */}
-        <div className="relative w-full h-40 md:h-full md:w-1/2 rounded-b-[32px] md:rounded-r-[32px] md:rounded-bl-none overflow-hidden bg-[#111] pointer-events-none shrink-0">
+        <div className="relative w-full h-40 md:h-full md:w-1/2 rounded-b-[32px] md:rounded-r-[32px] md:rounded-bl-none overflow-hidden bg-(--bg-disabled) pointer-events-none shrink-0">
           {modelViewerLoaded ? (
             <ModelViewerElement
               key={modelPath}
@@ -109,13 +104,14 @@ function ServiceCard({
               } as React.CSSProperties}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-white/20 animate-pulse text-xs">
+            <div className="w-full h-full flex items-center justify-center text-(--on-bg-low) animate-pulse text-xs">
               Loading 3D...
             </div>
           )}
           
-          <div className="hidden md:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
-          <div className="block md:hidden absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-[#0a0a0a] to-transparent" />
+          {/* Gradient blend to hide the edge of the 3D viewer */}
+          <div className="hidden md:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-(--card) to-transparent" />
+          <div className="block md:hidden absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-(--card) to-transparent" />
         </div>
       </div>
     </motion.div>

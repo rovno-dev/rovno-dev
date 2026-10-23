@@ -1,6 +1,6 @@
 import React from "react";
 import { AlxProjectPage } from "./alx-project-page";
-import { CveteyaProjectPage } from "./cveteya-project-page";
+import { CveteyaProjectPage } from "./cveteya";
 import { BreadProjectPage } from "./bread-project-page";
 import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
 
