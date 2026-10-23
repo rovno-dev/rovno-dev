@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { motion } from "motion/react";
 import type { CustomPageContext } from "../custom-pages";
 import { CveteyaLogo } from "./cveteya-logo";
+import { TelegramLogotypeMonoIcon } from "@/components/icons";
+import { MaxLogoIcon } from "@/components/icons/logotypes/max-logo-icon";
 
 const ACCENT_PINK = "#E94E77";
 const TEXT_DARK = "#2C2A29";
@@ -21,11 +23,10 @@ function GlassButton({ href, children, variant = "light" }: { href: string, chil
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-medium transition-all duration-300 overflow-hidden ${
-        isDark 
-          ? "bg-[#2C2A29]/90 text-white border border-white/10 shadow-[0_8px_32px_rgba(44,42,41,0.2)] hover:bg-[#2C2A29]"
-          : "bg-white/40 backdrop-blur-md text-[#2C2A29] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:bg-white/60"
-      }`}
+      className={`group relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-medium transition-all duration-300 overflow-hidden ${isDark
+        ? "bg-[#2C2A29]/90 text-white border border-white/10 shadow-[0_8px_32px_rgba(44,42,41,0.2)] hover:bg-[#2C2A29]"
+        : "bg-white/40 backdrop-blur-md text-[#2C2A29] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:bg-white/60"
+        }`}
     >
       <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <span className="relative z-10 flex items-center gap-2">
@@ -48,10 +49,10 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
   useEffect(() => {
     const html = document.documentElement;
     const originalClass = html.className;
-    
+
     html.classList.remove("dark");
     html.classList.add("light");
-    
+
     const originalBg = document.body.style.backgroundColor;
     document.body.style.backgroundColor = "#FCFAF8";
 
@@ -71,7 +72,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
 
   return (
     <main className="min-h-screen bg-[#FCFAF8] text-[#2C2A29] font-sans selection:bg-[#F2C6D4] selection:text-[#2C2A29] overflow-x-clip relative">
-      
+
       {/* Background Ambient Blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#F2C6D4]/40 blur-[100px] mix-blend-multiply" />
@@ -83,16 +84,16 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         {/* ──────────────── HERO ──────────────── */}
         <section className="relative min-h-[95dvh] flex flex-col justify-center items-center pt-32 pb-20">
           <Container className="text-center relative z-10 flex flex-col items-center">
-            
+
             <ScrollReveal threshold={0.01} className="flex flex-col items-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/40 backdrop-blur-md border border-white/60 text-sm font-medium mb-8 text-[#2C2A29]">
                 <Sparkle className="text-[#F2C6D4]" weight="fill" />
                 <span>Кейс · 2026</span>
               </div>
-              
+
               {/* SVG Logo */}
               <CveteyaLogo className="w-full h-auto" />
-              
+
               <p className="text-lg md:text-2xl text-[#7A7571] max-w-2xl mx-auto leading-relaxed mb-12 font-light">
                 {project.description || "Цифровой опыт для современного цветочного бутика. E-commerce, арт-дирекшн и жидкие интеракции."}
               </p>
@@ -121,7 +122,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                   sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                
+
                 <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 bg-white/30 backdrop-blur-xl border border-white/60 rounded-2xl p-4 md:p-6 flex items-center gap-4 shadow-lg">
                   <div className="w-12 h-12 rounded-full bg-[#F2C6D4] flex items-center justify-center">
                     <FlowerLotus className="w-6 h-6 text-[#2C2A29]" weight="fill" />
@@ -210,7 +211,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
           <Container>
             <ScrollReveal>
               <div className="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 overflow-hidden relative">
-                
+
                 {/* Left Content */}
                 <div className="flex-1 max-w-xl z-10">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold leading-[1.1] tracking-tight mb-4 text-[#1A1A1A]">
@@ -220,16 +221,16 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                     Экономьте с комфортом. Подпишитесь на нашего бота в Telegram или MAX, чтобы получить секретный промокод на скидку. Без спама, только выгода в один клик
                   </p>
                   <div className="flex flex-wrap items-center gap-4">
-                    <Link 
-                      href="https://max.ru" 
-                      target="_blank" 
+                    <Link
+                      href="https://max.ru"
+                      target="_blank"
                       className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#E94E77] text-white font-medium hover:bg-[#d43a63] transition-colors shadow-lg shadow-[#E94E77]/30"
                     >
                       Открыть MAX
                     </Link>
-                    <Link 
-                      href="https://t.me" 
-                      target="_blank" 
+                    <Link
+                      href="https://t.me"
+                      target="_blank"
                       className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border-2 border-[#E94E77] text-[#E94E77] font-medium hover:bg-[#E94E77]/5 transition-colors"
                     >
                       Открыть Telegram
@@ -242,10 +243,10 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                   {/* Phone Frame */}
                   <div className="relative w-[280px] h-[580px] bg-[#0a0a0a] rounded-[45px] p-2.5 shadow-2xl border-[4px] border-[#333] z-10 rotate-3 hover:rotate-0 transition-transform duration-500">
                     <div className="relative w-full h-full bg-gradient-to-br from-[#5B9C9C] via-[#47747F] to-[#2B4156] rounded-[35px] overflow-hidden flex flex-col items-center pt-14">
-                      
+
                       {/* Dynamic Island */}
                       <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-7 bg-black rounded-full z-20" />
-                      
+
                       {/* Time & Date */}
                       <div className="text-white text-center mb-10 z-10">
                         <p className="text-sm font-medium opacity-90 mb-1">Понедельник, 6 июня</p>
@@ -260,21 +261,19 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                             initial={{ opacity: 0, y: -20, scale: 0.9 }}
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true, margin: "-50px" }}
-                            transition={{ 
-                              delay: index * 0.4, 
-                              type: "spring", 
-                              stiffness: 200, 
-                              damping: 20 
+                            transition={{
+                              delay: index * 0.4,
+                              type: "spring",
+                              stiffness: 200,
+                              damping: 20
                             }}
                             className="bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-3 flex gap-3 text-white shadow-lg"
                           >
                             <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
                               {notif.icon === "telegram" ? (
-                                <TelegramLogo className="w-6 h-6 text-[#229ED9]" weight="fill" />
+                                <TelegramLogotypeMonoIcon className="w-6 h-6 text-[#229ED9]" />
                               ) : (
-                                <div className="w-6 h-6 rounded-full bg-[#E94E77] flex items-center justify-center text-white text-[10px] font-bold">
-                                  M
-                                </div>
+                                <MaxLogoIcon className="w-6 h-6 text-[#229ED9]" />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -287,12 +286,12 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                           </motion.div>
                         ))}
                       </div>
-                      
+
                       {/* Bottom Ambient Light */}
                       <div className="absolute bottom-[-50px] left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-white/20 blur-[60px] rounded-full" />
                     </div>
                   </div>
-                  
+
                   {/* Decorative blurred blob behind phone */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#F2C6D4] rounded-full blur-[80px] opacity-60 mix-blend-multiply z-0" />
                 </div>
@@ -310,9 +309,9 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               </h2>
             </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 md:gap-8">
               <ScrollReveal delay={0}>
-                <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
+                <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
                   <Image
                     src="/static-images/projects/cveteya/cveteya-1.png"
                     alt="Cveteya Gallery 1"
@@ -323,7 +322,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                 </div>
               </ScrollReveal>
               <ScrollReveal delay={100}>
-                <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
+                <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
                   <Image
                     src="/static-images/projects/cveteya/cveteya-2.png"
                     alt="Cveteya Gallery 2"
@@ -334,7 +333,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                 </div>
               </ScrollReveal>
               <ScrollReveal delay={200}>
-                <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
+                <div className="relative aspect-[16/9] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
                   <Image
                     src="/static-images/projects/cveteya/cveteya-3.png"
                     alt="Cveteya Gallery 3"
@@ -345,7 +344,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                 </div>
               </ScrollReveal>
               <ScrollReveal delay={300}>
-                <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
+                <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden border border-white/50 shadow-xl group">
                   <Image
                     src="/static-images/projects/cveteya/cveteya-4.png"
                     alt="Cveteya Gallery 4"
@@ -366,7 +365,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               <GlassCard className="p-12 md:p-20 text-center relative overflow-hidden bg-gradient-to-br from-white/40 to-white/10">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C6D4] rounded-full blur-[80px] opacity-40 mix-blend-multiply" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#B2D8C6] rounded-full blur-[80px] opacity-40 mix-blend-multiply" />
-                
+
                 <h2 className="text-3xl md:text-5xl font-serif mb-12 relative z-10">
                   Цветущие результаты.
                 </h2>
