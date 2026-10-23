@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
-import { motion, useMotionValue, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { CodeIcon, DiamondIcon, SignatureIcon } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
@@ -17,52 +17,42 @@ const serviceToModelPaths: Record<string, string> = {
 };
 
 function ServiceCard({
-  service, isActive, xPos, yPos, rotateZ, scale, zIndex, opacity,
-  onClick, onPointerDown, Icon, modelPath, modelViewerLoaded, ModelViewerElement, t, lang
+  service, isActive, offset, onClick, Icon, modelPath, modelViewerLoaded, ModelViewerElement, t, lang, handleSwipe
 }: any) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const rotateX = useTransform(y, [-0.5, 0.5], ["6deg", "-6deg"]);
-  const rotateY = useTransform(x, [-0.5, 0.5], ["-6deg", "6deg"]);
+  // Determine position and rotation based on offset from center
+  const xPos = offset * 80;
+  const yPos = Math.abs(offset) * 30;
+  const rotateZ = offset * 12;
+  const scale = isActive ? 1 : 0.9;
+  const zIndex = 30 - Math.abs(offset);
+  const opacity = Math.abs(offset) > 1 ? 0 : isActive ? 1 : 0.8;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isActive) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+  const handleDragEnd = (e: any, info: any) => {
+    if (info.offset.x > 100) {
+      handleSwipe("right");
+    } else if (info.offset.x < -100) {
+      handleSwipe("left");
+    }
   };
 
   return (
     <motion.div
       initial={false}
       animate={{ x: xPos, y: yPos, rotateZ, scale, zIndex, opacity }}
-      transition={{ type: "spring", stiffness: 260, damping: 25 }}
-      style={{
-        rotateX: isActive ? rotateX : 0,
-        rotateY: isActive ? rotateY : 0,
-        transformStyle: "preserve-3d",
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
       onClick={onClick}
-      onPointerDown={onPointerDown}
+      drag={isActive ? "x" : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.8}
+      onDragEnd={handleDragEnd}
       className={cn(
-        "absolute w-full max-w-[950px] h-[520px] rounded-[32px] cursor-pointer select-none overflow-hidden transition-colors duration-300",
-        isActive
-          ? "bg-[#141416] border border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.9)]"
-          : "bg-[#0a0a0a] border border-white/5 shadow-2xl"
+        "absolute w-full max-w-[900px] h-[500px] rounded-[32px] cursor-grab active:cursor-grabbing select-none overflow-hidden transition-colors duration-300",
+        "bg-[#0a0a0a] border border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.9)]"
       )}
+      style={{ transformOrigin: "bottom center" }}
     >
-      {/* Realistic Paper Texture Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.12] mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/5 via-transparent to-white/10 mix-blend-screen" />
-      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] rounded-[32px]" />
+      {/* Subtle paper texture / noise */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 h-full w-full">
         {/* Left Side: Text Content */}
@@ -72,7 +62,7 @@ function ServiceCard({
           </p>
           
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center border border-white/5 shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shrink-0">
               <Icon className="w-7 h-7 text-(--primary)" />
             </div>
             <h1 className="text-display-1 text-[2rem] sm:text-[2.5rem] lg:text-[3.5rem] leading-none tracking-tight truncate">
@@ -101,7 +91,7 @@ function ServiceCard({
         </div>
 
         {/* Right Side: Large 3D Viewer */}
-        <div className="relative h-full w-full rounded-r-[32px] overflow-hidden bg-black/20">
+        <div className="relative h-full w-full rounded-r-[32px] overflow-hidden bg-[#111] pointer-events-none">
           {modelViewerLoaded ? (
             <ModelViewerElement
               key={modelPath}
@@ -111,7 +101,6 @@ function ServiceCard({
               camera-controls
               interaction-prompt="none"
               rotation-per-second="20deg"
-              onPointerDown={(e: any) => e.stopPropagation()}
               style={{
                 width: '100%',
                 height: '100%',
@@ -125,19 +114,9 @@ function ServiceCard({
           )}
           
           {/* Gradient to blend the 3D viewer into the card edge */}
-          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#141416] to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
         </div>
       </div>
-
-      {/* Progress Bar */}
-      {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/5 z-20">
-          <div
-            className="h-full bg-(--primary)"
-            style={{ animation: 'service-progress 6s linear forwards' }}
-          />
-        </div>
-      )}
     </motion.div>
   );
 }
@@ -146,8 +125,8 @@ export default function ServicesSection() {
   const { t, lang } = useLanguage();
   const [modelViewerLoaded, setModelViewerLoaded] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const autoPlayTimer = useRef<NodeJS.Timeout | null>(null);
-  const autoPlayTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isSwiping, setIsSwiping] = useState(false);
+
   const ModelViewerElement = 'model-viewer' as any;
 
   useEffect(() => {
@@ -190,32 +169,20 @@ export default function ServicesSection() {
     },
   ];
 
-  useEffect(() => {
-    if (!autoPlayTimer.current) {
-      autoPlayTimer.current = setInterval(() => {
-        setSelectedIndex((prev) => (prev + 1) % services.length);
-      }, 6000);
-    }
-    return () => {
-      if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
-      if (autoPlayTimeout.current) clearTimeout(autoPlayTimeout.current);
-      autoPlayTimer.current = null;
-      autoPlayTimeout.current = null;
-    };
-  }, [services.length]);
-
-  const handleInteraction = () => {
-    if (autoPlayTimer.current) clearInterval(autoPlayTimer.current);
-    if (autoPlayTimeout.current) clearTimeout(autoPlayTimeout.current);
-    autoPlayTimeout.current = setTimeout(() => {
-      autoPlayTimer.current = setInterval(() => {
-        setSelectedIndex((prev) => (prev + 1) % services.length);
-      }, 6000);
-    }, 5000);
+  const handleSwipe = (direction: "left" | "right") => {
+    setIsSwiping(true);
+    // Short delay to let the card fly out before updating the index
+    setTimeout(() => {
+      setSelectedIndex((prev) => {
+        if (direction === "right") return (prev + 1) % services.length;
+        return (prev - 1 + services.length) % services.length;
+      });
+      setIsSwiping(false);
+    }, 200);
   };
 
   return (
-    <section className="relative py-16 lg:py-24 overflow-hidden text-on-bg-high min-h-[700px] flex items-center">
+    <section className="relative py-16 lg:py-24 overflow-hidden text-on-bg-high min-h-[700px] flex items-center justify-center">
       <Script
         type="module"
         src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"
@@ -223,22 +190,15 @@ export default function ServicesSection() {
         onError={() => console.error("[model-viewer] CDN script failed to load")}
       />
       
-      <Container className="relative z-10 w-full">
-        <div className="relative w-full h-[600px] flex items-center justify-center" style={{ perspective: '1200px' }}>
+      <Container className="relative z-10 w-full flex justify-center">
+        <div className="relative w-full max-w-[900px] h-[600px] flex items-center justify-center">
           {services.map((service, index) => {
+            // Calculate offset (-1, 0, 1) for the 3-card fan
             let offset = index - selectedIndex;
-            const total = services.length;
-            if (offset < -Math.floor(total / 2)) offset += total;
-            if (offset > Math.floor(total / 2)) offset -= total;
+            if (offset < -1) offset += services.length;
+            if (offset > 1) offset -= services.length;
 
             const isActive = offset === 0;
-            const xPos = offset * 60;
-            const yPos = offset * 20;
-            const rotateZ = offset * 5;
-            const scale = isActive ? 1 : 0.85 - Math.abs(offset) * 0.05;
-            const zIndex = 30 - Math.abs(offset);
-            const opacity = Math.abs(offset) > 2 ? 0 : isActive ? 1 : 0.5;
-            
             const Icon = service.icon;
             const modelPath = serviceToModelPaths[service.id] || "/3d/code_icon.glb";
 
@@ -247,20 +207,15 @@ export default function ServicesSection() {
                 key={service.title}
                 service={service}
                 isActive={isActive}
-                xPos={xPos}
-                yPos={yPos}
-                rotateZ={rotateZ}
-                scale={scale}
-                zIndex={zIndex}
-                opacity={opacity}
-                onClick={() => { setSelectedIndex(index); handleInteraction(); }}
-                onPointerDown={handleInteraction}
+                offset={offset}
+                onClick={() => { if (!isActive && !isSwiping) setSelectedIndex(index); }}
                 Icon={Icon}
                 modelPath={modelPath}
                 modelViewerLoaded={modelViewerLoaded}
                 ModelViewerElement={ModelViewerElement}
                 t={t}
                 lang={lang}
+                handleSwipe={handleSwipe}
               />
             );
           })}
