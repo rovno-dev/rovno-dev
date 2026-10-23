@@ -14,7 +14,7 @@ interface Props {
 /**
  * Server-rendered README display. Fetches through the same admin proxy
  * (which caches for 5 min). Fails silently if the repo isn't public or the
- * README is missing — the project page shouldn't 500 over a GitHub blip.
+ * README is missing - the project page shouldn't 500 over a GitHub blip.
  */
 export async function GithubReadmeBlock({ repo, branch }: Props) {
   let readme: string | null = null;

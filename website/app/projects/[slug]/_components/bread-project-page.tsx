@@ -21,7 +21,7 @@ import {
   type ProjectTagKind,
 } from "@/components/ui/project-tag-chip";
 
-/** Warm, honey-toned accent set — reads as wheat, crust, and glaze. */
+/** Warm, honey-toned accent set - reads as wheat, crust, and glaze. */
 const ACCENT = "#F2B441"; // wheat gold
 const ACCENT_WARM = "#C47840"; // baked crust
 const ACCENT_CREAM = "#FBF3E2"; // crumb
@@ -55,7 +55,7 @@ const PROCESS = [
   {
     n: "01",
     title: "Стратегия",
-    body: "Разобрали продуктовую линейку «Хлебная Страна» и определили, как каждый вкус должен звучать в кадре — от классики до новинок.",
+    body: "Разобрали продуктовую линейку «Хлебная Страна» и определили, как каждый вкус должен звучать в кадре - от классики до новинок.",
     icon: PaletteIcon,
   },
   {
@@ -67,13 +67,13 @@ const PROCESS = [
   {
     n: "03",
     title: "3D и съёмка",
-    body: "Собрали 3D-сцены в Blender, отсняли продуктовые планы, наложили графику. Свет и материалы подбирали под упаковку — чтобы цвет совпадал в кадре.",
+    body: "Собрали 3D-сцены в Blender, отсняли продуктовые планы, наложили графику. Свет и материалы подбирали под упаковку - чтобы цвет совпадал в кадре.",
     icon: CubeIcon,
   },
   {
     n: "04",
     title: "Постпродакшн",
-    body: "Монтаж, цвет, звук. Собрали версии под ТВ, диджитал и соцсети — один и тот же ролик работает в трёх форматах без потери смысла.",
+    body: "Монтаж, цвет, звук. Собрали версии под ТВ, диджитал и соцсети - один и тот же ролик работает в трёх форматах без потери смысла.",
     icon: PlayCircleIcon,
   },
 ];
@@ -105,7 +105,7 @@ export function BreadProjectPage({
               className="object-cover"
             />
           )}
-          {/* Tonal overlays — bottom fade for legibility, warm radial from
+          {/* Tonal overlays - bottom fade for legibility, warm radial from
               the corner to key the project's baked-in palette. */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/70 to-(--bg)" />
           <div
@@ -116,7 +116,7 @@ export function BreadProjectPage({
           />
         </div>
 
-        {/* Top zone left intentionally empty — the fixed header floats over
+        {/* Top zone left intentionally empty - the fixed header floats over
             this area on /projects/<slug>. Hero content is pushed down by the
             hero's own top padding (pt-32 md:pt-40) so nothing collides. */}
 
@@ -264,7 +264,7 @@ export function BreadProjectPage({
                     className="absolute inset-0 w-full h-full border-0"
                     allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                     allowFullScreen
-                    title={`${project.title} — film`}
+                    title={`${project.title} - film`}
                   />
                 </div>
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-body-4 text-(--on-bg-medium)">
@@ -278,7 +278,7 @@ export function BreadProjectPage({
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="mt-1.5 size-1.5 rounded-full shrink-0" style={{ background: ACCENT }} />
-                    <p>Цвет и свет подобраны под упаковку — хлеб выглядит так же, как на полке.</p>
+                    <p>Цвет и свет подобраны под упаковку - хлеб выглядит так же, как на полке.</p>
                   </div>
                 </div>
               </div>
@@ -360,71 +360,71 @@ export function BreadProjectPage({
           rely solely on the template's hard-coded sections (process,
           manifesto, film) skip this block entirely. */}
       {content && (
-      <ScrollReveal threshold={0.02}>
-        <section
-          id="case"
-          className="py-24 md:py-32 border-b border-(--outline) relative"
-        >
-          {/* Very subtle grid + accent bloom behind the body — keeps the
+        <ScrollReveal threshold={0.02}>
+          <section
+            id="case"
+            className="py-24 md:py-32 border-b border-(--outline) relative"
+          >
+            {/* Very subtle grid + accent bloom behind the body - keeps the
               section from reading as flat paper without competing with the
               prose for attention. */}
-          <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none opacity-[0.035]"
-            style={{
-              backgroundImage: `linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)`,
-              backgroundSize: "80px 80px",
-              maskImage:
-                "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
-              WebkitMaskImage:
-                "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
-            }}
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `radial-gradient(ellipse 40% 50% at 10% 20%, ${ACCENT}10, transparent 70%)`,
-            }}
-          />
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none opacity-[0.035]"
+              style={{
+                backgroundImage: `linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)`,
+                backgroundSize: "80px 80px",
+                maskImage:
+                  "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 70% 60% at 20% 30%, black 40%, transparent 95%)",
+              }}
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(ellipse 40% 50% at 10% 20%, ${ACCENT}10, transparent 70%)`,
+              }}
+            />
 
-          <Container variant="full-width" className="relative">
-            <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-              {/* Sticky rail: section label + intro caption. */}
-              <div className="lg:col-span-3">
-                <div className="lg:sticky lg:top-32">
-                  <SectionLabel number="04" title="Case" accent={ACCENT} />
-                  <p className="mt-5 text-body-5 text-(--on-bg-low) leading-relaxed max-w-[220px]">
-                    Разбор: как собирали концепт, материалы и финальный монтаж.
-                  </p>
-                  <span
-                    className="mt-6 inline-block h-px w-12"
-                    style={{ background: ACCENT }}
-                  />
+            <Container variant="full-width" className="relative">
+              <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+                {/* Sticky rail: section label + intro caption. */}
+                <div className="lg:col-span-3">
+                  <div className="lg:sticky lg:top-32">
+                    <SectionLabel number="04" title="Case" accent={ACCENT} />
+                    <p className="mt-5 text-body-5 text-(--on-bg-low) leading-relaxed max-w-[220px]">
+                      Разбор: как собирали концепт, материалы и финальный монтаж.
+                    </p>
+                    <span
+                      className="mt-6 inline-block h-px w-12"
+                      style={{ background: ACCENT }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Body. The framed panel gives the prose a physical anchor
+                {/* Body. The framed panel gives the prose a physical anchor
                   against the section's now-busier background. */}
-              <div className="lg:col-span-9">
-                <div className="relative rounded-3xl border border-(--outline) bg-(--bg) p-6 md:p-10 lg:p-12">
-                  {/* Corner ticks — the same schematic language used by the
+                <div className="lg:col-span-9">
+                  <div className="relative rounded-3xl border border-(--outline) bg-(--bg) p-6 md:p-10 lg:p-12">
+                    {/* Corner ticks - the same schematic language used by the
                       process grid, tying the case body back to the rest of
                       the page. */}
-                  <span aria-hidden className="absolute top-3 left-3 size-3 border-t border-l border-(--on-bg-low)/40" />
-                  <span aria-hidden className="absolute top-3 right-3 size-3 border-t border-r border-(--on-bg-low)/40" />
-                  <span aria-hidden className="absolute bottom-3 left-3 size-3 border-b border-l border-(--on-bg-low)/40" />
-                  <span aria-hidden className="absolute bottom-3 right-3 size-3 border-b border-r border-(--on-bg-low)/40" />
+                    <span aria-hidden className="absolute top-3 left-3 size-3 border-t border-l border-(--on-bg-low)/40" />
+                    <span aria-hidden className="absolute top-3 right-3 size-3 border-t border-r border-(--on-bg-low)/40" />
+                    <span aria-hidden className="absolute bottom-3 left-3 size-3 border-b border-l border-(--on-bg-low)/40" />
+                    <span aria-hidden className="absolute bottom-3 right-3 size-3 border-b border-r border-(--on-bg-low)/40" />
 
-                  <div className="prose-case max-w-[720px]">
-                    {content}
+                    <div className="prose-case max-w-[720px]">
+                      {content}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Container>
-        </section>
-      </ScrollReveal>
+            </Container>
+          </section>
+        </ScrollReveal>
       )}
 
       {/* ────────────────  MEDIA GALLERY  ──────────────── */}
@@ -441,19 +441,19 @@ export function BreadProjectPage({
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-6 gap-3 md:gap-4">
                   {project.media.map((m, idx) => {
-                    // Asymmetric rhythm — matches the collage feel of the
+                    // Asymmetric rhythm - matches the collage feel of the
                     // Dprofile case, where widescreen stills and vertical
                     // clips alternate.
                     const span =
                       idx % 5 === 0 ? "md:col-span-4" :
-                      idx % 5 === 1 ? "md:col-span-2" :
-                      idx % 5 === 2 ? "md:col-span-2" :
-                      idx % 5 === 3 ? "md:col-span-4" :
-                                      "md:col-span-6";
+                        idx % 5 === 1 ? "md:col-span-2" :
+                          idx % 5 === 2 ? "md:col-span-2" :
+                            idx % 5 === 3 ? "md:col-span-4" :
+                              "md:col-span-6";
                     const aspect =
                       idx % 5 === 0 || idx % 5 === 3 ? "aspect-[16/10]" :
-                      idx % 5 === 1 || idx % 5 === 2 ? "aspect-[3/4]" :
-                                                       "aspect-[21/9]";
+                        idx % 5 === 1 || idx % 5 === 2 ? "aspect-[3/4]" :
+                          "aspect-[21/9]";
                     return (
                       <figure
                         key={m.id}

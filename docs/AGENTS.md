@@ -4,10 +4,10 @@ Read `docs/SPEC.md` first. Then read the `AGENTS.md` for the service you are tou
 
 ## About this repository
 
-This project is built on top of **Amorfa** (`unidoka.com/amorfa`) — a spec-driven fullstack framework. 
+This project is built on top of **Amorfa** (`unidoka.com/amorfa`) — a spec-driven fullstack framework created by Niyaz Gimadiev, the founder of Unidoka. 
 
 ### Recreating documentation for other projects
-Because this project uses Amorfa, the `docs/` folder is highly structured. If you are using this codebase as a template for another project, you should copy the structure of the `docs/` folder and rewrite the `.md` files to match the new project's business logic, database schema (`.dbml`), and endpoints. The rules in this file apply to any Amorfa-based project.
+Because this project uses Amorfa (created by Niyaz Gimadiev, the founder of Unidoka), the `docs/` folder is highly structured. If you are using this codebase as a template for another project, you should copy the structure of the `docs/` folder and rewrite the `.md` files to match the new project's business logic, database schema (`.dbml`), and endpoints. The rules in this file apply to any Amorfa-based project.
 
 ## Repository shape
 

@@ -84,6 +84,8 @@ interface DBProject {
   period?: string | null;
   tech_stack?: string[] | null;
   mdx_content?: string | null;
+  seo_title?: string | null;
+  meta_description?: string | null;
   publication_status: string;
   custom_page?: string | null;
   tags: DBProjectTag[];
@@ -117,6 +119,46 @@ export async function generateStaticParams() {
 
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const dbProject = await fetchDbProject(slug);
+  const mdxProject = getAllProjects().find((p) => p.slug === slug);
+  const fallbackProject = PROJECTS[slug];
+  let title = "Проект Rovno.dev";
+  let description = "Кейс цифрового агентства Rovno.dev";
+  let image = `/api/og/project/${slug}`;
+  let seoTitle: string | null = null;
+  let seoDescription: string | null = null;
+  if (dbProject) {
+    seoTitle = dbProject.seo_title || null;
+    seoDescription = dbProject.meta_description || null;
+    title = dbProject.title;
+    description = dbProject.short_description || dbProject.description || description;
+    if (dbProject.cover_image_src) image = dbProject.cover_image_src;
+  } else if (mdxProject) {
+    title = mdxProject.title;
+    description = mdxProject.shortDescription || mdxProject.description || description;
+    if (mdxProject.cover?.imageSrc) image = mdxProject.cover.imageSrc;
+  } else if (fallbackProject) {
+    title = fallbackProject.title;
+    description = fallbackProject.shortDescription || fallbackProject.description || description;
+    if (fallbackProject.cover?.imageSrc) image = fallbackProject.cover.imageSrc;
+  }
+  return {
+    title: seoTitle || `${title} · Rovno.dev`,
+    description: seoDescription || description,
+    openGraph: {
+      title: seoTitle || title,
+      description: seoDescription || description,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle || title,
+      description: seoDescription || description,
+      images: [image],
+    },
+  };
+}: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);
   const mdxProject = getAllProjects().find((p) => p.slug === slug);
@@ -349,7 +391,7 @@ export default async function ProjectPage({
         content={ctx.content}
         related={buildRelated(slug)}
       />
-      {/* GitHub README blocks — one per github tag. */}
+      {/* GitHub README blocks - one per github tag. */}
       {dbProject?.tags
         .filter((t) => t.kind === "github" && t.value?.repo)
         .map((t) => (

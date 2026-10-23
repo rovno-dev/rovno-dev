@@ -12,7 +12,7 @@ export interface EventCustomPageMeta {
 export const EVENT_CUSTOM_PAGES_META: EventCustomPageMeta[] = [
   {
     key: "nash-dev",
-    label: "Наш.Dev — Terminal Brutalism",
+    label: "Наш.Dev - Terminal Brutalism",
     description:
       "Landing для IT-мероприятия: интерактивный терминал, marquee, слайдер Нияза, регистрация с валидацией. Строго чёрный / белый / лайм #CCFF00, без скруглений.",
   },

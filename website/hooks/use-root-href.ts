@@ -16,7 +16,7 @@ const PROTOCOL = (process.env.NEXT_PUBLIC_HTTP_PROTOCOL || "").trim().toLowerCas
 /**
  * Returns the href the logo click should navigate to.
  * - Root domain, or any localhost host, or no NEXT_PUBLIC_ROOT_DOMAIN set:
- *   "/" — stay on the current origin.
+ *   "/" - stay on the current origin.
  * - Prod subdomains (app.*, admin.*, i.*): absolute URL to the root domain.
  *
  * Starts as "/" for SSR hydration safety; upgrades on the client.

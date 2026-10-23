@@ -158,14 +158,14 @@ export default async function ArticlePage({
   return (
     <main className="min-h-screen bg-(--bg) pb-24">
       {/* =========================================================
-          HERO — cover as full-bleed background, same pattern as the
+          HERO - cover as full-bleed background, same pattern as the
           expert profile. Fixed height, rounded card, dark gradient at
           the bottom so the title/description stay readable no matter
           how light the cover is.
       ========================================================= */}
       <Container variant="full-width" className="pt-4 md:pt-8">
         <div className="relative w-full h-[480px] md:h-[600px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
-          {/* z-0 — cover image, or gradient fallback if none is set */}
+          {/* z-0 - cover image, or gradient fallback if none is set */}
           {article.image_url ? (
             article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
               <video
@@ -196,13 +196,13 @@ export default async function ArticlePage({
             </div>
           )}
 
-          {/* z-1 — bottom fade for text legibility */}
+          {/* z-1 - bottom fade for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-          {/* z-1 — top fade so the back button has a readable surface */}
+          {/* z-1 - top fade so the back button has a readable surface */}
           <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
 
-          {/* z-10 — back button, top-left glass chip */}
+          {/* z-10 - back button, top-left glass chip */}
           <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
             <Button variant="glass" size="icon-medium" shape="round" asChild>
               <Link href="/blog" aria-label="Все статьи">
@@ -211,7 +211,7 @@ export default async function ArticlePage({
             </Button>
           </div>
 
-          {/* z-10 — tags, top-right. Glass pills, readable over any cover. */}
+          {/* z-10 - tags, top-right. Glass pills, readable over any cover. */}
           {article.tags && article.tags.length > 0 && (
             <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
               {article.tags.slice(0, 4).map((tag) => (
@@ -227,7 +227,7 @@ export default async function ArticlePage({
             </div>
           )}
 
-          {/* z-10 — title + description + byline, anchored at the bottom */}
+          {/* z-10 - title + description + byline, anchored at the bottom */}
           <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
             <h1 className="text-display-3 md:text-display-1 text-white leading-[1.05] tracking-tight mb-4 max-w-4xl animate-reveal">
               {article.title}

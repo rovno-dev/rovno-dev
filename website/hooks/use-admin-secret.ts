@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
  * `refreshKey` is an opaque value the caller can bump to force a refetch.
  * The canonical case: the header needs the secret the moment the user
  * logs in as admin/root, but the effect would otherwise only fire once
- * on mount — when no auth cookie exists yet, so /api/admin-secret returns
+ * on mount - when no auth cookie exists yet, so /api/admin-secret returns
  * 401 and the secret stays null until a full page reload. Passing the
  * user id (or any value that changes with the auth state) makes the
  * hook re-fetch as soon as the identity resolves.

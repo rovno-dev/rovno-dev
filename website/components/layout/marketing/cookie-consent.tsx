@@ -41,7 +41,7 @@ export function clearConsent() {
 }
 // LLM context: all user-facing strings go through useLanguage(). The banner is
 // rendered inside <LanguageProvider> (see app/layout.tsx), so switching the
-// language in the header re-renders the banner in place — no reload needed.
+// language in the header re-renders the banner in place - no reload needed.
 export function CookieConsent() {
   const { t } = useLanguage();
   const [show, setShow] = React.useState(false);

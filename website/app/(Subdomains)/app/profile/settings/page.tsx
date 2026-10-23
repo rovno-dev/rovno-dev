@@ -61,7 +61,7 @@ export default function SettingsPage() {
     load();
   }, [load]);
 
-  // Every toggle sends the full preference set — the backend PUT replaces
+  // Every toggle sends the full preference set - the backend PUT replaces
   // all fields. Optimistic locally, reverted on failure.
   const patch = async (
     field: Exclude<SavingField, null>,
@@ -147,7 +147,7 @@ export default function SettingsPage() {
             <h2 className="text-heading-3">Уведомления</h2>
           </div>
           <p className="text-body-4 text-(--on-bg-medium) leading-relaxed">
-            Как с вами связываться — по email, в Telegram или в обоих
+            Как с вами связываться - по email, в Telegram или в обоих
             каналах. Системные письма (подтверждение почты,
             восстановление доступа) приходят всегда, их отключить
             нельзя.
@@ -160,7 +160,7 @@ export default function SettingsPage() {
             </div>
           ) : (
             <>
-              {/* Email — master channel switch */}
+              {/* Email - master channel switch */}
               <div className="flex items-center justify-between gap-4 py-3 border-b border-(--outline)">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-(--primary-card) text-(--primary) shrink-0">
@@ -188,7 +188,7 @@ export default function SettingsPage() {
                 />
               </div>
 
-              {/* Telegram — master channel switch */}
+              {/* Telegram - master channel switch */}
               <div className="space-y-3 py-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <p className="text-body-5 text-(--on-bg-low) leading-relaxed">
-                  Отдельная подписка — по умолчанию выключена. Включите,
+                  Отдельная подписка - по умолчанию выключена. Включите,
                   если хотите получать новости о промо и распродажах.
                 </p>
               </div>
@@ -310,7 +310,7 @@ export default function SettingsPage() {
         <Card className="rounded-3xl border-(--outline) p-6">
           <h2 className="text-heading-3 mb-2">Аккаунт</h2>
           <p className="text-body-4 text-(--on-bg-medium)">
-            Управление профилем, паролем и безопасностью — в
+            Управление профилем, паролем и безопасностью - в
             соответствующих разделах бокового меню.
           </p>
         </Card>
@@ -328,7 +328,7 @@ export default function SettingsPage() {
           <div className="space-y-4 py-2">
             <ol className="text-body-3 text-(--on-bg-medium) space-y-3 list-decimal pl-5">
               <li>
-                Открылся Telegram — нажмите{" "}
+                Открылся Telegram - нажмите{" "}
                 <b className="text-(--on-bg-high)">Start</b> в диалоге с
                 ботом.
               </li>

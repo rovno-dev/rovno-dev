@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Editorial MDX primitives for case-study bodies. Distinct from the generic
- * MDX set — these are pitched at long-form case narrative, not at blog prose.
+ * MDX set - these are pitched at long-form case narrative, not at blog prose.
  * All three read as "designer's margin notes" rather than article elements.
  */
 
@@ -42,7 +42,7 @@ export function Callout({
   );
 }
 
-/** Standalone pull-quote. No attribution — this is the designer speaking. */
+/** Standalone pull-quote. No attribution - this is the designer speaking. */
 export function PullQuote({ children }: { children: ReactNode }) {
   return (
     <figure className="my-12 md:my-16 relative">

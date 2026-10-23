@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Admin panel",
 };
 // LLM context: this layout matches /admin/*. The [secret] segment is BELOW
-// this layout, so LayoutProps<"/admin">.params is Promise<{}> — declaring
+// this layout, so LayoutProps<"/admin">.params is Promise<{}> - declaring
 // Promise<{ secret: string }> here is a type error. The secret reaches the
 // sidebar via useAdminSecret() (fetched from /api/admin-secret), not params.
 export default function AdminRootLayout({

@@ -16,14 +16,14 @@ export interface LegalDocMeta {
   description: string;
   publishedAt: string;
   publishedAtLabel: string;
-  /** Body with frontmatter stripped — passed to compileMDX. */
+  /** Body with frontmatter stripped - passed to compileMDX. */
   body: string;
   headings: LegalHeading[];
 }
 
 export const LEGAL_DOC_ORDER = [
   "privacy",
-  // Separate consent document — required by 152-ФЗ for form submissions
+  // Separate consent document - required by 152-ФЗ for form submissions
   // since 01.09.2025. Sits right next to the privacy policy so the two
   // are always read together.
   "consent",

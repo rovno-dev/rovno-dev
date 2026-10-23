@@ -36,7 +36,7 @@ export default function BlogArticleNotFound() {
         if (!cancelled) setRecent(all as ArticleRef[]);
       })
       .catch(() => {
-        // Silent — the "maybe you were looking for" section simply won't
+        // Silent - the "maybe you were looking for" section simply won't
         // render if the fetch fails. A 404 page that itself errors is the
         // worst possible outcome.
       });

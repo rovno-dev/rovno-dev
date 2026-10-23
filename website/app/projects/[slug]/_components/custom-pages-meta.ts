@@ -11,7 +11,7 @@
  *      to CUSTOM_PAGE_RENDERERS in `custom-pages.tsx`.
  *   3. Add the matching key/label/description here.
  *   4. (optional) Seed a project with `custom_page = "my-page"` via the
- *      admin panel — no backend or DB change required.
+ *      admin panel - no backend or DB change required.
  */
 
 export interface CustomPageMeta {
@@ -23,13 +23,13 @@ export interface CustomPageMeta {
 export const CUSTOM_PAGES_META: CustomPageMeta[] = [
   {
     key: "alx",
-    label: "ALX — glitch hero",
+    label: "ALX - glitch hero",
     description:
       "Lime/red glitch treatment, giant marquee, biomech palette. Content is hard-coded inside the template.",
   },
   {
     key: "bread",
-    label: "Хлебная Страна — film-first",
+    label: "Хлебная Страна - film-first",
     description:
       "Warm wheat palette, embedded film player, four-step process grid. Content is hard-coded inside the template.",
   },

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 // LLM context: /app/* has no dynamic segments, so LayoutProps<"/app">.params
 // is Promise<{}>. The previous signature claimed Promise<{secret}> which the
-// router never produces — remove it.
+// router never produces - remove it.
 export default function AppRootLayout({
   children,
 }: {

@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: '%s · Rovno.dev',
   },
   description:
-    'Digital-агентство полного цикла Rovno.dev — дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
+    'Digital-агентство полного цикла Rovno.dev - дизайн, LLM, сайты, приложения, логотипы и айдентика, 3D.',
   applicationName: 'Rovno.dev',
   keywords: ['rovno.dev', 'digital-агентство', 'веб-разработка', 'дизайн', 'айдентика', '3D', 'LLM'],
   robots: {
@@ -89,7 +89,7 @@ export default function RootLayout({
 
           This guard turns the duplicate into a silent no-op. It runs as
           a synchronous <head> script, so it is installed before any
-          module script (including next/script afterInteractive) fires —
+          module script (including next/script afterInteractive) fires -
           the very first define call is already protected.
         */}
         <script

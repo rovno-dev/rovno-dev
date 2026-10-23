@@ -73,7 +73,7 @@ export default function AdminEventRequestsPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetchAdminEvents().then(setEvents).catch(() => {});
+    fetchAdminEvents().then(setEvents).catch(() => { });
   }, [user]);
 
   useEffect(() => { if (user) load(); }, [user, load]);
@@ -136,7 +136,7 @@ export default function AdminEventRequestsPage() {
                 ))}
               </SelectContent>
             </Select>
-            
+
             <div className="relative flex-1">
               <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low)" />
               <Input
@@ -177,7 +177,7 @@ export default function AdminEventRequestsPage() {
           <Card className="rounded-3xl border-(--outline) bg-(--card) divide-y divide-(--outline) overflow-hidden">
             {rows.map((r) => {
               const meta = STATUS_META[r.status] ?? STATUS_META.new;
-              const fullName = [r.surname, r.name, r.patronymic].filter(Boolean).join(" ") || "—";
+              const fullName = [r.surname, r.name, r.patronymic].filter(Boolean).join(" ") || "-";
               const saving = savingId === r.id;
               return (
                 <div key={r.id} className="p-5 space-y-3">

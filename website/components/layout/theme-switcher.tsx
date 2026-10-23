@@ -37,7 +37,7 @@ export function ThemeSwitcher() {
             {/*
               Phosphor icons render as <svg fill="currentColor"> with plain
               <path> children. Their colour is therefore driven by the CSS
-              `color` property, not by `stroke-*` on the child paths — the
+              `color` property, not by `stroke-*` on the child paths - the
               old [&_path]:stroke-(--bg) set the stroke and left the fill
               inheriting the parent text colour, so the active glyph stayed
               dark against the inverted (dark) active pill.

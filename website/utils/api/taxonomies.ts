@@ -8,7 +8,7 @@ export interface Taxonomy {
   id: string;
   code: string;
   labels: Record<string, string>;
-  /** Legacy field — mirrors labels.en. */
+  /** Legacy field - mirrors labels.en. */
   label: string;
 }
 

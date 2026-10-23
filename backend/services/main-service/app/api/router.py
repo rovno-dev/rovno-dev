@@ -6,6 +6,8 @@ from app.api.v1 import admin_articles
 from app.api.v1 import admin_projects
 from app.api.v1 import admin_team
 from app.api.v1 import admin_events
+# from app.api.v1 import admin_presentations
+# from app.api.v1 import presentations
 from app.api.v1 import admin_event_requests
 from app.api.v1 import admin_catalog
 from app.api.v1 import admin_taxonomies
@@ -42,6 +44,7 @@ router.include_router(admin_projects.router)
 router.include_router(admin_team.router)
 router.include_router(admin_taxonomies.router)
 router.include_router(admin_events.router)
+# router.include_router(admin_presentations.router)
 router.include_router(admin_event_requests.router)
 router.include_router(admin_catalog.router)
 # Root-only: order-notification recipients + template editor.
@@ -59,6 +62,7 @@ router.include_router(orders.router)
 router.include_router(articles.router)
 router.include_router(projects.router)
 router.include_router(events.router)
+# router.include_router(presentations.router)
 router.include_router(uploads.router)
 router.include_router(tags.router)
 router.include_router(stack.router)

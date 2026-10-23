@@ -18,3 +18,4 @@ from .article import Article
 from .article_category import ArticleCategory
 from .tag import Tag, article_tags
 from .user_session import UserSession
+from .presentation import Presentation, PresentationSlide

@@ -29,21 +29,43 @@ export async function generateMetadata({
   const { slug } = await params;
   const ev = await fetchEventServer(slug);
   if (!ev) return { title: "Событие не найдено · Rovno.dev" };
+  const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN
+    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    : "http://localhost:3000";
+
   const fallbackImage = `/api/og/event/${ev.slug}`;
-  const ogImage = ev.cover_image_src || fallbackImage;
+  
+  // Telegram requires absolute URLs and cannot render videos as previews.
+  const isVideo = ev.cover_image_src?.match(/\.(webm|mp4|mov)$/i);
+  const rawImage = ev.cover_image_src && !isVideo ? ev.cover_image_src : fallbackImage;
+  
+  const ogImage = rawImage.startsWith("http") 
+    ? rawImage 
+    : `${baseUrl}${rawImage}`;
 
   return {
     title: ev.seo_title || `${ev.title} · Rovno.dev`,
     description: ev.meta_description || ev.short_description || ev.description,
     openGraph: {
-      title: ev.title,
-      description: ev.short_description || ev.description,
-      images: [ogImage],
+      title: ev.seo_title || ev.title,
+      description: ev.meta_description || ev.short_description || ev.description,
+      url: `${baseUrl}/events/${ev.slug}`,
+      siteName: "Rovno.dev",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: ev.title,
+        }
+      ],
+      locale: "ru_RU",
+      type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: ev.title,
-      description: ev.short_description || ev.description,
+      title: ev.seo_title || ev.title,
+      description: ev.meta_description || ev.short_description || ev.description,
       images: [ogImage],
     },
   };

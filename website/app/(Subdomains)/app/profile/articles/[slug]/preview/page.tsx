@@ -146,7 +146,7 @@ function SessionExpired() {
             Сессия истекла
           </h3>
           <p className="text-body-4 text-(--on-bg-medium) mb-4">
-            Обновите страницу — токен обновится автоматически.
+            Обновите страницу - токен обновится автоматически.
           </p>
           <Button variant="outlined" size="small" asChild>
             <a href="">
@@ -224,7 +224,7 @@ export default async function PreviewArticlePage({
 
   return (
     <div className="space-y-6">
-      {/* Admin header — the meta strip that tells you you're in preview
+      {/* Admin header - the meta strip that tells you you're in preview
           mode, distinct from the public article page. */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ export default async function PreviewArticlePage({
         </div>
       </div>
 
-      {/* Same hero pattern as the public article — cover as full-bleed
+      {/* Same hero pattern as the public article - cover as full-bleed
           background, gradient overlay, title/description/badges layered
           on top. What you see here is what readers see. */}
       <div className="relative w-full h-[420px] md:h-[520px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline)">
@@ -279,7 +279,7 @@ export default async function PreviewArticlePage({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
-        {/* Tags, top-right — same treatment as the public page */}
+        {/* Tags, top-right - same treatment as the public page */}
         {article.tags && article.tags.length > 0 && (
           <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
             {article.tags.slice(0, 4).map((tag) => (

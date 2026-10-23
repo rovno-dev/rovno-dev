@@ -29,7 +29,7 @@ export default function BlogArticleError({
             Не удалось загрузить статью
           </h1>
           <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-10">
-            Похоже, у нас временные проблемы с сервером. Попробуйте ещё раз через минуту — если не поможет,
+            Похоже, у нас временные проблемы с сервером. Попробуйте ещё раз через минуту - если не поможет,
             вернитесь в журнал.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

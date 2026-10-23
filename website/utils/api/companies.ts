@@ -64,7 +64,7 @@ export async function fetchClientServer(slug: string): Promise<ClientDetail | nu
   }
 }
 
-/** Admin list — uses /admin/companies so it includes unpublished companies. */
+/** Admin list - uses /admin/companies so it includes unpublished companies. */
 export async function fetchCompanies(): Promise<ClientListItem[]> {
   const res = await $fetch("/api/v1/admin/companies", { isToast: false });
   if (!Array.isArray(res?.json)) return [];

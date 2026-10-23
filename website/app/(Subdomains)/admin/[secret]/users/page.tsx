@@ -83,7 +83,7 @@ const ROLE_OPTIONS = [
 ];
 
 // Role treatment is deliberately quiet. Only root takes the brand accent
-// — everything else sits in the neutral outline so a role never competes
+// - everything else sits in the neutral outline so a role never competes
 // with the content for attention.
 const ROLE_STYLE: Record<string, { label: string; className: string }> = {
   root: {
@@ -166,7 +166,7 @@ export default function AdminUsersPage() {
     });
   };
 
-  // Filters — every dimension is independent; "all" is a no-op pass-through.
+  // Filters - every dimension is independent; "all" is a no-op pass-through.
   const [roleFilter, setRoleFilter] =
     useState<"all" | "client" | "user" | "admin" | "root">("all");
   const [verifiedFilter, setVerifiedFilter] =
@@ -267,7 +267,7 @@ export default function AdminUsersPage() {
     blockedFilter !== "all" ||
     teamFilter !== "all";
 
-  // Count of active chips (query excluded — it is visible in the input).
+  // Count of active chips (query excluded - it is visible in the input).
   // Drives the badge on the collapsed toggle button so an admin sees at a
   // glance that filters are narrowing the list.
   const activeFilterCount =
@@ -340,7 +340,7 @@ export default function AdminUsersPage() {
   return (
     <CheckUser>
       <div className="space-y-6">
-        {/* Header — title left, controls right on one baseline. */}
+        {/* Header - title left, controls right on one baseline. */}
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-display-2 tracking-tight">Пользователи</h1>
@@ -381,102 +381,102 @@ export default function AdminUsersPage() {
         {/* Search + filters. The search input is always visible; the
     chip strip folds away behind a toggle so the header stays
     compact when it isn't needed. */}
-<div className="space-y-3">
-  <div className="flex items-center gap-2">
-    <div className="relative flex-1">
-      <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
-      <Input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Поиск по имени, email, телефону, username…"
-        className="pl-9 h-10"
-      />
-    </div>
-    <button
-      type="button"
-      onClick={toggleFilters}
-      aria-expanded={filtersOpen}
-      aria-controls="admin-users-filters"
-      title={filtersOpen ? "Свернуть фильтры" : "Развернуть фильтры"}
-      className={cn(
-        "inline-flex items-center gap-1.5 shrink-0 h-10 rounded-lg border border-(--outline) bg-(--card) px-3 text-body-4 font-medium transition-colors",
-        "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--on-bg-low)/40",
-        filtersOpen && "bg-(--state-hover) text-(--on-bg-high)",
-      )}
-    >
-      <FunnelSimpleIcon className="size-4" />
-      <span className="hidden sm:inline">
-        {filtersOpen ? "Скрыть" : "Фильтры"}
-      </span>
-      {!filtersOpen && activeFilterCount > 0 && (
-        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-(--primary) text-(--on-primary) text-[10px] font-semibold tabular-nums">
-          {activeFilterCount}
-        </span>
-      )}
-    </button>
-  </div>
-  {filtersOpen && (
-    <div
-      id="admin-users-filters"
-      className="flex flex-wrap items-center gap-x-5 gap-y-2"
-    >
-      <FilterGroup
-        label="Роль"
-        value={roleFilter}
-        options={[
-          { value: "all", label: "Все" },
-          { value: "client", label: "Клиент" },
-          { value: "user", label: "Пользователь" },
-          { value: "admin", label: "Админ" },
-          { value: "root", label: "Root" },
-        ]}
-        onChange={(v) => setRoleFilter(v as typeof roleFilter)}
-      />
-      <FilterGroup
-        label="Статус"
-        value={verifiedFilter}
-        options={[
-          { value: "all", label: "Все" },
-          { value: "verified", label: "Подтв." },
-          { value: "unverified", label: "Не подтв." },
-        ]}
-        onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
-      />
-      <FilterGroup
-        label="Доступ"
-        value={blockedFilter}
-        options={[
-          { value: "all", label: "Все" },
-          { value: "active", label: "Активные" },
-          { value: "blocked", label: "Заблок." },
-        ]}
-        onChange={(v) => setBlockedFilter(v as typeof blockedFilter)}
-      />
-      <FilterGroup
-        label="Команда"
-        value={teamFilter}
-        options={[
-          { value: "all", label: "Все" },
-          { value: "team", label: "В команде" },
-          { value: "external", label: "Вне" },
-        ]}
-        onChange={(v) => setTeamFilter(v as typeof teamFilter)}
-      />
-      {hasActiveFilters && (
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
-        >
-          <XIcon className="size-3" />
-          Сбросить
-        </button>
-      )}
-    </div>
-  )}
-</div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--on-bg-low) pointer-events-none" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Поиск по имени, email, телефону, username…"
+                className="pl-9 h-10"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={toggleFilters}
+              aria-expanded={filtersOpen}
+              aria-controls="admin-users-filters"
+              title={filtersOpen ? "Свернуть фильтры" : "Развернуть фильтры"}
+              className={cn(
+                "inline-flex items-center gap-1.5 shrink-0 h-10 rounded-lg border border-(--outline) bg-(--card) px-3 text-body-4 font-medium transition-colors",
+                "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--on-bg-low)/40",
+                filtersOpen && "bg-(--state-hover) text-(--on-bg-high)",
+              )}
+            >
+              <FunnelSimpleIcon className="size-4" />
+              <span className="hidden sm:inline">
+                {filtersOpen ? "Скрыть" : "Фильтры"}
+              </span>
+              {!filtersOpen && activeFilterCount > 0 && (
+                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-(--primary) text-(--on-primary) text-[10px] font-semibold tabular-nums">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
+          {filtersOpen && (
+            <div
+              id="admin-users-filters"
+              className="flex flex-wrap items-center gap-x-5 gap-y-2"
+            >
+              <FilterGroup
+                label="Роль"
+                value={roleFilter}
+                options={[
+                  { value: "all", label: "Все" },
+                  { value: "client", label: "Клиент" },
+                  { value: "user", label: "Пользователь" },
+                  { value: "admin", label: "Админ" },
+                  { value: "root", label: "Root" },
+                ]}
+                onChange={(v) => setRoleFilter(v as typeof roleFilter)}
+              />
+              <FilterGroup
+                label="Статус"
+                value={verifiedFilter}
+                options={[
+                  { value: "all", label: "Все" },
+                  { value: "verified", label: "Подтв." },
+                  { value: "unverified", label: "Не подтв." },
+                ]}
+                onChange={(v) => setVerifiedFilter(v as typeof verifiedFilter)}
+              />
+              <FilterGroup
+                label="Доступ"
+                value={blockedFilter}
+                options={[
+                  { value: "all", label: "Все" },
+                  { value: "active", label: "Активные" },
+                  { value: "blocked", label: "Заблок." },
+                ]}
+                onChange={(v) => setBlockedFilter(v as typeof blockedFilter)}
+              />
+              <FilterGroup
+                label="Команда"
+                value={teamFilter}
+                options={[
+                  { value: "all", label: "Все" },
+                  { value: "team", label: "В команде" },
+                  { value: "external", label: "Вне" },
+                ]}
+                onChange={(v) => setTeamFilter(v as typeof teamFilter)}
+              />
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
+                >
+                  <XIcon className="size-3" />
+                  Сбросить
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
-{/* Loading */}
+        {/* Loading */}
         {loading && (
           <div
             className={cn(
@@ -623,7 +623,7 @@ export default function AdminUsersPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// ViewSwitcher — segmented control, single group
+// ViewSwitcher - segmented control, single group
 // ─────────────────────────────────────────────────────────────────────
 function ViewSwitcher({
   value,
@@ -665,7 +665,7 @@ function ViewSwitcher({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// FilterGroup — small-caps label + a single segmented chip row
+// FilterGroup - small-caps label + a single segmented chip row
 // ─────────────────────────────────────────────────────────────────────
 function FilterGroup({
   label,
@@ -705,7 +705,7 @@ function FilterGroup({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// RoleTag — thin outline, monochrome except root
+// RoleTag - thin outline, monochrome except root
 // ─────────────────────────────────────────────────────────────────────
 function RoleTag({ role }: { role: string }) {
   const s = ROLE_STYLE[role] ?? ROLE_STYLE.user;
@@ -722,7 +722,7 @@ function RoleTag({ role }: { role: string }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// UserCard — cards view entry
+// UserCard - cards view entry
 // ─────────────────────────────────────────────────────────────────────
 function UserCard({
   user,
@@ -743,7 +743,7 @@ function UserCard({
   onAddToTeam: () => void;
   onRemoveFromTeam: () => void;
 }) {
-  // Order notifications are admin/root-only — plain users never receive
+  // Order notifications are admin/root-only - plain users never receive
   // them. The linked chat id is only meaningful for a user who could ever
   // receive a notification, so we surface it only on admin-like rows.
   const isAdminLike = user.role === "admin" || user.role === "root";
@@ -791,7 +791,7 @@ function UserCard({
         </div>
       </div>
 
-      {/* Contacts — plain text rows. No chips. */}
+      {/* Contacts - plain text rows. No chips. */}
       <div className="px-4 pb-3 space-y-1 text-body-4 text-(--on-bg-medium)">
         <a
           href={`mailto:${user.email}`}
@@ -819,7 +819,7 @@ function UserCard({
         )}
       </div>
 
-      {/* Actions — always visible, quiet. */}
+      {/* Actions - always visible, quiet. */}
       <div className="mt-auto px-2 py-2 border-t border-(--outline) flex items-center gap-0.5">
         <button
           type="button"
@@ -881,7 +881,7 @@ function UserCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// UserTable — table view
+// UserTable - table view
 // ─────────────────────────────────────────────────────────────────────
 function UserTable({
   users,

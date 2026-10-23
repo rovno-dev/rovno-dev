@@ -12,7 +12,7 @@ import { SidebarSimpleIcon, SidebarIcon, CaretDownIcon } from "@phosphor-icons/r
 /**
  * A single nav item.
  *
- * `href` is a SUFFIX, not a full path — the sidebar prepends `basePath`.
+ * `href` is a SUFFIX, not a full path - the sidebar prepends `basePath`.
  * Use "" for the base route itself (e.g. the dashboard at the root of a
  * section); pair it with `exact: true` so it doesn't match every child.
  */
@@ -115,7 +115,7 @@ export function Sidebar({
   const path = pathname.replace(/\/+$/, "") || "/";
 
   const isItemActive = (href: string, item: SidebarItem): boolean => {
-    // `exact` items match the full path only — this is how a dashboard at
+    // `exact` items match the full path only - this is how a dashboard at
     // "/admin/secret" avoids highlighting on "/admin/secret/team".
     if (item.exact) return path === href;
     // Prefix items match themselves AND their children, so a parent like
@@ -293,19 +293,19 @@ export function Sidebar({
           if (isCollapsed && hasChildren) {
             return (
               <Tooltip key={item.href} delayDuration={0}>
-                            <TooltipTrigger asChild>
-              <Button
-                variant={anyActive ? "glass" : "text"}
-                className="justify-center p-3 w-full relative group"
-                asChild
-              >
-                <Link href={href}>
-                  <Icon className="size-5 shrink-0" />
-                  {/* Indicator dot for sub-items */}
-                  <span className="absolute bottom-2 right-2 size-1.5 rounded-full bg-(--primary) group-hover:bg-(--primary)" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={anyActive ? "glass" : "text"}
+                    className="justify-center p-3 w-full relative group"
+                    asChild
+                  >
+                    <Link href={href}>
+                      <Icon className="size-5 shrink-0" />
+                      {/* Indicator dot for sub-items */}
+                      <span className="absolute bottom-2 right-2 size-1.5 rounded-full bg-(--primary) group-hover:bg-(--primary)" />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
                 <TooltipContent
                   side="right"
                   sideOffset={8}

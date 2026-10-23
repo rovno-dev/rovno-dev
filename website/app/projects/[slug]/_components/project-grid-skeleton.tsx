@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 
 /**
  * Skeleton for the /projects grid. Matches the tile geometry of
- * <ProjectCard> exactly — same aspect ratio, same radius, same padding —
+ * <ProjectCard> exactly - same aspect ratio, same radius, same padding -
  * so the layout doesn't shift when real data arrives.
  */
 export function ProjectGridSkeleton({ count = 6 }: { count?: number }) {

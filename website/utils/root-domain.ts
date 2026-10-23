@@ -2,7 +2,7 @@
 //
 // Two modes, chosen automatically at runtime:
 //
-//   • PATH MODE  — current host is localhost / *.localhost / 127.0.0.1,
+//   • PATH MODE  - current host is localhost / *.localhost / 127.0.0.1,
 //                  or no root domain is configured. Every "cross-subdomain"
 //                  URL collapses to a plain path on the current origin:
 //                    crossSubdomainUrl("app", "/profile") → "/app/profile"
@@ -10,7 +10,7 @@
 //                  rejects `Domain=.localhost` cookies, the subdomain hosts
 //                  have no routes, and the proxy rewrite isn't wired.
 //
-//   • SUBDOMAIN MODE — real registrable root domain (prod). URLs become
+//   • SUBDOMAIN MODE - real registrable root domain (prod). URLs become
 //                  absolute: "https://app.rovno.dev/profile".
 
 function normalizeRootDomain(raw: string | undefined | null): string {
@@ -96,7 +96,7 @@ export function rootDomainUrl(path: string): string {
  */
 export function crossSubdomainUrl(subdomain: string, path: string = "/"): string {
   const p = path.startsWith("/") ? path : "/" + path;
-  // Already on the target subdomain — return a same-origin path so the
+  // Already on the target subdomain - return a same-origin path so the
   // browser doesn't route through the proxy a second time. Without this,
   // admin.rovno.dev + "/admin/secret/events" hits proxy.ts which prepends
   // the subdomain prefix again → /admin/admin/secret/events → 404.

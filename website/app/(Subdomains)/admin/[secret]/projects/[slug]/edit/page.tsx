@@ -17,7 +17,7 @@ export default function EditProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   // Next.js hands us the already-decoded slug. Run it through
-  // decodeURIComponent anyway — it's idempotent on unencoded strings and it
+  // decodeURIComponent anyway - it's idempotent on unencoded strings and it
   // covers the case where a stale client cached a percent-encoded URL.
   const { slug: rawSlug } = use(params);
   let slug = rawSlug;

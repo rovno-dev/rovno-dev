@@ -26,7 +26,7 @@ function tagsOf(p: Project): string[] {
 /**
  * Filter bar + project grid. Purely presentational: every project comes
  * down as a prop from the RSC page, which fetches them from the DB with an
- * ISR tag. No client-side fetch, no merge with local data — the grid shows
+ * ISR tag. No client-side fetch, no merge with local data - the grid shows
  * exactly what the database returns, subject to the active filters.
  */
 export function FilterBar({
@@ -136,7 +136,7 @@ export function FilterBar({
 
   return (
     <>
-      {/* Floating pill — same visual language as the header. */}
+      {/* Floating pill - same visual language as the header. */}
       <div className="sticky top-[68px] md:top-[92px] z-40 mt-4 mb-5">
         <Container>
           <div

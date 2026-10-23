@@ -36,7 +36,7 @@ AI-optimized fullstack framework. Build an any app in hours
 `;
 
 // ponytail: minimal inline markdown → JSX. Handles headings, fenced code, lists,
-// paragraphs, bold, inline code. Enough for README previews — no deps needed.
+// paragraphs, bold, inline code. Enough for README previews - no deps needed.
 function inlineMd(text: string, k: { n: number }): ReactNode[] {
   const out: ReactNode[] = [];
   const re = /(`[^`]+`|\*\*[^*]+\*\*)/g;

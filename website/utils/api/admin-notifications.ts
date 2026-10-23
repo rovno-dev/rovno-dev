@@ -3,7 +3,7 @@ import { $fetch } from "@/utils/fetch";
 export interface AdminNotificationSettings {
   order_notify_email: boolean;
   order_notify_telegram: boolean;
-  /** Legacy single list — kept for backward compatibility. */
+  /** Legacy single list - kept for backward compatibility. */
   order_recipient_ids: string[];
   /** Who receives new-order notifications by email. */
   order_email_recipient_ids: string[];

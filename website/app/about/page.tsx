@@ -55,7 +55,7 @@ function AboutHero() {
             <span className="text-(--primary)">которые меняют правила.</span>
           </h1>
           <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed max-w-[720px]">
-            Rovno.dev — агентство полного цикла, где дизайн встречается с
+            Rovno.dev - агентство полного цикла, где дизайн встречается с
             передовыми технологиями. Мы не просто рисуем интерфейсы, мы
             проектируем опыт, который помогает брендам расти в мире больших
             языковых моделей и цифровой трансформации.
@@ -81,12 +81,12 @@ const VALUES = [
   {
     icon: Users,
     title: "Партнёрство",
-    body: "Работаем как внутренняя команда клиента, а не как подрядчик на час. Остаёмся после релиза — там, где начинается самое интересное.",
+    body: "Работаем как внутренняя команда клиента, а не как подрядчик на час. Остаёмся после релиза - там, где начинается самое интересное.",
   },
   {
     icon: FilmStrip,
     title: "Скорость без спешки",
-    body: "Спринты по две недели, демо в конце каждого. Быстро — потому что процесс отлажен, а не потому что режем углы.",
+    body: "Спринты по две недели, демо в конце каждого. Быстро - потому что процесс отлажен, а не потому что режем углы.",
   },
 ];
 
@@ -161,8 +161,8 @@ function ExpertCard({
     member.project_count === 1
       ? "проект"
       : member.project_count < 5
-      ? "проекта"
-      : "проектов";
+        ? "проекта"
+        : "проектов";
 
   return (
     <Link
@@ -274,13 +274,12 @@ function ExpertsSection({ members }: { members: PublicTeamMember[] }) {
           </Card>
         ) : (
           <div
-            className={`grid grid-cols-1 sm:grid-cols-2 ${
-              members.length >= 4
+            className={`grid grid-cols-1 sm:grid-cols-2 ${members.length >= 4
                 ? "lg:grid-cols-4"
                 : members.length === 3
-                ? "lg:grid-cols-3"
-                : "lg:grid-cols-2"
-            } gap-6 md:gap-8`}
+                  ? "lg:grid-cols-3"
+                  : "lg:grid-cols-2"
+              } gap-6 md:gap-8`}
           >
             {members.map((m, idx) => (
               <ExpertCard key={m.id} member={m} index={idx} />
@@ -416,7 +415,7 @@ function AboutCTA() {
                 с которой мы справимся?
               </h2>
               <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-10 max-w-lg mx-auto">
-                Расскажите о проекте — ответим в течение 3 часов. Даже если это
+                Расскажите о проекте - ответим в течение 3 часов. Даже если это
                 только идея на салфетке.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -15,7 +15,7 @@ import type { Project } from "@/app/_data/projects";
  * per ISR window.
  *
  * Selection: only rows with `is_featured: true`. The grid is a mirror
- * of what an admin flagged in the project editor — no fill from recent
+ * of what an admin flagged in the project editor - no fill from recent
  * rows. Zero featured projects renders the empty state below.
  */
 export default function BestWorksSection({
@@ -26,7 +26,7 @@ export default function BestWorksSection({
   const { t } = useLanguage();
 
   // Featured-only: the home section shows exactly the rows an admin has
-  // flagged `is_featured`. No fill-from-recent fallback — an empty list
+  // flagged `is_featured`. No fill-from-recent fallback - an empty list
   // is a valid, meaningful state that surfaces the empty card below.
   const picked = projects.filter((p) => p.is_featured);
   const cards: Project[] = picked.map(dbRowToProject);

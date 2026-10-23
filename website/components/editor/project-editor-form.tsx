@@ -169,7 +169,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   // The form stores stack as names (backend resolves names -> rows). The
   // picker needs id-based items; we bridge by looking up the row for each
   // name in the current pool. A name not in the pool renders as a synthetic
-  // id "name:<name>" — the picker still shows it, and creating it on save
+  // id "name:<name>" - the picker still shows it, and creating it on save
   // resolves the collision on the server side.
   const selectedStack: MultiPickerItem[] = form.tech_stack.map((name) => {
     const found = stackPool.find((s) => s.name.toLowerCase() === name.toLowerCase());
@@ -214,12 +214,12 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         : await createProject(payload);
       toast.success(status === "published" ? "Проект опубликован" : "Проект сохранён");
       await revalidateTags(["projects"]);
-        if (!isEdit) {
-          const basePath = window.location.pathname.replace(/\/new\/?$/, "");
-          router.replace(`${basePath}/${saved.slug}/edit`);
-        } else {
-          router.refresh();
-        }
+      if (!isEdit) {
+        const basePath = window.location.pathname.replace(/\/new\/?$/, "");
+        router.replace(`${basePath}/${saved.slug}/edit`);
+      } else {
+        router.refresh();
+      }
     } catch (err: any) {
       toast.error(err?.message || "Ошибка сохранения");
     } finally {
@@ -245,7 +245,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
 
   const githubTags = form.tags.filter((t) => t.kind === "github");
 
-  // A project with a bespoke template ignores MDX content and media —
+  // A project with a bespoke template ignores MDX content and media -
   // the template renders its own hard-coded sections. Only the
   // identity fields need to be filled in.
   const isCustomPage = !!form.custom_page;
@@ -291,7 +291,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
             <Input
               value={form.title}
               onChange={(e) => update("title", e.target.value)}
-              placeholder="Например: ALX — Чужой"
+              placeholder="Например: ALX - Чужой"
             />
           </Field>
           <Field>
@@ -307,11 +307,11 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
             <Input
               value={form.period}
               onChange={(e) => update("period", e.target.value)}
-              placeholder="2024 или 2023 — Present"
+              placeholder="2024 или 2023 - Present"
             />
           </Field>
 
-          {/* Client — chip picker sourced from the companies table. Creating
+          {/* Client - chip picker sourced from the companies table. Creating
               a new one persists a Company row immediately, so subsequent
               projects can pick it too. */}
           <Field>
@@ -332,7 +332,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
             />
           </Field>
 
-          {/* Category — chip picker sourced from project_categories. Same
+          {/* Category - chip picker sourced from project_categories. Same
               create-on-the-fly behaviour. */}
           <Field>
             <FieldLabel>Категория</FieldLabel>
@@ -356,7 +356,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
           </Field>
 
           {/* Bespoke template selector. The list is code-defined on the
-              frontend — no backend call required. */}
+              frontend - no backend call required. */}
           <Field className="md:col-span-2">
             <FieldLabel>Кастомная страница</FieldLabel>
             <Select
@@ -445,7 +445,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         <EntityMultiPicker
           value={selectedStack}
           onChange={(next) => {
-            // Persist names, not ids — the backend resolves names to rows
+            // Persist names, not ids - the backend resolves names to rows
             // and creates any that don't exist yet.
             update("tech_stack", next.map((n) => n.label));
           }}
@@ -477,7 +477,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         )}
       </Card>
 
-      {/* Media gallery — hidden when a premade template owns the visuals. */}
+      {/* Media gallery - hidden when a premade template owns the visuals. */}
       {!isCustomPage && (
         <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
           <div>
@@ -490,7 +490,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         </Card>
       )}
 
-      {/* Content — hidden when a premade template is selected. */}
+      {/* Content - hidden when a premade template is selected. */}
       {!isCustomPage && (
         <div className="space-y-3">
           <h2 className="text-heading-3">Содержимое (MDX)</h2>

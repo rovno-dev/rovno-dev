@@ -84,7 +84,7 @@ export interface ArticlePayload {
   description?: string;
   image_url?: string;
   date?: string;
-  /** Tag names — backend upserts into the tags table. */
+  /** Tag names - backend upserts into the tags table. */
   tags?: string[];
   categories?: string[];
   brands?: string[];
@@ -102,7 +102,7 @@ const API_BASE =
   "http://localhost:8000";
 
 // Server-side fetchers used by RSC pages. `revalidate: 60` gives the blog
-// a one-minute ISR window — good enough for a low-frequency blog, and the
+// a one-minute ISR window - good enough for a low-frequency blog, and the
 // pages remain statically rendered for SEO.
 export async function fetchPublishedArticlesServer(params?: {
   tag?: string;
@@ -153,7 +153,7 @@ export async function fetchMyArticles(): Promise<ArticleListItem[]> {
     throw new Error(String(detail));
   }
   if (!Array.isArray(body)) {
-    throw new Error("Unexpected response from server — expected a list.");
+    throw new Error("Unexpected response from server - expected a list.");
   }
   return (body as ArticleListItem[]).map((a) => ({ ...a, tags: normalizeTags(a.tags) }));
 }

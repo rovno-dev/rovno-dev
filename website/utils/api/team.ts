@@ -181,7 +181,7 @@ export async function fetchTeamMemberProjectsPublic(
 
 // ─────────────────────────────────────────────────────────────────────────
 // Server-side fetchers. Used by Server Components (about page, expert page).
-// Plain `fetch` with ISR — no $fetch, no cookie storage, no client deps.
+// Plain `fetch` with ISR - no $fetch, no cookie storage, no client deps.
 // ─────────────────────────────────────────────────────────────────────────
 
 const API_BASE =

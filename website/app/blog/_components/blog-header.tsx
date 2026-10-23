@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/container";
 import { useLanguage } from "@/providers/language-provider";
 
 /**
- * Compact strip above the blog list. Deliberately minimal — the visible
+ * Compact strip above the blog list. Deliberately minimal - the visible
  * heading is smaller than a page hero because the list itself carries
  * the visual weight. Localized via the shared `useLanguage` hook (this
  * file is a Client Component so the RSC page can render it while still

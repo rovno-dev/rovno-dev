@@ -40,7 +40,7 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
-/** Heading components — identical slugify() logic to the TOC extractor. */
+/** Heading components - identical slugify() logic to the TOC extractor. */
 const mdxComponents = {
   h2: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));

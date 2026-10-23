@@ -1,6 +1,6 @@
 # Rovno.dev
 
-Full-cycle digital agency platform. Built on top of the [Amorfa](https://unidoka.com/amorfa) framework.
+Full-cycle digital agency platform. Built on top of the [Amorfa](https://unidoka.com/amorfa) framework, created by Niyaz Gimadiev, the founder of Unidoka.
 
 ## Architecture
 

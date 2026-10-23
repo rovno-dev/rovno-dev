@@ -272,7 +272,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>{t("editor.event_reg_url")}</FieldLabel>
-            <Input value={form.registration_url} onChange={(e) => update("registration_url", e.target.value)} placeholder="https://forms.yandex.com/… — если пусто, форма на сайте" />
+            <Input value={form.registration_url} onChange={(e) => update("registration_url", e.target.value)} placeholder="https://forms.yandex.com/… - если пусто, форма на сайте" />
           </Field>
         </div>
 
@@ -287,7 +287,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
               <PlusIcon className="size-4" /> {t("editor.event_add_seat")}
             </Button>
           </div>
-          
+
           {form.seat_types.length > 0 && (
             <div className="space-y-2">
               {form.seat_types.map((seat, idx) => (

@@ -41,20 +41,20 @@ export default function SecurityPage() {
       if (res?.response?.ok) {
         setSessions(res.json);
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
     if (!user) return;
     fetchSessions();
-    
+
     // Decode token to find current session ID
     const token = safeCookieStorage.getItem("access_token");
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         if (payload.sid) setCurrentSid(payload.sid);
-      } catch {}
+      } catch { }
     }
   }, [user]);
 
@@ -101,7 +101,7 @@ export default function SecurityPage() {
       await deleteAccount();
       toast.success("Аккаунт удалён");
       // Clear auth state locally then leave the app area. We intentionally
-      // skip the /logout call — the account no longer exists server-side.
+      // skip the /logout call - the account no longer exists server-side.
       try {
         await logout();
       } catch {
@@ -170,7 +170,7 @@ export default function SecurityPage() {
               const ua = s.user_agent || "";
               const isMobile = /mobile|android|iphone|ipad/i.test(ua);
               const Icon = isMobile ? DeviceMobile : Desktop;
-              
+
               // Simple parser for a clean device name
               let deviceName = "Неизвестное устройство";
               if (/windows/i.test(ua)) deviceName = "Windows";
@@ -219,7 +219,7 @@ export default function SecurityPage() {
         <p className="text-body-3 text-(--on-bg-medium) mb-6">
           Защитите аккаунт с помощью приложения Google Authenticator или аналогичного.
         </p>
-        
+
         {!totpSetup ? (
           <Button
             onClick={async () => {
@@ -275,7 +275,7 @@ export default function SecurityPage() {
       <Card className="rounded-3xl border border-[color-mix(in_srgb,var(--error),transparent_70%)] bg-[color-mix(in_srgb,var(--error),transparent_96%)] p-6 shadow-sm">
         <h2 className="text-heading-3 mb-2 text-(--error)">Опасная зона</h2>
         <p className="text-body-3 text-(--on-bg-medium) mb-5">
-          Удаление аккаунта — необратимое действие. Все ваши данные будут утеряны
+          Удаление аккаунта - необратимое действие. Все ваши данные будут утеряны
           без возможности восстановления.
         </p>
         <Button variant="glass-red" size="large" onClick={() => setDeleteOpen(true)}>

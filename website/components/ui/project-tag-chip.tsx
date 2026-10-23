@@ -9,14 +9,14 @@ export type ProjectTagKind = "from_chief" | "license" | "github" | "custom";
  * so they don't compete with it visually.
  *
  * Accents are kept bright enough that their border and glow read on a dark
- * photographic hero — they are decoration on top of an image, not on a
+ * photographic hero - they are decoration on top of an image, not on a
  * neutral surface. The label itself is always white for the same reason.
  */
 const TAG_THEME: Record<ProjectTagKind, { accent: string }> = {
   from_chief: { accent: "#FF9A3C" },
-  license:    { accent: "#38BDF8" },
-  github:     { accent: "#A78BFA" },
-  custom:     { accent: "#CBD5E1" },
+  license: { accent: "#38BDF8" },
+  github: { accent: "#A78BFA" },
+  custom: { accent: "#CBD5E1" },
 };
 
 interface ProjectTagChipProps {
@@ -31,14 +31,14 @@ interface ProjectTagChipProps {
 /**
  * Glow-stroke pill. Three layers:
  *   1. A near-transparent accent fill, so the pill reads as tinted not solid.
- *   2. A 1px accent stroke at ~55% opacity — the "hard" edge.
- *   3. Two box-shadows — a tight inner ring (backlight) plus a wide outer
- *      bloom (spill) — and an inset highlight so the top edge catches light.
+ *   2. A 1px accent stroke at ~55% opacity - the "hard" edge.
+ *   3. Two box-shadows - a tight inner ring (backlight) plus a wide outer
+ *      bloom (spill) - and an inset highlight so the top edge catches light.
  *
  * The accent is exposed as `--accent` and every layer references it via
  * `color-mix`, so changing the kind in one line recolors the whole pill.
  *
- * The label is white and does not follow the theme — the chips live over
+ * The label is white and does not follow the theme - the chips live over
  * dark hero imagery, where the light-mode `--on-bg-high` would be invisible.
  */
 export function ProjectTagChip({
@@ -81,7 +81,7 @@ export function ProjectTagChip({
         } as React.CSSProperties
       }
     >
-      {/* Icon slot — accent-tinted glyph with a small notification dot,
+      {/* Icon slot - accent-tinted glyph with a small notification dot,
           mirroring the Redis Iris treatment. */}
       <span
         className={cn(
@@ -101,7 +101,7 @@ export function ProjectTagChip({
         >
           {icon ?? <DotGlyph />}
         </span>
-        {/* The tiny status dot on the icon's top-right corner. Decoration —
+        {/* The tiny status dot on the icon's top-right corner. Decoration -
             it's what sells the "alive"/live-status feel of the pill. */}
         <span
           aria-hidden

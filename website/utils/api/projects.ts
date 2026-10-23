@@ -164,7 +164,7 @@ export interface DbProjectList {
 
 /**
  * Client-side fetch of the public project list. Uses $fetch, which resolves
- * NEXT_PUBLIC_API_BASE_URL from the browser — the same base every authed
+ * NEXT_PUBLIC_API_BASE_URL from the browser - the same base every authed
  * call already uses. Fails soft so a backend blip never breaks the grid.
  */
 export async function fetchPublishedProjectsClient(): Promise<DbProjectList[]> {

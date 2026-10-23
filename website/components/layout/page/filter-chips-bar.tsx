@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * vertical rhythm. Reusable for /projects, /events, and anything else that
  * needs an inline filter.
  *
- * The component itself is presentation-only — pass an array of
+ * The component itself is presentation-only - pass an array of
  * { id, label, count?, active } and an onSelect handler.
  */
 export function FilterChipsBar({

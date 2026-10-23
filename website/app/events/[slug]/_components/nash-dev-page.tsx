@@ -1,23 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import type { EventCustomContext } from "./event-custom-pages";
-import { registerForEvent } from "@/utils/api/events";
 import Image from "next/image";
 import { NashDevLogo } from "@/components/icons/logotypes/nash-dev-logo";
 import { useLanguage } from "@/providers/language-provider";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Наш.Dev — Terminal Brutalism landing.
-   ═══════════════════════════════════════════════════════════════════════ */
-
 const LIME = "#CCFF00";
 const BLACK = "#000000";
 const WHITE = "#FFFFFF";
 
+// ── Media links ───────────────────────────────────────────────────
+// TODO: replace the empty VK/OID/ID and YouTube ID after publishing.
+// The VideoEmbed component auto-falls back to YouTube after 4s if VK
+// doesn't load or is missing credentials.
+const VK_VIDEO_OID = "";
+const VK_VIDEO_ID = "";
+const YOUTUBE_VIDEO_ID = "";
+const VK_VIDEO_LINK = "https://vkvideo.ru/";
+const YOUTUBE_LINK = "https://youtube.com/";
+const VK_GALLERY_LINK = "https://vk.com/albums";
+const PRESENTATION_LINK = "https://nd-2026.slides.rovno.dev";
+
+const REELS = [
+  { src: "/videos/socials/short-videos-1.webm", title: "Выпуск 01" },
+  { src: "/videos/socials/short-videos-2.webm", title: "Выпуск 02" },
+  { src: "/videos/socials/short-videos-3.webm", title: "Выпуск 03" },
+  { src: "/videos/socials/short-videos-2.webm", title: "Выпуск 04" },
+  { src: "/videos/socials/short-videos-1.webm", title: "Выпуск 05" },
+];
+
+const GALLERY = [
+  "/images/events/nash-dev-2026/speaker-mikhail.png",
+  "/images/events/nash-dev-2026/speaker-niyaz.png",
+  "/images/events/nash-dev-2026/speaker-danil.png",
+  "/images/events/nash-dev-2026/speaker-amir.png",
+  "/images/events/nash-dev-2026/speaker-anastasia.png",
+  "/images/events/nash-dev-2026/speaker-secret.png",
+];
+
+// ── Shared UI primitives ─────────────────────────────────────────
 function Prompt({ children }: { children: React.ReactNode }) {
   return (
     <span style={{ color: LIME }} className="mr-2 select-none">
@@ -36,16 +61,14 @@ function Cursor() {
   );
 }
 
-/* ── Hero ────────────────────────────────────────────────────────────── */
-
-const HERO_LINE = "> КОНФЕРЕНЦИЯ ДЛЯ СОЗДАТЕЛЕЙ БУДУЩЕГО_";
+// ── Hero (post-event) ────────────────────────────────────────────
+const HERO_LINE = "> СОБЫТИЕ ЗАВЕРШЕНО_";
 
 function Hero({ ctx }: { ctx: EventCustomContext }) {
   const [typed, setTyped] = useState("");
   const [showInput, setShowInput] = useState(false);
   const [history, setHistory] = useState<{ cmd: string; out: string[] }[]>([]);
   const [draft, setDraft] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let i = 0;
@@ -66,25 +89,39 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
     switch (c) {
       case "help":
         out = [
-          "  help       — список команд",
-          "  about      — о мероприятии",
-          "  register   — открыть регистрацию",
-          "  speakers   — список спикеров",
-          "  location   — где и когда",
-          "  clear      — очистить терминал",
+          "  help       - список команд",
+          "  about      - о мероприятии",
+          "  video      - запись",
+          "  photos     - фотографии",
+          "  slides     - презентация",
+          "  speakers   - список спикеров",
+          "  location   - где и когда",
+          "  clear      - очистить терминал",
         ];
         break;
       case "about":
         out = [
-          "  Наш.Dev — ивент для тех, кто устал от лекций.",
+          "  Наш.Dev - ивент для тех, кто устал от лекций.",
           "  15 мин доклад + 15 мин интерактив. 0% канцелярщины.",
         ];
         break;
-      case "register":
-        out = ["  Открываю форму регистрации..."];
+      case "video":
+        out = ["  Открываю запись..."];
         setTimeout(() => {
-          document.getElementById("register")?.scrollIntoView({ behavior: "smooth" });
+          document.getElementById("video")?.scrollIntoView({ behavior: "smooth" });
         }, 400);
+        break;
+      case "photos":
+        out = ["  Открываю галерею..."];
+        setTimeout(() => {
+          document.getElementById("gallery")?.scrollIntoView({ behavior: "smooth" });
+        }, 400);
+        break;
+      case "slides":
+        out = ["  Открываю презентацию..."];
+        setTimeout(() => {
+          window.open(PRESENTATION_LINK, "_blank", "noopener,noreferrer");
+        }, 300);
         break;
       case "speakers":
         out = ["  Листайте до блока SPEAKERS ↓"];
@@ -124,7 +161,6 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
     >
       <div className="max-w-[1200px] mx-auto px-6">
         <NashDevLogo className="h-auto w-full sm:h-18 sm:w-auto mb-10" />
-
         <h1
           className="font-mono text-[2rem] md:text-[3.5rem] lg:text-[4.5rem] leading-[1.05] tracking-tight mb-8"
           style={{ color: WHITE, minHeight: "1.2em" }}
@@ -132,10 +168,16 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
           {typed}
           {!showInput && <Cursor />}
         </h1>
-
         <p className="font-mono text-sm md:text-base mb-12" style={{ color: "#888" }}>
           {"// "}
-          {ctx.locationName || "МЦК КИТС"} _{ctx.startAt ? new Date(ctx.startAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }).toUpperCase() : "23 ОКТЯБРЯ 2026 13:00-15:00"}
+          {ctx.locationName || "МЦК КИТС"}_{" "}
+          {ctx.startAt
+            ? new Date(ctx.startAt).toLocaleDateString("ru-RU", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }).toUpperCase()
+            : "23 ОКТЯБРЯ 2026"}
         </p>
 
         {showInput && (
@@ -146,7 +188,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
             <div className="flex items-center gap-2 px-4 py-2 border-b" style={{ borderColor: "#222" }}>
               <span className="size-2 rounded-none" style={{ background: LIME }} />
               <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#666" }}>
-                terminal — nash.dev
+                terminal - nash.dev
               </span>
             </div>
             <div className="p-4 max-h-[240px] overflow-y-auto" style={{ color: WHITE }}>
@@ -166,7 +208,6 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
               <div className="flex items-center">
                 <Prompt>{"$"}</Prompt>
                 <input
-                  ref={inputRef}
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={onKey}
@@ -183,7 +224,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
 
         {showInput && (
           <div className="md:hidden flex flex-wrap gap-2 mb-10">
-            {["help", "about", "register", "speakers"].map((c) => (
+            {["video", "photos", "slides", "speakers"].map((c) => (
               <button
                 key={c}
                 onClick={() => handleCommand(c)}
@@ -198,11 +239,27 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
 
         <div className="flex flex-wrap gap-3">
           <a
-            href="#register"
+            href="#video"
             className="inline-flex items-center justify-center font-mono text-sm md:text-base uppercase tracking-widest px-8 py-4 border-2"
             style={{ background: LIME, color: BLACK, borderColor: LIME }}
           >
-            {"{ ЗАПИСАТЬСЯ_ }"}
+            {"{ СМОТРЕТЬ ЗАПИСЬ_ }"}
+          </a>
+          <a
+            href="#gallery"
+            className="inline-flex items-center justify-center font-mono text-sm md:text-base uppercase tracking-widest px-8 py-4 border-2"
+            style={{ borderColor: "#333", color: WHITE }}
+          >
+            ФОТО
+          </a>
+          <a
+            href={PRESENTATION_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center font-mono text-sm md:text-base uppercase tracking-widest px-8 py-4 border-2"
+            style={{ borderColor: "#333", color: WHITE }}
+          >
+            ПРЕЗЕНТАЦИЯ
           </a>
         </div>
       </div>
@@ -210,10 +267,9 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-/* ── Marquee ─────────────────────────────────────────────────────────── */
-
+// ── Marquee ──────────────────────────────────────────────────────
 function Marquee() {
-  const items = ["НАШ.DEV", "23 ОКТЯБРЯ", "МЦК КИТС", "БЕСПЛАТНО", "РЕГИСТРАЦИЯ ОТКРЫТА"];
+  const items = ["НАШ.DEV", "23 ОКТЯБРЯ 2026", "МЦК КИТС", "СОСТОЯЛОСЬ", "ЗАПИСЬ ДОСТУПНА"];
   const line = items.join("  //  ") + "  //  ";
   return (
     <div className="overflow-hidden border-b" style={{ borderColor: "#222", background: LIME, color: BLACK }}>
@@ -228,8 +284,198 @@ function Marquee() {
   );
 }
 
-/* ── Manifesto ───────────────────────────────────────────────────────── */
+// ── Video recording (VK → YouTube fallback) ──────────────────────
+function VideoEmbed() {
+  const [provider, setProvider] = useState<"vk" | "youtube">("vk");
+  const [loaded, setLoaded] = useState(false);
 
+  useEffect(() => {
+    if (provider !== "vk" || loaded) return;
+    const t = setTimeout(() => setProvider("youtube"), 4000);
+    return () => clearTimeout(t);
+  }, [provider, loaded]);
+
+  const vkReady = Boolean(VK_VIDEO_OID && VK_VIDEO_ID);
+  const src =
+    provider === "vk" && vkReady
+      ? `https://vk.com/video_ext.php?oid=${VK_VIDEO_OID}&id=${VK_VIDEO_ID}&hd=2`
+      : `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID || "dQw4w9WgXcQ"}?rel=0`;
+
+  return (
+    <div className="relative aspect-video border border-[#222] bg-[#0a0a0a] overflow-hidden">
+      <iframe
+        key={provider}
+        src={src}
+        className="absolute inset-0 w-full h-full border-0"
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        allowFullScreen
+        title="Наш.Dev 2026 — запись"
+        onLoad={() => setLoaded(true)}
+        onError={() => setProvider("youtube")}
+      />
+    </div>
+  );
+}
+
+function VideoSection() {
+  return (
+    <section id="video" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>Открыть запись
+        </p>
+        <VideoEmbed />
+        <div className="flex flex-wrap gap-3 mt-6">
+          <a
+            href={YOUTUBE_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+            style={{ borderColor: "#333", color: WHITE }}
+          >
+            YouTube
+            <ArrowUpRight size={14} weight="bold" />
+          </a>
+          <a
+            href={VK_VIDEO_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+            style={{ borderColor: "#333", color: WHITE }}
+          >
+            VK Video
+            <ArrowUpRight size={14} weight="bold" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Gallery (preview + VK album link) ────────────────────────────
+function GallerySection() {
+  return (
+    <section id="gallery" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>Фото с события
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {GALLERY.map((src, i) => (
+            <div
+              key={i}
+              className="relative aspect-square border border-[#222] overflow-hidden group"
+            >
+              <Image
+                src={src}
+                alt={`Фото ${i + 1}`}
+                fill
+                sizes="(max-width: 768px) 50vw, 33vw"
+                unoptimized
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-8">
+          <a
+            href={VK_GALLERY_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-5 py-3 border transition-colors"
+            style={{ borderColor: LIME, color: LIME }}
+          >
+            Все фото на VK
+            <ArrowUpRight size={14} weight="bold" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Presentation (iframe) ───────────────────────────────────────
+function PresentationSection() {
+  return (
+    <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>Презентация
+        </p>
+        <div className="relative w-full h-[80vh] min-h-[500px] border border-[#222] bg-[#0a0a0a] overflow-hidden">
+          <iframe
+            src={PRESENTATION_LINK}
+            className="absolute inset-0 w-full h-full border-0 bg-black"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            title="Наш.Дев 2026 — презентация"
+          />
+        </div>
+        <div className="mt-6">
+          <a
+            href={PRESENTATION_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+            style={{ borderColor: "#333", color: WHITE }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = LIME;
+              e.currentTarget.style.color = LIME;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#333";
+              e.currentTarget.style.color = WHITE;
+            }}
+          >
+            Открыть в новой вкладке
+            <ArrowUpRight size={14} weight="bold" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Reels carousel (5 vertical videos) ──────────────────────────
+function ReelsSection() {
+  return (
+    <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <p className="font-mono text-base md:text-lg mb-8" style={{ color: LIME }}>
+          <Prompt>{"$"}</Prompt>Reels с события
+        </p>
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-admin">
+          {REELS.map((r, i) => (
+            <div
+              key={i}
+              className="shrink-0 w-[220px] md:w-[260px] aspect-[9/16] border relative overflow-hidden"
+              style={{ borderColor: "#222", background: "#0a0a0a" }}
+            >
+              <video
+                src={r.src}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/40 to-transparent pt-8">
+                <p className="font-mono text-xs uppercase tracking-[0.2em]" style={{ color: LIME }}>
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <p className="font-mono text-sm mt-1" style={{ color: WHITE }}>
+                  {r.title}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Manifesto ────────────────────────────────────────────────────
 function Manifesto({ ctx }: { ctx: EventCustomContext }) {
   return (
     <section id="about" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
@@ -263,29 +509,12 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-/* ── Audience (styled like speakers) ─────────────────────────────────── */
-
+// ── Audience ────────────────────────────────────────────────────
 const AUDIENCE = [
-  {
-    code: "STUDENT_16-20",
-    title: "Студент 16–20",
-    desc: "Учишься, хочешь понять, куда идти дальше. Приходи посмотреть, как это устроено на практике.",
-  },
-  {
-    code: "NEWBIE_CODER",
-    title: "Начинающий разработчик",
-    desc: "Знаешь основы, но пока не понимаешь, как из этого сделать работу. Здесь — живые примеры.",
-  },
-  {
-    code: "IT_ENTHUSIAST",
-    title: "IT-энтузиаст",
-    desc: "Следишь за индустрией, ходишь на митапы. Тут — люди и разговоры без пафоса и презентаций.",
-  },
-  {
-    code: "CAREER_SWITCHER",
-    title: "Меняет профессию",
-    desc: "Работал в другой сфере, хочешь перейти в IT. Здесь — люди, которые уже это сделали.",
-  },
+  { code: "STUDENT_16-20", title: "Студент 16–20", desc: "Учишься, хочешь понять, куда идти дальше. Приходи посмотреть, как это устроено на практике." },
+  { code: "NEWBIE_CODER", title: "Начинающий разработчик", desc: "Знаешь основы, но пока не понимаешь, как из этого сделать работу. Здесь — живые примеры." },
+  { code: "IT_ENTHUSIAST", title: "IT-энтузиаст", desc: "Следишь за индустрией, ходишь на митапы. Тут — люди и разговоры без пафоса и презентаций." },
+  { code: "CAREER_SWITCHER", title: "Меняет профессию", desc: "Работал в другой сфере, хочешь перейти в IT. Здесь — люди, которые уже это сделали." },
 ];
 
 function Audience() {
@@ -293,26 +522,15 @@ function Audience() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Кто может участвовать?
+          <Prompt>{"$"}</Prompt>Кто пришёл?
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: "#222" }}>
           {AUDIENCE.map((a) => (
-            <div
-              key={a.code}
-              className="p-6 md:p-8"
-              style={{ background: BLACK }}
-            >
-              {/* Code label — same framing as speakers */}
+            <div key={a.code} className="p-6 md:p-8" style={{ background: BLACK }}>
               <p className="font-mono text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "#666" }}>
-                {"{ "}
-                {a.code}
-                {" }"}
+                {"{ "}{a.code}{" }"}
               </p>
-              <h3
-                className="font-mono text-xl md:text-2xl mb-3 tracking-tight"
-                style={{ color: WHITE }}
-              >
+              <h3 className="font-mono text-xl md:text-2xl mb-3 tracking-tight" style={{ color: WHITE }}>
                 {a.title}
               </h3>
               <p className="text-sm md:text-base leading-relaxed" style={{ color: "#aaa" }}>
@@ -326,8 +544,7 @@ function Audience() {
   );
 }
 
-/* ── Speakers ────────────────────────────────────────────────────────── */
-
+// ── Speakers ────────────────────────────────────────────────────
 interface Speaker {
   name: string;
   role: string;
@@ -368,7 +585,6 @@ const SPEAKERS: Speaker[] = [
     fact: "undefined",
     bio: "undefined",
     avatar_url: "/images/events/nash-dev-2026/speaker-secret.png",
-    // link: "https://",
   },
   {
     name: "Амир Бадрутдинов",
@@ -384,7 +600,6 @@ const SPEAKERS: Speaker[] = [
     fact: "До того как стать CEO она 6 лет работала веб-дизайнером",
     bio: "6+ лет в веб-дизайне, преподаватель школы веб-дизайна Стилетика, 30+ проектов, 2+ года в бизнес-аналитике. Ей есть что рассказать.",
     avatar_url: "/images/events/nash-dev-2026/speaker-anastasia.png",
-    // link: "https://",
   },
 ];
 
@@ -396,7 +611,6 @@ function Speakers() {
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
           <Prompt>{"$"}</Prompt>Спикеры
         </p>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {SPEAKERS.map((s, i) => (
             <div
@@ -421,15 +635,9 @@ function Speakers() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              {/* Image — fixed aspect + shrink-0. Its height never varies
-                  with the text below, so every photo in a row starts at
-                  the same Y regardless of how long the role string is. */}
               <div
                 className="relative aspect-square w-full mb-6 overflow-hidden shrink-0"
-                style={{
-                  background:
-                    "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px",
-                }}
+                style={{ background: "repeating-conic-gradient(#222 0% 25%, #111 0% 50%) 50% / 8px 8px" }}
               >
                 {s.avatar_url && (
                   <Image
@@ -442,14 +650,8 @@ function Speakers() {
                   />
                 )}
               </div>
-              {/* flex-1 + flex flex-col: the text block fills whatever
-                  height is left in the grid cell, so every card in a row
-                  ends on the same baseline. `mt-auto` on the closing brace
-                  pins it to the bottom for a consistent frame. */}
               <div className="flex-1 flex flex-col min-w-0">
-                <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
-                  {"{"}
-                </p>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>{"{"}</p>
                 <p className="font-mono text-sm mb-1" style={{ color: LIME }}>name:</p>
                 <p className="font-mono text-lg mb-4" style={{ color: WHITE }}>"{s.name}"</p>
                 <p className="font-mono text-sm mb-1" style={{ color: LIME }}>role:</p>
@@ -475,15 +677,12 @@ function Speakers() {
                     </p>
                   </>
                 )}
-                <p className="font-mono text-xs uppercase tracking-[0.2em] mt-auto pt-6" style={{ color: "#666" }}>
-                  {"}"}
-                </p>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] mt-auto pt-6" style={{ color: "#666" }}>{"}"}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-
       {open && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4"
@@ -499,32 +698,32 @@ function Speakers() {
               <span className="text-xs uppercase tracking-[0.2em]" style={{ color: "#666" }}>
                 README.md — {open.name}
               </span>
-              <button onClick={() => setOpen(null)} className="text-lg" style={{ color: "#666" }}>
-                ✕
-              </button>
+              <button onClick={() => setOpen(null)} className="text-lg" style={{ color: "#666" }}>✕</button>
             </div>
             <h3 className="text-2xl mb-2" style={{ color: WHITE }}># {open.name}</h3>
             <p className="text-sm mb-6" style={{ color: LIME }}>## {open.role}</p>
             <p className="text-base leading-relaxed mb-4" style={{ color: "#ddd" }}>{open.bio}</p>
             <p className="text-sm mb-6" style={{ color: "#666" }}>{open.fact}</p>
-            <a
-              href={open.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
-              style={{ borderColor: "#333", color: WHITE }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = LIME;
-                e.currentTarget.style.color = LIME;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#333";
-                e.currentTarget.style.color = WHITE;
-              }}
-            >
-              contact
-              <ArrowUpRight size={14} weight="bold" />
-            </a>
+            {open.link && (
+              <a
+                href={open.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.16em] px-4 py-2.5 border transition-colors"
+                style={{ borderColor: "#333", color: WHITE }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = LIME;
+                  e.currentTarget.style.color = LIME;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#333";
+                  e.currentTarget.style.color = WHITE;
+                }}
+              >
+                contact
+                <ArrowUpRight size={14} weight="bold" />
+              </a>
+            )}
           </div>
         </div>
       )}
@@ -532,110 +731,7 @@ function Speakers() {
   );
 }
 
-/* ── AI slider (clip-path split) ─────────────────────────────────────── */
-
-function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
-
-  useEffect(() => {
-    // 23 October 2026, 12:30 Moscow time (UTC+3)
-    const target = new Date("2026-10-23T12:30:00+03:00").getTime();
-
-    const update = () => {
-      const now = Date.now();
-      const diff = target - now;
-      if (diff <= 0) {
-        setTimeLeft({ d: 0, h: 0, m: 0, s: 0 });
-        return;
-      }
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / 1000 / 60) % 60);
-      const s = Math.floor((diff / 1000) % 60);
-      setTimeLeft({ d, h, m, s });
-    };
-
-    update();
-    const id = setInterval(update, 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  if (!timeLeft) return null;
-
-  return (
-    <div className="flex gap-4 font-mono items-center">
-      <div className="flex flex-col items-center">
-        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.d).padStart(2, '0')}</span>
-        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">days</span>
-      </div>
-      <span className="text-2xl text-[#666] pb-6">:</span>
-      <div className="flex flex-col items-center">
-        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.h).padStart(2, '0')}</span>
-        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">hours</span>
-      </div>
-      <span className="text-2xl text-[#666] pb-6">:</span>
-      <div className="flex flex-col items-center">
-        <span className="text-4xl md:text-5xl lg:text-6xl text-white">{String(timeLeft.m).padStart(2, '0')}</span>
-        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">mins</span>
-      </div>
-      <span className="text-2xl text-[#666] pb-6">:</span>
-      <div className="flex flex-col items-center">
-        <span className="text-4xl md:text-5xl lg:text-6xl text-[#CCFF00]">{String(timeLeft.s).padStart(2, '0')}</span>
-        <span className="text-[10px] uppercase tracking-widest text-[#666] mt-2">secs</span>
-      </div>
-    </div>
-  );
-}
-
-function StreamSection() {
-  return (
-    <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
-      <div className="max-w-[1200px] mx-auto px-6">
-        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>system --status
-        </p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Timer */}
-          <div>
-            <p className="font-mono text-sm md:text-base uppercase tracking-[0.2em] mb-6" style={{ color: "#888" }}>
-              // ДО НАЧАЛА ОСТАЛОСЬ
-            </p>
-            <CountdownTimer />
-            <p className="font-mono text-sm md:text-base mt-8" style={{ color: WHITE }}>
-              <Prompt>{"$"}</Prompt>date: 23 октября 2026, 12:30 MSK
-            </p>
-          </div>
-
-          {/* Video */}
-          <div>
-            <p className="font-mono text-sm md:text-base uppercase tracking-[0.2em] mb-4" style={{ color: "#888" }}>
-              // ТРАНСЛЯЦИЯ
-            </p>
-            <div className="relative aspect-video border border-[#222] bg-[#0a0a0a] flex items-center justify-center overflow-hidden group">
-              {/* Placeholder until link is added */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-[#444] group-hover:opacity-0 transition-opacity">
-                <span className="text-4xl mb-2">▶</span>
-                <span className="font-mono text-sm uppercase tracking-widest">iframe placeholder</span>
-              </div>
-              {/* Example Iframe wrapper */}
-              <iframe
-                className="absolute inset-0 w-full h-full border-0"
-                src=""
-                title="Live stream"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Timeline (dots aligned to the line) ─────────────────────────────── */
-
+// ── Timeline ────────────────────────────────────────────────────
 const TIMELINE = [
   { time: "13:10", cmd: "./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
   { time: "13:25", cmd: "./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
@@ -652,14 +748,9 @@ function Timeline() {
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
         <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Таймлайн
+          <Prompt>{"$"}</Prompt>Как прошло
         </p>
-
-        {/* Both the vertical rail and the dots live in the same coordinate
-            space so the dots sit centred on the line. Line at x=6px
-            (left-1.5), dot 12×12 anchored at x=0 → dot centre at 6px. */}
         <div className="relative">
-          {/* Animated vertical line */}
           <motion.div
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
@@ -668,7 +759,6 @@ function Timeline() {
             className="absolute top-2 bottom-2 w-px origin-top"
             style={{ left: "6px", background: "#222" }}
           />
-
           {TIMELINE.map((t, i) => (
             <motion.div
               key={i}
@@ -711,72 +801,25 @@ function Timeline() {
   );
 }
 
-/* ── Features ────────────────────────────────────────────────────────── */
-
-const FEATURES = [
-  { cmd: "networking", desc: "Событие где можно найти людей с которыми можно начать проект." },
-  { cmd: "get_certificate", desc: "Официальный сертификат об участии (по запросу)." },
-  { cmd: "win_kolonka", desc: "Розыгрыш Яндекс Станции за лучший вопрос." },
-  { cmd: "contact_speakers", desc: "Общение со спикерами после выступления." },
-];
-
-function Features() {
-  return (
-    <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
-      <div className="max-w-[1200px] mx-auto px-6">
-        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Преимущества
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px" style={{ background: "#222" }}>
-          {FEATURES.map((f, i) => (
-            <div key={i} className="p-8 md:p-10" style={{ background: BLACK }}>
-              <p className="font-mono text-base md:text-lg mb-3" style={{ color: LIME }}>
-                <Prompt>{"$"}</Prompt>
-                {f.cmd}
-              </p>
-              <p className="text-sm md:text-base" style={{ color: "#aaa" }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Location ────────────────────────────────────────────────────────── */
-// Yandex Map embed for the venue. If the iframe never fires `onLoad`
-// (blocked by a corporate proxy, DNS failure, embed endpoint down), we
-// swap to Google Maps after a short grace period. We can't rely on
-// `onError` for cross-origin iframes — it fires for network errors but
-// not for blocked frames — so the timeout is the real trigger.
+// ── Location ────────────────────────────────────────────────────
 const YANDEX_MAP_SRC =
   "https://yandex.ru/map-widget/v1/?um=constructor%3Ac65a3696f6811e8fdf9a467d8657d05efab313aee6808b886bebb2138cf28370&source=constructor";
 const GOOGLE_MAP_SRC =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2242.5166000790605!2d49.17465141284107!3d55.80163137299019!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x415eb281ef8e4d65%3A0x5b12cc06fe4a5dfe!2z0JrQsNC30LDQvdGB0LrQuNC5INGC0LXRhdC90LjQutGD0Lwg0LjQvdGE0L7RgNC80LDRhtC40L7QvdC90YvRhSDRgtC10YXQvdC-0LvQvtCz0LjQuSDQuCDRgdCy0Y_Qt9C4!5e0!3m2!1sen!2sru!4v1791396027142!5m2!1sen!2sru";
 const MAP_FALLBACK_MS = 4000;
-// Venue coordinates extracted from the Google Maps embed. Shared by
-// both “build a route” deep links below so a venue move is a
-// one-line edit here.
 const VENUE_LAT = 55.801339;
 const VENUE_LON = 49.177800;
+
 function MapEmbed() {
-  // `provider` flips to "google" the moment the Yandex frame is judged
-  // dead. `loaded` guards against a late onLoad from a Yandex frame that
-  // was already replaced — once we've fallen back, we ignore it.
   const [provider, setProvider] = useState<"yandex" | "google">("yandex");
   const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
     if (provider !== "yandex" || loaded) return;
-    const t = setTimeout(() => {
-      // Double-check: if onLoad already fired we would have bailed, but a
-      // race between the timer and the load event is possible on slow
-      // connections. Reading the ref-free `loaded` state here is fine —
-      // the closure captures the value at effect-run time, and the effect
-      // re-runs whenever `loaded` changes.
-      setProvider("google");
-    }, MAP_FALLBACK_MS);
+    const t = setTimeout(() => setProvider("google"), MAP_FALLBACK_MS);
     return () => clearTimeout(t);
   }, [provider, loaded]);
+
   const src = provider === "yandex" ? YANDEX_MAP_SRC : GOOGLE_MAP_SRC;
   return (
     <iframe
@@ -795,197 +838,13 @@ function MapEmbed() {
     />
   );
 }
-/* ── Giveaway — Yandex Station ─────────────────────────────────────────── */
-function AsciiStation() {
-  const [frame, setFrame] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setFrame((f) => f + 1), 100);
-    return () => clearInterval(id);
-  }, []);
 
-  const W = 24;
-  const H = 9;
-  const cx = W / 2;
-  const angle = frame * 0.08;
-
-  const lx = Math.cos(angle);
-  const lz = Math.sin(angle);
-
-  const lines = [];
-
-  // Top cap
-  let top = "";
-  for (let x = 0; x < W; x++) {
-    const nx = (x - cx + 0.5) / (W / 2);
-    if (Math.abs(nx) <= 0.8) top += "▄"; // ▄
-    else top += " ";
-  }
-  lines.push(top);
-
-  // Body (spinning cylinder shading)
-  for (let y = 1; y < H - 1; y++) {
-    let line = "";
-    for (let x = 0; x < W; x++) {
-      const nx = (x - cx + 0.5) / (W / 2);
-      if (Math.abs(nx) <= 0.92) {
-        const nz = Math.sqrt(1 - nx * nx);
-        const intensity = Math.max(0, nx * lx + nz * lz);
-        const val = (intensity + 0.2) / 1.2;
-        if (val > 0.8) line += "█"; // █
-        else if (val > 0.5) line += "▓"; // ▓
-        else if (val > 0.3) line += "▒"; // ▒
-        else line += "░"; // ░
-      } else {
-        line += " ";
-      }
-    }
-    lines.push(line);
-  }
-
-  // Bottom cap
-  let bot = "";
-  for (let x = 0; x < W; x++) {
-    const nx = (x - cx + 0.5) / (W / 2);
-    if (Math.abs(nx) <= 0.8) bot += "▀"; // ▀
-    else bot += " ";
-  }
-  lines.push(bot);
-
-  return (
-    <div className="relative font-mono" style={{ color: LIME, textShadow: `0 0 8px ${LIME}44` }}>
-      <pre className="m-0 leading-[1.1] text-[10px] sm:text-xs md:text-sm">{lines.join("\n")}</pre>
-      {/* Center play button (Yandex Station Lite) */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ paddingTop: '0.2rem' }}>
-        <span className="text-heading-2 font-bold text-[#744BFF]">▲</span>
-      </div>
-    </div>
-  );
-}
-
-function NashWave() {
-  const [frame, setFrame] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setFrame((f) => (f + 1) % 10000), 100);
-    return () => clearInterval(id);
-  }, []);
-
-  const COUNT = 3;
-  const dots = Array.from({ length: COUNT }, (_, i) => {
-    const phase = (frame * 0.35 + i * 0.9) % (Math.PI * 2);
-    const level = (Math.sin(phase) + 1) / 2;
-    const char = level > 0.75 ? "\u25CF" : level > 0.4 ? "\u2022" : "\u00B7";
-    return { char, level };
-  });
-
-  return (
-    <span className="inline-flex items-center gap-[3px] font-mono" style={{ color: LIME }} aria-hidden>
-      {dots.map((d, i) => (
-        <span
-          key={i}
-          className="inline-block w-2 text-center transition-opacity duration-100"
-          style={{ opacity: 0.35 + d.level * 0.65 }}
-        >
-          {d.char}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-function Giveaway() {
-  return (
-    <section
-      className="border-b py-20 md:py-28"
-      style={{ borderColor: "#222", background: BLACK }}
-    >
-      <div className="max-w-[1200px] mx-auto px-6">
-        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>cat prize.yaml
-        </p>
-        <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
-          <div>
-            {/* Left — metadata */}
-            <div className="font-mono space-y-6">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                  prize
-                </p>
-                <p className="text-2xl md:text-3xl" style={{ color: WHITE }}>
-                  Яндекс Станция Лайт
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t" style={{ borderColor: "#222" }}>
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                    brand
-                  </p>
-                  <p className="text-base" style={{ color: WHITE }}>Yandex</p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                    value
-                  </p>
-                  <p className="text-base" style={{ color: WHITE }}>6 700 ₽</p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                    timing
-                  </p>
-                  <p className="text-base" style={{ color: WHITE }}>14:50 — в зале</p>
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.24em] mb-1" style={{ color: "#666" }}>
-                    how_to_win???
-                  </p>
-                  <p className="text-base" style={{ color: WHITE }}>лучший вопрос</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-10">
-              <p className="text-[11px] uppercase tracking-[0.24em] mb-2" style={{ color: "#666" }}>
-                Правила
-              </p>
-              <ul className="text-sm md:text-base space-y-1.5" style={{ color: "#aaa" }}>
-                <li className="flex gap-2">
-                  <span style={{ color: LIME }}>→</span>
-                  задай содержательный вопрос спикеру
-                </li>
-                <li className="flex gap-2">
-                  <span style={{ color: LIME }}>→</span>
-                  спикер сам выбирает лучший после доклада, а мы выбираем лучший из лушчих
-                </li>
-                <li className="flex gap-2">
-                  <span style={{ color: LIME }}>→</span>
-                  вручение - в конце мероприятия
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-6 border-t sm:border-none pt-8" style={{ borderColor: "#222" }}>
-            <div className="flex flex-col items-center">
-              <AsciiStation />
-              <div className="font-mono text-[11px] mt-6" style={{ color: "#666" }}>
-                {">"} Алиса, включи плейлист для Наш Дэв...
-              </div>
-              <div className="flex items-center gap-1.5 font-mono text-[11px] mt-3" style={{ color: "#666" }}>
-                <NashWave />
-                <span>Включаю плейлист для мероприятий</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 function Location({ ctx }: { ctx: EventCustomContext }) {
   const { t, lang } = useLanguage();
-  // Yandex takes a full locale (ru_RU / en_US); Google takes a bare
-  // two-letter code. Both route deep-links point at the same coordinates
-  // the map embed uses, so the two never drift out of sync.
   const yandexLang = lang === "ru" ? "ru_RU" : "en_US";
   const yandexRouteUrl = `https://yandex.ru/maps/?rtext=~${VENUE_LAT},${VENUE_LON}&rtt=auto&lang=${yandexLang}`;
   const googleRouteUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_LAT},${VENUE_LON}&hl=${lang}`;
+
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
       <div className="max-w-[1200px] mx-auto px-6">
@@ -1008,10 +867,6 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
               <p className="text-xs uppercase tracking-[0.2em] mb-1" style={{ color: "#666" }}>Остановка</p>
               <p className="text-base" style={{ color: WHITE }}>Советская Площадь</p>
             </div>
-            {/* Route buttons — two providers, one row. Terminal-style
-                outlined pills that light up in LIME on hover, matching the
-                rest of the page's interactive language. Both open in a new
-                tab so the reader doesn't lose their place on the landing. */}
             <div className="pt-4 mt-2 border-t space-y-3" style={{ borderColor: "#222" }}>
               <p className="text-xs uppercase tracking-[0.2em]" style={{ color: "#666" }}>
                 <Prompt>{"$"}</Prompt>{t("events.route_hint")}
@@ -1074,358 +929,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-/* ── FAQ ─────────────────────────────────────────────────────────────── */
-
-const FAQ = [
-  { q: "Нужны ли знания для понимания докладов?", a: "Нет. Объясняем так, что поймет даже тот, кто зашёл случайно." },
-  { q: "Сколько стоит участие?", a: "Бесплатно. Регистрация обязательна, чтобы мы точно тебя пропустили." },
-  { q: "Есть ли ограничение по возрасту?", a: "Мероприятие рассчитано на 16+. Если вам меньше — напишите нам, обсудим (rovno.dev@gmail.com)." },
-  { q: "Будет ли запись?", a: "Ключевые доклады выложим в ВК Видео и Youtube Вершин. Но лучше приходить лично — нетворкинг не записать." },
-  { q: "Что взять с собой?", a: "Документ подтверждающий личность, хорошее настроение." },
-];
-
-function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
-  return (
-    <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
-      <div className="max-w-[900px] mx-auto px-6">
-        <p className="font-mono text-base md:text-lg mb-12" style={{ color: LIME }}>
-          <Prompt>{"$"}</Prompt>Вопрос-ответ
-        </p>
-
-        <div>
-          {FAQ.map((item, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={i} className="border-b last:border-b-0" style={{ borderColor: "#222" }}>
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="w-full text-left py-5 flex items-start gap-4 font-mono"
-                >
-                  <span className="text-lg shrink-0 w-6" style={{ color: LIME }}>
-                    {isOpen ? "−" : "+"}
-                  </span>
-                  <div className="flex-1">
-                    <span className="text-base md:text-lg" style={{ color: WHITE }}>
-                      <Prompt>{"$"}</Prompt>question: "{item.q}"
-                    </span>
-                    {isOpen && (
-                      <div className="mt-4 text-sm md:text-base leading-relaxed" style={{ color: "#aaa" }}>
-                        <Prompt>{"$"}</Prompt>answer: "{item.a}"
-                      </div>
-                    )}
-                  </div>
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Registration ────────────────────────────────────────────────────── */
-
-const STATUS_OPTIONS = ["STUDENT", "GUEST"] as const;
-
-/* ── Seat counter ─────────────────────────────────────────────────────
-   Terminal-style capacity meter. Renders a combined progress bar and
-   a breakdown of the seat types. If no limits are set, shows "no info". */
-function SeatCounter({ taken, seatTypes }: { taken: number; seatTypes: { type: string; count: number }[] }) {
-  const total = seatTypes.reduce((sum, s) => sum + s.count, 0);
-
-  if (total <= 0) {
-    return (
-      <div className="font-mono border border-[#222] bg-[#0a0a0a] p-5 mb-10">
-        <p className="text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
-          <Prompt>{"$"}</Prompt>status --seats
-        </p>
-        <p className="text-sm" style={{ color: "#888" }}>// no info</p>
-      </div>
-    );
-  }
-
-  const capped = Math.min(taken, total);
-  const cells = 20;
-  const filled = Math.round((capped / total) * cells);
-  const empty = cells - filled;
-  const bar = "█".repeat(filled) + "░".repeat(empty);
-  const isFull = taken >= total;
-  const remaining = Math.max(0, total - taken);
-
-  const breakdown = seatTypes.map(s => `${s.count} ${s.type}`).join(", ");
-
-  return (
-    <div
-      className="font-mono border p-5 mb-10"
-      style={{
-        borderColor: isFull ? "#FF3B3B" : "#222",
-        background: "#0a0a0a",
-      }}
-    >
-      <p className="text-xs uppercase tracking-[0.2em] mb-3" style={{ color: "#666" }}>
-        <Prompt>{"$"}</Prompt>status --seats
-      </p>
-      <div
-        className="text-lg md:text-2xl tracking-wider whitespace-nowrap overflow-x-auto"
-        style={{ color: isFull ? "#FF3B3B" : WHITE }}
-      >
-        [{bar}] {capped}&nbsp;/&nbsp;{total}
-      </div>
-      <p className="text-sm mt-2" style={{ color: isFull ? "#FF3B3B" : "#888" }}>
-        {isFull
-          ? "// capacity reached — registration is closed"
-          : `// ${remaining} из ${total} свободно (${breakdown})`}
-      </p>
-    </div>
-  );
-}
-
-function Registration({ ctx }: { ctx: EventCustomContext }) {
-  const seatTypes = ctx.seatTypes || [];
-  const capacity = seatTypes.reduce((sum, s) => sum + s.count, 0);
-  const registered = ctx.registeredCount ?? 0;
-  const isFull = capacity > 0 && registered >= capacity;
-  const [form, setForm] = useState({
-    name: "",
-    surname: "",
-    phone: "",
-    email: "",
-    telegram_username: "",
-    status: "STUDENT" as (typeof STATUS_OPTIONS)[number],
-    confirm_age_18: false,
-    accept_pd: false,
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!form.name.trim() || !form.phone.trim()) {
-      setError("name и phone обязательны");
-      return;
-    }
-    if (!form.confirm_age_18) {
-      setError("подтвердите возраст 16+");
-      return;
-    }
-    if (!form.accept_pd) {
-      setError("нужно согласие на обработку персональных данных");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await registerForEvent(ctx.slug, {
-        name: form.name.trim(),
-        surname: form.surname.trim() || undefined,
-        phone: form.phone.trim(),
-        email: form.email.trim() || undefined,
-        telegram_username: form.telegram_username.trim() || undefined,
-        meta: {
-          status: form.status,
-          confirm_age_18: form.confirm_age_18,
-          accept_pd: form.accept_pd,
-        },
-      });
-      setDone(true);
-    } catch (err: any) {
-      setError(err?.message || "Не удалось отправить заявку. Попробуйте ещё раз.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-  if (done) {
-    return (
-      <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
-        <div className="max-w-[900px] mx-auto px-6 font-mono">
-          {/* `+ 1` reflects the registration the current visitor just
-              submitted — the server response isn't refetched, so this is
-              the only accurate in-memory projection. */}
-          <SeatCounter taken={registered + 1} seatTypes={seatTypes} />
-          <p className="text-2xl md:text-4xl mb-6" style={{ color: LIME }}>
-            ✓ Registration successful.
-          </p>
-          <p className="text-lg md:text-2xl" style={{ color: WHITE }}>
-            Увидимся на событии{" "}
-            {ctx.startAt
-              ? new Date(ctx.startAt).toLocaleDateString("ru-RU", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
-              : "23 октября 2026"}
-            .
-          </p>
-          <p className="text-base mt-8" style={{ color: "#666" }}>
-            Мы отправим напоминание на почту за 3 дня до события
-          </p>
-        </div>
-      </section>
-    );
-  }
-  return (
-    <section id="register" className="py-20 md:py-32" style={{ background: BLACK }}>
-      <div className="max-w-[900px] mx-auto px-6 font-mono">
-        <SeatCounter taken={registered} seatTypes={seatTypes} />
-        {isFull ? (
-          <>
-            <p className="text-2xl md:text-4xl mb-4" style={{ color: "#FF3B3B" }}>
-              ✕ Registration closed
-            </p>
-            <p className="text-lg md:text-xl" style={{ color: WHITE }}>
-              Все места заняты.
-            </p>
-            <p className="text-base mt-4" style={{ color: "#666" }}>
-              Если кто-то отменит участие, регистрация откроется снова.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="text-base md:text-lg mb-12" style={{ color: LIME }}>
-              <Prompt>{"$"}</Prompt>init_registration()
-            </p>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <Field label="enter_name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="Иван" required />
-              <Field label="enter_surname" value={form.surname} onChange={(v) => setForm({ ...form, surname: v })} placeholder="Иванов" />
-              <Field label="enter_phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+7 ___ ___-__-__" required />
-              <Field label="enter_email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} placeholder="you@example.com" />
-              <Field label="enter_telegram" value={form.telegram_username} onChange={(v) => setForm({ ...form, telegram_username: v })} placeholder="@username" />
-              <div>
-                <p className="text-sm mb-3" style={{ color: LIME }}>
-                  <Prompt>{"$"}</Prompt>Кто ты?:
-                </p>
-                <div className="flex gap-3">
-                  {STATUS_OPTIONS.map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setForm({ ...form, status: opt })}
-                      className="font-mono text-sm uppercase tracking-wider px-5 py-3 border"
-                      style={{
-                        borderColor: form.status === opt ? LIME : "#333",
-                        color: form.status === opt ? BLACK : WHITE,
-                        background: form.status === opt ? LIME : BLACK,
-                      }}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {/* Age confirmation — plain terminal-style toggle. */}
-              <label className="flex items-start gap-3 cursor-pointer pt-4">
-                <input
-                  type="checkbox"
-                  checked={form.confirm_age_18}
-                  onChange={(e) => setForm({ ...form, confirm_age_18: e.target.checked })}
-                  className="mt-1 accent-[#CCFF00] size-4"
-                />
-                <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-                  <Prompt>{"$"}</Prompt>confirm_age_16: подтверждаю, что мне 16 лет или больше
-                </span>
-              </label>
-              {/* Legal consent — mirrors the site-wide order form so the consent
-                  language is identical across every form on the domain. Links
-                  open in a new tab; the user can read the policy without losing
-                  the form state. */}
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.accept_pd}
-                  onChange={(e) => setForm({ ...form, accept_pd: e.target.checked })}
-                  className="mt-1 accent-[#CCFF00] size-4"
-                />
-                <span className="text-sm leading-relaxed" style={{ color: WHITE }}>
-                  <Prompt>{"$"}</Prompt>accept_pd: даю{" "}
-                  <a
-                    href="/docs/consent"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                    style={{ color: LIME }}
-                  >
-                    согласие на обработку персональных данных
-                  </a>{" "}
-                  и подтверждаю ознакомление с{" "}
-                  <a
-                    href="/docs/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                    style={{ color: LIME }}
-                  >
-                    Политикой конфиденциальности
-                  </a>{" "}
-                  и{" "}
-                  <a
-                    href="/docs/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                    style={{ color: LIME }}
-                  >
-                    Пользовательским соглашением
-                  </a>
-                  .
-                </span>
-              </label>
-              {error && (
-                <p className="font-mono text-sm px-4 py-3 border" style={{ color: "#FF3B3B", borderColor: "#FF3B3B" }}>
-                  ERROR: {error}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full font-mono text-base uppercase tracking-widest px-8 py-5 border-2 disabled:opacity-50"
-                style={{ background: LIME, color: BLACK, borderColor: LIME }}
-              >
-                {submitting ? "executing..." : "> execute_registration [ОТПРАВИТЬ]"}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  required?: boolean;
-}) {
-  return (
-    <div>
-      <p className="text-sm mb-2" style={{ color: LIME }}>
-        <Prompt>{"$"}</Prompt>
-        {label}:{required && <span style={{ color: "#FF3B3B" }}> *</span>}
-      </p>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full font-mono text-base px-4 py-3 border bg-transparent outline-none"
-        style={{ borderColor: "#333", color: WHITE, caretColor: LIME }}
-        onFocus={(e) => (e.currentTarget.style.borderColor = LIME)}
-        onBlur={(e) => (e.currentTarget.style.borderColor = "#333")}
-      />
-    </div>
-  );
-}
-
-/* ── Footer ──────────────────────────────────────────────────────────── */
-
+// ── Footer ──────────────────────────────────────────────────────
 function EventFooter() {
   return (
     <footer className="border-t py-12 font-mono" style={{ borderColor: "#222", background: BLACK }}>
@@ -1437,15 +941,14 @@ function EventFooter() {
           <Prompt>{"$"}</Prompt>make event --type "cool"
         </div>
         <div className="text-xs uppercase tracking-[0.2em]" style={{ color: "#444" }}>
-          Rovno.dev x <span><Link href='https://unidoka.com'>Юнидока</Link></span> x <span><Link href='https://unidoka.com/vershiny'>Вершины</Link></span> © {new Date().getFullYear()}
+          Rovno.dev x <span><Link href="https://unidoka.com">Юнидока</Link></span> x <span><Link href="https://unidoka.com/vershiny">Вершины</Link></span> © {new Date().getFullYear()}
         </div>
       </div>
     </footer>
   );
 }
 
-/* ── Root ────────────────────────────────────────────────────────────── */
-
+// ── Root ────────────────────────────────────────────────────────
 export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
   return (
     <div className="min-h-screen" style={{ background: BLACK, color: WHITE }}>
@@ -1458,32 +961,24 @@ export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
-        @keyframes nashWave {
-          0%, 100% { opacity: 0.25; transform: translateY(0); }
-          50% { opacity: 1; transform: translateY(-2px); }
-        }
-        .nash-wave { animation: nashWave 1.4s ease-in-out infinite; display: inline-block; }
-        .nash-colon { animation: nashBlink 1s steps(1, end) infinite; }
         .nash-dev-root *,
         .nash-dev-root *::before,
         .nash-dev-root *::after {
           border-radius: 0 !important;
         }
       `}</style>
-
       <div className="nash-dev-root">
         <Hero ctx={ctx} />
         <Marquee />
+        <VideoSection />
+        <GallerySection />
+        <PresentationSection />
+        <ReelsSection />
         <Manifesto ctx={ctx} />
         <Audience />
         <Speakers />
-        <StreamSection />
         <Timeline />
-        <Features />
-        <Giveaway />
         <Location ctx={ctx} />
-        <Faq />
-        <Registration ctx={ctx} />
         <EventFooter />
       </div>
     </div>

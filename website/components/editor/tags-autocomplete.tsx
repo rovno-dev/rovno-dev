@@ -10,7 +10,7 @@ interface Props {
   placeholder?: string;
   className?: string;
   maxTags?: number;
-  /** Filters the suggestion pool — "tag" | "category" | "brand". */
+  /** Filters the suggestion pool - "tag" | "category" | "brand". */
   kind?: "tag" | "category" | "brand";
 }
 
@@ -21,12 +21,12 @@ interface Props {
  *   - On focus, shows the most-used tags that aren't already selected.
  *   - Typing filters; the first arrow-down/up navigates the list.
  *   - Enter or comma commits the highlighted suggestion (or, if none is
- *     highlighted, the raw draft text — creating a new tag).
+ *     highlighted, the raw draft text - creating a new tag).
  *   - Space also commits, so `foo bar<Space>` becomes a `foo bar` chip.
  *   - Backspace on an empty input removes the last chip.
  *   - Blur commits whatever's in the draft, so nothing gets lost.
  *
- * Existing suggestions are case-preserved — typing "Design" when "design"
+ * Existing suggestions are case-preserved - typing "Design" when "design"
  * already exists picks the existing casing so the DB stays canonical.
  */
 export function TagsAutocomplete({

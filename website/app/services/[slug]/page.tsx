@@ -33,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const doc = loadServiceDoc(slug);
+  const doc = loadServiceDoc(slug) as any;
   if (!doc) return { title: "Услуга не найдена · Rovno.dev" };
   return {
     title: `${doc.title} · Rovno.dev`,
@@ -63,7 +63,7 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
-/** Heading components — identical slugify() logic to the TOC extractor. */
+/** Heading components - identical slugify() logic to the TOC extractor. */
 const mdxComponents = {
   h2: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));
@@ -120,7 +120,7 @@ export default async function ServicePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const doc = loadServiceDoc(slug);
+  const doc = loadServiceDoc(slug) as any;
   if (!doc) notFound();
 
   const { content } = await compileMDX({
@@ -240,7 +240,7 @@ export default async function ServicePage({
                         href={`/services/${s.slug}`}
                         className="text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
                       >
-                        {s.shortTitle}
+                        {(s as any).shortTitle}
                       </Link>
                     </li>
                   ))}
@@ -268,7 +268,7 @@ export default async function ServicePage({
                   Нужна {doc.shortTitle.toLowerCase()}?
                 </h2>
                 <p className="text-body-3 text-(--on-bg-medium) max-w-lg">
-                  Опишите задачу — ответим в течение 3 часов и предложим план.
+                  Опишите задачу - ответим в течение 3 часов и предложим план.
                 </p>
               </div>
               <Button size="large" asChild className="shrink-0">

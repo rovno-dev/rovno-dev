@@ -13,7 +13,7 @@ export const revalidate = 300;
 export const metadata = {
   title: "Компании · Rovno.dev",
   description:
-    "Организации, с которыми мы работали — от брендинга и айдентики до продуктовых сайтов и 3D.",
+    "Организации, с которыми мы работали - от брендинга и айдентики до продуктовых сайтов и 3D.",
 };
 
 /** Two-letter initials for the fallback tile when no logotype is set. */
@@ -81,7 +81,7 @@ export default async function ClientsPage() {
             </h1>
             <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-[620px]">
               {clients.length > 0
-                ? "Портфолио по каждому кейсу — в разделе «Проекты»."
+                ? "Портфолио по каждому кейсу - в разделе «Проекты»."
                 : "Здесь появятся клиенты, с которыми мы работаем."}
             </p>
           </div>
@@ -139,7 +139,7 @@ export default async function ClientsPage() {
                     Хотите в этот список?
                   </h2>
                   <p className="text-body-3 text-(--on-bg-medium) max-w-xl">
-                    Расскажите о задаче — ответим в течение 3 часов.
+                    Расскажите о задаче - ответим в течение 3 часов.
                   </p>
                 </div>
                 <Button size="large" asChild className="shrink-0">
@@ -181,7 +181,7 @@ function EmptyState() {
   const GHOSTS = 10;
   return (
     <div className="relative animate-reveal">
-      {/* Ghost tile grid — masked to a soft radial so edges dissolve. */}
+      {/* Ghost tile grid - masked to a soft radial so edges dissolve. */}
       <div
         aria-hidden
         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4"
@@ -286,14 +286,14 @@ function ClientTile({
           )}
         </div>
 
-        {/* Industry tag — top-left, muted at rest. */}
+        {/* Industry tag - top-left, muted at rest. */}
         {client.industry && (
           <span className="absolute top-3 left-3 text-[10px] uppercase tracking-[0.22em] text-(--on-bg-low)">
             {client.industry}
           </span>
         )}
 
-        {/* Project count — bottom-right, tabular, subtle accent on hover. */}
+        {/* Project count - bottom-right, tabular, subtle accent on hover. */}
         {client.project_count > 0 && (
           <span className="absolute bottom-3 right-3 text-[10px] font-medium tabular-nums text-(--on-bg-low) group-hover:text-(--primary) transition-colors">
             {client.project_count}{" "}
@@ -301,7 +301,7 @@ function ClientTile({
           </span>
         )}
 
-        {/* Name overlay — hover-revealed, bottom gradient. */}
+        {/* Name overlay - hover-revealed, bottom gradient. */}
         <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <p className="text-body-3 font-medium text-white truncate">
             {client.name}

@@ -10,8 +10,8 @@ export interface CropRect {
 
 export const ASPECT_PRESETS = [
   { id: "free", label: "Свободно", ratio: null },
-  { id: "1:1",  label: "1:1",  ratio: 1 },
-  { id: "4:3",  label: "4:3",  ratio: 4 / 3 },
+  { id: "1:1", label: "1:1", ratio: 1 },
+  { id: "4:3", label: "4:3", ratio: 4 / 3 },
   { id: "16:9", label: "16:9", ratio: 16 / 9 },
   { id: "21:8", label: "21:8", ratio: 21 / 8 },
 ] as const;
@@ -31,7 +31,7 @@ export function fitRectForAspect(
   if (!aspect) return { x: 0, y: 0, width: 1, height: 1 };
   const srcAspect = natW / natH;
   if (srcAspect > aspect) {
-    // Source is wider — crop sides.
+    // Source is wider - crop sides.
     const w = aspect / srcAspect;
     return { x: (1 - w) / 2, y: 0, width: w, height: 1 };
   }

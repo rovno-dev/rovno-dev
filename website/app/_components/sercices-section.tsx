@@ -14,21 +14,20 @@ import { Badge } from "@/components/ui/badge";
 
 // 1. Assign GLB model file paths to your service titles
 const serviceToProjectSlugs: Record<string, string[]> = {
-  "Разработка": ["vanguard", "sadovod", "courtElegance", "concord"],
-  "3D & Motion": ["alx", "bread", "concord"],
-  "Продвижение": ["vanguard", "sadovod", "concord"],
-  "Брендинг": ["alx", "bread"],
+  "development": ["vanguard", "sadovod", "courtElegance", "concord"],
+  "motion": ["alx", "bread", "concord"],
+  "branding": ["alx", "bread"],
 };
 
 // Create a mapping for your 3D assets matching the service key
 const serviceToModelPaths: Record<string, string> = {
-  "Разработка": "/3d/code_icon.glb",       // Place your .glb files in your public folder
-  "3D & Motion": "/3d/3d_icon.glb",
-  "Брендинг": "/3d/design_icon.glb",
+  "development": "/3d/code_icon.glb",
+  "motion": "/3d/3d_icon.glb",
+  "branding": "/3d/design_icon.glb",
 };
 
-function getLatestProjectForService(serviceTitle: string): Project {
-  const slugs = serviceToProjectSlugs[serviceTitle] || [];
+function getLatestProjectForService(serviceId: string): Project {
+  const slugs = serviceToProjectSlugs[serviceId] || [];
   const candidates = slugs
     .map((slug) => PROJECTS[slug])
     .filter(Boolean)
@@ -73,24 +72,27 @@ export default function ServicesSection() {
 
   const services = [
     {
-      title: t("services.development"),
-      description: t("services.dev_description"),
+      id: "development",
+      title: t("services.web-development.short"),
+      description: t("services.web-development.desc"),
       icon: CodeIcon,
       color: "#3b82f6",
       services: [t("services.dev_sub1"), t("services.dev_sub2"), t("services.dev_sub3"), t("services.dev_sub4"), t("services.dev_sub5")],
       price: { from: "75 000", avg: "250 000" },
     },
     {
-      title: t("services.motion"),
-      description: t("services.motion_description"),
+      id: "motion",
+      title: t("services.3d-motion.short"),
+      description: t("services.3d-motion.desc"),
       icon: DiamondIcon,
       color: "#f59e0b",
       services: [t("services.motion_sub1"), t("services.motion_sub2"), t("services.motion_sub3"), t("services.motion_sub4"), t("services.motion_sub5")],
       price: { from: "45 000", avg: "100 000" },
     },
     {
-      title: t("services.branding"),
-      description: t("services.branding_description"),
+      id: "branding",
+      title: t("services.branding.short"),
+      description: t("services.branding.desc"),
       icon: SignatureIcon,
       color: "#a855f7",
       services: [t("services.branding_sub1"), t("services.branding_sub2"), t("services.branding_sub3"), t("services.branding_sub4")],
@@ -131,11 +133,11 @@ export default function ServicesSection() {
   };
 
   const currentService = services[selectedIndex];
-  const currentProject = getLatestProjectForService(currentService.title);
+  const currentProject = getLatestProjectForService(currentService.id);
   const Icon = currentService.icon;
 
   // 3. Extract the right model based on the active slide layout
-  const currentModelPath = serviceToModelPaths[currentService.title] || "/3d/code_icon.glb";
+  const currentModelPath = serviceToModelPaths[currentService.id] || "/3d/code_icon.glb";
 
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden text-on-bg-high">
@@ -201,8 +203,8 @@ export default function ServicesSection() {
                         <div className="w-12 h-12 relative overflow-hidden pointer-events-none" onPointerDown={(e) => e.stopPropagation()}>
                           {modelViewerLoaded ? (
                             <ModelViewerElement
-                              key={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
-                              src={serviceToModelPaths[service.title] || "/3d/code_icon.glb"}
+                              key={serviceToModelPaths[service.id] || "/3d/code_icon.glb"}
+                              src={serviceToModelPaths[service.id] || "/3d/code_icon.glb"}
                               interaction-prompt="none"
                               style={{ width: '100%', height: '100%', '--poster-color': 'transparent' } as React.CSSProperties}
                             />
