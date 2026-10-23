@@ -97,7 +97,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
-  const [seoOpen, setSeoOpen] = useState(false);
+  const [seoOpen, setSeoOpen] = useState(true);
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));

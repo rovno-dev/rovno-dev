@@ -47,8 +47,8 @@ export async function generateMetadata({
     title: ev.seo_title || `${ev.title} · Rovno.dev`,
     description: ev.meta_description || ev.short_description || ev.description,
     openGraph: {
-      title: ev.title,
-      description: ev.short_description || ev.description,
+      title: ev.seo_title || ev.title,
+      description: ev.meta_description || ev.short_description || ev.description,
       url: `${baseUrl}/events/${ev.slug}`,
       siteName: "Rovno.dev",
       images: [
@@ -64,8 +64,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: ev.title,
-      description: ev.short_description || ev.description,
+      title: ev.seo_title || ev.title,
+      description: ev.meta_description || ev.short_description || ev.description,
       images: [ogImage],
     },
   };
