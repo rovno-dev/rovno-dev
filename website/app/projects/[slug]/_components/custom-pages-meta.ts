@@ -22,6 +22,12 @@ export interface CustomPageMeta {
 
 export const CUSTOM_PAGES_META: CustomPageMeta[] = [
   {
+    key: "cveteya",
+    label: "Cveteya - Liquid Glass",
+    description:
+      "Warm pastel tones, liquid glassmorphism, elegant serif typography, and soft organic layouts for a premium floral boutique.",
+  },
+  {
     key: "alx",
     label: "ALX - glitch hero",
     description:

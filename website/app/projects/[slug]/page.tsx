@@ -4,7 +4,6 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import path from "path";
 import fs from "fs";
 import matter from "gray-matter";
-
 import { Container } from "@/components/ui/container";
 import { Project, PROJECTS } from "@/app/_data/projects";
 import { getAllProjects } from "@/app/_data/projects/parser";
@@ -12,7 +11,6 @@ import { CLIENTS } from "@/app/_data/clients";
 import { PROJECT_CATEGORIES } from "@/app/_data/categories";
 import { PROJECT_TAGS } from "@/app/_data/project-tags";
 import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
-
 import { GithubReadmeBlock } from "./_components/github-readme-block";
 import {
   CustomProjectPage,
@@ -22,7 +20,6 @@ import {
   findCustomPageRenderer,
   type CustomPageContext,
 } from "./_components/custom-pages";
-
 import {
   Gallery,
   MetricCard,
@@ -44,11 +41,6 @@ import {
 } from "@/components/mdx";
 import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 
-// On-demand projects come from the DB and change without a redeploy.
-// force-dynamic guarantees a fresh render on every request, so the first
-// hit after publishing never serves a cached 404 (the previous revalidate=60
-// setup cached the not-found on the first request, which is why a manual
-// reload was the only way to see the page).
 export const dynamic = "force-dynamic";
 
 const API_BASE =
@@ -62,14 +54,12 @@ interface DBProjectTag {
   label: string;
   value?: any;
 }
-
 interface DBProjectMedia {
   id: string;
   type: "image" | "video";
   url: string;
   caption?: string | null;
 }
-
 interface DBProject {
   id: string;
   slug: string;
@@ -117,7 +107,6 @@ export async function generateStaticParams() {
   return all.map((project) => ({ slug: project.slug }));
 }
 
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);
@@ -155,45 +144,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title: seoTitle || title,
       description: seoDescription || description,
-      images: [image],
-    },
-  };
-}: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const dbProject = await fetchDbProject(slug);
-  const mdxProject = getAllProjects().find((p) => p.slug === slug);
-  const fallbackProject = PROJECTS[slug];
-
-  let title = "Проект Rovno.dev";
-  let description = "Кейс цифрового агентства Rovno.dev";
-  let image = `/api/og/project/${slug}`;
-
-  if (dbProject) {
-    title = dbProject.title;
-    description = dbProject.short_description || dbProject.description || description;
-    if (dbProject.cover_image_src) image = dbProject.cover_image_src;
-  } else if (mdxProject) {
-    title = mdxProject.title;
-    description = mdxProject.shortDescription || mdxProject.description || description;
-    if (mdxProject.cover?.imageSrc) image = mdxProject.cover.imageSrc;
-  } else if (fallbackProject) {
-    title = fallbackProject.title;
-    description = fallbackProject.shortDescription || fallbackProject.description || description;
-    if (fallbackProject.cover?.imageSrc) image = fallbackProject.cover.imageSrc;
-  }
-
-  return {
-    title: `${title} · Rovno.dev`,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [image],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
       images: [image],
     },
   };
@@ -237,7 +187,6 @@ const getCompiledMDX = cache(async (content: string) => {
   return compiled;
 });
 
-/** Compile an MDX file's body into React nodes, ready to drop into the page. */
 async function loadMdxBody(slug: string): Promise<React.ReactNode> {
   const filePath = path.join(
     process.cwd(),
@@ -266,7 +215,6 @@ function buildRelated(currentSlug: string, limit = 3): RelatedRef[] {
     }));
 }
 
-/** Normalize a DB project into the shape every renderer consumes. */
 function dbToContext(
   db: DBProject,
   content: React.ReactNode,
@@ -301,7 +249,6 @@ function dbToContext(
   };
 }
 
-/** Same, for MDX / hardcoded projects. */
 function staticToContext(
   project: Project,
   content: React.ReactNode,
@@ -341,17 +288,13 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
-  // 1. Resolve which data source this project comes from.
   const mdxProjects = getAllProjects();
   const mdxProject = mdxProjects.find((p) => p.slug === slug);
   const fallbackProject = PROJECTS[slug] as Project | undefined;
   const projectData = mdxProject || fallbackProject;
   const dbProject = !projectData ? await fetchDbProject(slug) : null;
-
   if (!projectData && !dbProject) notFound();
 
-  // 2. Compile the MDX body once, regardless of source.
   const content = dbProject
     ? dbProject.mdx_content
       ? await getCompiledMDX(dbProject.mdx_content)
@@ -360,19 +303,10 @@ export default async function ProjectPage({
       ? await loadMdxBody(slug)
       : null;
 
-  // 3. Normalize to the shape every renderer understands.
   const ctx = dbProject
     ? dbToContext(dbProject, content)
-    // parser.Project and index.Project overlap in every field the
-    // renderer reads; only their `category` typing diverges (free-form
-    // string vs literal union). Cast through unknown to satisfy TS
-    // without weakening either definition.
     : staticToContext(projectData as unknown as Project, content);
 
-  // 4. Pick a renderer:
-  //      a. DB row's custom_page wins (admin-controlled)
-  //      b. MDX/hardcoded customPage field next (author-controlled)
-  //      c. nothing → the shared CustomProjectPage
   const customKey =
     dbProject?.custom_page ||
     (projectData as Project | undefined)?.customPage ||
@@ -383,7 +317,6 @@ export default async function ProjectPage({
     return renderer.render(ctx);
   }
 
-  // 5. Fall through to the shared premium layout.
   return (
     <>
       <CustomProjectPage
@@ -391,7 +324,6 @@ export default async function ProjectPage({
         content={ctx.content}
         related={buildRelated(slug)}
       />
-      {/* GitHub README blocks - one per github tag. */}
       {dbProject?.tags
         .filter((t) => t.kind === "github" && t.value?.repo)
         .map((t) => (
