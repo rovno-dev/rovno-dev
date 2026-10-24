@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,6 +29,14 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   // Force dark mode on this specific page
   useEffect(() => {
@@ -70,39 +79,58 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-blue-500/30">
 
       {/* ──────────────── HERO ──────────────── */}
-      <section className="relative pt-32 pb-20 border-b border-(--outline) overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
-          style={{
-            backgroundImage: "linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-            maskImage: "radial-gradient(ellipse 60% 60% at 50% 0%, black 40%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse 60% 60% at 50% 0%, black 40%, transparent 100%)",
-          }}
-        />
+      <section ref={heroRef} className="relative h-[100svh] min-h-[700px] overflow-hidden flex items-center justify-center bg-black">
 
-        <Container className="relative z-10 text-center flex flex-col items-center">
+        {/* Parallax Background Video */}
+        <motion.div
+          style={{ y: videoY }}
+          className="absolute inset-0 w-full h-[120%] -top-[10%] z-0"
+        >
+          {/* Using a placeholder video, replace with actual security camera footage */}
+          <video
+            src="/videos/hero/solutions.webm"
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover opacity-60"
+          />
+          {/* Dark Overlay for text readability */}
+          <div className="absolute inset-0 bg-black/60 z-10" />
+          {/* Bottom Gradient Fade into the page background */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-(--bg) to-transparent z-10" />
+        </motion.div>
+
+        {/* Foreground Content */}
+        <motion.div
+          style={{ y: textY, opacity: textOpacity }}
+          className="relative z-20 text-center flex flex-col items-center px-6 w-full max-w-4xl mt-16"
+        >
           <ScrollReveal>
-            <h1 className="text-display-1 md:text-[5rem] lg:text-[6rem] font-heading font-bold leading-[0.95] tracking-tighter mb-6">
-              Jungle Bread <br className="hidden md:block" /> <span className="text-(--primary)">Smart Guard</span>
+
+            <h1 className="text-display-1 md:text-[5rem] lg:text-[6rem] font-heading tracking-tighter mb-6 text-white drop-shadow-2xl">
+              Безопасность для<br className="hidden md:block" />Jungle Bread
             </h1>
 
-            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) max-w-2xl mx-auto leading-relaxed mb-10">
+            <p className="text-body-2 text-white/80 max-w-2xl mx-auto leading-relaxed mb-10 drop-shadow-md">
               {project.description || "Умная охранная система для садика для собак. Прямые эфиры для владельцев, полный контроль для администрации и ИИ-детекция поведения."}
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">
-              {project.href && (
-                <Button size="large" variant="outlined" asChild>
-                  <Link href={project.href} target="_blank" rel="noopener noreferrer">
-                    Оригинал кейса
-                    <ArrowUpRight weight="bold" className="size-4" />
-                  </Link>
-                </Button>
-              )}
+              <Button size="large" variant="filled" asChild >
+                <Link
+                  href={'https://app.jungle-bread.com'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+
+                >
+                  Оригинал кейса
+                  <ArrowUpRight weight="bold" className="size-4" />
+                </Link>
+              </Button>
             </div>
           </ScrollReveal>
-        </Container>
+        </motion.div>
       </section>
 
       {/* ──────────────── WEB APP SHOWCASE ──────────────── */}
