@@ -67,7 +67,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
   const notifications = [
     { id: 1, app: "Telegram", text: "Скидка ждет вас!", time: "9:41 AM", icon: "telegram" },
     { id: 2, app: "MAX", text: "Новый промокод внутри", time: "9:41 AM", icon: "max" },
-    { id: 3, app: "Telegram", text: "Секретный бонус активирован", time: "9:42 AM", icon: "telegram" },
+    { id: 3, app: "Telegram", text: "Секретный бонус активирован", time: "9:41 AM", icon: "telegram" },
   ];
 
   return (
@@ -158,7 +158,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               <ScrollReveal delay={0}>
                 <GlassCard className="h-full flex flex-col">
                   <div className="w-14 h-14 rounded-2xl bg-[#F2C6D4]/50 flex items-center justify-center mb-6 border border-white/50">
-                    <ShoppingBag className="w-7 h-7 text-[#2C2A29]" weight="duotone" />
+                    <ShoppingBag className="w-7 h-7 text-[#2C2A29]" weight="bold" />
                   </div>
                   <h3 className="text-xl font-serif mb-3">E-commerce</h3>
                   <p className="text-[#7A7571] text-sm leading-relaxed flex-1">
@@ -170,7 +170,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               <ScrollReveal delay={100}>
                 <GlassCard className="h-full flex flex-col">
                   <div className="w-14 h-14 rounded-2xl bg-[#B2D8C6]/50 flex items-center justify-center mb-6 border border-white/50">
-                    <Heart className="w-7 h-7 text-[#2C2A29]" weight="duotone" />
+                    <Heart className="w-7 h-7 text-[#2C2A29]" weight="bold" />
                   </div>
                   <h3 className="text-xl font-serif mb-3">Арт-дирекшн</h3>
                   <p className="text-[#7A7571] text-sm leading-relaxed flex-1">
@@ -182,7 +182,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               <ScrollReveal delay={200}>
                 <GlassCard className="h-full flex flex-col">
                   <div className="w-14 h-14 rounded-2xl bg-[#E6DAC9]/50 flex items-center justify-center mb-6 border border-white/50">
-                    <Sparkle className="w-7 h-7 text-[#2C2A29]" weight="duotone" />
+                    <Sparkle className="w-7 h-7 text-[#2C2A29]" weight="bold" />
                   </div>
                   <h3 className="text-xl font-serif mb-3">Liquid UI</h3>
                   <p className="text-[#7A7571] text-sm leading-relaxed flex-1">
@@ -194,7 +194,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               <ScrollReveal delay={300}>
                 <GlassCard className="h-full flex flex-col">
                   <div className="w-14 h-14 rounded-2xl bg-[#D6D0F2]/50 flex items-center justify-center mb-6 border border-white/50">
-                    <ChartLineUp className="w-7 h-7 text-[#2C2A29]" weight="duotone" />
+                    <ChartLineUp className="w-7 h-7 text-[#2C2A29]" weight="bold" />
                   </div>
                   <h3 className="text-xl font-serif mb-3">SEO & Аналитика</h3>
                   <p className="text-[#7A7571] text-sm leading-relaxed flex-1">

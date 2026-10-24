@@ -22,6 +22,12 @@ export interface CustomPageMeta {
 
 export const CUSTOM_PAGES_META: CustomPageMeta[] = [
   {
+    key: "jungle-bread-security",
+    label: "Jungle Bread - Security",
+    description:
+      "Security system for a dog kindergarten with live camera feeds for owners, admin dashboard, and noise-based aggression detection.",
+  },
+  {
     key: "cveteya",
     label: "Cveteya - Liquid Glass",
     description:
