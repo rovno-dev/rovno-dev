@@ -83,16 +83,11 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
 
         <Container className="relative z-10 text-center flex flex-col items-center">
           <ScrollReveal>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-(--primary-glass) border border-(--primary)/20 text-sm font-medium mb-6 text-(--primary)">
-              <ShieldCheck weight="fill" className="size-4" />
-              <span>Smart Guard System</span>
-            </div>
-
             <h1 className="text-display-1 md:text-[5rem] lg:text-[6rem] font-heading font-bold leading-[0.95] tracking-tighter mb-6">
               Jungle Bread <br className="hidden md:block" /> <span className="text-(--primary)">Smart Guard</span>
             </h1>
 
-            <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) max-w-2xl mx-auto leading-relaxed mb-10">
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) max-w-2xl mx-auto leading-relaxed mb-10">
               {project.description || "Умная охранная система для садика для собак. Прямые эфиры для владельцев, полный контроль для администрации и ИИ-детекция поведения."}
             </p>
 
@@ -141,7 +136,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <BrowserVideoPlayer src="/videos/hero/apps.webm" url="app.junglebread.ru" />
+              <BrowserVideoPlayer src="/static-images/projects/jungle-bread/hero.webm" url="app.junglebread.ru" />
             </ScrollReveal>
           </div>
         </Container>

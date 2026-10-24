@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { ArrowUpRight, ArrowLeft, FlowerLotus, Sparkle, Heart, ShoppingBag, ChartLineUp, TelegramLogo } from "@phosphor-icons/react/dist/ssr";
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
-import { useEffect } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
 import type { CustomPageContext } from "../custom-pages";
 import { CustomVideoPlayer } from "@/components/ui/custom-video-player";
 import { CveteyaLogo } from "./cveteya-logo";
@@ -55,6 +55,17 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode, cl
 }
 
 export function CveteyaProjectPage({ project, content }: { project: CustomPageContext, content: React.ReactNode }) {
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax effects
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+
   useEffect(() => {
     const html = document.documentElement;
     const originalClass = html.className;
@@ -91,45 +102,40 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
 
       <div className="relative z-10">
         {/* ──────────────── HERO ──────────────── */}
-        <section className="relative min-h-[95dvh] flex flex-col justify-center items-center pt-32 pb-20">
-          <Container className="text-center relative z-10 flex flex-col items-center">
-            <ScrollReveal threshold={0.01} className="flex flex-col items-center">
+        <section ref={heroRef} className="relative h-[100svh] min-h-[700px] overflow-hidden flex items-center justify-center bg-black">
+          {/* Parallax Background Video */}
+          <motion.div
+            style={{ y: videoY }}
+            className="absolute inset-0 w-full h-[120%] -top-[10%] z-0"
+          >
+            <CustomVideoPlayer
+              src="/static-images/projects/cveteya/cveteya-footage.webm"
+              className="w-full h-full"
+            />
+            {/* Dark Overlay for text readability */}
+            <div className="absolute inset-0 bg-black/50 z-10" />
+            {/* Bottom Gradient Fade into the light theme */}
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#FCFAF8] to-transparent z-10" />
+          </motion.div>
 
+          {/* Foreground Content */}
+          <motion.div
+            style={{ y: textY, opacity: textOpacity }}
+            className="relative z-20 flex flex-col items-center text-center px-6 w-full max-w-[1000px] mt-16"
+          >
+            <CveteyaLogo className="w-full max-w-[600px] text-white mb-10 drop-shadow-2xl" />
 
-              {/* SVG Logo */}
-              <CveteyaLogo className="w-full h-auto" />
+            <p className="text-lg md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed mb-12 font-light drop-shadow-md">
+              {project.description || "Дизайн для экспресс e-commerce магазина цветов"}
+            </p>
 
-              <p className="text-lg md:text-2xl text-[#7A7571] max-w-2xl mx-auto leading-relaxed mb-12 font-light">
-                {project.description || "Цифровой опыт для современного цветочного бутика. E-commerce, арт-дирекшн и жидкие интеракции."}
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <GlassButton href="https://cveteya.com">
-                  <span>Смотреть сайт</span>
-                  <ArrowUpRight weight="bold" />
-                </GlassButton>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={200} threshold={0.01} className="w-full max-w-[1000px] mt-20">
-              <div className="relative aspect-[16/9] md:aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl ">
-                <CustomVideoPlayer
-                  src="/static-images/projects/cveteya/cveteya-footage.webm"
-                  className="absolute inset-0 w-full h-full"
-                />
-
-                {/* <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 bg-white/30 backdrop-blur-xl border border-white/60 rounded-2xl p-4 md:p-6 flex items-center gap-4 shadow-lg z-30 pointer-events-none">
-                  <div className="w-12 h-12 rounded-full bg-[#F2C6D4] flex items-center justify-center">
-                    <FlowerLotus className="w-6 h-6 text-[#2C2A29]" weight="fill" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-serif text-lg md:text-xl font-medium text-[#2C2A29]">Bloom & Grow</p>
-                    <p className="text-xs md:text-sm text-[#7A7571]">Брендинг и веб-сайт</p>
-                  </div>
-                </div> */}
-              </div>
-            </ScrollReveal>
-          </Container>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <GlassButton href="https://cveteya.com">
+                <span>Смотреть сайт</span>
+                <ArrowUpRight weight="bold" />
+              </GlassButton>
+            </div>
+          </motion.div>
         </section>
 
         {/* ──────────────── BENTO / FEATURES (4 CARDS) ──────────────── */}
@@ -206,38 +212,22 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         <section className="py-16">
           <Container>
             <ScrollReveal>
-              <div className="bg-white rounded-[40px] shadow-xl border border-gray-100 p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 overflow-hidden relative">
+              <div className="bg-white rounded-[1.25rem] shadow-xl border border-gray-100 p-8 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 overflow-hidden relative">
 
                 {/* Left Content */}
-                <div className="flex-1 max-w-xl z-10">
+                <div className="flex-1 z-10">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold leading-[1.1] tracking-tight mb-4 text-[#1A1A1A]">
-                    Перейди в Telegram-бот или MAX и получи скидку
+                    Фокус на Telegram MAX боты
                   </h2>
                   <p className="text-base md:text-lg text-[#666] leading-relaxed mb-8">
-                    Экономьте с комфортом. Подпишитесь на нашего бота в Telegram или MAX, чтобы получить секретный промокод на скидку. Без спама, только выгода в один клик
+                    Сделали дизайн так, чтобы клиент перешёл в бот и сделал повторный заказ
                   </p>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <Link
-                      href="https://max.ru"
-                      target="_blank"
-                      className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#E94E77] text-white font-medium hover:bg-[#d43a63] transition-colors shadow-lg shadow-[#E94E77]/30"
-                    >
-                      Открыть MAX
-                    </Link>
-                    <Link
-                      href="https://t.me"
-                      target="_blank"
-                      className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border-2 border-[#E94E77] text-[#E94E77] font-medium hover:bg-[#E94E77]/5 transition-colors"
-                    >
-                      Открыть Telegram
-                    </Link>
-                  </div>
                 </div>
 
                 {/* Right Content (Phone Mockup) */}
                 <div className="flex-1 flex justify-center lg:justify-end relative w-full max-w-[400px]">
                   {/* Phone Frame */}
-                  <div className="relative w-[280px] h-[580px] bg-[#0a0a0a] rounded-[45px] p-2.5 shadow-2xl border-[4px] border-[#333] z-10 rotate-3 hover:rotate-0 transition-transform duration-500">
+                  <div className="relative w-[300px] h-[580px] bg-[#0a0a0a] rounded-[45px] p-2.5 shadow-2xl border-[4px] border-[#333] z-10 rotate-3 hover:rotate-0 transition-transform duration-500">
                     <div className="relative w-full h-full bg-gradient-to-br from-[#5B9C9C] via-[#47747F] to-[#2B4156] rounded-[35px] overflow-hidden flex flex-col items-center pt-14">
 
                       {/* Dynamic Island */}
@@ -305,7 +295,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#B2D8C6] rounded-full blur-[80px] opacity-40 mix-blend-multiply" />
 
                 <h2 className="text-3xl md:text-5xl font-serif mb-12 relative z-10">
-                  Цветущие результаты.
+                  Цветущие результаты
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
                   <div className="flex flex-col items-center">
@@ -338,7 +328,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
                 Готовы к росту?
               </h2>
               <p className="text-lg text-[#7A7571] mb-12 max-w-lg mx-auto">
-                Давайте создадим что-то прекрасное вместе. Мы сейчас принимаем новые проекты.
+                Предлагаем создать вам премиальный цифровой продукт, который будет приносить заказы.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <GlassButton href="/order" variant="dark">
