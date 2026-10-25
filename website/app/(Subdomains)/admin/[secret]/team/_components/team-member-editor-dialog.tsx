@@ -448,6 +448,7 @@ export function TeamMemberEditorDialog({
             )}
           </div>
         </div>
+          <div className="pt-6 border-t border-(--outline) space-y-4"><h3 className="text-heading-3">Профиль эксперта</h3><ExpertEditor value={expert} onChange={setExpert} /></div>
 
         <DialogFooter>
           <Button variant="outlined" onClick={() => onOpenChange(false)} disabled={saving}>
