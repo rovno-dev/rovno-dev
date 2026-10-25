@@ -1,7 +1,6 @@
-"use client";
 
 import { ReactNode } from "react";
-import { Globe } from "@phosphor-icons/react";
+import { Globe } from "@phosphor-icons/react/dist/ssr";
 import RovnoLogotypeIcon from "@/components/layout/logo/logo-icon";
 import { AmorfaLogo } from "@/components/icons/logotypes/amorfa-logo";
 import { VershinyLogo } from "@/components/icons/logotypes/vershiny-logo";

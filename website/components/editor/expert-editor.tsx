@@ -249,9 +249,9 @@ export function ExpertEditor({
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-heading-3 mb-1">Карьерный путь</h2>
+            <h2 className="text-heading-3 mb-1">Опыт и образование</h2>
             <p className="text-body-4 text-(--on-bg-medium)">
-              Год, заголовок и описание. Показываются таймлайном.
+              Этапы карьеры или учебы. Показываются единым таймлайном на странице эксперта.
             </p>
           </div>
           <Button type="button" variant="outlined" size="small" onClick={addMilestone} disabled={disabled}>
@@ -280,7 +280,7 @@ export function ExpertEditor({
                     <Input
                       value={m.title}
                       onChange={(e) => setMilestone(i, { title: e.target.value })}
-                      placeholder="Rovno.dev - со-основатель"
+                      placeholder="Rovno.dev - со-основатель / МГУ - Бакалавриат"
                       disabled={disabled}
                     />
                   </Field>

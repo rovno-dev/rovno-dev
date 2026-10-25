@@ -109,7 +109,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
           <ScrollReveal>
 
             <h1 className="text-display-1 md:text-[5rem] lg:text-[6rem] font-heading tracking-tighter mb-6 text-white drop-shadow-2xl">
-              Безопасность для<br className="hidden md:block" />Jungle Bread
+              Безопасность для <br className="hidden md:block" />Jungle Bread
             </h1>
 
             <p className="text-body-2 text-white/80 max-w-2xl mx-auto leading-relaxed mb-10 drop-shadow-md">
