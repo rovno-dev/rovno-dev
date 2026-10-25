@@ -16,6 +16,10 @@ import { ExpertCTA } from "./_components/expert-cta";
 import TatarstanIcon from "@/components/icons/experts-icons/Tatarstan-icon";
 import { EXPERTS_DATA } from "@/app/_data/experts";
 import {
+  resolveExpertSocialIcon,
+  resolveExpertTagIcon,
+} from "@/components/icons/expert-icon-map";
+import {
   fetchTeamMemberServer,
   fetchTeamMemberProjectsServer,
   type PublicTeamMember,
@@ -93,6 +97,26 @@ export default async function ExpertPage({
   const enrichment = EXPERTS_DATA[slug];
 
   if (!member) notFound();
+  // Expert fields (stats/skills/milestones/tags/socials/location) come
+  // from the DB now. Fall back per-field to EXPERTS_DATA only when the
+  // DB value is empty, so an admin editing one section can't blank out
+  // the others. Once a member fills in their profile through
+  // /app/profile, their EXPERTS_DATA entry becomes dead code.
+  const dbStats = member.expert_stats ?? [];
+  const dbSkills = member.expert_skills ?? [];
+  const dbMilestones = member.expert_milestones ?? [];
+  const dbTags = member.expert_tags ?? [];
+  const dbSocials = member.expert_socials ?? [];
+  const useStats = dbStats.length > 0 ? dbStats : (enrichment?.stats ?? []);
+  const useSkills = dbSkills.length > 0 ? dbSkills : (enrichment?.skills ?? []);
+  const useMilestones =
+    dbMilestones.length > 0 ? dbMilestones : (enrichment?.milestones ?? []);
+  const useLocation = member.location || enrichment?.location || null;
+  const tagsFromDb = dbTags.length > 0;
+  const tagsFromLegacy = !tagsFromDb && (enrichment?.tags?.length ?? 0) > 0;
+  const socialsFromDb = dbSocials.length > 0;
+  const socialsFromLegacy =
+    !socialsFromDb && (enrichment?.socials?.length ?? 0) > 0;
 
   const displayName =
     [member.name, member.surname].filter(Boolean).join(" ") ||
@@ -148,27 +172,39 @@ export default async function ExpertPage({
               </Button>
             </div>
 
-            {enrichment?.socials && enrichment.socials.length > 0 && (
+            {(socialsFromDb || socialsFromLegacy) && (
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30 flex flex-row md:flex-col gap-2">
-                {enrichment.socials.map((social, key) => (
-                  <Button
-                    key={key}
-                    variant="glass"
-                    size="icon-medium"
-                    shape="round"
-                    asChild
-                    className="animate-reveal [&_path]:fill-white! bg-black/30 border-white/25 hover:bg-black/50 [&_svg]:text-white!"
-                    style={{ animationDelay: `${300 + key * 80}ms` }}
-                  >
-                    <Link
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {social.icon}
-                    </Link>
-                  </Button>
-                ))}
+                {socialsFromDb
+                  ? dbSocials.map((social, key) => (
+                      <Button
+                        key={key}
+                        variant="glass"
+                        size="icon-medium"
+                        shape="round"
+                        asChild
+                        className="animate-reveal [&_path]:fill-white! bg-black/30 border-white/25 hover:bg-black/50 [&_svg]:text-white!"
+                        style={{ animationDelay: `${300 + key * 80}ms` }}
+                      >
+                        <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                          {resolveExpertSocialIcon(social.kind)}
+                        </Link>
+                      </Button>
+                    ))
+                  : (enrichment?.socials ?? []).map((social, key) => (
+                      <Button
+                        key={key}
+                        variant="glass"
+                        size="icon-medium"
+                        shape="round"
+                        asChild
+                        className="animate-reveal [&_path]:fill-white! bg-black/30 border-white/25 hover:bg-black/50 [&_svg]:text-white!"
+                        style={{ animationDelay: `${300 + key * 80}ms` }}
+                      >
+                        <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                          {social.icon}
+                        </Link>
+                      </Button>
+                    ))}
               </div>
             )}
 
@@ -184,10 +220,10 @@ export default async function ExpertPage({
               <p className="text-body-2 md:text-display-5 text-white/75 max-w-2xl leading-snug mb-4 animate-reveal delay-300 fill-mode-both">
                 {member.role}
               </p>
-              {enrichment?.location && (
+              {useLocation && (
                 <p className="inline-flex items-center gap-1.5 text-body-4 text-white/55 animate-reveal delay-400 fill-mode-both">
                   <MapPin className="size-4" weight="fill" />
-                  {enrichment.location}
+                  {useLocation}
                 </p>
               )}
             </div>
@@ -196,11 +232,11 @@ export default async function ExpertPage({
       </Container>
 
       {/* ═══════════ STATS (hardcoded enrichment only) ═══════════ */}
-      {enrichment?.stats && enrichment.stats.length > 0 && (
+      {useStats.length > 0 && (
         <Container variant="full-width" className="pt-12 md:pt-16">
           <div className="max-w-[1200px] mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-(--outline) border border-(--outline) rounded-3xl overflow-hidden">
-              {enrichment.stats.map((s, i) => (
+              {useStats.map((s, i) => (
                 <div key={i} className="bg-(--bg) p-6 md:p-8">
                   <div className="text-4xl md:text-5xl font-heading font-semibold tracking-tight text-(--primary) leading-none mb-2 tabular-nums">
                     {s.value}
@@ -231,31 +267,51 @@ export default async function ExpertPage({
             )}
           </div>
 
-          {enrichment?.tags && enrichment.tags.length > 0 && (
+          {(tagsFromDb || tagsFromLegacy) && (
             <div className="flex flex-wrap gap-2 lg:justify-end">
-              {enrichment.tags.map((tag, idx) => (
-                <Badge
-                  key={idx}
-                  variant="tonal-card-static"
-                  size="chip-medium"
-                  className="gap-2 animate-reveal fill-mode-both"
-                  style={{ animationDelay: `${idx * 60}ms` }}
-                >
-                  {tag.icon && (
-                    <span className="size-3.5 inline-flex items-center justify-center [&>svg]:size-3.5">
-                      {tag.icon}
-                    </span>
-                  )}
-                  {tag.label}
-                </Badge>
-              ))}
+              {tagsFromDb
+                ? dbTags.map((tag, idx) => {
+                    const icon = resolveExpertTagIcon(tag.icon_key);
+                    return (
+                      <Badge
+                        key={idx}
+                        variant="tonal-card-static"
+                        size="chip-medium"
+                        className="gap-2 animate-reveal fill-mode-both"
+                        style={{ animationDelay: `${idx * 60}ms` }}
+                      >
+                        {icon && (
+                          <span className="size-3.5 inline-flex items-center justify-center [&>svg]:size-3.5">
+                            {icon}
+                          </span>
+                        )}
+                        {tag.label}
+                      </Badge>
+                    );
+                  })
+                : (enrichment?.tags ?? []).map((tag, idx) => (
+                    <Badge
+                      key={idx}
+                      variant="tonal-card-static"
+                      size="chip-medium"
+                      className="gap-2 animate-reveal fill-mode-both"
+                      style={{ animationDelay: `${idx * 60}ms` }}
+                    >
+                      {tag.icon && (
+                        <span className="size-3.5 inline-flex items-center justify-center [&>svg]:size-3.5">
+                          {tag.icon}
+                        </span>
+                      )}
+                      {tag.label}
+                    </Badge>
+                  ))}
             </div>
           )}
         </div>
       </Container>
 
       {/* ═══════════ SKILLS (hardcoded enrichment only) ═══════════ */}
-      {enrichment?.skills && enrichment.skills.length > 0 && (
+      {useSkills.length > 0 && (
         <ScrollReveal threshold={0.05}>
           <Container variant="full-width" className="pt-20 md:pt-28">
             <div className="max-w-[1200px] mx-auto">
@@ -263,7 +319,7 @@ export default async function ExpertPage({
                 Что делает лучше всех
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
-                {enrichment.skills.map((skill, i) => (
+                {useSkills.map((skill, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex items-baseline justify-between gap-4">
                       <span className="text-body-3 text-(--on-bg-high)">
@@ -288,7 +344,7 @@ export default async function ExpertPage({
       )}
 
       {/* ═══════════ MILESTONES (hardcoded enrichment only) ═══════════ */}
-      {enrichment?.milestones && enrichment.milestones.length > 0 && (
+      {useMilestones.length > 0 && (
         <ScrollReveal threshold={0.05}>
           <Container variant="full-width" className="pt-20 md:pt-28">
             <div className="max-w-[1200px] mx-auto">
@@ -296,7 +352,7 @@ export default async function ExpertPage({
                 Карьерный путь
               </h2>
               <div>
-                {enrichment.milestones.map((m, i) => (
+                {useMilestones.map((m, i) => (
                   <div
                     key={i}
                     className="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-4 md:gap-8 py-6 border-b border-(--outline) last:border-b-0"

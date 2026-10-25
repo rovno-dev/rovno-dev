@@ -136,36 +136,67 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
       {/* ──────────────── WEB APP SHOWCASE ──────────────── */}
       <section className="py-24 border-b border-(--outline)">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <ScrollReveal>
-              <div>
-                <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight mb-6">
-                  Веб-приложение для контроля
-                </h2>
-                <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-8">
-                  Мы разработали удобную веб-платформу, которая позволяет владельцам и сотрудникам садика не переживать о питомцах. Включите трансляцию в браузере в любой момент, чтобы проверить, как проходит день.
-                </p>
-                <ul className="space-y-4 mb-8">
-                  {[
-                    "Доступ из любого браузера без установки",
-                    "Прямые эфиры с камер в HD-качестве",
-                    "Push-уведомления и система оповещений",
-                    "Единая экосистема для владельцев и админов"
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-body-3 text-(--on-bg-high)">
-                      <div className="size-6 rounded-full bg-(--primary-glass) flex items-center justify-center shrink-0">
-                        <span className="text-(--primary) text-sm font-bold">✓</span>
-                      </div>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </ScrollReveal>
+          <div className="flex flex-col gap-16 md:gap-24">
 
-            <ScrollReveal delay={200}>
-              <BrowserVideoPlayer src="/static-images/projects/jungle-bread/hero.webm" url="app.junglebread.ru" />
-            </ScrollReveal>
+            {/* Top: Camera + Text */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+
+              {/* Camera Illustration */}
+              <div className="w-full flex justify-center">
+                <ScrollReveal className="w-full flex justify-center">
+                  <div className="relative w-full max-w-[400px] aspect-[3/4]">
+                    <Image
+                      src="/static-images/projects/jungle-bread/cctv.webp"
+                      alt="CCTV Camera"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain"
+                      style={{
+                        maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+                        WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)"
+                      }}
+                    />
+                  </div>
+                </ScrollReveal>
+              </div>
+
+              {/* Text & List */}
+              <div className="w-full">
+                <ScrollReveal delay={100}>
+                  <div>
+                    <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight mb-6">
+                      Веб-приложение для контроля
+                    </h2>
+                    <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-8">
+                      Мы разработали удобную веб-платформу, которая позволяет владельцам и сотрудникам садика не переживать о питомцах. Включите трансляцию в браузере в любой момент, чтобы проверить, как проходит день.
+                    </p>
+                    <ul className="space-y-4 mb-8">
+                      {[
+                        "Доступ из любого браузера без установки",
+                        "Прямые эфиры с камер в HD-качестве",
+                        "Push-уведомления и система оповещений",
+                        "Единая экосистема для владельцев и админов"
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-3 text-body-3 text-(--on-bg-high)">
+                          <div className="size-6 rounded-full bg-(--primary-glass) flex items-center justify-center shrink-0">
+                            <span className="text-(--primary) text-sm font-bold">✓</span>
+                          </div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </ScrollReveal>
+              </div>
+            </div>
+
+            {/* Bottom: Video Player (Always down) */}
+            <div className="w-full max-w-4xl mx-auto">
+              <ScrollReveal delay={200}>
+                <BrowserVideoPlayer src="/static-images/projects/jungle-bread/hero.webm" url="app.junglebread.ru" />
+              </ScrollReveal>
+            </div>
+
           </div>
         </Container>
       </section>
@@ -238,7 +269,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
         </Container>
       </section>
 
-      {/* ──────────────── FEATURES (4 CARDS, MONOCHROME ICONS) ──────────────── */}
+      {/* ──────────────── FEATURES (4 CARDS, INFORMATIVE MOCKUPS) ──────────────── */}
       <section className="py-24">
         <Container>
           <ScrollReveal>
@@ -248,11 +279,26 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+            {/* Card 1: Owners */}
             <ScrollReveal delay={0}>
-              <Card className="p-8 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col">
-                <div className="size-14 rounded-2xl bg-(--bg) border border-(--outline) flex items-center justify-center mb-6">
-                  <UserFocus weight="duotone" className="size-7 text-(--on-bg-high)" />
+              <Card className="p-6 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col group hover:border-(--primary)/30 transition-colors">
+                <div className="w-full h-32 rounded-2xl bg-(--bg) border border-(--outline) mb-6 relative overflow-hidden flex flex-col group-hover:border-(--primary)/20 transition-colors">
+                  <div className="h-7 border-b border-(--outline) flex items-center px-3 gap-1.5 bg-(--card)/50">
+                    <div className="size-1.5 rounded-full bg-(--on-bg-low)/30" />
+                    <div className="size-1.5 rounded-full bg-(--on-bg-low)/30" />
+                    <div className="size-1.5 rounded-full bg-(--on-bg-low)/30" />
+                  </div>
+                  <div className="flex-1 p-3 flex items-center gap-3">
+                    <div className="size-10 rounded-full bg-(--primary-glass) flex items-center justify-center shrink-0 border border-(--primary)/20">
+                      <UserFocus className="size-5 text-(--primary)" />
+                    </div>
+                    <div className="flex flex-col gap-2 w-full">
+                      <div className="h-2 w-2/3 bg-(--on-bg-low)/20 rounded-full" />
+                      <div className="h-2 w-1/2 bg-(--on-bg-low)/20 rounded-full" />
+                    </div>
+                  </div>
                 </div>
                 <h3 className="text-heading-3 font-semibold mb-3">Доступ для владельцев</h3>
                 <p className="text-body-3 text-(--on-bg-medium) flex-1">
@@ -261,10 +307,22 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
               </Card>
             </ScrollReveal>
 
+            {/* Card 2: Admin */}
             <ScrollReveal delay={100}>
-              <Card className="p-8 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col">
-                <div className="size-14 rounded-2xl bg-(--bg) border border-(--outline) flex items-center justify-center mb-6">
-                  <ShieldCheck weight="duotone" className="size-7 text-(--on-bg-high)" />
+              <Card className="p-6 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col group hover:border-(--primary)/30 transition-colors">
+                <div className="w-full h-32 rounded-2xl bg-(--bg) border border-(--outline) mb-6 relative overflow-hidden flex group-hover:border-(--primary)/20 transition-colors">
+                  <div className="w-12 border-r border-(--outline) flex flex-col items-center py-3 gap-3 bg-(--card)/50">
+                    <ShieldCheck className="size-4 text-(--primary)" />
+                    <div className="size-4 rounded bg-(--on-bg-low)/20" />
+                    <div className="size-4 rounded bg-(--on-bg-low)/20" />
+                  </div>
+                  <div className="flex-1 p-3 grid grid-cols-2 gap-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="rounded-lg bg-(--on-bg-low)/5 border border-(--outline) flex items-center justify-center">
+                        <VideoCamera className="size-3.5 text-(--on-bg-low)" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <h3 className="text-heading-3 font-semibold mb-3">Админ-панель</h3>
                 <p className="text-body-3 text-(--on-bg-medium) flex-1">
@@ -273,10 +331,24 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
               </Card>
             </ScrollReveal>
 
+            {/* Card 3: Aggression */}
             <ScrollReveal delay={200}>
-              <Card className="p-8 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col">
-                <div className="size-14 rounded-2xl bg-(--bg) border border-(--outline) flex items-center justify-center mb-6">
-                  <Waveform weight="duotone" className="size-7 text-(--on-bg-high)" />
+              <Card className="p-6 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col group hover:border-(--primary)/30 transition-colors">
+                <div className="w-full h-32 rounded-2xl bg-(--bg) border border-(--outline) mb-6 relative overflow-hidden flex items-center justify-center group-hover:border-(--primary)/20 transition-colors">
+                  <div className="relative z-10 flex flex-col items-center gap-3 w-full">
+                    <div className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-500 text-[10px] font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                      !!!
+                    </div>
+                    <div className="h-10 w-32 flex items-end justify-center gap-2">
+                      {[30, 60, 100, 70, 40, 90, 60, 80, 45].map((h, i) => (
+                        <div
+                          key={i}
+                          style={{ height: `${h}%` }}
+                          className={`w-1.5 rounded-full transition-all duration-300 ${i === 2 || i === 5 || i === 7 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-(--on-bg-low)/30'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
                 <h3 className="text-heading-3 font-semibold mb-3">Детекция агрессии</h3>
                 <p className="text-body-3 text-(--on-bg-medium) flex-1">
@@ -285,10 +357,22 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
               </Card>
             </ScrollReveal>
 
+            {/* Card 4: Web Platform */}
             <ScrollReveal delay={300}>
-              <Card className="p-8 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col">
-                <div className="size-14 rounded-2xl bg-(--bg) border border-(--outline) flex items-center justify-center mb-6">
-                  <Desktop weight="duotone" className="size-7 text-(--on-bg-high)" />
+              <Card className="p-6 rounded-3xl bg-(--card) border-(--outline) h-full flex flex-col group hover:border-(--primary)/30 transition-colors">
+                <div className="w-full h-32 rounded-2xl bg-(--bg) border border-(--outline) mb-6 relative overflow-hidden flex flex-col group-hover:border-(--primary)/20 transition-colors">
+                  <div className="h-7 border-b border-(--outline) flex items-center px-3 gap-1.5 bg-(--card)/50">
+                    <div className="size-1.5 rounded-full bg-red-500/50" />
+                    <div className="size-1.5 rounded-full bg-yellow-500/50" />
+                    <div className="size-1.5 rounded-full bg-green-500/50" />
+                  </div>
+                  <div className="flex-1 p-3 flex flex-col items-center justify-center gap-2">
+                    <div className="size-8 rounded-full bg-(--primary-glass) flex items-center justify-center">
+                      <Desktop className="size-4 text-(--primary)" />
+                    </div>
+                    <div className="h-1.5 w-16 bg-(--on-bg-low)/20 rounded-full" />
+                    <div className="h-1.5 w-10 bg-(--on-bg-low)/20 rounded-full" />
+                  </div>
                 </div>
                 <h3 className="text-heading-3 font-semibold mb-3">Веб-платформа</h3>
                 <p className="text-body-3 text-(--on-bg-medium) flex-1">
@@ -296,6 +380,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
                 </p>
               </Card>
             </ScrollReveal>
+
           </div>
         </Container>
       </section>

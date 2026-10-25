@@ -37,6 +37,12 @@ def _to_response(tm: TeamMember, user: Optional[User]) -> TeamMemberWithUser:
         user_username=user.username if user else None,
         user_avatar_url=user.avatar_url if user else None,
         user_bio=user.bio if user else None,
+        location=tm.location,
+        expert_tags=tm.expert_tags,
+        expert_socials=tm.expert_socials,
+        expert_stats=tm.expert_stats,
+        expert_skills=tm.expert_skills,
+        expert_milestones=tm.expert_milestones,
     )
 
 
@@ -79,6 +85,18 @@ def make_team_member(
             existing.cover_url = payload.cover_url
         if payload.sort_order is not None:
             existing.sort_order = payload.sort_order
+        if payload.location is not None:
+            existing.location = payload.location
+        if payload.expert_tags is not None:
+            existing.expert_tags = payload.expert_tags
+        if payload.expert_socials is not None:
+            existing.expert_socials = payload.expert_socials
+        if payload.expert_stats is not None:
+            existing.expert_stats = payload.expert_stats
+        if payload.expert_skills is not None:
+            existing.expert_skills = payload.expert_skills
+        if payload.expert_milestones is not None:
+            existing.expert_milestones = payload.expert_milestones
         db.commit()
         db.refresh(existing)
         return _to_response(existing, user)
@@ -89,6 +107,12 @@ def make_team_member(
         cover_url=payload.cover_url,
         sort_order=payload.sort_order or 0,
         is_active=True,
+        location=payload.location,
+        expert_tags=payload.expert_tags,
+        expert_socials=payload.expert_socials,
+        expert_stats=payload.expert_stats,
+        expert_skills=payload.expert_skills,
+        expert_milestones=payload.expert_milestones,
     )
     db.add(tm)
     db.commit()

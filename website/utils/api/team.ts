@@ -1,5 +1,35 @@
 import { $fetch } from "@/utils/fetch";
 
+// ── Expert-profile shapes (JSON columns on team_members) ────────────
+// `icon_key` / `kind` are string keys the frontend maps to React
+// components via components/icons/expert-icon-map.tsx. Never store
+// rendered markup or component names in the DB.
+export interface ExpertTag {
+  label: string;
+  icon_key?: string | null;
+}
+
+export interface ExpertSocial {
+  kind: string; // "telegram" | "vk" | "github" | "dprofile" | "behance" | "website"
+  href: string;
+}
+
+export interface ExpertStat {
+  value: string;
+  label: string;
+}
+
+export interface ExpertSkill {
+  label: string;
+  level: number; // 0-100
+}
+
+export interface ExpertMilestone {
+  year: string;
+  title: string;
+  body: string;
+}
+
 export interface TeamMemberPublic {
   id: string;
   user_id: string;
@@ -7,6 +37,12 @@ export interface TeamMemberPublic {
   bio?: string | null;
   cover_url?: string | null;
   sort_order: number;
+  location?: string | null;
+  expert_tags?: ExpertTag[] | null;
+  expert_socials?: ExpertSocial[] | null;
+  expert_stats?: ExpertStat[] | null;
+  expert_skills?: ExpertSkill[] | null;
+  expert_milestones?: ExpertMilestone[] | null;
 }
 
 export interface TeamMemberAdmin extends TeamMemberPublic {
@@ -92,6 +128,13 @@ export async function updateTeamMember(
     /** Applied to the linked user. Required for the member to appear on
      *  /about and to have a working /<username> profile. */
     username?: string | null;
+    // Expert-profile fields. `undefined` = leave unchanged; [] = clear.
+    location?: string | null;
+    expert_tags?: ExpertTag[] | null;
+    expert_socials?: ExpertSocial[] | null;
+    expert_stats?: ExpertStat[] | null;
+    expert_skills?: ExpertSkill[] | null;
+    expert_milestones?: ExpertMilestone[] | null;
   }
 ): Promise<TeamMemberAdmin> {
   const res = await $fetch(`/api/v1/admin/team/users/${userId}`, {

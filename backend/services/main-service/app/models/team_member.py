@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Boolean, Text
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, Boolean, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from database.database import Base
 
@@ -18,6 +18,16 @@ class TeamMember(Base):
     # 21:8 wide banner used as the expert-page hero background. If unset, the
     # page falls back to the user's 1:1 avatar.
     cover_url = Column(String, nullable=True)
+    # Expert-profile fields, editable via /app/profile (self) or
+    # /admin/team (admin). Stored as JSON because each is a small ordered
+    # list - no joins, no separate CRUD. Icon/social "kind" is a string
+    # KEY the frontend maps to a component; never store rendered markup.
+    location = Column(String, nullable=True)
+    expert_tags = Column(JSON, nullable=True)
+    expert_socials = Column(JSON, nullable=True)
+    expert_stats = Column(JSON, nullable=True)
+    expert_skills = Column(JSON, nullable=True)
+    expert_milestones = Column(JSON, nullable=True)
     sort_order = Column(Integer, default=0)
     # Soft-remove: an admin can take someone off the team without deleting
     # the row, so their published articles keep pointing at a team record.

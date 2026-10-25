@@ -25,6 +25,11 @@ import {
 import { cn } from "@/lib/utils";
 import type { TeamMemberAdmin, TeamMemberProject, ProjectPickerItem } from "@/utils/api/team";
 import {
+  ExpertEditor,
+  EMPTY_EXPERT_FIELDS,
+  type ExpertFieldsValue,
+} from "@/components/editor/expert-editor";
+import {
   updateTeamMember,
   fetchTeamMemberProjects,
   setTeamMemberProjects,
@@ -52,6 +57,7 @@ export function TeamMemberEditorDialog({
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [expert, setExpert] = useState<ExpertFieldsValue>(EMPTY_EXPERT_FIELDS);
 
   // -- Project pinning state --
   const [projects, setProjects] = useState<TeamMemberProject[]>([]);
@@ -69,6 +75,14 @@ export function TeamMemberEditorDialog({
     setCoverUrl(member.cover_url || "");
     setSortOrder(member.sort_order ?? 0);
     setIsActive(member.is_active);
+    setExpert({
+      location: member.location || "",
+      expert_tags: member.expert_tags || [],
+      expert_socials: member.expert_socials || [],
+      expert_stats: member.expert_stats || [],
+      expert_skills: member.expert_skills || [],
+      expert_milestones: member.expert_milestones || [],
+    });
     setPickerOpen(false);
     setProjectSearch("");
   }, [member]);
@@ -160,6 +174,12 @@ export function TeamMemberEditorDialog({
         is_active: isActive,
         // Sent even when empty so the admin can intentionally clear it.
         username: username.trim() || null,
+        location: expert.location.trim() || null,
+        expert_tags: expert.expert_tags,
+        expert_socials: expert.expert_socials,
+        expert_stats: expert.expert_stats,
+        expert_skills: expert.expert_skills,
+        expert_milestones: expert.expert_milestones,
       });
       await setTeamMemberProjects(
         member.user_id,

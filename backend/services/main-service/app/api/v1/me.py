@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from app.models.user import User
 from app.models.client import Client
@@ -32,6 +32,14 @@ class UserUpdateRequest(BaseModel):
     team_role: Optional[str] = Field(None, min_length=1, max_length=120)
     team_bio: Optional[str] = None
     team_cover_url: Optional[str] = None
+    # Expert-profile fields. Follow the same "team_*" prefix as the other
+    # team-member-only fields above. `None` = leave unchanged; [] = clear.
+    team_location: Optional[str] = None
+    team_expert_tags: Optional[List[Dict[str, Any]]] = None
+    team_expert_socials: Optional[List[Dict[str, Any]]] = None
+    team_expert_stats: Optional[List[Dict[str, Any]]] = None
+    team_expert_skills: Optional[List[Dict[str, Any]]] = None
+    team_expert_milestones: Optional[List[Dict[str, Any]]] = None
 
     @field_validator("username")
     @classmethod
@@ -75,6 +83,12 @@ def _serialize_me(db: Session, user: User) -> dict:
                 "bio": tm.bio,
                 "cover_url": tm.cover_url,
                 "sort_order": tm.sort_order,
+                "location": tm.location,
+                "expert_tags": tm.expert_tags,
+                "expert_socials": tm.expert_socials,
+                "expert_stats": tm.expert_stats,
+                "expert_skills": tm.expert_skills,
+                "expert_milestones": tm.expert_milestones,
             }
             if tm
             else None
@@ -102,6 +116,12 @@ async def update_me(
     team_role = update_data.pop("team_role", None)
     team_bio = update_data.pop("team_bio", None)
     team_cover_url = update_data.pop("team_cover_url", None)
+    team_location = update_data.pop("team_location", None)
+    team_expert_tags = update_data.pop("team_expert_tags", None)
+    team_expert_socials = update_data.pop("team_expert_socials", None)
+    team_expert_stats = update_data.pop("team_expert_stats", None)
+    team_expert_skills = update_data.pop("team_expert_skills", None)
+    team_expert_milestones = update_data.pop("team_expert_milestones", None)
 
     # Username uniqueness check if it's changing.
     if "username" in update_data and update_data["username"] != current_user.username:
@@ -132,6 +152,18 @@ async def update_me(
             tm.bio = team_bio
         if team_cover_url is not None:
             tm.cover_url = team_cover_url
+        if team_location is not None:
+            tm.location = team_location or None
+        if team_expert_tags is not None:
+            tm.expert_tags = team_expert_tags
+        if team_expert_socials is not None:
+            tm.expert_socials = team_expert_socials
+        if team_expert_stats is not None:
+            tm.expert_stats = team_expert_stats
+        if team_expert_skills is not None:
+            tm.expert_skills = team_expert_skills
+        if team_expert_milestones is not None:
+            tm.expert_milestones = team_expert_milestones
 
     db.commit()
     db.refresh(current_user)

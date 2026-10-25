@@ -16,6 +16,11 @@ import { toast } from "sonner";
 import { updateProfile } from "@/utils/api/user";
 import { cn } from "@/lib/utils";
 import { UserIcon, ArrowUpRightIcon } from "@phosphor-icons/react";
+import {
+  ExpertEditor,
+  EMPTY_EXPERT_FIELDS,
+  type ExpertFieldsValue,
+} from "@/components/editor/expert-editor";
 
 const BIO_LIMIT = 64;
 
@@ -48,6 +53,8 @@ export default function ProfilePage() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [expertFields, setExpertFields] =
+    useState<ExpertFieldsValue>(EMPTY_EXPERT_FIELDS);
 
   useEffect(() => {
     if (!user) return;
@@ -62,6 +69,14 @@ export default function ProfilePage() {
       team_role: user.team_member?.role || "",
       team_bio: user.team_member?.bio || "",
       team_cover_url: user.team_member?.cover_url || "",
+    });
+    setExpertFields({
+      location: user.team_member?.location || "",
+      expert_tags: user.team_member?.expert_tags || [],
+      expert_socials: user.team_member?.expert_socials || [],
+      expert_stats: user.team_member?.expert_stats || [],
+      expert_skills: user.team_member?.expert_skills || [],
+      expert_milestones: user.team_member?.expert_milestones || [],
     });
   }, [user]);
 
@@ -85,6 +100,12 @@ export default function ProfilePage() {
             team_role: form.team_role,
             team_bio: form.team_bio,
             team_cover_url: form.team_cover_url,
+            team_location: expertFields.location,
+            team_expert_tags: expertFields.expert_tags,
+            team_expert_socials: expertFields.expert_socials,
+            team_expert_stats: expertFields.expert_stats,
+            team_expert_skills: expertFields.expert_skills,
+            team_expert_milestones: expertFields.expert_milestones,
           }
           : {}),
       });
@@ -318,6 +339,27 @@ export default function ProfilePage() {
               )}
             </Field>
           </Card>
+        )}
+
+        {/* ══════════ Expert-profile enrichment ══════════ */}
+        {isTeam && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-heading-2">Профиль эксперта</h2>
+                <p className="text-body-4 text-(--on-bg-medium) mt-1">
+                  Данные, которые показываются на публичной странице
+                  {" "}
+                  <code className="font-mono">/{form.username || "username"}</code>.
+                </p>
+              </div>
+            </div>
+            <ExpertEditor
+              value={expertFields}
+              onChange={setExpertFields}
+              disabled={!isEditing}
+            />
+          </div>
         )}
       </div>
     </CheckUser>
