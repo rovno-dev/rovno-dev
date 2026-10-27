@@ -245,6 +245,13 @@ export interface PublicTeamMember {
   short_bio: string | null;
   sort_order: number;
   project_count: number;
+  // Expert page enrichment fields
+  location?: string | null;
+  expert_tags?: ExpertTag[] | null;
+  expert_socials?: ExpertSocial[] | null;
+  expert_stats?: ExpertStat[] | null;
+  expert_skills?: ExpertSkill[] | null;
+  expert_milestones?: ExpertMilestone[] | null;
 }
 
 export async function fetchPublicTeamServer(): Promise<PublicTeamMember[]> {
