@@ -1,4 +1,11 @@
 import { $fetch } from "@/utils/fetch";
+import type {
+  ExpertTag,
+  ExpertSocial,
+  ExpertStat,
+  ExpertSkill,
+  ExpertMilestone,
+} from "@/utils/api/team";
 
 export interface TeamMemberBrief {
   id: string;
@@ -6,6 +13,12 @@ export interface TeamMemberBrief {
   bio?: string | null;
   cover_url?: string | null;
   sort_order: number;
+  location?: string | null;
+  expert_tags?: ExpertTag[] | null;
+  expert_socials?: ExpertSocial[] | null;
+  expert_stats?: ExpertStat[] | null;
+  expert_skills?: ExpertSkill[] | null;
+  expert_milestones?: ExpertMilestone[] | null;
 }
 
 export interface UserProfile {
@@ -37,6 +50,12 @@ export interface UpdateProfilePayload {
   team_role?: string;
   team_bio?: string;
   team_cover_url?: string;
+  team_location?: string;
+  team_expert_tags?: ExpertTag[];
+  team_expert_socials?: ExpertSocial[];
+  team_expert_stats?: ExpertStat[];
+  team_expert_skills?: ExpertSkill[];
+  team_expert_milestones?: ExpertMilestone[];
 }
 
 export async function updateProfile(data: UpdateProfilePayload): Promise<UserProfile> {

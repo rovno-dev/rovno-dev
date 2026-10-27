@@ -6,7 +6,6 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import {
   ArrowUpRight,
-  Star,
   Users,
   Code,
   Palette,
@@ -47,10 +46,7 @@ function AboutHero() {
       />
       <Container className="relative">
         <div className="max-w-[900px] animate-reveal">
-          <p className="text-body-5 uppercase tracking-[0.34em] text-(--on-bg-low) mb-5">
-            Rovno.dev · О нас
-          </p>
-          <h1 className="text-display-2 md:text-display-0 text-(--on-bg-high) mb-8 leading-[0.98] tracking-[-0.03em]">
+          <h1 className="text-display-3 md:text-display-1 text-(--on-bg-high) mb-8 leading-[1.05] tracking-[-0.03em]">
             Создаём цифровые продукты, <br />
             <span className="text-(--primary)">которые меняют правила.</span>
           </h1>
@@ -96,17 +92,11 @@ function ValuesSection() {
       <section className="py-20 md:py-28">
         <Container>
           <div className="mb-12 md:mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="h-px w-8 bg-(--primary)" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-(--on-bg-low)">
-                Принципы
-              </span>
-            </div>
-            <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight max-w-[700px]">
+            <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight max-w-[700px]">
               Четыре вещи, которые мы не готовы менять.
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {VALUES.map((v, i) => {
               const Icon = v.icon;
               return (
@@ -178,8 +168,9 @@ function ExpertCard({
                 src={avatar}
                 alt={displayName}
                 fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                unoptimized
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card) flex items-center justify-center">
@@ -229,20 +220,9 @@ function ExpertsSection({ members }: { members: PublicTeamMember[] }) {
       <Container>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
           <div className="max-w-[640px]">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="h-px w-8 bg-(--primary)" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-(--on-bg-low)">
-                Команда
-              </span>
-            </div>
-            <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight mb-4">
+            <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight">
               Наши эксперты
             </h2>
-            <p className="text-body-2 text-(--on-bg-medium) leading-relaxed">
-              {members.length > 0
-                ? "Команда специалистов, объединивших свои усилия для создания исключительных решений."
-                : "Команда скоро появится здесь."}
-            </p>
           </div>
           <Button
             variant="glass"
@@ -275,10 +255,10 @@ function ExpertsSection({ members }: { members: PublicTeamMember[] }) {
         ) : (
           <div
             className={`grid grid-cols-1 sm:grid-cols-2 ${members.length >= 4
-                ? "lg:grid-cols-4"
-                : members.length === 3
-                  ? "lg:grid-cols-3"
-                  : "lg:grid-cols-2"
+              ? "lg:grid-cols-4"
+              : members.length === 3
+                ? "lg:grid-cols-3"
+                : "lg:grid-cols-2"
               } gap-6 md:gap-8`}
           >
             {members.map((m, idx) => (
@@ -349,30 +329,28 @@ const PROCESS = [
 function ProcessSection() {
   return (
     <ScrollReveal threshold={0.05}>
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 overflow-hidden">
         <Container>
           <div className="mb-12 md:mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="h-px w-8 bg-(--primary)" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-(--on-bg-low)">
-                Как мы работаем
-              </span>
-            </div>
-            <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight max-w-[700px]">
+            <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight max-w-[700px]">
               Четыре шага от идеи до релиза.
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-(--outline) border border-(--outline) rounded-3xl overflow-hidden">
-            {PROCESS.map((step) => (
-              <div
-                key={step.n}
-                className="group relative bg-(--bg) p-8 md:p-10 min-h-[280px] flex flex-col justify-between transition-colors hover:bg-(--card)"
-              >
-                <span className="font-mono text-5xl md:text-6xl font-black leading-none text-(--primary) tabular-nums">
-                  {step.n}
-                </span>
-                <div>
-                  <h3 className="text-xl md:text-2xl font-heading font-semibold mb-3 tracking-tight">
+
+          {/* Mobile: Vertical Timeline */}
+          <div className="flex flex-col md:hidden relative pb-4">
+            {PROCESS.map((step, idx) => (
+              <div key={step.n} className="relative flex gap-6 pb-10 last:pb-0">
+                <div className="flex flex-col items-center">
+                  <div className="size-12 rounded-full bg-(--bg) border-2 border-(--primary) flex items-center justify-center z-10 shrink-0 shadow-[0_0_0_4px_var(--bg)]">
+                    <span className="font-mono text-lg font-black text-(--primary)">{step.n}</span>
+                  </div>
+                  {idx !== PROCESS.length - 1 && (
+                    <div className="w-[2px] flex-1 bg-(--outline) mt-2" />
+                  )}
+                </div>
+                <div className="pt-2 pr-4">
+                  <h3 className="text-xl font-heading font-semibold mb-3 tracking-tight">
                     {step.title}
                   </h3>
                   <p className="text-body-4 text-(--on-bg-medium) leading-relaxed">
@@ -381,6 +359,33 @@ function ProcessSection() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Desktop: Horizontal Timeline */}
+          <div className="hidden md:block relative w-full max-w-5xl mx-auto py-8">
+            <div className="px-8 relative">
+              <div className="absolute top-[138px] left-[10%] right-[10%] h-[2px] bg-(--outline) -translate-y-1/2" />
+              <div className="flex justify-between">
+                {PROCESS.map((step) => (
+                  <div key={step.n} className="relative flex flex-col items-center w-1/4 group">
+                    <div className="flex flex-col items-center h-32 justify-end pb-6 text-center px-2">
+                      <div className="font-mono text-4xl md:text-5xl font-black text-(--primary) mb-3 leading-none">
+                        {step.n}
+                      </div>
+                      <h3 className="text-lg md:text-xl font-heading font-semibold tracking-tight">
+                        {step.title}
+                      </h3>
+                    </div>
+                    <div className="relative z-10 size-5 rounded-full bg-(--bg) border-[3px] border-(--primary) group-hover:bg-(--primary) transition-colors shadow-[0_0_0_6px_var(--bg)]" />
+                    <div className="pt-6 text-center px-4">
+                      <p className="text-body-4 text-(--on-bg-medium) leading-relaxed">
+                        {step.body}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </Container>
       </section>
@@ -404,13 +409,7 @@ function AboutCTA() {
               }}
             />
             <div className="relative max-w-2xl mx-auto">
-              <div className="inline-flex items-center gap-2 mb-6">
-                <Star className="size-4 text-(--primary)" weight="fill" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-(--on-bg-low)">
-                  Начнём?
-                </span>
-              </div>
-              <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight mb-6 leading-[1.05]">
+              <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight mb-6 leading-[1.05]">
                 Есть задача, <br />
                 с которой мы справимся?
               </h2>

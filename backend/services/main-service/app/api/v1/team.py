@@ -43,6 +43,12 @@ def _serialize_member(tm: TeamMember, user: Optional[User], count: int = 0):
         surname=(user.surname if user else None),
         avatar_url=(user.avatar_url if user else None),
         short_bio=(user.bio if user else None),
+        location=tm.location,
+        expert_tags=tm.expert_tags,
+        expert_socials=tm.expert_socials,
+        expert_stats=tm.expert_stats,
+        expert_skills=tm.expert_skills,
+        expert_milestones=tm.expert_milestones,
         project_count=count,
     )
 

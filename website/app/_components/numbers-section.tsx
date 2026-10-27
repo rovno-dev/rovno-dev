@@ -94,13 +94,20 @@ function SpotlightCard({ children, color }: { children: React.ReactNode; color: 
 export default function NumbersSection() {
   const { t } = useLanguage();
   const { ref: sectionRef, inView } = useInView({ threshold: 0.1 });
-  
+
   const stats = [
     {
       number: t("home.stats_team_number"),
       description: t("home.stats_team_experience"),
       buttonText: t("home.stats_team_btn"),
       href: "/team",
+      color: "var(--primary)",
+    },
+    {
+      number: t("home.stats_spec_number"),
+      description: t("home.stats_spec_prep"),
+      buttonText: t("home.stats_spec_btn"),
+      href: "/order",
       color: "var(--primary)",
     },
     {
@@ -117,13 +124,6 @@ export default function NumbersSection() {
       href: "/reviews",
       color: "var(--primary)",
     },
-    {
-      number: t("home.stats_spec_number"),
-      description: t("home.stats_spec_prep"),
-      buttonText: t("home.stats_spec_btn"),
-      href: "/order",
-      color: "var(--primary)",
-    },
   ];
 
   return (
@@ -132,7 +132,7 @@ export default function NumbersSection() {
         <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-left sm:text-center text-(--on-bg-high)">
           {t("home.numbers_title")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
           {stats.map((stat, idx) => (
             <SpotlightCard key={idx} color={stat.color}>
               <NumberDisplay value={stat.number} active={inView} />
