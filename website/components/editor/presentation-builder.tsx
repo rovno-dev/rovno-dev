@@ -14,7 +14,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { LiveProvider, LiveError, LivePreview } from "react-live";
-import Editor, { useMonaco } from "@monaco-editor/react";
+// import Editor, { useMonaco } from "@monaco-editor/react";
 import { SlideRenderer } from "@/components/presentation/slide-renderer";
 import { tsxScope } from "@/components/presentation/tsx-scope";
 import { SLIDE_META } from "@/components/presentation/registry";
@@ -120,26 +120,26 @@ export function PresentationBuilder({ initial, onSave }: { initial: Presentation
   const [description, setDescription] = useState(initial?.description || "");
   const [startsAt, setStartsAt] = useState<Date | undefined>(initial?.starts_at ? new Date(initial.starts_at) : undefined);
   const [endsAt, setEndsAt] = useState<Date | undefined>(initial?.ends_at ? new Date(initial.ends_at) : undefined);
-  
+
   const [slides, setSlides] = useState<Slide[]>(initial?.slides || []);
   const [customTsx, setCustomTsx] = useState(initial?.custom_tsx || DEFAULT_TSX);
   const [activeIdx, setActiveIdx] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
-  
+
   const [viewMode, setViewMode] = useState<"visual" | "code">("visual");
   const [codeViewMode, setCodeViewMode] = useState<CodeViewMode>("split");
   const [copied, setCopied] = useState(false);
 
-  const monaco = useMonaco();
+  // const monaco = useMonaco();
 
-  // Register One Dark Pro theme when Monaco loads
-  useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme("one-dark-pro", ONE_DARK_PRO_THEME as any);
-      monaco.editor.setTheme("one-dark-pro");
-    }
-  }, [monaco]);
+  // // Register One Dark Pro theme when Monaco loads
+  // useEffect(() => {
+  //   if (monaco) {
+  //     monaco.editor.defineTheme("one-dark-pro", ONE_DARK_PRO_THEME as any);
+  //     monaco.editor.setTheme("one-dark-pro");
+  //   }
+  // }, [monaco]);
 
   const activeSlide = slides[activeIdx];
 
@@ -164,9 +164,9 @@ export function PresentationBuilder({ initial, onSave }: { initial: Presentation
 
   const updateTheme = (key: keyof SlideTheme, val: string) => {
     const next = [...slides];
-    next[activeIdx] = { 
-      ...activeSlide, 
-      theme: { ...(activeSlide.theme || { mode: "dark" }), [key]: val } 
+    next[activeIdx] = {
+      ...activeSlide,
+      theme: { ...(activeSlide.theme || { mode: "dark" }), [key]: val }
     };
     setSlides(next);
   };
@@ -297,31 +297,32 @@ ${DEFAULT_TSX}`;
                 {copied ? <Check className="size-3 mr-2 text-green-500" /> : <Copy className="size-3 mr-2" />}
                 Prompt
               </Button>
-              <Button size="small" onClick={() => { if(!isValidTsx(customTsx)) { toast.error("Security Error"); } else { toast.success("Code updated"); } }}>Update Preview</Button>
+              <Button size="small" onClick={() => { if (!isValidTsx(customTsx)) { toast.error("Security Error"); } else { toast.success("Code updated"); } }}>Update Preview</Button>
             </div>
           </div>
 
-          {/* Dynamic Layout Area */}
+          Dynamic Layout Area
           <div className="flex-1 flex min-h-0">
             {/* Editor Pane */}
             {(codeViewMode === "split" || codeViewMode === "code") && (
-              <div className={`flex flex-col min-w-0 bg-[#282c34] ${codeViewMode === "split" ? "w-1/2 border-r border-(--outline)" : "w-full"}`}>
-                <Editor
-                  height="100%"
-                  defaultLanguage="typescript"
-                  value={customTsx}
-                  onChange={(value: string | undefined) => setCustomTsx(value || "")}
-                  theme="one-dark-pro"
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    wordWrap: "on",
-                    scrollBeyondLastLine: false,
-                    padding: { top: 16, bottom: 16 },
-                    fontFamily: "var(--font-mono, monospace)",
-                  }}
-                />
-              </div>
+              <></>
+              // <div className={`flex flex-col min-w-0 bg-[#282c34] ${codeViewMode === "split" ? "w-1/2 border-r border-(--outline)" : "w-full"}`}>
+              //   <Editor
+              //     height="100%"
+              //     defaultLanguage="typescript"
+              //     value={customTsx}
+              //     onChange={(value: string | undefined) => setCustomTsx(value || "")}
+              //     theme="one-dark-pro"
+              //     options={{
+              //       minimap: { enabled: false },
+              //       fontSize: 14,
+              //       wordWrap: "on",
+              //       scrollBeyondLastLine: false,
+              //       padding: { top: 16, bottom: 16 },
+              //       fontFamily: "var(--font-mono, monospace)",
+              //     }}
+              //   />
+              // </div>
             )}
 
             {/* Preview Pane */}
@@ -361,7 +362,7 @@ ${DEFAULT_TSX}`;
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-admin">
               {slides.length === 0 && (
                 <p className="text-xs text-center text-(--on-bg-low) py-8">Нет слайдов</p>
@@ -429,15 +430,15 @@ ${DEFAULT_TSX}`;
                   <div className="space-y-2">
                     <label className="text-xs font-medium text-(--on-bg-medium)">Фоновый цвет</label>
                     <div className="flex gap-2">
-                       <Input type="color" value={activeSlide.theme?.bg || (activeSlide.theme?.mode === 'light' ? '#ffffff' : '#000000')} onChange={(e) => updateTheme("bg", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
-                       <Input value={activeSlide.theme?.bg || ""} onChange={(e) => updateTheme("bg", e.target.value)} placeholder="auto" className="flex-1 font-mono text-xs h-10" />
+                      <Input type="color" value={activeSlide.theme?.bg || (activeSlide.theme?.mode === 'light' ? '#ffffff' : '#000000')} onChange={(e) => updateTheme("bg", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
+                      <Input value={activeSlide.theme?.bg || ""} onChange={(e) => updateTheme("bg", e.target.value)} placeholder="auto" className="flex-1 font-mono text-xs h-10" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-medium text-(--on-bg-medium)">Бренд-цвет</label>
                     <div className="flex gap-2">
-                       <Input type="color" value={activeSlide.theme?.brand || '#CCFF00'} onChange={(e) => updateTheme("brand", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
-                       <Input value={activeSlide.theme?.brand || ""} onChange={(e) => updateTheme("brand", e.target.value)} placeholder="site default" className="flex-1 font-mono text-xs h-10" />
+                      <Input type="color" value={activeSlide.theme?.brand || '#CCFF00'} onChange={(e) => updateTheme("brand", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
+                      <Input value={activeSlide.theme?.brand || ""} onChange={(e) => updateTheme("brand", e.target.value)} placeholder="site default" className="flex-1 font-mono text-xs h-10" />
                     </div>
                   </div>
                 </div>
@@ -446,9 +447,9 @@ ${DEFAULT_TSX}`;
               {activeSlide.type !== "CustomTsx" && (
                 <div className="pt-4 border-t border-(--outline)">
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-(--on-bg-medium) mb-3">Фоновое изображение</h3>
-                  <ImageUploadField 
-                    value={activeSlide.content.image_url || ""} 
-                    onChange={(url) => updateSlide("image_url", url)} 
+                  <ImageUploadField
+                    value={activeSlide.content.image_url || ""}
+                    onChange={(url) => updateSlide("image_url", url)}
                     defaultAspect="16:9"
                   />
                 </div>
