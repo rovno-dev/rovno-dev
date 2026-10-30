@@ -57,3 +57,7 @@ We use a root `CHANGELOG.md` instead of a `VERSION` file.
 (cd website && npx tsc --noEmit)
 (cd tg-bot && pytest -q)
 ```
+
+### Other additionals
+
+Please stop adding subheaidngs (with number of card, desc, etc.) please.

@@ -1,4 +1,5 @@
 "use client";
+
 import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
@@ -41,13 +42,10 @@ export default function Header() {
   const isFullWidth =
     pathname?.startsWith("/admin") || pathname?.startsWith("/app/profile");
 
-  // Full URL in prod, path in dev.
   const adminHref = adminSecret
     ? crossSubdomainUrl("admin", `/${adminSecret}`)
     : null;
   const profileHref = crossSubdomainUrl("app", "/profile");
-
-  // Root-level links always go to the main domain.
   const rootLink = (path: string) => rootDomainUrl(path);
 
   return (
@@ -64,16 +62,10 @@ export default function Header() {
         rounded-full mx-4 sm:px-6 sm:mx-0 mt-2 h-[55px] sm:h-[80px] px-6
         "
       >
-        <div
-          className={cn(
-            isLoading || user ? "sm:justify-between" : "justify-between",
-            "w-full flex items-center gap-6",
-          )}
-        >
-          <Link href={logoHref}>
+        <div className="w-full flex items-center gap-6 justify-between">
+          <Link href={logoHref} className="shrink-0">
             <Logo className="!h-[24px] sm:h-[40px]" />
           </Link>
-
           <nav className="hidden lg:flex gap-4 text-sm">
             <NavLink href={rootLink(ROUTES.projects.href)}>
               {t("nav.projects")}
@@ -92,8 +84,8 @@ export default function Header() {
             </NavLink>
           </nav>
         </div>
-
-        <div className="flex items-center gap-1">
+        
+        <div className="flex items-center gap-2 shrink-0">
           <Button size={"small"} className="hidden md:flex" asChild>
             <Link href={rootLink(ROUTES.order.href)}>
               <Lightbulb />
@@ -101,54 +93,60 @@ export default function Header() {
             </Link>
           </Button>
 
-          <LanguageSwitcher />
-
-          {/* Unauthenticated CTAs. Sign in from lg upward; sign up only
-              from xl so the row never crowds on a 1024-1279px viewport. */}
-          {!isLoading && !user && (
-            <>
-              <Button size="small" variant="text" className="hidden lg:flex" asChild>
-                <Link href={rootLink("/login")}>{t("nav.login")}</Link>
-              </Button>
-              <Button size="small" className="hidden xl:flex" asChild>
-                <Link href={rootLink("/register")}>{t("nav.register")}</Link>
-              </Button>
-            </>
-          )}
+          {/* Language Switcher hidden on mobile */}
+          <div className="hidden sm:block">
+            <LanguageSwitcher />
+          </div>
 
           {isLoading ? (
-            <div className="ml-2 flex items-center">
-              <Skeleton className="size-8 rounded-full" />
-            </div>
-          ) : user ? (
-            <DropdownMenu>
+            <Skeleton className="size-9 rounded-full ml-1" />
+          ) : (
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button variant="text" size="icon-small" className="ml-2">
-                  <User className="stroke-primary" />
+                <Button 
+                  variant="glass" 
+                  size="icon-small" 
+                  shape="round" 
+                  className="ml-1 size-9 border-(--outline) hover:bg-(--state-hover)"
+                >
+                  <User className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href={profileHref} prefetch={false}>
-                    {t("nav.profile")}
-                  </Link>
-                </DropdownMenuItem>
-                {(user?.role === "admin" || user?.role === "root") &&
-                  adminHref && (
+                {user ? (
+                  <>
                     <DropdownMenuItem asChild>
-                      <Link href={adminHref}>{t("nav.admin")}</Link>
+                      <Link href={profileHref} prefetch={false}>
+                        {t("nav.profile")}
+                      </Link>
                     </DropdownMenuItem>
-                  )}
-                <DropdownMenuItem onClick={logout}>
-                  {t("nav.logout")}
-                </DropdownMenuItem>
+                    {(user?.role === "admin" || user?.role === "root") &&
+                      adminHref && (
+                        <DropdownMenuItem asChild>
+                          <Link href={adminHref}>{t("nav.admin")}</Link>
+                        </DropdownMenuItem>
+                      )}
+                    <DropdownMenuItem onClick={logout}>
+                      {t("nav.logout")}
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href={rootLink("/login")}>{t("nav.login")}</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={rootLink("/register")}>{t("nav.register")}</Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : null}
-
+          )}
+          
           <FloatingMenu
             position="top"
-            triggerClassName="hidden sm:flex lg:hidden"
+            triggerClassName="flex lg:hidden ml-1"
           />
         </div>
       </Container>

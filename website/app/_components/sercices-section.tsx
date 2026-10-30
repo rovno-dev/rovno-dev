@@ -1,216 +1,132 @@
-/// <reference types="@google/model-viewer" />
 "use client";
 
-import { useState, useEffect } from "react";
-import Script from "next/script";
-import { motion, useAnimationControls } from "motion/react";
 import { Container } from "@/components/ui/container";
-import { CodeIcon, DiamondIcon, SignatureIcon } from "@phosphor-icons/react";
-import { useLanguage } from "@/providers/language-provider";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
+import Link from "next/link";
 
-const serviceToModelPaths: Record<string, string> = {
-  "development": "/3d/code_icon.glb",
-  "motion": "/3d/3d_icon.glb",
-  "branding": "/3d/design_icon.glb",
-};
+const AuditIcon = () => (
+  <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="size-16 md:size-20">
+    <path d="M14 10H38L50 22V54H14V10Z" />
+    <path d="M38 10V22H50" />
+    <path d="M22 44V36M28 44V28M34 44V32M40 44V24" strokeWidth="1.5" />
+    <circle cx="32" cy="34" r="14" fill="var(--bg)" strokeWidth="2" />
+    <path d="M42 44L54 56" strokeWidth="3" />
+  </svg>
+);
 
-const cardVariants = {
-  center: { x: 0, y: 0, rotateZ: 0, scale: 1, zIndex: 30, opacity: 1 },
-  left: { x: -110, y: -10, rotateZ: -6, scale: 0.9, zIndex: 20, opacity: 0.6 },
-  right: { x: 110, y: -10, rotateZ: 6, scale: 0.9, zIndex: 20, opacity: 0.6 },
-};
+const DigitalizationIcon = () => (
+  <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="size-16 md:size-20">
+    <rect x="16" y="12" width="32" height="12" rx="2" fill="var(--bg)" />
+    <circle cx="22" cy="18" r="1.5" fill="currentColor" />
+    <circle cx="28" cy="18" r="1.5" fill="currentColor" />
+    <path d="M36 18H42" />
+    <rect x="16" y="26" width="32" height="12" rx="2" fill="var(--bg)" />
+    <circle cx="22" cy="32" r="1.5" fill="currentColor" />
+    <circle cx="28" cy="32" r="1.5" fill="currentColor" />
+    <path d="M36 32H42" />
+    <rect x="16" y="40" width="32" height="12" rx="2" fill="var(--bg)" />
+    <circle cx="22" cy="46" r="1.5" fill="currentColor" />
+    <circle cx="28" cy="46" r="1.5" fill="currentColor" />
+    <path d="M36 46H42" />
+    <path d="M8 18H16M48 18H56M8 32H16M48 32H56M8 46H16M48 46H56" strokeWidth="1.5" strokeDasharray="2 2" />
+    <path d="M8 18V46M56 18V46" strokeWidth="1" opacity="0.5" />
+    <path d="M32 52V58M32 6V12" />
+    <circle cx="32" cy="58" r="2" fill="currentColor" />
+    <circle cx="32" cy="6" r="2" fill="currentColor" />
+  </svg>
+);
 
-function ServiceCard({
-  service, isActive, position, onClick, Icon, modelPath, modelViewerLoaded, ModelViewerElement, t, lang, handleSwipe
-}: any) {
+const StartupIcon = () => (
+  <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="size-16 md:size-20">
+    <path d="M32 8C32 8 44 18 44 36C44 44 38 52 32 56C26 52 20 44 20 36C20 18 32 8 32 8Z" fill="var(--bg)" />
+    <circle cx="32" cy="26" r="6" />
+    <circle cx="32" cy="26" r="2.5" fill="currentColor" />
+    <path d="M20 36L10 44V52L20 46" />
+    <path d="M44 36L54 44V52L44 46" />
+    <path d="M26 52L32 60L38 52" />
+    <path d="M29 52L32 56L35 52" strokeWidth="1" opacity="0.5" />
+    <path d="M14 26H6M14 30H4M50 26H58M50 30H60" strokeWidth="1" opacity="0.5" />
+    <path d="M48 12L50 16L54 18L50 20L48 24L46 20L42 18L46 16L48 12Z" fill="currentColor" />
+    <path d="M12 16L14 18L16 16L14 14L12 16Z" fill="currentColor" />
+    <path d="M54 32L56 34L58 32L56 30L54 32Z" fill="currentColor" />
+  </svg>
+);
+
+const SERVICES = [
+  {
+    id: "01",
+    title: "Аудит",
+    description:
+      "Детально проверим инфраструктуру, найдём слабые места и подскажем как действовать дальше. Подготовим детальный план и ТЗ под подходящую технологию и функционал.",
+    icon: <AuditIcon />,
+  },
+  {
+    id: "02",
+    title: "Цифровизация",
+    description:
+      "Автоматизируем процессы, разработаем цифровые продукты под нужные задачи и будем заниматься тем, чтобы работа инфраструктуры никогда не останавливалась.",
+    icon: <DigitalizationIcon />,
+  },
+  {
+    id: "03",
+    title: "Стартап",
+    description:
+      "Реализуем цифровой продукт, поможем выйграть инвестиционные раунды или просто протестируем идею для вашего стартапа.",
+    icon: <StartupIcon />,
+  },
+];
+
+export default function ServicesSection() {
   return (
-    <motion.div
-      drag={isActive ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.9}
-      onDragEnd={(e, info) => {
-        const swipeThreshold = 80;
-        if (info.offset.x > swipeThreshold) handleSwipe("right");
-        else if (info.offset.x < -swipeThreshold) handleSwipe("left");
-      }}
-      animate={position}
-      variants={cardVariants}
-      transition={{ type: "spring", stiffness: 300, damping: 30, mass: 0.8 }}
-      onClick={onClick}
-      className={cn(
-        "absolute w-full max-w-[900px] h-auto min-h-[500px] md:h-[500px] rounded-[32px] cursor-grab active:cursor-grabbing select-none overflow-hidden flex flex-col",
-        "bg-(--card) border border-(--outline) shadow-xl",
-        "touch-pan-y"
-      )}
-      style={{ transformOrigin: "bottom center" }}
-    >
-      {/* Paper texture overlay (adapts to light/dark) */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05] dark:opacity-[0.08] mix-blend-multiply dark:mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+    <section className="bg-(--bg) text-(--on-bg-high) py-24 md:py-32 pb-40 md:pb-32">
+      <Container>
+        <div className="flex flex-col gap-16 md:gap-24">
 
-      <div className="relative z-10 flex flex-col md:flex-row h-full w-full">
-        
-        {/* Top / Left Side: Text Content */}
-        <div className="flex flex-col p-6 sm:p-8 md:p-12 w-full md:w-1/2 flex-1 md:flex-none pointer-events-none">
-          <p className="text-xl md:text-2xl text-(--on-bg-low) mb-6 font-medium">
-            {lang === 'ru' ? 'Мы делаем...' : 'We do...'}
-          </p>
-          
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-(--bg) flex items-center justify-center border border-(--outline) shrink-0">
-              <Icon className="w-6 h-6 md:w-7 md:h-7 text-(--primary)" />
-            </div>
-            <h1 className="text-display-1 text-[2rem] sm:text-[2.5rem] md:text-[2.5rem] lg:text-[3rem] leading-tight tracking-tight text-(--on-bg-high)">
-              {service.title}
-            </h1>
-          </div>
+          {/* Section Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words"
+          >
+            Услуги
+          </motion.h2>
 
-          <div className="flex flex-wrap gap-2 mb-8">
-            {service.services.map((s: string) => (
-              <Badge variant="outlined-static" key={s} className="bg-(--bg) border-(--outline) text-(--on-bg-medium)">
-                {s}
-              </Badge>
+          {/* Responsive Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-(--outline)">
+            {SERVICES.map((service, index) => (
+              <Link
+                key={service.id}
+                href="/order"
+                className={`group relative flex flex-col justify-start p-8 md:p-12 lg:p-16 transition-colors duration-500 hover:bg-(--card) focus-visible:bg-(--card) outline-none h-full min-h-[400px] md:min-h-[500px] border-r border-b border-(--outline) ${index === 2 ? "md:col-span-2 lg:col-span-1" : ""
+                  }`}
+              >
+                {/* Top Row: Custom Icon + Arrow */}
+                <div className="flex justify-between items-start w-full mb-16 md:mb-24 shrink-0">
+                  <div className="opacity-80 group-hover:opacity-100 transition-opacity">
+                    {service.icon}
+                  </div>
+                  <div className="flex items-center justify-center size-10 md:size-12 rounded-none border border-(--outline) bg-(--bg) group-hover:bg-(--primary) group-hover:border-(--primary) group-hover:text-(--on-primary) transition-all duration-300">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-4 md:size-5">
+                      <path d="M2.5 12.5L12.5 2.5M12.5 2.5H4.5M12.5 2.5V10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Bottom Row: Text Content */}
+                <div className="mt-auto flex flex-col gap-4">
+                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-sans font-medium tracking-tight">
+                    {service.title}
+                  </h3>
+                  <p className="text-(--on-bg-medium) text-base md:text-lg leading-relaxed max-w-md">
+                    {service.description}
+                  </p>
+                </div>
+              </Link>
             ))}
           </div>
 
-          <div className="flex flex-row items-center gap-8 md:gap-12 mt-auto pb-4">
-            <div className="flex flex-col">
-              <span className="text-xs uppercase tracking-widest text-(--on-bg-low) mb-1">{t("services.from")}</span>
-              <span className="text-xl md:text-2xl font-semibold text-(--on-bg-high)">{service.price.from} ₽</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs uppercase tracking-widest text-(--on-bg-low) mb-1">{t("services.avg_label")}</span>
-              <span className="text-xl md:text-2xl font-semibold text-(--on-bg-high)">{service.price.avg} ₽</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom / Right Side: 3D Viewer */}
-        <div className="relative w-full h-40 md:h-full md:w-1/2 rounded-b-[32px] md:rounded-r-[32px] md:rounded-bl-none overflow-hidden bg-(--bg-disabled) pointer-events-none shrink-0">
-          {modelViewerLoaded ? (
-            <ModelViewerElement
-              key={modelPath}
-              src={modelPath}
-              alt={`3D representative for ${service.title}`}
-              auto-rotate
-              camera-controls
-              interaction-prompt="none"
-              rotation-per-second="20deg"
-              style={{
-                width: '100%',
-                height: '100%',
-                '--poster-color': 'transparent',
-              } as React.CSSProperties}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-(--on-bg-low) animate-pulse text-xs">
-              Loading 3D...
-            </div>
-          )}
-          
-          {/* Gradient blend to hide the edge of the 3D viewer */}
-          <div className="hidden md:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-(--card) to-transparent" />
-          <div className="block md:hidden absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-(--card) to-transparent" />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-export default function ServicesSection() {
-  const { t, lang } = useLanguage();
-  const [modelViewerLoaded, setModelViewerLoaded] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const ModelViewerElement = 'model-viewer' as any;
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (customElements.get("model-viewer")) {
-      setModelViewerLoaded(true);
-      return;
-    }
-    let cancelled = false;
-    customElements.whenDefined("model-viewer").then(() => {
-      if (!cancelled) setModelViewerLoaded(true);
-    });
-    return () => { cancelled = true; };
-  }, []);
-
-  const services = [
-    {
-      id: "development",
-      title: t("services.web-development.short"),
-      description: t("services.web-development.desc"),
-      icon: CodeIcon,
-      services: [t("services.dev_sub1"), t("services.dev_sub2"), t("services.dev_sub3"), t("services.dev_sub4"), t("services.dev_sub5")],
-      price: { from: "75 000", avg: "250 000" },
-    },
-    {
-      id: "motion",
-      title: t("services.3d-motion.short"),
-      description: t("services.3d-motion.desc"),
-      icon: DiamondIcon,
-      services: [t("services.motion_sub1"), t("services.motion_sub2"), t("services.motion_sub3"), t("services.motion_sub4"), t("services.motion_sub5")],
-      price: { from: "45 000", avg: "100 000" },
-    },
-    {
-      id: "branding",
-      title: t("services.branding.short"),
-      description: t("services.branding.desc"),
-      icon: SignatureIcon,
-      services: [t("services.branding_sub1"), t("services.branding_sub2"), t("services.branding_sub3"), t("services.branding_sub4")],
-      price: { from: "75 000", avg: "150 000" },
-    },
-  ];
-
-  const handleSwipe = (direction: "left" | "right") => {
-    setSelectedIndex((prev) => {
-      if (direction === "right") return (prev + 1) % services.length;
-      return (prev - 1 + services.length) % services.length;
-    });
-  };
-
-  return (
-    <section className="relative py-16 lg:py-24 overflow-hidden text-on-bg-high min-h-[700px] flex items-center justify-center">
-      <Script
-        type="module"
-        src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"
-        strategy="afterInteractive"
-        onError={() => console.error("[model-viewer] CDN script failed to load")}
-      />
-      
-      <Container className="relative z-10 w-full flex justify-center px-4 md:px-0">
-        <div className="relative w-full max-w-[900px] h-[600px] flex items-center justify-center">
-          {services.map((service, index) => {
-            let offset = index - selectedIndex;
-            if (offset < -1) offset += services.length;
-            if (offset > 1) offset -= services.length;
-
-            const isActive = offset === 0;
-            const position = offset === 0 ? "center" : offset < 0 ? "left" : "right";
-            
-            const Icon = service.icon;
-            const modelPath = serviceToModelPaths[service.id] || "/3d/code_icon.glb";
-
-            return (
-              <ServiceCard
-                key={service.title}
-                service={service}
-                isActive={isActive}
-                position={position}
-                onClick={() => { if (!isActive) setSelectedIndex(index); }}
-                Icon={Icon}
-                modelPath={modelPath}
-                modelViewerLoaded={modelViewerLoaded}
-                ModelViewerElement={ModelViewerElement}
-                t={t}
-                lang={lang}
-                handleSwipe={handleSwipe}
-              />
-            );
-          })}
         </div>
       </Container>
     </section>

@@ -4,8 +4,9 @@ import ServicesSection from "./_components/sercices-section";
 import NumbersSection from "./_components/numbers-section";
 import SocialsSection from "./_components/socials-section";
 import CtaSection from "./_components/cta-section";
-import HeroSection from "./_components/hero-section";
+import VideoShowcaseSection from "./_components/video-showcase-section";
 import { fetchPublishedProjectsServer } from "@/utils/api/projects";
+import HeroSection from "./_components/hero-section";
 
 // Featured projects change rarely; a minute of ISR is plenty and keeps
 // the home route static-fast for repeat visitors.
@@ -32,8 +33,11 @@ export default async function Home() {
         <SocialsSection />
       </ScrollReveal>
       <ScrollReveal delay={200} threshold={0.05}>
-        <CtaSection />
+        <VideoShowcaseSection />
       </ScrollReveal>
+      {/* <ScrollReveal delay={250} threshold={0.05}>
+        <CtaSection />
+      </ScrollReveal> */}
     </>
   );
 }

@@ -1,18 +1,15 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ListIcon, X, User as UserIcon } from "@phosphor-icons/react";
+import { ListIcon, X, Lightbulb } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
-import { useUser } from "@/entities/user/model/user-context";
-import {
-  rootDomainUrl,
-  isAbsoluteUrl,
-  crossSubdomainUrl,
-} from "@/utils/root-domain";
+import { rootDomainUrl } from "@/utils/root-domain";
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "../language-switcher";
 
 interface FloatingMenuProps {
   position?: "top" | "bottom";
@@ -31,7 +28,6 @@ export function FloatingMenu({
 }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
-  const { user, isLoading } = useUser();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -63,9 +59,7 @@ export function FloatingMenu({
     };
   }, [open]);
 
-  // All root-level links go to the main domain
   const rootLink = (path: string) => rootDomainUrl(path);
-
   const links = [
     { href: rootLink(ROUTES.projects.href), label: t("nav.projects") },
     { href: rootLink(ROUTES.services.href), label: t("nav.services") },
@@ -74,14 +68,8 @@ export function FloatingMenu({
     { href: rootLink(ROUTES.blog.href), label: t("nav.blog") },
   ];
 
-  const loginHref = rootDomainUrl("/login");
-  const registerHref = rootDomainUrl("/register");
-  const loginIsAbsolute = isAbsoluteUrl(loginHref);
-  const registerIsAbsolute = isAbsoluteUrl(registerHref);
-  const profileHref = crossSubdomainUrl("app", "/profile");
-
   return (
-    <div ref={wrapperRef} className="contents">
+    <div ref={wrapperRef} className="relative flex items-center">
       <Button
         variant="text"
         shape={triggerShape}
@@ -98,21 +86,18 @@ export function FloatingMenu({
           <ListIcon className={triggerIconClassName} />
         )}
       </Button>
-
+      
       {open && (
         <div
           id="floating-menu-panel"
           className={cn(
-            "fixed left-2 right-2 sm:left-auto sm:right-6 sm:w-96 z-[60]",
-            "rounded-3xl border border-(--outline)",
-            "bg-(--card) shadow-2xl p-2",
-            "animate-in fade-in duration-200",
+            "z-[60] flex flex-col border border-(--outline) shadow-2xl backdrop-blur-2xl bg-(--card)/80",
             position === "bottom"
-              ? "bottom-32 slide-in-from-bottom-4"
-              : "top-24 slide-in-from-top-4",
+              ? "fixed inset-x-4 bottom-24 mx-auto max-w-sm rounded-[2rem] p-5 animate-in slide-in-from-bottom-6 fade-in duration-300"
+              : "absolute top-[calc(100%+16px)] right-0 w-64 rounded-3xl p-3 animate-in slide-in-from-top-4 fade-in duration-200"
           )}
         >
-          <nav className="flex flex-col">
+          <nav className="flex flex-col gap-1">
             {links.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -121,7 +106,7 @@ export function FloatingMenu({
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "px-4 py-2.5 rounded-2xl text-body-2 font-medium transition-colors",
+                    "px-4 py-3 rounded-2xl text-lg font-medium transition-colors",
                     isActive
                       ? "bg-(--primary-glass) text-(--primary)"
                       : "text-(--on-bg-high) hover:bg-(--state-hover)",
@@ -132,51 +117,23 @@ export function FloatingMenu({
               );
             })}
           </nav>
+          
+          {/* Mobile-only bottom section */}
+          {position === "bottom" && (
+            <div className="flex flex-col gap-4 pt-5 border-t border-(--outline) mt-4">
+              <div className="flex items-center justify-between px-2 py-2">
+                <span className="text-sm font-medium text-(--on-bg-medium)">
+                  {t("nav.language")}
+                </span>
+                <LanguageSwitcher />
+              </div>
 
-          {!isLoading && (
-            <div className="mt-1.5 pt-2 border-t border-(--outline)">
-              {user ? (
-                <Button
-                  variant="outlined"
-                  size="large"
-                  className="w-full"
-                  asChild
-                >
-                  <Link
-                    href={profileHref}
-                    prefetch={false}
-                    onClick={() => setOpen(false)}
-                  >
-                    <UserIcon className="size-4" />
-                    {t("nav.profile")}
-                  </Link>
-                </Button>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outlined" size="large" asChild>
-                    {loginIsAbsolute ? (
-                      <a href={loginHref} onClick={() => setOpen(false)}>
-                        {t("nav.login")}
-                      </a>
-                    ) : (
-                      <Link href={loginHref} onClick={() => setOpen(false)}>
-                        {t("nav.login")}
-                      </Link>
-                    )}
-                  </Button>
-                  <Button size="large" asChild>
-                    {registerIsAbsolute ? (
-                      <a href={registerHref} onClick={() => setOpen(false)}>
-                        {t("nav.register")}
-                      </a>
-                    ) : (
-                      <Link href={registerHref} onClick={() => setOpen(false)}>
-                        {t("nav.register")}
-                      </Link>
-                    )}
-                  </Button>
-                </div>
-              )}
+              <Button size="large" className="w-full rounded-xl" asChild>
+                <Link href={rootLink(ROUTES.order.href)} onClick={() => setOpen(false)}>
+                  <Lightbulb weight="fill" className="size-5" />
+                  {t("nav.order")}
+                </Link>
+              </Button>
             </div>
           )}
         </div>
