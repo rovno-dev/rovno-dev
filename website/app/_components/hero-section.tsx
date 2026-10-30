@@ -32,7 +32,7 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, scale: 0.94, filter: "blur(28px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
             className="relative flex items-center justify-center w-full"
           >
             <motion.div
@@ -46,7 +46,7 @@ export default function HeroSection() {
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{
-                  duration: 7,
+                  duration: 5,
                   ease: "easeInOut",
                   repeat: Infinity,
                   delay: 1.9,

@@ -20,11 +20,11 @@ const CANVAS = 320;
 
 function buildParticles(): Particle[] {
   const out: Particle[] = [];
-  const S = 2.0;
+  // Denser step for a sharper, more premium texture
+  const S = 1.8;
 
   const add = (x: number, y: number, alpha: number, size: number) => {
     const a = Math.random() * Math.PI * 2;
-    // Massively increased escape magnitude (100–160) to fill the outer square.
     const m = 100 + Math.random() * 60;
     out.push({
       x, y, vx: 0, vy: 0,
@@ -39,36 +39,35 @@ function buildParticles(): Particle[] {
   };
 
   // ── Left bracket [ ────────────────────────────────────────────────────
-  // Adjusted to match the visual weight of the provided logo reference.
-  const sx = 45;
-  const sw = 24;   // Spine thickness
+  const sx = 55;
+  const sw = 10;    // Thinner spine
   const sy = 30;
-  const bh = 260;  // Bracket height
-  const ah = 24;   // Arm thickness
-  const reach = 100; // How far the arms extend right (45 + 100 = 145)
+  const bh = 260;   // Keep tall
+  const ah = 10;    // Thinner arms
+  const reach = 45; // Shorter arm reach
 
-  // Spine (thick vertical on the left)
+  // Spine (thin vertical on the left)
   for (let y = sy; y <= sy + bh; y += S) {
     for (let dx = 0; dx < sw; dx += S) {
-      add(sx + dx, y, 1, 2.4);
+      add(sx + dx, y, 1, 2.2);
     }
   }
 
-  // Top arm (thick horizontal, extends right from spine)
+  // Top arm (short horizontal)
   for (let x = sx; x <= sx + reach; x += S) {
     for (let dy = 0; dy < ah; dy += S) {
-      add(x, sy + dy, 1, 2.4);
+      add(x, sy + dy, 1, 2.2);
     }
   }
 
-  // Bottom arm (same, mirrored y)
+  // Bottom arm (short horizontal)
   for (let x = sx; x <= sx + reach; x += S) {
     for (let dy = 0; dy < ah; dy += S) {
-      add(x, sy + bh - dy, 1, 2.4);
+      add(x, sy + bh - dy, 1, 2.2);
     }
   }
 
-  // ── Right bracket ] — exact mirror ───────────────────────────────────
+  // ── Right bracket ] ───────────────────────────────────────────────────
   const mirror = (x: number) => CANVAS - x;
   const n = out.length;
   for (let i = 0; i < n; i++) {
@@ -102,6 +101,7 @@ export function ParticleLogo({
   const targetHover = useRef(0);
   const envelope = useRef(0);
   const particles = useRef<Particle[]>([]);
+  const mouse = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
     particles.current = buildParticles();
@@ -142,7 +142,8 @@ export function ParticleLogo({
       last = now;
 
       const target = targetHover.current;
-      const rate = target > envelope.current ? 0.16 : 0.075;
+      // Very fast shatter, snappy return
+      const rate = target > envelope.current ? 0.35 : 0.15;
       envelope.current += (target - envelope.current) * rate * dt;
       const hv = envelope.current;
 
@@ -163,34 +164,48 @@ export function ParticleLogo({
 
       const t = now / 1000;
 
-      // Trails
+      // Pass 1: Trails (under dots)
       ctx.strokeStyle = color;
       ctx.lineCap = "round";
       for (const p of particles.current) {
         const speed = Math.hypot(p.vx, p.vy);
-        if (speed > 1.8 && hv > 0.05) {
-          ctx.globalAlpha = Math.min(0.28, hv * speed * 0.045);
-          ctx.lineWidth = p.size * 0.65;
+        if (speed > 1.5 && hv > 0.05) {
+          ctx.globalAlpha = Math.min(0.25, hv * speed * 0.04);
+          ctx.lineWidth = p.size * 0.6;
           ctx.beginPath();
-          ctx.moveTo(p.x - p.vx * 2.2, p.y - p.vy * 2.2);
+          ctx.moveTo(p.x - p.vx * 2.0, p.y - p.vy * 2.0);
           ctx.lineTo(p.x, p.y);
           ctx.stroke();
         }
       }
 
-      // Dots
+      // Pass 2: Dots
       ctx.fillStyle = color;
       for (const p of particles.current) {
         const tx = p.hx + p.ex * hv;
         const ty = p.hy + p.ey * hv;
 
-        const wob = hv * 4; // slightly more wobble when scattered
-        const dx = tx - p.x + Math.sin(t * p.freq + p.phase) * wob;
-        const dy = ty - p.y + Math.cos(t * p.freq + p.phase) * wob;
+        // Mouse repulsion (only active when scattered)
+        let mxForce = 0;
+        let myForce = 0;
+        if (hv > 0.1) {
+          const dx = p.x - mouse.current.x;
+          const dy = p.y - mouse.current.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 70) {
+            const force = (70 - dist) / 70;
+            mxForce = (dx / dist) * force * 4;
+            myForce = (dy / dist) * force * 4;
+          }
+        }
 
-        p.vx += dx * 0.075 * dt;
-        p.vy += dy * 0.075 * dt;
-        const damp = Math.pow(0.80 + hv * 0.06, dt);
+        const wob = hv * 3;
+        const dx = tx - p.x + Math.sin(t * p.freq + p.phase) * wob + mxForce;
+        const dy = ty - p.y + Math.cos(t * p.freq + p.phase) * wob + myForce;
+
+        p.vx += dx * 0.08 * dt;
+        p.vy += dy * 0.08 * dt;
+        const damp = Math.pow(0.82 + hv * 0.05, dt);
         p.vx *= damp;
         p.vy *= damp;
         p.x += p.vx * dt;
@@ -213,15 +228,23 @@ export function ParticleLogo({
     <div
       className={`relative cursor-pointer ${className}`}
       onMouseEnter={() => { targetHover.current = 1; }}
-      onMouseLeave={() => { targetHover.current = 0; }}
+      onMouseLeave={() => { 
+        targetHover.current = 0; 
+        mouse.current = { x: -1000, y: -1000 };
+      }}
     >
       <canvas
         ref={canvasRef}
+        onPointerMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          mouse.current = {
+            x: (e.clientX - rect.left) * (CANVAS / rect.width),
+            y: (e.clientY - rect.top) * (CANVAS / rect.height),
+          };
+        }}
         aria-hidden
         className="pointer-events-none w-full h-full"
         style={{
-          // Changed mask to a soft square fade instead of a circle,
-          // so the scattered particles form an outer square cloud.
           maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent), linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
           WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent), linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
           maskComposite: "intersect",
