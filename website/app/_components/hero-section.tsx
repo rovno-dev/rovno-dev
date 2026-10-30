@@ -36,9 +36,9 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-4xl"
+            className="max-w-lg"
           >
-            <p className="text-(--on-bg-high) text-heading-3">
+            <p className="text-(--on-bg-high) text-heading-2">
               Для тех, кому дороги. <span className="text-(--on-bg-medium)">
                 Cервисы будущего, использование ИИ приватно и эффективно и сервисы, радующие пользователей каждый день.
               </span>

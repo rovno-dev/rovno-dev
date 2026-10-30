@@ -78,7 +78,7 @@ const SERVICES = [
 
 export default function ServicesSection() {
   return (
-    <section className="bg-(--bg) text-(--on-bg-high) py-24 md:py-32 pb-40 md:pb-32">
+    <section className="bg-(--bg) text-(--on-bg-high) py-16 md:py-24">
       <Container>
         <div className="flex flex-col gap-16 md:gap-24">
 
@@ -103,7 +103,7 @@ export default function ServicesSection() {
                   }`}
               >
                 {/* Top Row: Custom Icon + Arrow */}
-                <div className="flex justify-between items-start w-full mb-16 md:mb-24 shrink-0">
+                <div className="flex justify-between items-start w-full mb-8 md:mb-12 shrink-0">
                   <div className="opacity-80 group-hover:opacity-100 transition-opacity">
                     {service.icon}
                   </div>
@@ -115,7 +115,7 @@ export default function ServicesSection() {
                 </div>
 
                 {/* Bottom Row: Text Content */}
-                <div className="mt-auto flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
                   <h3 className="text-3xl md:text-4xl lg:text-5xl font-sans font-medium tracking-tight">
                     {service.title}
                   </h3>

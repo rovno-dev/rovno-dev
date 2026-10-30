@@ -546,7 +546,7 @@ export function BreadProjectPage({
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button size="xlarge" asChild>
                 <Link href="/order">
-                  Оформить заказ
+                  Оставить заявку
                   <ArrowUpRight className="size-5" />
                 </Link>
               </Button>

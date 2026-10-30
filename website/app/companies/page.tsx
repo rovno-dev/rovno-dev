@@ -144,7 +144,7 @@ export default async function ClientsPage() {
                 </div>
                 <Button size="large" asChild className="shrink-0">
                   <Link href="/order">
-                    Оформить заказ
+                    Оставить заявку
                     <ArrowUpRight className="size-4" />
                   </Link>
                 </Button>

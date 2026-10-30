@@ -5,7 +5,7 @@ import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "./nav-link";
-import { Lightbulb, User } from "@phosphor-icons/react";
+import { User } from "@phosphor-icons/react";
 import { ROUTES } from "@/utils/constants/routes";
 import { useUser } from "@/entities/user/model/user-context";
 import { useState, useEffect } from "react";
@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { FloatingMenu } from "./floating-menu";
+import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
@@ -88,7 +89,7 @@ export default function Header() {
         <div className="flex items-center gap-2 shrink-0">
           <Button size={"small"} className="hidden md:flex" asChild>
             <Link href={rootLink(ROUTES.order.href)}>
-              <Lightbulb />
+              <TelemostStackIcon className="mr-1 -ml-1" />
               {t("nav.order")}
             </Link>
           </Button>
@@ -144,9 +145,10 @@ export default function Header() {
             </DropdownMenu>
           )}
           
+          {/* Hidden on mobile, visible on tablet */}
           <FloatingMenu
             position="top"
-            triggerClassName="flex lg:hidden ml-1"
+            triggerClassName="hidden md:flex lg:hidden ml-1"
           />
         </div>
       </Container>

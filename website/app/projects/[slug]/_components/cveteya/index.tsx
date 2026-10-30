@@ -332,7 +332,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <GlassButton href="/order" variant="dark">
-                  Оформить заказ
+                  Оставить заявку
                   <ArrowUpRight weight="bold" />
                 </GlassButton>
                 <GlassButton href="/projects">

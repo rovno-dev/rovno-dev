@@ -24,10 +24,10 @@ export default async function Home() {
         <ServicesSection />
       </ScrollReveal>
       <ScrollReveal threshold={0.05}>
-        <NumbersSection />
+        <BestWorksSection projects={projects} />
       </ScrollReveal>
       <ScrollReveal delay={100} threshold={0.05}>
-        <BestWorksSection projects={projects} />
+        <NumbersSection />
       </ScrollReveal>
       <ScrollReveal delay={150} threshold={0.05}>
         <SocialsSection />

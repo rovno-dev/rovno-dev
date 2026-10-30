@@ -78,7 +78,7 @@ export function ExpertCTA({ displayName }: Props) {
             <div className="flex justify-center">
               <Button size="large" asChild>
                 <Link href="/order">
-                  {lang === "ru" ? "Оформить заказ" : "Start a project"}
+                  {lang === "ru" ? "Оставить заявку" : "Start a project"}
                   <ArrowUpRight className="size-4" />
                 </Link>
               </Button>

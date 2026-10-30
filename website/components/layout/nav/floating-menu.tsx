@@ -3,13 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ListIcon, X, Lightbulb } from "@phosphor-icons/react";
+import { ListIcon, X } from "@phosphor-icons/react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
 import { rootDomainUrl } from "@/utils/root-domain";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "../language-switcher";
+import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 
 interface FloatingMenuProps {
   position?: "top" | "bottom";
@@ -86,41 +88,52 @@ export function FloatingMenu({
           <ListIcon className={triggerIconClassName} />
         )}
       </Button>
-      
+
       {open && (
         <div
           id="floating-menu-panel"
           className={cn(
-            "z-[60] flex flex-col border border-(--outline) shadow-2xl backdrop-blur-2xl bg-(--card)/80",
+            "z-[60] flex flex-col border border-(--outline) shadow-2xl backdrop-blur-[var(--glass)] bg-(--card)/80",
             position === "bottom"
-              ? "fixed inset-x-4 bottom-24 mx-auto max-w-sm rounded-[2rem] p-5 animate-in slide-in-from-bottom-6 fade-in duration-300"
-              : "absolute top-[calc(100%+16px)] right-0 w-64 rounded-3xl p-3 animate-in slide-in-from-top-4 fade-in duration-200"
+              ? "fixed inset-x-4 bottom-24 mx-auto max-w-sm rounded-[2rem] p-5"
+              : "absolute top-[calc(100%+16px)] right-0 w-64 rounded-3xl p-3"
           )}
         >
           <nav className="flex flex-col gap-1">
-            {links.map((link) => {
+            {links.map((link, i) => {
               const isActive = pathname === link.href;
               return (
-                <Link
+                <motion.div
                   key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "px-4 py-3 rounded-2xl text-lg font-medium transition-colors",
-                    isActive
-                      ? "bg-(--primary-glass) text-(--primary)"
-                      : "text-(--on-bg-high) hover:bg-(--state-hover)",
-                  )}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.3, ease: "easeOut" }}
                 >
-                  {link.label}
-                </Link>
+                  <Link
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "block px-4 py-3 rounded-2xl text-lg font-medium transition-colors",
+                      isActive
+                        ? "bg-(--primary-glass) text-(--primary)"
+                        : "text-(--on-bg-high) hover:bg-(--state-hover)",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               );
             })}
           </nav>
-          
+
           {/* Mobile-only bottom section */}
           {position === "bottom" && (
-            <div className="flex flex-col gap-4 pt-5 border-t border-(--outline) mt-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.25, duration: 0.3 }}
+              className="flex flex-col gap-4 pt-5 border-t border-(--outline) mt-4"
+            >
               <div className="flex items-center justify-between px-2 py-2">
                 <span className="text-sm font-medium text-(--on-bg-medium)">
                   {t("nav.language")}
@@ -130,11 +143,11 @@ export function FloatingMenu({
 
               <Button size="large" className="w-full rounded-xl" asChild>
                 <Link href={rootLink(ROUTES.order.href)} onClick={() => setOpen(false)}>
-                  <Lightbulb weight="fill" className="size-5" />
+                  <TelemostStackIcon />
                   {t("nav.order")}
                 </Link>
               </Button>
-            </div>
+            </motion.div>
           )}
         </div>
       )}

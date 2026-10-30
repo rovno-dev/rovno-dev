@@ -10,7 +10,7 @@ export const orderTranslations: Record<Language, Record<string, string>> = {
     'order.services_label': 'Service type',
     'order.submit': 'Submit Request',
     'order.subtitle': 'Describe your task and we\'ll prepare an offer."',
-    'order.title': 'Make an Order',
+    'order.title': 'Book call',
   },
   ru: {
     'order.submit': 'Отправить заявку',
