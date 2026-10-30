@@ -6,10 +6,8 @@ interface Particle {
   y: number;
   vx: number;
   vy: number;
-  /** Home position — where this particle sits when the logo is assembled. */
   hx: number;
   hy: number;
-  /** Escape vector, applied × hover envelope, so targets scatter on hover. */
   ex: number;
   ey: number;
   size: number;
@@ -18,23 +16,16 @@ interface Particle {
   freq: number;
 }
 
-/**
- * Particle field forming a "[]" bracket logo — procedurally generated from
- * the ASCII reference. No SVG sampling, no external assets.
- *
- * NOTE: The inner "kidneys" loop was completely deleted. This file contains
- * ONLY spine, top arm, and bottom arm generation. If you still see a central
- * pill after saving this file, you are looking at a cached browser version.
- */
 const CANVAS = 320;
 
 function buildParticles(): Particle[] {
   const out: Particle[] = [];
-  const S = 2.4;
+  const S = 2.0;
 
   const add = (x: number, y: number, alpha: number, size: number) => {
     const a = Math.random() * Math.PI * 2;
-    const m = 55 + Math.random() * 40;
+    // Massively increased escape magnitude (100–160) to fill the outer square.
+    const m = 100 + Math.random() * 60;
     out.push({
       x, y, vx: 0, vy: 0,
       hx: x, hy: y,
@@ -48,42 +39,42 @@ function buildParticles(): Particle[] {
   };
 
   // ── Left bracket [ ────────────────────────────────────────────────────
-  // Huge: 260px tall, 110px reach. Thick 24px spine and arms.
-  const sx = 30;
-  const sw = 24;
+  // Adjusted to match the visual weight of the provided logo reference.
+  const sx = 45;
+  const sw = 24;   // Spine thickness
   const sy = 30;
-  const bh = 260;
-  const ah = 24;
-  const reach = 110;
+  const bh = 260;  // Bracket height
+  const ah = 24;   // Arm thickness
+  const reach = 100; // How far the arms extend right (45 + 100 = 145)
 
   // Spine (thick vertical on the left)
   for (let y = sy; y <= sy + bh; y += S) {
     for (let dx = 0; dx < sw; dx += S) {
-      add(sx + dx, y, 1, 2.8);
+      add(sx + dx, y, 1, 2.4);
     }
   }
 
   // Top arm (thick horizontal, extends right from spine)
   for (let x = sx; x <= sx + reach; x += S) {
     for (let dy = 0; dy < ah; dy += S) {
-      add(x, sy + dy, 1, 2.8);
+      add(x, sy + dy, 1, 2.4);
     }
   }
 
   // Bottom arm (same, mirrored y)
   for (let x = sx; x <= sx + reach; x += S) {
     for (let dy = 0; dy < ah; dy += S) {
-      add(x, sy + bh - dy, 1, 2.8);
+      add(x, sy + bh - dy, 1, 2.4);
     }
   }
 
-  // ── Right bracket ] — exact mirror around canvas center ─────────────
+  // ── Right bracket ] — exact mirror ───────────────────────────────────
   const mirror = (x: number) => CANVAS - x;
   const n = out.length;
   for (let i = 0; i < n; i++) {
     const p = out[i];
     const a = Math.random() * Math.PI * 2;
-    const m = 55 + Math.random() * 40;
+    const m = 100 + Math.random() * 60;
     out.push({
       x: mirror(p.x), y: p.y,
       vx: 0, vy: 0,
@@ -193,7 +184,7 @@ export function ParticleLogo({
         const tx = p.hx + p.ex * hv;
         const ty = p.hy + p.ey * hv;
 
-        const wob = hv * 3;
+        const wob = hv * 4; // slightly more wobble when scattered
         const dx = tx - p.x + Math.sin(t * p.freq + p.phase) * wob;
         const dy = ty - p.y + Math.cos(t * p.freq + p.phase) * wob;
 
@@ -229,10 +220,12 @@ export function ParticleLogo({
         aria-hidden
         className="pointer-events-none w-full h-full"
         style={{
-          maskImage:
-            "radial-gradient(circle at center, black 45%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(circle at center, black 45%, transparent 100%)",
+          // Changed mask to a soft square fade instead of a circle,
+          // so the scattered particles form an outer square cloud.
+          maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent), linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent), linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          maskComposite: "intersect",
+          WebkitMaskComposite: "source-in",
         }}
       />
     </div>
