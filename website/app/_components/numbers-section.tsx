@@ -129,7 +129,7 @@ export default function NumbersSection() {
   return (
     <section ref={sectionRef} className="pt-12 sm:pt-18 pb-8 sm:pb-18">
       <Container>
-        <h2 className="text-display-2 text-[2rem] sm:text-[3.5rem] mb-8 sm:mb-16 text-left sm:text-center text-(--on-bg-high)">
+        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words mb-8 sm:mb-16 text-(--on-bg-high)">
           {t("home.numbers_title")}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">

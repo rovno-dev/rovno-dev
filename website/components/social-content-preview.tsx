@@ -274,7 +274,7 @@ export function SocialContentPreview({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "w-full h-[60vh] 2xl:h-[80vh] border border-border rounded-xl flex flex-col items-center justify-between overflow-hidden bg-background shadow-md group transition-all duration-300 hover:border-primary/30",
+        "w-full h-[60vh] 2xl:h-[80vh] border border-border flex flex-col items-center justify-between overflow-hidden bg-background shadow-md group transition-all duration-300 hover:border-primary/30",
         className
       )}
     >

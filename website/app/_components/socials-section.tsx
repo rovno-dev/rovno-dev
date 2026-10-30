@@ -26,13 +26,13 @@ const mediaTypes = [
     icons: [
       { label: "VK Video", icon: <VKLogotypeMonoIcon />, link: "https://vkvideo.ru/rovno_dev" },
       { label: "TikTok", icon: <TiktokLogoMono />, link: "https://tiktok.com/rovno_dev" },
-      { label: "YT Shorts", icon: <YoutubeLogoMono />, link: "https://youtube.com/rovno_dev" },
+      { label: "YT Shorts", icon: <YoutubeLogoMono />, link: "https://youtube.com/@Rovno_dev" },
     ],
   },
   {
     id: "videos",
     icons: [
-      { label: "YouTube", icon: <YoutubeLogoMono />, link: "https://youtube.com/rovno_dev" },
+      { label: "YouTube", icon: <YoutubeLogoMono />, link: "https://youtube.com/@Rovno_dev" },
       { label: "VK Video", icon: <VKLogotypeMonoIcon />, link: "https://vkvideo.ru/rovno_dev" },
     ],
   },
@@ -55,7 +55,7 @@ const mediaTypes = [
     icons: [
       { label: "VC", icon: <VCRULogotypeMonoIcon />, link: "https://vc.ru/rovno_dev" },
       { label: "Habr", icon: <HabrLogotypeMonoIcon />, link: "https://habr.com/rovno_dev" },
-      { label: "Medium", icon: <MediumLogotypeMonoIcon />, link: "https:/ / habr.com / rovno_dev" },
+      // { label: "Medium", icon: <MediumLogotypeMonoIcon />, link: "https://medium.com/rovno_dev" },
     ],
   },
   {
@@ -75,14 +75,14 @@ export default function SocialsSection() {
       title: t("home.socials.preview.shorts.title"),
       description: t("home.socials.preview.shorts.description"),
       thumbnail: "/static-images/projects/alx/alx-cover.png",
-      link: "https://youtube.com/rovno_dev",
+      link: "https://youtube.com/@Rovno_dev",
     },
     videos: {
       type: "video",
       title: t("home.socials.preview.videos.title"),
       description: t("home.socials.preview.videos.description"),
       thumbnail: "/static-images/projects/bread/bread-cover.png",
-      link: "https://youtube.com/rovno_dev",
+      link: "https://youtube.com/@Rovno_dev",
     },
     design: {
       type: "article",
@@ -115,9 +115,9 @@ export default function SocialsSection() {
   };
   const activePreview = previewMap[selectedMediaType];
   return (
-    <Container variant="full-screen" className="py-12 md:py-20">
+    <Container variant="full-screen" className="py-12 md:py-20 pb-0!">
       <div className="space-y-8">
-        <h2 className="text-display-2 md:text-display-1 text-(--on-bg-high) text-center animate-reveal">
+        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words text-(--on-bg-high) animate-reveal mb-8">
           {t("home.socials_title")}
         </h2>
         {/* Mobile: preview at top + horizontal scroll badges */}

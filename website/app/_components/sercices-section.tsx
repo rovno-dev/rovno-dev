@@ -58,21 +58,18 @@ const SERVICES = [
     title: "Аудит",
     description:
       "Детально проверим инфраструктуру, найдём слабые места и подскажем как действовать дальше. Подготовим детальный план и ТЗ под подходящую технологию и функционал.",
-    icon: <AuditIcon />,
   },
   {
     id: "02",
     title: "Цифровизация",
     description:
       "Автоматизируем процессы, разработаем цифровые продукты под нужные задачи и будем заниматься тем, чтобы работа инфраструктуры никогда не останавливалась.",
-    icon: <DigitalizationIcon />,
   },
   {
     id: "03",
     title: "Стартап",
     description:
       "Реализуем цифровой продукт, поможем выйграть инвестиционные раунды или просто протестируем идею для вашего стартапа.",
-    icon: <StartupIcon />,
   },
 ];
 
@@ -104,9 +101,6 @@ export default function ServicesSection() {
               >
                 {/* Top Row: Custom Icon + Arrow */}
                 <div className="flex justify-between items-start w-full mb-8 md:mb-12 shrink-0">
-                  <div className="opacity-80 group-hover:opacity-100 transition-opacity">
-                    {service.icon}
-                  </div>
                   <div className="flex items-center justify-center size-10 md:size-12 rounded-none border border-(--outline) bg-(--bg) group-hover:bg-(--primary) group-hover:border-(--primary) group-hover:text-(--on-primary) transition-all duration-300">
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-4 md:size-5">
                       <path d="M2.5 12.5L12.5 2.5M12.5 2.5H4.5M12.5 2.5V10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />

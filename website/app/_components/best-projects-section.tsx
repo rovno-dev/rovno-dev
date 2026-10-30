@@ -34,7 +34,7 @@ export default function BestWorksSection({
   return (
     <section className="py-8 md:py-10">
       <Container>
-        <h2 className="text-display-2 sm:text-display-1 mb-10 text-center">
+        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words mb-10">
           {t("home.best_works_title")}
         </h2>
 
