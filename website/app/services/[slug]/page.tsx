@@ -8,7 +8,7 @@ import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
 import { SERVICES_META, loadServiceDoc } from "@/app/_data/services";
 import { MDXParagraph } from "@/components/mdx";
-import { QuickOrderDialog } from "./_components/quick-order-dialog";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 
 export function generateStaticParams() {
   return SERVICES_META.map((s) => ({ slug: s.slug }));

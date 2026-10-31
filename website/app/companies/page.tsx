@@ -8,6 +8,7 @@ import {
   type ClientListItem,
 } from "@/utils/api/companies";
 import { ArrowUpRight, HandshakeIcon } from "@phosphor-icons/react/dist/ssr";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 
 export const revalidate = 300;
 export const metadata = {
@@ -142,12 +143,12 @@ export default async function ClientsPage() {
                     Расскажите о задаче - ответим в течение 3 часов.
                   </p>
                 </div>
-                <Button size="large" asChild className="shrink-0">
-                  <Link href="/order">
+                <QuickOrderDialog serviceName="Разработка проекта">
+                  <Button size="large" className="shrink-0">
                     Оставить заявку
                     <ArrowUpRight className="size-4" />
-                  </Link>
-                </Button>
+                  </Button>
+                </QuickOrderDialog>
               </div>
             </div>
           </Container>

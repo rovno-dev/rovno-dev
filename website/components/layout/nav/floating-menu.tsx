@@ -12,6 +12,7 @@ import { rootDomainUrl } from "@/utils/root-domain";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "../language-switcher";
 import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 
 interface FloatingMenuProps {
   position?: "top" | "bottom";
@@ -141,12 +142,12 @@ export function FloatingMenu({
                 <LanguageSwitcher />
               </div>
 
-              <Button size="large" className="w-full rounded-xl" asChild>
-                <Link href={rootLink(ROUTES.order.href)} onClick={() => setOpen(false)}>
+              <QuickOrderDialog serviceName="Консультация">
+                <Button size="large" className="w-full rounded-xl" onClick={() => setOpen(false)}>
                   <TelemostStackIcon />
                   {t("nav.order")}
-                </Link>
-              </Button>
+                </Button>
+              </QuickOrderDialog>
             </motion.div>
           )}
         </div>

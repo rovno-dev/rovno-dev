@@ -16,6 +16,7 @@ import {
   fetchPublicTeamServer,
   type PublicTeamMember,
 } from "@/utils/api/team";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 
 export const revalidate = 60;
 
@@ -418,12 +419,12 @@ function AboutCTA() {
                 только идея на салфетке.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button size="xlarge" asChild>
-                  <Link href="/order">
+                <QuickOrderDialog serviceName="Разработка проекта">
+                  <Button size="xlarge">
                     Оставить заявку
                     <ArrowUpRight className="size-5" />
-                  </Link>
-                </Button>
+                  </Button>
+                </QuickOrderDialog>
                 <Button size="xlarge" variant="outlined" asChild>
                   <Link href="/projects">Смотреть проекты</Link>
                 </Button>

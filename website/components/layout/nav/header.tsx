@@ -25,6 +25,7 @@ import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { FloatingMenu } from "./floating-menu";
 import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
@@ -87,12 +88,12 @@ export default function Header() {
         </div>
         
         <div className="flex items-center gap-2 shrink-0">
-          <Button size={"small"} className="hidden md:flex" asChild>
-            <Link href={rootLink(ROUTES.order.href)}>
+          <QuickOrderDialog serviceName="Консультация">
+            <Button size={"small"} className="hidden md:flex">
               <TelemostStackIcon className="mr-1 -ml-1" />
               {t("nav.order")}
-            </Link>
-          </Button>
+            </Button>
+          </QuickOrderDialog>
 
           {/* Language Switcher hidden on mobile */}
           <div className="hidden sm:block">
