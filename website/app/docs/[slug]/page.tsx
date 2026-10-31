@@ -144,7 +144,7 @@ export default async function LegalDocPage({
       <section className="py-12 md:py-16">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-            <article className="max-w-[760px]">{content}</article>
+            <article className="min-w-0 max-w-[760px]">{content}</article>
 
             <div className="space-y-8">
               <DocsTOC headings={doc.headings} />

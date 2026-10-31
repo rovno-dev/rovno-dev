@@ -1,26 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { compileMDX } from "next-mdx-remote/rsc";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  Palette,
-  Code,
-  Cube,
-  FilmStrip,
-  Megaphone,
-  Sparkle,
-} from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
-import {
-  SERVICES_META,
-  loadServiceDoc,
-  findServiceMeta,
-} from "@/app/_data/services";
+import { SERVICES_META, loadServiceDoc } from "@/app/_data/services";
 import { MDXParagraph } from "@/components/mdx";
 
 export function generateStaticParams() {
@@ -41,15 +27,6 @@ export async function generateMetadata({
   };
 }
 
-const ICONS: Record<string, React.ComponentType<{ className?: string; weight?: "bold" | "fill" | "regular" }>> = {
-  palette: Palette,
-  code: Code,
-  cube: Cube,
-  film: FilmStrip,
-  megaphone: Megaphone,
-  sparkle: Sparkle,
-};
-
 /** Extract plain text from a React children tree (for heading slugs). */
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
@@ -63,14 +40,13 @@ function extractText(node: React.ReactNode): string {
   return "";
 }
 
-/** Heading components - identical slugify() logic to the TOC extractor. */
 const mdxComponents = {
   h2: ({ children }: { children: React.ReactNode }) => {
     const id = slugify(extractText(children));
     return (
       <h2
         id={id}
-        className="text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28"
+        className="text-2xl md:text-3xl font-semibold text-(--on-bg-high) mt-12 mb-4 tracking-tight scroll-mt-28"
       >
         {children}
       </h2>
@@ -81,7 +57,7 @@ const mdxComponents = {
     return (
       <h3
         id={id}
-        className="text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
+        className="text-lg md:text-xl font-medium text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
       >
         {children}
       </h3>
@@ -129,80 +105,42 @@ export default async function ServicePage({
     options: { parseFrontmatter: false },
   });
 
-  const Icon = ICONS[doc.iconKey];
   const otherServices = SERVICES_META.filter((s) => s.slug !== slug);
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Hero */}
-      <section className="relative border-b border-(--outline) pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
-            maskImage:
-              "radial-gradient(ellipse 60% 70% at 25% 0%, black 40%, transparent 90%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 60% 70% at 25% 0%, black 40%, transparent 90%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse 45% 55% at 15% 10%, ${doc.accent}18, transparent 65%)`,
-          }}
-        />
-        <Container className="relative">
-          <div className="max-w-[900px]">
+      {/* Hero — Minimalist, no color, no icon */}
+      <section className="relative border-b border-(--outline) pt-16 md:pt-24 pb-12 md:pb-16">
+        <Container>
+          <div className="max-w-[860px]">
             <Link
-              href="/services"
-              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-6"
+              href="/#services"
+              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors mb-8"
             >
               <ArrowLeft className="size-4" />
               Все услуги
             </Link>
-
-            <div className="flex items-center gap-4 mb-6">
-              <div
-                className="flex size-14 items-center justify-center rounded-2xl"
-                style={{
-                  background: `${doc.accent}20`,
-                  color: doc.accent,
-                }}
-              >
-                {Icon && <Icon className="size-6" weight="bold" />}
-              </div>
-              <p
-                className="text-body-5 uppercase tracking-[0.3em]"
-                style={{ color: doc.accent }}
-              >
-                {doc.tagline}
-              </p>
-            </div>
-
-            <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) leading-[1.05] tracking-[-0.02em] mb-5">
-              {doc.title}
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-semibold text-(--on-bg-high) leading-[1.1] tracking-[-0.02em] mb-5">
+              {doc.shortTitle}
             </h1>
-            <p className="text-body-2 md:text-display-5 text-(--on-bg-medium) leading-relaxed max-w-[680px]">
+            
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-[680px]">
               {doc.description}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
+            {/* Clean, monochrome metadata strip */}
+            <div className="mt-10 flex flex-wrap gap-x-12 gap-y-6 pt-6 border-t border-(--outline)">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-(--on-bg-low) mb-1">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">
                   Срок
                 </p>
                 <p className="text-body-3 text-(--on-bg-high) font-medium">
                   {doc.leadTime}
                 </p>
               </div>
-              <div className="w-px h-10 bg-(--outline)" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-(--on-bg-low) mb-1">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">
                   Стоимость
                 </p>
                 <p className="text-body-3 text-(--on-bg-high) font-medium">
@@ -217,10 +155,14 @@ export default async function ServicePage({
       {/* Body + TOC */}
       <section className="py-12 md:py-16">
         <Container>
+          {/* Added min-w-0 here to prevent the article from overflowing 
+              into the TOC column and causing the overlap bug. */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-            <article className="max-w-[760px] prose-case">{content}</article>
-
-            <div className="space-y-8">
+            <article className="min-w-0 max-w-[760px] prose-case">
+              {content}
+            </article>
+            
+            <div className="space-y-8 hidden lg:block">
               {doc.headings.length > 0 && (
                 <Toc
                   headings={doc.headings}
@@ -228,8 +170,7 @@ export default async function ServicePage({
                   ariaLabel="Содержание услуги"
                 />
               )}
-
-              <div className="hidden lg:block pt-6 border-t border-(--outline)">
+              <div className="pt-6 border-t border-(--outline)">
                 <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">
                   Другие услуги
                 </p>
@@ -238,9 +179,9 @@ export default async function ServicePage({
                     <li key={s.slug}>
                       <Link
                         href={`/services/${s.slug}`}
-                        className="text-(--on-bg-medium) hover:text-(--primary) transition-colors leading-snug block"
+                        className="text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors leading-snug block"
                       >
-                        {(s as any).shortTitle}
+                        {s.shortTitle}
                       </Link>
                     </li>
                   ))}
@@ -251,24 +192,17 @@ export default async function ServicePage({
         </Container>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Minimalist */}
       <section className="pb-24">
         <Container>
-          <div className="max-w-[860px] mx-auto relative rounded-5xl border border-(--outline) bg-(--card) p-8 md:p-12 overflow-hidden">
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `radial-gradient(ellipse 70% 120% at 100% 0%, ${doc.accent}18, transparent 65%)`,
-              }}
-            />
-            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-[860px] mx-auto rounded-3xl border border-(--outline) bg-(--card) p-8 md:p-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) mb-2 tracking-tight">
+                <h2 className="text-2xl md:text-3xl text-(--on-bg-high) mb-2 tracking-tight">
                   Нужна {doc.shortTitle.toLowerCase()}?
                 </h2>
                 <p className="text-body-3 text-(--on-bg-medium) max-w-lg">
-                  Опишите задачу - ответим в течение 3 часов и предложим план.
+                  Опишите задачу — ответим в течение 3 часов и предложим план.
                 </p>
               </div>
               <Button size="large" asChild className="shrink-0">

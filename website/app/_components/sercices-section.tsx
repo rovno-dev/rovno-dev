@@ -24,7 +24,7 @@ export default function ServicesSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             {/* 1. Audit (Spans 2 cols) -> Links to UX/UI */}
-            <Link href="/services/ux-ui" className="group relative md:col-span-2 flex flex-col justify-between p-4 md:p-6 min-h-[380px] md:min-h-[480px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40 hover:shadow-2xl hover:shadow-blue-500/5">
+            <Link href="/services/audit" className="group relative md:col-span-2 flex flex-col justify-between p-4 md:p-6 min-h-[380px] md:min-h-[480px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40 hover:shadow-2xl hover:shadow-blue-500/5">
               <div className="absolute top-0 right-0 w-[80%] h-[150%] pointer-events-none">
                 <div className="absolute inset-0 bg-gradient-to-bl from-blue-500/20 via-blue-500/5 to-transparent transform translate-x-1/4 -translate-y-1/4 rotate-12 opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
@@ -50,7 +50,7 @@ export default function ServicesSection() {
             </Link>
 
             {/* 2. Digitalization (Spans 1 col) -> Links to Web Development */}
-            <Link href="/services/web-development" className="group relative md:col-span-1 flex flex-col justify-between p-4 md:p-6 min-h-[380px] md:min-h-[480px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40 hover:shadow-2xl hover:shadow-violet-500/5">
+            <Link href="/services/digitalization" className="group relative md:col-span-1 flex flex-col justify-between p-4 md:p-6 min-h-[380px] md:min-h-[480px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40 hover:shadow-2xl hover:shadow-violet-500/5">
 
               <div className="absolute top-6 left-0 right-0 px-6 flex flex-col gap-3 pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-500">
                 <motion.div initial={{ x: 20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="self-end max-w-[85%] bg-(--bg) border border-(--outline) rounded-2xl rounded-tr-sm p-3.5 text-[13px] leading-relaxed text-(--on-bg-medium) shadow-sm">
@@ -71,7 +71,7 @@ export default function ServicesSection() {
             </Link>
 
             {/* 3. Startup (Spans 3 cols) -> Links to Promotion */}
-            <Link href="/services/promotion" className="group relative md:col-span-3 flex flex-col md:flex-row md:items-end justify-between p-4 md:p-6 min-h-[300px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40">
+            <Link href="/services/startup" className="group relative md:col-span-3 flex flex-col md:flex-row md:items-end justify-between p-4 md:p-6 min-h-[300px] rounded-3xl border border-(--outline) bg-(--card) overflow-hidden transition-all duration-300 hover:border-(--on-bg-low)/40">
               <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-end">
                 <div className="relative w-full max-w-[600px] h-full">
                   {[0, 1, 2, 3, 4].map((i) => (
