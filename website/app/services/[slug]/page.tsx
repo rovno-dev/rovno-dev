@@ -8,6 +8,7 @@ import { Toc } from "@/components/layout/toc/toc";
 import { slugify } from "@/utils/slugify";
 import { SERVICES_META, loadServiceDoc } from "@/app/_data/services";
 import { MDXParagraph } from "@/components/mdx";
+import { QuickOrderDialog } from "./_components/quick-order-dialog";
 
 export function generateStaticParams() {
   return SERVICES_META.map((s) => ({ slug: s.slug }));
@@ -27,7 +28,6 @@ export async function generateMetadata({
   };
 }
 
-/** Extract plain text from a React children tree (for heading slugs). */
 function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return String(node);
@@ -109,60 +109,76 @@ export default async function ServicePage({
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* Hero — Minimalist, no color, no icon */}
-      <section className="relative border-b border-(--outline) pt-16 md:pt-24 pb-12 md:pb-16">
-        <Container>
-          <div className="max-w-[860px]">
+      {/* Fancy Left-Aligned Hero */}
+      <section className="relative border-b border-(--outline) pt-24 pb-16 overflow-hidden">
+        {/* Subtle blueprint grid background */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, var(--on-bg-high) 1px, transparent 1px), linear-gradient(to bottom, var(--on-bg-high) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+            maskImage:
+              "radial-gradient(ellipse 60% 80% at 20% 20%, black 40%, transparent 90%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 60% 80% at 20% 20%, black 40%, transparent 90%)",
+          }}
+        />
+        
+        <Container className="relative z-10">
+          <div className="max-w-[860px] animate-reveal">
             <Link
               href="/#services"
-              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors mb-8"
+              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors mb-10 group"
             >
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
               Все услуги
             </Link>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-semibold text-(--on-bg-high) leading-[1.1] tracking-[-0.02em] mb-5">
+            <h1 className="text-5xl md:text-7xl font-heading font-semibold text-(--on-bg-high) leading-[1.05] tracking-[-0.03em] mb-6">
               {doc.shortTitle}
             </h1>
             
-            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-[680px]">
+            <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-[640px] mb-10">
               {doc.description}
             </p>
 
-            {/* Clean, monochrome metadata strip */}
-            <div className="mt-10 flex flex-wrap gap-x-12 gap-y-6 pt-6 border-t border-(--outline)">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">
-                  Срок
-                </p>
-                <p className="text-body-3 text-(--on-bg-high) font-medium">
-                  {doc.leadTime}
-                </p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">
-                  Стоимость
-                </p>
-                <p className="text-body-3 text-(--on-bg-high) font-medium">
-                  {doc.startingAt}
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <QuickOrderDialog serviceName={doc.shortTitle}>
+                <Button size="large" className="h-14 px-8 text-lg w-full sm:w-auto">
+                  Обсудить проект
+                  <ArrowUpRight className="size-5 ml-2" />
+                </Button>
+              </QuickOrderDialog>
+              
+              <div className="flex gap-8 sm:pl-8 sm:border-l border-(--outline)">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">Срок</p>
+                  <p className="text-body-3 text-(--on-bg-high) font-medium">{doc.leadTime}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">Стоимость</p>
+                  <p className="text-body-3 text-(--on-bg-high) font-medium">{doc.startingAt}</p>
+                </div>
               </div>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Body + TOC */}
-      <section className="py-12 md:py-16">
+      {/* Content & TOC — Fixed layout using flex and min-w-0 to prevent overlap */}
+      <section className="py-16 md:py-24 relative">
         <Container>
-          {/* Added min-w-0 here to prevent the article from overflowing 
-              into the TOC column and causing the overlap bug. */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-            <article className="min-w-0 max-w-[760px] prose-case">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-start relative">
+            
+            {/* Main Article */}
+            <article className="flex-1 w-full min-w-0 max-w-[760px] prose-case">
               {content}
             </article>
             
-            <div className="space-y-8 hidden lg:block">
+            {/* Sidebar */}
+            <aside className="hidden lg:block w-[260px] shrink-0 sticky top-32">
               {doc.headings.length > 0 && (
                 <Toc
                   headings={doc.headings}
@@ -170,16 +186,16 @@ export default async function ServicePage({
                   ariaLabel="Содержание услуги"
                 />
               )}
-              <div className="pt-6 border-t border-(--outline)">
-                <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">
+              <div className="mt-12 pt-8 border-t border-(--outline)">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-(--on-bg-low) mb-4">
                   Другие услуги
                 </p>
-                <ul className="space-y-2.5 text-body-4">
+                <ul className="space-y-3">
                   {otherServices.map((s) => (
                     <li key={s.slug}>
                       <Link
                         href={`/services/${s.slug}`}
-                        className="text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors leading-snug block"
+                        className="text-body-4 text-(--on-bg-medium) hover:text-(--primary) transition-colors block"
                       >
                         {s.shortTitle}
                       </Link>
@@ -187,7 +203,7 @@ export default async function ServicePage({
                   ))}
                 </ul>
               </div>
-            </div>
+            </aside>
           </div>
         </Container>
       </section>
@@ -195,7 +211,7 @@ export default async function ServicePage({
       {/* CTA — Minimalist */}
       <section className="pb-24">
         <Container>
-          <div className="max-w-[860px] mx-auto rounded-3xl border border-(--outline) bg-(--card) p-8 md:p-12">
+          <div className="max-w-[860px] rounded-3xl border border-(--outline) bg-(--card) p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <h2 className="text-2xl md:text-3xl text-(--on-bg-high) mb-2 tracking-tight">
@@ -205,12 +221,12 @@ export default async function ServicePage({
                   Опишите задачу — ответим в течение 3 часов и предложим план.
                 </p>
               </div>
-              <Button size="large" asChild className="shrink-0">
-                <Link href="/order">
+              <QuickOrderDialog serviceName={doc.shortTitle}>
+                <Button size="large" className="shrink-0">
                   Оставить заявку
                   <ArrowUpRight className="size-4" />
-                </Link>
-              </Button>
+                </Button>
+              </QuickOrderDialog>
             </div>
           </div>
         </Container>
