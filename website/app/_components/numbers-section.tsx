@@ -8,18 +8,20 @@ import { useLanguage } from "@/providers/language-provider";
 function useInView<T extends HTMLElement>(options?: IntersectionObserverInit) {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
+  
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setInView(true);
-        observer.disconnect();
+        observer.disconnect(); // Only animate once when it comes into view
       }
     }, options);
     observer.observe(el);
     return () => observer.disconnect();
   }, [options]);
+  
   return { ref, inView };
 }
 
@@ -47,7 +49,7 @@ export default function NumbersSection() {
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col items-center text-center group"
             >
-              <div className="transition-transform duration-500 ease-out group-hover:scale-110">
+              <div className="transition-transform duration-500 ease-out group-hover:scale-110 min-h-[80px] md:min-h-[96px] flex items-center justify-center">
                 {inView ? (
                   <LettersPull 
                     text={stat.number} 

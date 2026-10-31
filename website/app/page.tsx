@@ -20,29 +20,29 @@ export default async function Home() {
   return (
     <>
       <HeroSection />
-      
-      <LogoMarquee />
-      
+
+      {/* <LogoMarquee /> */}
+
       <ScrollReveal threshold={0.05}>
         <ServicesSection />
       </ScrollReveal>
-      
+
       <ScrollReveal threshold={0.05}>
         <BestWorksSection projects={projects} />
       </ScrollReveal>
-      
+
       <ScrollReveal delay={100} threshold={0.05}>
         <NumbersSection />
       </ScrollReveal>
-      
+
       {/* <ScrollReveal delay={150} threshold={0.05}>
         <SocialsSection />
       </ScrollReveal> */}
-      
+
       <ScrollReveal delay={150} threshold={0.05}>
         <VideoShowcaseSection />
       </ScrollReveal>
-      
+
       {/* <ScrollReveal delay={250} threshold={0.05}>
         <CtaSection />
       </ScrollReveal> */}
