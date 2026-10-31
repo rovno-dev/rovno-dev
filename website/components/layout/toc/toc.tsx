@@ -62,7 +62,7 @@ export function Toc({ headings, label, ariaLabel }: TocProps) {
   const activeHeading = headings.find((h) => h.id === activeId);
   return (
     <>
-      <aside aria-label={ariaLabel} className="hidden lg:block lg:sticky lg:top-32 h-fit">
+      <aside aria-label={ariaLabel} className="hidden lg:block lg:sticky lg:top-32 h-fit bg-[var(--primary-glass)] backdrop-blur-[var(--blur-glass)] p-3 rounded-xl">
         <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">{label}</p>
         <nav>
           <ul className="space-y-1.5 text-body-4">

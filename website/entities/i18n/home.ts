@@ -15,7 +15,7 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_projects_btn': 'Our projects',
     'home.stats_clients_btn': 'Client reviews',
     'home.stats_spec_btn': 'See for yourself',
-    
+
     'home.stats.projects_label': 'projects completed',
     'home.stats.experience_label': 'average team experience',
     'home.stats.companies_label': 'companies trust us',
@@ -56,18 +56,18 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_projects_number': '42',
     'home.stats_clients_number': '18',
     'home.stats_spec_number': '1 день',
-    'home.stats_projects_done': 'проектов завершено',
+    'home.stats_projects_done': 'проекта завершено',
     'home.stats_happy_clients': 'довольных клиентов',
     'home.stats_spec_prep': 'в среднем занимает подготовка технических заданий и документации',
     'home.stats_team_btn': 'Наша команда',
     'home.stats_projects_btn': 'Наши проекты',
     'home.stats_clients_btn': 'Отзывы клиентов',
     'home.stats_spec_btn': 'Убедитесь сами',
-    
-    'home.stats.projects_label': 'проектов завершено',
+
+    'home.stats.projects_label': 'проекта завершено',
     'home.stats.experience_label': 'средний стаж команды',
     'home.stats.companies_label': 'компаний доверяют нам',
-    'home.stats.specs_label': 'день на подготовку ТЗ',
+    'home.stats.specs_label': 'день чтобы понять задачи',
 
     'home.best_works_title': 'Избранные проекты',
     'home.view_all_projects': 'Все проекты',
