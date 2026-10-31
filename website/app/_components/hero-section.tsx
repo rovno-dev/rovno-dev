@@ -3,12 +3,16 @@ import { useRef } from "react";
 import { ParticleLogo } from "@/components/layout/logo/particle-logo";
 import { Container } from "@/components/ui/container";
 import { motion, useScroll, useTransform } from "motion/react";
+import { useLanguage } from "@/providers/language-provider";
+
 export default function HeroSection() {
+  const { t } = useLanguage();
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
+
   // Scroll-driven dissolve. Plays forward as the hero scrolls out and
   // reverses on the way back, so the logo "reassembles" on up-scroll.
   const logoOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
@@ -19,6 +23,7 @@ export default function HeroSection() {
   );
   const logoScale = useTransform(scrollYProgress, [0, 0.35], [1, 0.86]);
   const logoY = useTransform(scrollYProgress, [0, 0.35], [0, -40]);
+
   return (
     <section
       ref={heroRef}
@@ -57,6 +62,7 @@ export default function HeroSection() {
             </motion.div>
           </motion.div>
         </div>
+
         {/* Bottom statement — reveals on section entry */}
         <div className="w-full flex justify-center md:justify-start">
           <div className="max-w-lg">
@@ -68,7 +74,7 @@ export default function HeroSection() {
                 transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
                 className="inline-block"
               >
-                Для тех, кому дороги.
+                {t("hero.subtitle.part1")}
               </motion.span>{" "}
               <span className="text-(--on-bg-medium)">
                 <motion.span
@@ -82,7 +88,7 @@ export default function HeroSection() {
                   }}
                   className="inline-block"
                 >
-                  Cервисы будущего, использование ИИ приватно и эффективно и сервисы, радующие пользователей каждый день.
+                  {t("hero.subtitle.part2")}
                 </motion.span>
               </span>
             </p>

@@ -15,6 +15,12 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_projects_btn': 'Our projects',
     'home.stats_clients_btn': 'Client reviews',
     'home.stats_spec_btn': 'See for yourself',
+    
+    'home.stats.projects_label': 'projects completed',
+    'home.stats.experience_label': 'average team experience',
+    'home.stats.companies_label': 'companies trust us',
+    'home.stats.specs_label': 'day to prepare tech specs',
+
     'home.best_works_title': 'Featured Projects',
     'home.view_all_projects': 'All projects',
     'home.socials_title': 'Our Addictive Media',
@@ -57,6 +63,12 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_projects_btn': 'Наши проекты',
     'home.stats_clients_btn': 'Отзывы клиентов',
     'home.stats_spec_btn': 'Убедитесь сами',
+    
+    'home.stats.projects_label': 'проектов завершено',
+    'home.stats.experience_label': 'средний стаж команды',
+    'home.stats.companies_label': 'компаний доверяют нам',
+    'home.stats.specs_label': 'день на подготовку ТЗ',
+
     'home.best_works_title': 'Избранные проекты',
     'home.view_all_projects': 'Все проекты',
     'home.socials_title': 'Наши залипательные медиа',

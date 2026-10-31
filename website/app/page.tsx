@@ -7,6 +7,7 @@ import CtaSection from "./_components/cta-section";
 import VideoShowcaseSection from "./_components/video-showcase-section";
 import { fetchPublishedProjectsServer } from "@/utils/api/projects";
 import HeroSection from "./_components/hero-section";
+import LogoMarquee from "./_components/logo-marquee";
 
 // Featured projects change rarely; a minute of ISR is plenty and keeps
 // the home route static-fast for repeat visitors.
@@ -16,25 +17,32 @@ export default async function Home() {
   // Fail-soft: an unreachable backend yields an empty list, and the
   // featured section renders its empty state instead of a broken grid.
   const projects = await fetchPublishedProjectsServer();
-
   return (
     <>
       <HeroSection />
+      
+      <LogoMarquee />
+      
       <ScrollReveal threshold={0.05}>
         <ServicesSection />
       </ScrollReveal>
+      
       <ScrollReveal threshold={0.05}>
         <BestWorksSection projects={projects} />
       </ScrollReveal>
+      
       <ScrollReveal delay={100} threshold={0.05}>
         <NumbersSection />
       </ScrollReveal>
+      
       {/* <ScrollReveal delay={150} threshold={0.05}>
         <SocialsSection />
       </ScrollReveal> */}
+      
       <ScrollReveal delay={150} threshold={0.05}>
         <VideoShowcaseSection />
       </ScrollReveal>
+      
       {/* <ScrollReveal delay={250} threshold={0.05}>
         <CtaSection />
       </ScrollReveal> */}

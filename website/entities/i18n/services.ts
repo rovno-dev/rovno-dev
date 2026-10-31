@@ -2,7 +2,26 @@ import type { Language } from './translations';
 
 export const servicesTranslations: Record<Language, Record<string, string>> = {
   en: {
+    // ── Home Page Services Section ──
     'services.page.title': 'Services',
+
+    'services.audit.short': 'Audit',
+    'services.audit.desc': "We'll deeply analyze your infrastructure, find weak spots, and tell you how to move forward.",
+    'services.audit.badge1': 'Codebase',
+    'services.audit.badge2': 'Security',
+    'services.audit.badge3': 'Metrics',
+    'services.audit.badge4': 'Database',
+
+    'services.digitalization.short': 'Digitalization',
+    'services.digitalization.desc': 'We automate processes and build digital products tailored to your tasks.',
+    'services.digitalization.chat1': '@data-agent How to optimize the onboarding process?',
+    'services.digitalization.chat2': 'I analyzed 4 stages. I suggest automating access provisioning.',
+    'services.digitalization.btn': 'Make report',
+
+    'services.startup.short': 'Startup',
+    'services.startup.desc': 'We build digital products and help you win investment rounds.',
+
+    // ── Other Services Meta ──
     'services.from': 'from',
     'services.avg_label': 'average',
     'services.dev_sub1': 'Websites',
@@ -19,56 +38,49 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'services.branding_sub2': 'Identity',
     'services.branding_sub3': 'Brandbook',
     'services.branding_sub4': 'Guidelines',
-
     'services.page.subtitle': 'Six directions that can be ordered separately or combined into a turnkey project.',
     'services.page.hero1': 'We do',
     'services.page.hero2': 'everything',
     'services.page.hero3': '- from logo to production.',
     'services.other': 'Explore other services',
-    'services.cta.title': 'Didn\'t find what you were looking for?',
-    'services.cta.subtitle': 'Tell us about your task - we will propose a solution. Even if it\'s not on the list.',
+    'services.cta.title': "Didn't find what you were looking for?",
+    'services.cta.subtitle': "Tell us about your task - we will propose a solution. Even if it's not on the list.",
     'services.cta.button': 'Book call',
     'services.back': 'All services',
     'services.time': 'Timeline',
     'services.price': 'Starting at',
     'services.lead_time': 'Lead time',
 
-    // Meta definitions
     'services.branding.title': 'Branding & Identity',
     'services.branding.short': 'Branding',
     'services.branding.tagline': 'Logo, corporate identity, brandbook',
-    'services.branding.desc': 'We build a brand\'s visual system - from the logo to the guidelines the team can work with for years.',
+    'services.branding.desc': "We build a brand's visual system - from the logo to the guidelines the team can work with for years.",
     'services.branding.time': '3–6 weeks',
     'services.branding.price': 'from $800',
-
     'services.web-development.title': 'Web Development',
     'services.web-development.short': 'Development',
     'services.web-development.tagline': 'Websites, apps, Mini Apps',
     'services.web-development.desc': 'We design and develop digital products on Next.js, FastAPI, and PostgreSQL - from a landing page to a full product with billing.',
     'services.web-development.time': '4–12 weeks',
     'services.web-development.price': 'from $1,500',
-
     'services.3d-motion.title': '3D & Motion Design',
     'services.3d-motion.short': '3D / Motion',
     'services.3d-motion.tagline': '3D models, animation, CGI',
     'services.3d-motion.desc': 'We create 3D models, animations, and CGI graphics for promos, products, and corporate presentations.',
     'services.3d-motion.time': '2–8 weeks',
     'services.3d-motion.price': 'from $1,000',
-
     'services.video-production.title': 'Video Production',
     'services.video-production.short': 'Video',
     'services.video-production.tagline': 'Promo videos, editing, post-production',
     'services.video-production.desc': 'Full-cycle video production: script, shooting, editing, color grading, and sound. One master video - three versions for different platforms.',
     'services.video-production.time': '2–6 weeks',
     'services.video-production.price': 'from $1,200',
-
     'services.promotion.title': 'Promotion & Advertising',
     'services.promotion.short': 'Promotion',
     'services.promotion.tagline': 'SEO, targeted ads, PPC, SMM',
     'services.promotion.desc': 'We set up paid and organic traffic. We work with Yandex Direct, targeting, and SEO - with transparent analytics.',
     'services.promotion.time': 'ongoing',
     'services.promotion.price': 'from $600/mo',
-
     'services.ux-ui.title': 'UX/UI Design',
     'services.ux-ui.short': 'UX/UI',
     'services.ux-ui.tagline': 'Product design, design systems',
@@ -84,7 +96,26 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'tech.detail.cta': 'Need a project on',
   },
   ru: {
+    // ── Home Page Services Section ──
     'services.page.title': 'Услуги',
+
+    'services.audit.short': 'Аудит',
+    'services.audit.desc': 'Детально проверим инфраструктуру, найдём слабые места и подскажем как действовать дальше.',
+    'services.audit.badge1': 'Код',
+    'services.audit.badge2': 'Безопасность',
+    'services.audit.badge3': 'Метрики',
+    'services.audit.badge4': 'Базы данных',
+
+    'services.digitalization.short': 'Цифровизация',
+    'services.digitalization.desc': 'Автоматизируем процессы, разработаем цифровые продукты под задачи.',
+    'services.digitalization.chat1': '@data-agent Как оптимизировать процесс онбординга?',
+    'services.digitalization.chat2': 'Я проанализировал 4 этапа. Предлагаю автоматизировать выдачу доступов.',
+    'services.digitalization.btn': 'Сделать отчёт',
+
+    'services.startup.short': 'Стартап',
+    'services.startup.desc': 'Реализуем цифровой продукт, поможем выйграть инвестиционные раунды.',
+
+    // ── Other Services Meta ──
     'services.from': 'от',
     'services.avg_label': 'в среднем',
     'services.dev_sub1': 'Сайты',
@@ -101,7 +132,6 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'services.branding_sub2': 'Айдентика',
     'services.branding_sub3': 'Брендбук',
     'services.branding_sub4': 'Гайдлайны',
-
     'services.page.subtitle': 'Шесть направлений, которые можно заказать по отдельности или собрать в один проект под ключ.',
     'services.page.hero1': 'Делаем',
     'services.page.hero2': 'всё',
@@ -121,35 +151,30 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'services.branding.desc': 'Собираем визуальную систему бренда - от логотипа до гайдлайнов, по которым команда сможет работать годами.',
     'services.branding.time': '3–6 недель',
     'services.branding.price': 'от 75 000 ₽',
-
     'services.web-development.title': 'Веб-разработка',
     'services.web-development.short': 'Разработка',
     'services.web-development.tagline': 'Сайты, приложения, Mini Apps',
     'services.web-development.desc': 'Проектируем и разрабатываем цифровые продукты на Next.js, FastAPI и PostgreSQL - от лендинга до продукта с биллингом.',
     'services.web-development.time': '4–12 недель',
     'services.web-development.price': 'от 150 000 ₽',
-
     'services.3d-motion.title': '3D и моушн-дизайн',
     'services.3d-motion.short': '3D / Motion',
     'services.3d-motion.tagline': '3D-модели, анимация, CGI',
     'services.3d-motion.desc': 'Создаём 3D-модели, анимации и CGI-графику для промо, продуктов и корпоративных презентаций.',
     'services.3d-motion.time': '2–8 недель',
     'services.3d-motion.price': 'от 90 000 ₽',
-
     'services.video-production.title': 'Видеопродакшн',
     'services.video-production.short': 'Видео',
     'services.video-production.tagline': 'Промо-ролики, монтаж, склейка',
     'services.video-production.desc': 'Полный цикл видеопродакшна: сценарий, съёмка, монтаж, цветокоррекция и звук. Один мастер-ролик - три версии под площадки.',
     'services.video-production.time': '2–6 недель',
     'services.video-production.price': 'от 120 000 ₽',
-
     'services.promotion.title': 'Продвижение и реклама',
     'services.promotion.short': 'Продвижение',
     'services.promotion.tagline': 'SEO, таргет, контекст, SMM',
     'services.promotion.desc': 'Настраиваем платный и органический трафик. Работаем с Яндекс Директ, таргетом и SEO - с прозрачной аналитикой.',
     'services.promotion.time': 'постоянно',
     'services.promotion.price': 'от 60 000 ₽/мес',
-
     'services.ux-ui.title': 'UX/UI-дизайн',
     'services.ux-ui.short': 'UX/UI',
     'services.ux-ui.tagline': 'Продуктовый дизайн, дизайн-системы',

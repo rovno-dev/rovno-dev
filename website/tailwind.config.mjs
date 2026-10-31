@@ -5,33 +5,45 @@
    an attribute nothing sets — so state styling silently no-ops. */
 import plugin from 'tailwindcss/plugin';
 
-export default plugin(function ({ addUtilities, addVariant }) {
+export default plugin(function ({ addUtilities, addVariant, matchUtilities, theme }) {
+  matchUtilities(
+    {
+      'animate-marquee': (value) => ({
+        animation: `marquee 5s linear infinite`,
+        '@keyframes marquee': {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      }),
+    },
+    { values: theme('spacing') }
+  );
   // --- Radix state variants ---------------------------------------------
   // Each entry maps a Tailwind variant name to one or more selectors.
   // Radix historically emits `data-state`, newer versions sometimes emit
   // boolean attributes of the same name — match either.
   const radixStates = {
-    'data-checked':        ['&[data-state="checked"]',        '&[data-checked]'],
-    'data-unchecked':      ['&[data-state="unchecked"]',      '&[data-unchecked]'],
-    'data-indeterminate':  ['&[data-state="indeterminate"]',  '&[data-indeterminate]'],
-    'data-active':         ['&[data-state="active"]',         '&[data-active]'],
-    'data-inactive':       ['&[data-state="inactive"]',       '&[data-inactive]'],
-    'data-on':             ['&[data-state="on"]',             '&[data-on]'],
-    'data-off':            ['&[data-state="off"]',            '&[data-off]'],
-    'data-open':           ['&[data-state="open"]',           '&[data-open]'],
-    'data-closed':         ['&[data-state="closed"]',         '&[data-closed]'],
-    'data-disabled':       ['&[data-disabled]',               '&[data-state="disabled"]'],
-    'data-highlighted':    ['&[data-highlighted]',            '&[data-state="highlighted"]'],
-    'data-selected':       ['&[data-selected]',               '&[data-state="selected"]'],
-    'data-placeholder':    ['&[data-placeholder]'],
-    'data-expanded':       ['&[data-expanded]',               '&[data-state="expanded"]'],
-    'data-collapsed':      ['&[data-collapsed]',              '&[data-state="collapsed"]'],
+    'data-checked': ['&[data-state="checked"]', '&[data-checked]'],
+    'data-unchecked': ['&[data-state="unchecked"]', '&[data-unchecked]'],
+    'data-indeterminate': ['&[data-state="indeterminate"]', '&[data-indeterminate]'],
+    'data-active': ['&[data-state="active"]', '&[data-active]'],
+    'data-inactive': ['&[data-state="inactive"]', '&[data-inactive]'],
+    'data-on': ['&[data-state="on"]', '&[data-on]'],
+    'data-off': ['&[data-state="off"]', '&[data-off]'],
+    'data-open': ['&[data-state="open"]', '&[data-open]'],
+    'data-closed': ['&[data-state="closed"]', '&[data-closed]'],
+    'data-disabled': ['&[data-disabled]', '&[data-state="disabled"]'],
+    'data-highlighted': ['&[data-highlighted]', '&[data-state="highlighted"]'],
+    'data-selected': ['&[data-selected]', '&[data-state="selected"]'],
+    'data-placeholder': ['&[data-placeholder]'],
+    'data-expanded': ['&[data-expanded]', '&[data-state="expanded"]'],
+    'data-collapsed': ['&[data-collapsed]', '&[data-state="collapsed"]'],
     'data-orientation-horizontal': ['&[data-orientation="horizontal"]'],
-    'data-orientation-vertical':   ['&[data-orientation="vertical"]'],
-    'data-side-top':       ['&[data-side="top"]'],
-    'data-side-bottom':    ['&[data-side="bottom"]'],
-    'data-side-left':      ['&[data-side="left"]'],
-    'data-side-right':     ['&[data-side="right"]'],
+    'data-orientation-vertical': ['&[data-orientation="vertical"]'],
+    'data-side-top': ['&[data-side="top"]'],
+    'data-side-bottom': ['&[data-side="bottom"]'],
+    'data-side-left': ['&[data-side="left"]'],
+    'data-side-right': ['&[data-side="right"]'],
   };
   for (const [name, selectors] of Object.entries(radixStates)) {
     addVariant(name, selectors);
