@@ -29,10 +29,10 @@ export default async function Home() {
       <ScrollReveal delay={100} threshold={0.05}>
         <NumbersSection />
       </ScrollReveal>
-      <ScrollReveal delay={150} threshold={0.05}>
+      {/* <ScrollReveal delay={150} threshold={0.05}>
         <SocialsSection />
-      </ScrollReveal>
-      <ScrollReveal delay={200} threshold={0.05}>
+      </ScrollReveal> */}
+      <ScrollReveal delay={150} threshold={0.05}>
         <VideoShowcaseSection />
       </ScrollReveal>
       {/* <ScrollReveal delay={250} threshold={0.05}>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
-import { LightbulbIcon } from "@phosphor-icons/react";
+import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
@@ -173,12 +173,11 @@ export default function VideoShowcaseSection() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4 sm:mt-4 justify-center px-4">
-            <Button size="large" className="w-full max-w-[288px] h-14 text-lg shadow-xl relative z-20" asChild>
-              <Link href={ROUTES.order.href}>
-                <LightbulbIcon className="w-5 h-5" />
+            <QuickOrderDialog serviceName="Консультация">
+              <Button size="large" className="w-full max-w-[288px] h-14 text-lg shadow-xl relative z-20">
                 {t("hero.order")}
-              </Link>
-            </Button>
+              </Button>
+            </QuickOrderDialog>
           </div>
         </div>
       </Container>

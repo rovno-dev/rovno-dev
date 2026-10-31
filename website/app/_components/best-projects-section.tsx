@@ -34,7 +34,7 @@ export default function BestWorksSection({
   return (
     <section className="py-8 md:py-10">
       <Container>
-        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words mb-10">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl leading-[1.1] font-sans font-medium tracking-[-0.02em] uppercase text-center w-full break-words mb-10">
           {t("home.best_works_title")}
         </h2>
 
@@ -54,6 +54,7 @@ export default function BestWorksSection({
                 key={project.id || project.slug}
                 project={project}
                 index={idx}
+                variant="featured"
                 tags={(project.tags || [])
                   .map((tg) => tg.title)
                   .filter((v): v is string => !!v)

@@ -20,7 +20,7 @@ export const SERVICES_META: ServiceMeta[] = [
     iconKey: "code",
     accent: "#336DFF",
     leadTime: "1–2 недели",
-    startingAt: "от 50 000 ₽",
+    startingAt: "от 70 000 ₽",
   },
   {
     slug: "digitalization",
@@ -31,7 +31,7 @@ export const SERVICES_META: ServiceMeta[] = [
     iconKey: "cube",
     accent: "#A855F7",
     leadTime: "4–12 недель",
-    startingAt: "от 150 000 ₽",
+    startingAt: "от 750 000 ₽",
   },
   {
     slug: "startup",
@@ -42,7 +42,7 @@ export const SERVICES_META: ServiceMeta[] = [
     iconKey: "sparkle",
     accent: "#10B981",
     leadTime: "6–10 недель",
-    startingAt: "от 250 000 ₽",
+    startingAt: "от 750 000 ₽",
   }
 ];
 

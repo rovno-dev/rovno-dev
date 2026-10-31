@@ -31,7 +31,6 @@ export function QuickOrderDialog({
     }
     setLoading(true);
 
-    // Reusing the existing endpoint. user_email is omitted (nullable).
     const formData = new FormData();
     formData.append("services", JSON.stringify([serviceName]));
     formData.append("user_name", name);
@@ -65,14 +64,12 @@ export function QuickOrderDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden border-(--outline) bg-(--bg) gap-0">
-        <div className="p-6 md:p-8 space-y-6">
+        {/* Added max-h and overflow-y-auto to fix the scrollbar hiding issue */}
+        <div className="p-6 md:p-8 space-y-6 max-h-[85vh] overflow-y-auto scrollbar-admin">
           <div>
             <h2 className="text-2xl font-heading font-semibold tracking-tight text-(--on-bg-high)">
               Обсудить проект
             </h2>
-            <p className="text-body-4 text-(--on-bg-medium) mt-1">
-              Услуга: <span className="text-(--primary) font-medium">{serviceName}</span>
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
