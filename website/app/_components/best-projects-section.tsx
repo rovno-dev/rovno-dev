@@ -7,7 +7,7 @@ import Link from "next/link";
 import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/providers/language-provider";
 import { dbRowToProject, type DbProjectList } from "@/utils/api/projects";
-import type { Project } from "@/app/_data/projects";
+import type { Project } from "@/utils/api/projects";
 
 /**
  * Featured projects on the home page. Data comes down as a prop from the

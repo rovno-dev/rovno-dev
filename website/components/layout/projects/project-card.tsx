@@ -1,11 +1,11 @@
 "use client";
+
 import { useState, useEffect, useRef, useMemo, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ImageBrokenIcon, ArrowUpRight } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
-import { Project } from "@/app/_data/projects";
-import { CLIENTS } from "@/app/_data/clients";
+import { Project } from "@/utils/api/projects";
 import { cn } from "@/lib/utils";
 
 export interface ProjectTagRef {
@@ -57,7 +57,6 @@ function MarqueeText({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const probeRef = useRef<HTMLSpanElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-
   const [isMarquee, setIsMarquee] = useState(false);
   const [travel, setTravel] = useState(0);
   const [animName] = useState(
@@ -68,13 +67,11 @@ function MarqueeText({
     const wrapper = wrapperRef.current;
     const probe = probeRef.current;
     if (!wrapper || !probe) return;
-
     const measure = () => {
       const lh = parseFloat(getComputedStyle(probe).lineHeight);
       const wraps = probe.scrollHeight > Math.ceil(lh) + 2;
       setIsMarquee(wraps);
     };
-
     const ro = new ResizeObserver(measure);
     ro.observe(wrapper);
     measure();
@@ -127,7 +124,6 @@ function MarqueeText({
               animation-play-state: running;
             }
           `}</style>
-
           <div
             ref={trackRef}
             className={`${trackClass} flex w-max whitespace-nowrap`}
@@ -175,32 +171,19 @@ export default function ProjectCard({
   const hasCover = Boolean(project.cover?.imageSrc?.trim());
   const showFallback = !hasCover || failed;
 
-  const client = project.clientId ? CLIENTS[project.clientId] : null;
   const normalizedTags = (tags || [])
     .map((t) => (typeof t === "string" ? t : t.name || t.label || ""))
     .filter(Boolean)
     .slice(0, 3);
 
-  const clientInitials = client?.name
-    ? client.name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((w) => w[0])
-        .join("")
-        .toUpperCase()
-    : "";
-
-  // ── Color Extraction ─────────────────────────────────────────
   const [bgColor, setBgColor] = useState<{ r: number; g: number; b: number } | null>(null);
 
   useEffect(() => {
     if (!project.cover?.imageSrc || showFallback) return;
-
     let isCancelled = false;
     const img = new window.Image();
     img.crossOrigin = "anonymous";
     img.src = project.cover.imageSrc;
-
     img.onload = () => {
       if (isCancelled) return;
       try {
@@ -209,13 +192,10 @@ export default function ProjectCard({
         canvas.height = 10;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
-
         const sampleHeight = img.naturalHeight * 0.3;
         ctx.drawImage(img, 0, 0, img.naturalWidth, sampleHeight, 0, 0, 10, 10);
-        
         const data = ctx.getImageData(0, 0, 10, 10).data;
         let r = 0, g = 0, b = 0, count = 0;
-        
         for (let i = 0; i < data.length; i += 4) {
           if (data[i + 3] < 128) continue;
           r += data[i];
@@ -223,7 +203,6 @@ export default function ProjectCard({
           b += data[i + 2];
           count++;
         }
-        
         if (count > 0) {
           setBgColor({
             r: Math.round(r / count),
@@ -233,7 +212,6 @@ export default function ProjectCard({
         }
       } catch (err) {}
     };
-
     return () => {
       isCancelled = true;
     };
@@ -252,7 +230,6 @@ export default function ProjectCard({
   const textColorClass = isLight ? "text-[var(--dark-8)]" : "text-[var(--gray-0)]";
   const shadowClass = isLight ? "drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]";
 
-  // THE NEW URL FORMAT
   const href = `/projects/${project.id}/${project.slug}`;
 
   return (
@@ -284,7 +261,6 @@ export default function ProjectCard({
         className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500" 
         style={gradientStyle}
       />
-      
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
 
       <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 flex items-start justify-between gap-4 pointer-events-none">
@@ -299,7 +275,6 @@ export default function ProjectCard({
             </p>
           )}
         </div>
-
         <div 
           className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ${
             isLight 
@@ -311,28 +286,7 @@ export default function ProjectCard({
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
-        {client ? (
-          <div
-            className="size-12 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-lg ring-1 ring-black/10 pointer-events-auto"
-            aria-label={client.name}
-          >
-            {client.logotype ? (
-              <Image
-                src={client.logotype}
-                alt={client.name}
-                width={48}
-                height={48}
-                className="object-contain p-2"
-              />
-            ) : (
-              <span className="text-black font-bold text-xs tracking-tight">
-                {clientInitials}
-              </span>
-            )}
-          </div>
-        ) : <div />}
-
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-end gap-4 pointer-events-none">
         {normalizedTags.length > 0 && (
           <div className="flex flex-wrap justify-end gap-2 pointer-events-auto">
             {normalizedTags.map((t, i) => (

@@ -152,6 +152,7 @@ def create_article(
         date=payload.date or datetime.utcnow(),
         mdx_content=payload.mdx_content or "",
         raw_json=payload.raw_json,
+        attachments=payload.attachments,
         seo_title=payload.seo_title,
         meta_description=payload.meta_description,
         publication_status=final_status,

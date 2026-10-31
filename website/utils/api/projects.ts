@@ -4,6 +4,7 @@ const SERVER_API_BASE =
   process.env.API_BASE_URL_INTERNAL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:8000";
+
 export type ProjectTagKind = "from_chief" | "license" | "github" | "custom";
 
 export interface ProjectTag {
@@ -21,6 +22,25 @@ export interface ProjectMedia {
   thumbnail_url?: string | null;
   caption?: string | null;
   sort_order?: number;
+}
+
+export interface Project {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  shortDescription?: string;
+  tags?: { title: string; href?: string }[];
+  cover: {
+    videoSrc?: string;
+    imageSrc: string;
+  };
+  href?: string;
+  category: string;
+  clientId: string;
+  period?: string;
+  techStack?: string[];
+  customPage?: string;
 }
 
 export interface ProjectDetail {
@@ -43,7 +63,6 @@ export interface ProjectDetail {
   meta_description?: string | null;
   is_featured: boolean;
   publication_status: string;
-  /** Key of a bespoke renderer, or null for the shared layout. */
   custom_page?: string | null;
   tags: ProjectTag[];
   media: ProjectMedia[];
@@ -132,11 +151,6 @@ export async function fetchGithubReadme(repo: string, branch?: string): Promise<
   return res.json;
 }
 
-
-/**
- * Minimal shape of a row returned by GET /api/v1/projects. Exported so the
- * /projects RSC page can type its DB fetch without re-declaring the shape.
- */
 export interface DbProjectTag {
   id: string;
   kind: string;
@@ -162,11 +176,6 @@ export interface DbProjectList {
   tags?: DbProjectTag[] | null;
 }
 
-/**
- * Client-side fetch of the public project list. Uses $fetch, which resolves
- * NEXT_PUBLIC_API_BASE_URL from the browser - the same base every authed
- * call already uses. Fails soft so a backend blip never breaks the grid.
- */
 export async function fetchPublishedProjectsClient(): Promise<DbProjectList[]> {
   try {
     const res = await $fetch("/api/v1/projects", { isToast: false });
@@ -177,14 +186,6 @@ export async function fetchPublishedProjectsClient(): Promise<DbProjectList[]> {
   }
 }
 
-/**
- * Server-side fetch of the public project list. Uses the internal API base
- * and Next's ISR cache, tagged "projects" so admin mutations can invalidate
- * the list with a single `revalidateTags(["projects"])` call.
- *
- * Fails soft: a backend blip returns an empty list rather than 500-ing the
- * whole /projects route.
- */
 export async function fetchPublishedProjectsServer(): Promise<DbProjectList[]> {
   try {
     const res = await fetch(`${SERVER_API_BASE}/api/v1/projects`, {
@@ -198,18 +199,10 @@ export async function fetchPublishedProjectsServer(): Promise<DbProjectList[]> {
   }
 }
 
-
-// ─────────────────────────────────────────────────────────────────────
-// Row → card-shape mapper. Kept here so the home featured section and
-// the /projects list page render off exactly the same transformation.
-// ─────────────────────────────────────────────────────────────────────
-import type { Project } from "@/app/_data/projects";
-
 export function dbRowToProject(r: DbProjectList): Project {
   const tags = (r.tags || [])
     .map((t) => ({ title: (t.label || "").trim() }))
     .filter((t) => t.title.length > 0);
-
   return {
     id: r.id,
     slug: r.slug,
@@ -222,8 +215,7 @@ export function dbRowToProject(r: DbProjectList): Project {
       videoSrc: r.cover_video_src || undefined,
     },
     href: "",
-    category: ((r.category?.code as Project["category"]) ??
-      "corporative") as Project["category"],
+    category: (r.category?.code ?? "corporative"),
     clientId: "",
     period: r.period || "",
     techStack: [],

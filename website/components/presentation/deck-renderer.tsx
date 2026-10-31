@@ -1,11 +1,25 @@
 "use client";
+
 import { LiveProvider, LiveError, LivePreview } from "react-live";
 import { tsxScope } from "./tsx-scope";
 
+/**
+ * Normalise user-authored TSX before it reaches React.
+ *
+ * See CustomTsxSlide.tsx for the full rationale — this is the same fix,
+ * applied to the deck-level code path. `\bclassname=` only matches at a
+ * word boundary so variable names are safe.
+ */
+function normaliseClassname(code: string): string {
+  return code.replace(/\bclassname=/g, "className=");
+}
+
 export function DeckRenderer({ code }: { code: string }) {
+  const safeCode = normaliseClassname(code);
+
   return (
     <div className="fixed inset-0 w-full h-full bg-black overflow-hidden flex flex-col">
-      <LiveProvider code={code} scope={tsxScope} noInline={true}>
+      <LiveProvider code={safeCode} scope={tsxScope} noInline={true}>
         <div className="flex-1 relative">
           <LivePreview className="absolute inset-0" />
         </div>

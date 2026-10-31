@@ -189,7 +189,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     is_featured: form.is_featured,
     publication_status: status,
     tags: form.tags,
-    media: form.media,
+    media: form.media, // Убедись, что form.media содержит полный массив
     custom_page: form.custom_page,
   });
 

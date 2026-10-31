@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import ProjectCard from "@/components/layout/projects/project-card";
-import type { Project } from "@/app/_data/projects";
+import type { Project } from "@/utils/api/projects";
 import type { Taxonomy } from "@/utils/api/taxonomies";
 import {
   MagnifyingGlassIcon,
@@ -126,7 +126,7 @@ export function FilterBar({
       <div className="sticky top-[68px] md:top-[92px] z-40 pt-6 pb-8 backdrop-blur-xl bg-(--bg)/80 border-b border-(--outline)">
         <Container>
           <div className="flex items-center gap-2 h-14 rounded-2xl border border-(--outline) bg-(--card) shadow-sm pl-4 pr-2">
-            
+
             {/* Search Input */}
             <div className="relative flex-1 md:flex-initial md:w-[240px] h-full flex items-center min-w-0">
               <MagnifyingGlassIcon className="absolute left-0 size-4 text-(--on-bg-low) pointer-events-none" />
@@ -151,7 +151,7 @@ export function FilterBar({
                 </button>
               )}
             </div>
-            
+
             {/* Desktop Category Chips */}
             <div className="hidden md:flex flex-1 min-w-0 items-center gap-2 pl-4 ml-2 border-l border-(--outline) h-8">
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar h-full">
@@ -200,7 +200,7 @@ export function FilterBar({
               )}
             </button>
           </div>
-          
+
           {/* Mobile Filters Dropdown */}
           {mobileOpen && (
             <div className="md:hidden mt-3 rounded-2xl border border-(--outline) bg-(--card) p-4 space-y-4 shadow-lg">
@@ -276,6 +276,7 @@ export function FilterBar({
                   key={project.id || project.slug}
                   project={project}
                   index={idx}
+                  variant="featured"
                   categoryMap={categoryMap}
                   tags={tagListForSlug(project.slug).map((label, i) => ({
                     id: `${project.slug}-tag-${i}`,

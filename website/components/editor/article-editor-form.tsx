@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -44,7 +45,6 @@ interface FormState {
   seo_title: string;
   meta_description: string;
   raw_json: string;
-  // Article gallery - same shape the backend stores on the row.
   attachments: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[];
 }
 
@@ -74,9 +74,7 @@ function toFormState(article?: Article | null): FormState {
     seo_title: article.seo_title || "",
     meta_description: article.meta_description || "",
     raw_json: article.raw_json ? JSON.stringify(article.raw_json, null, 2) : "",
-    // TagRef[] -> string[] - the tag editor works with names.
     tags: (article.tags || []).map((t) => t.name),
-    // Default sort_order so the media uploader has a stable key.
     attachments: (article.attachments || []).map((a, i) => ({
       ...a,
       sort_order: a.sort_order ?? i,
@@ -93,7 +91,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
   const isPublished = initial?.publication_status === "published";
   const isPending = initial?.publication_status === "pending_review";
   const isRejected = initial?.publication_status === "rejected";
-
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
@@ -161,6 +158,8 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       seo_title: form.seo_title.trim() || null,
       meta_description: form.meta_description.trim() || null,
       publication_status: status,
+      // ФИКС: Без этой строки бэкенд не получал attachments и удалял их из БД!
+      attachments: form.attachments, 
     };
   };
 
@@ -175,8 +174,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       const saved = isEdit && initial
         ? await updateArticle(initial.slug, payload)
         : await createArticle(payload);
-      // Different toast depending on where it went: team members publish
-      // immediately, everyone else lands in the review queue.
       if (status === "published" && !isTeam) {
         toast.success("Статья отправлена на проверку");
       } else {
@@ -194,9 +191,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
     }
   };
 
-  // Toggle only makes sense on an already-published article - moving it back
-  // to drafts. The draft → published direction is handled by the primary
-  // save button (which does save + publish in one call).
   const handleUnpublish = async () => {
     if (!initial) return;
     setSaving(true);
@@ -239,15 +233,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
             </p>
           )}
         </div>
-
-        {/*
-          Action rules per state - exactly one primary (blue) and one
-          secondary (outlined) button at a time. No duplicate labels.
-
-            published → [Unpublish] [Delete] [FloppyDiskIcon changes]
-            draft     → [FloppyDiskIcon draft] [Delete] [Publish]
-            new       → [FloppyDiskIcon draft] [Publish]
-        */}
         <div className="flex flex-wrap items-center gap-2">
           {isEdit && isPublished && (
             <>
@@ -270,7 +255,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
               </Button>
             </>
           )}
-
           {isEdit && !isPublished && (
             <>
               <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
@@ -292,7 +276,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
               </Button>
             </>
           )}
-
           {!isEdit && (
             <>
               <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
@@ -308,7 +291,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         </div>
       </div>
 
-      {/* Review status banner */}
       {isEdit && isPending && (
         <Card className="rounded-3xl border border-blue-500/30 bg-blue-500/5 p-5 flex items-start gap-4">
           <ClockIcon className="size-5 text-blue-500 shrink-0 mt-0.5" />
@@ -320,7 +302,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
           </div>
         </Card>
       )}
-
       {isEdit && isRejected && initial?.review_note && (
         <Card className="rounded-3xl border border-rose-500/30 bg-rose-500/5 p-5 flex items-start gap-4">
           <XCircleIcon className="size-5 text-rose-500 shrink-0 mt-0.5" />
@@ -337,7 +318,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         </Card>
       )}
 
-      {/* Metadata */}
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-4 overflow-visible">
         <h2 className="text-heading-3">{t("editor.section_meta")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,7 +375,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         </div>
       </Card>
 
-      {/* Attachments gallery */}
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
         <h2 className="text-heading-3">Медиа</h2>
         <p className="text-body-4 text-(--on-bg-medium)">
@@ -407,7 +386,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         />
       </Card>
 
-      {/* AI payload */}
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
         <button
           type="button"
@@ -439,7 +417,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         )}
       </Card>
 
-      {/* Content */}
       <div className="space-y-3">
         <h2 className="text-heading-3">{t("editor.section_content")}</h2>
         <ArticleEditor
@@ -449,7 +426,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         />
       </div>
 
-      {/* SEO */}
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
         <button
           type="button"

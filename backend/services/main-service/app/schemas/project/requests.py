@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Any, List, Optional
 from uuid import UUID
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, Field, field_validator
 
 class ProjectTagIn(BaseModel):
     kind: str = Field(..., description="from_chief | license | github | custom")
@@ -10,14 +9,12 @@ class ProjectTagIn(BaseModel):
     value: Optional[Any] = None
     sort_order: Optional[int] = 0
 
-
 class ProjectMediaIn(BaseModel):
     type: str = Field(..., description="image | video")
     url: str
     thumbnail_url: Optional[str] = None
     caption: Optional[str] = None
     sort_order: Optional[int] = 0
-
 
 class ProjectCreate(BaseModel):
     slug: Optional[str] = None
@@ -41,6 +38,12 @@ class ProjectCreate(BaseModel):
     media: Optional[List[ProjectMediaIn]] = None
     custom_page: Optional[str] = None
 
+    @field_validator("mdx_content")
+    @classmethod
+    def sanitize_mdx(cls, v):
+        if isinstance(v, str):
+            return v.replace("classname=", "className=")
+        return v
 
 class ProjectUpdate(BaseModel):
     slug: Optional[str] = None
@@ -63,3 +66,10 @@ class ProjectUpdate(BaseModel):
     tags: Optional[List[ProjectTagIn]] = None
     media: Optional[List[ProjectMediaIn]] = None
     custom_page: Optional[str] = None
+
+    @field_validator("mdx_content")
+    @classmethod
+    def sanitize_mdx(cls, v):
+        if isinstance(v, str):
+            return v.replace("classname=", "className=")
+        return v

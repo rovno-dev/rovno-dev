@@ -1,25 +1,10 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
-import path from "path";
-import fs from "fs";
-import matter from "gray-matter";
 import { Container } from "@/components/ui/container";
-import { Project, PROJECTS } from "@/app/_data/projects";
-import { getAllProjects } from "@/app/_data/projects/parser";
-import { CLIENTS } from "@/app/_data/clients";
-import { PROJECT_CATEGORIES } from "@/app/_data/categories";
-import { PROJECT_TAGS } from "@/app/_data/project-tags";
-import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
+import { CustomProjectPage, type RelatedRef } from "./_components/custom-project-page";
+import { findCustomPageRenderer, type CustomPageContext } from "./_components/custom-pages";
 import { GithubReadmeBlock } from "./_components/github-readme-block";
-import {
-  CustomProjectPage,
-  type RelatedRef,
-} from "./_components/custom-project-page";
-import {
-  findCustomPageRenderer,
-  type CustomPageContext,
-} from "./_components/custom-pages";
 import {
   Gallery,
   MetricCard,
@@ -97,16 +82,25 @@ async function fetchDbProject(slug: string): Promise<DBProject | null> {
   }
 }
 
-export async function generateStaticParams() {
-  const mdxProjects = getAllProjects();
-  const dataProjects = Object.values(PROJECTS);
-  const seen = new Set<string>();
-  const all = [...mdxProjects, ...dataProjects].filter((p) => {
-    if (seen.has(p.slug)) return false;
-    seen.add(p.slug);
-    return true;
-  });
-  return all.map((project) => ({ id: project.id, slug: project.slug }));
+async function getRelatedProjects(currentSlug: string, limit = 3): Promise<RelatedRef[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/projects?limit=10`, { next: { revalidate: 60, tags: ["projects"] } } as any);
+    if (!res.ok) return [];
+    const body = await res.json();
+    if (!Array.isArray(body)) return [];
+    return body
+      .filter((p: any) => p.slug !== currentSlug)
+      .slice(0, limit)
+      .map((p: any) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        coverImage: p.cover_image_src,
+        categoryLabel: p.category?.label,
+      }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -116,43 +110,15 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);
-  const mdxProject = getAllProjects().find((p) => p.slug === slug);
-  const fallbackProject = PROJECTS[slug];
+  if (!dbProject) return { title: "Проект не найден · Rovno.dev" };
 
-  let title = "Проект Rovno.dev";
-  let description = "Кейс цифрового агентства Rovno.dev";
-  let image = `/api/og/project/${slug}`;
-  let seoTitle: string | null = null;
-  let seoDescription: string | null = null;
-
-  if (dbProject) {
-    seoTitle = dbProject.seo_title || null;
-    seoDescription = dbProject.meta_description || null;
-    title = dbProject.title;
-    description = dbProject.short_description || dbProject.description || description;
-    if (dbProject.cover_image_src) image = dbProject.cover_image_src;
-  } else if (mdxProject) {
-    title = mdxProject.title;
-    description = mdxProject.shortDescription || mdxProject.description || description;
-    if (mdxProject.cover?.imageSrc) image = mdxProject.cover.imageSrc;
-  } else if (fallbackProject) {
-    title = fallbackProject.title;
-    description = fallbackProject.shortDescription || fallbackProject.description || description;
-    if (fallbackProject.cover?.imageSrc) image = fallbackProject.cover.imageSrc;
-  }
-
+  const image = dbProject.cover_image_src || `/api/og/project/${slug}`;
   return {
-    title: seoTitle || `${title} · Rovno.dev`,
-    description: seoDescription || description,
+    title: dbProject.seo_title || `${dbProject.title} · Rovno.dev`,
+    description: dbProject.meta_description || dbProject.short_description,
     openGraph: {
-      title: seoTitle || title,
-      description: seoDescription || description,
-      images: [image],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: seoTitle || title,
-      description: seoDescription || description,
+      title: dbProject.seo_title || dbProject.title,
+      description: dbProject.meta_description || dbProject.short_description,
       images: [image],
     },
   };
@@ -196,39 +162,7 @@ const getCompiledMDX = cache(async (content: string) => {
   return compiled;
 });
 
-async function loadMdxBody(slug: string): Promise<React.ReactNode> {
-  const filePath = path.join(
-    process.cwd(),
-    "_data/projects/content",
-    `${slug}.mdx`,
-  );
-  let source: string | undefined;
-  try {
-    source = fs.readFileSync(filePath, "utf8");
-  } catch {
-    return null;
-  }
-  const { content } = matter(source);
-  return getCompiledMDX(content);
-}
-
-function buildRelated(currentSlug: string, limit = 3): RelatedRef[] {
-  return Object.values(PROJECTS)
-    .filter((p) => p.slug !== currentSlug)
-    .slice(0, limit)
-    .map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      coverImage: p.cover.imageSrc,
-      categoryLabel: PROJECT_CATEGORIES.find((c) => c.code === p.category)?.label,
-    }));
-}
-
-function dbToContext(
-  db: DBProject,
-  content: React.ReactNode,
-): CustomPageContext {
+function dbToContext(db: DBProject, content: React.ReactNode): CustomPageContext {
   return {
     slug: db.slug,
     title: db.title,
@@ -245,7 +179,7 @@ function dbToContext(
     techStack: db.tech_stack || [],
     tags: (db.tags || []).map((t) => ({
       id: t.id,
-      kind: t.kind as ProjectTagKind,
+      kind: t.kind as any,
       label: t.label,
       meta: t.value?.author ?? null,
     })),
@@ -259,84 +193,33 @@ function dbToContext(
   };
 }
 
-function staticToContext(
-  project: Project,
-  content: React.ReactNode,
-): CustomPageContext {
-  const client = project.clientId ? CLIENTS[project.clientId] : null;
-  const categoryLabel = PROJECT_CATEGORIES.find(
-    (c) => c.code === project.category,
-  )?.label;
-
-  return {
-    slug: project.slug,
-    title: project.title,
-    shortDescription: project.shortDescription || project.description || "",
-    description: project.description || "",
-    coverImage: project.cover.imageSrc,
-    coverVideo: project.cover.videoSrc,
-    href: project.href,
-    category: project.category,
-    categoryLabel,
-    clientName: client?.name,
-    period: project.period,
-    platform: project.platform,
-    techStack: project.techStack || [],
-    tags: (PROJECT_TAGS[project.slug] || []).map((t) => ({
-      id: t.id,
-      kind: t.kind,
-      label: t.label,
-      meta: t.meta ?? null,
-    })),
-    media: [],
-    content,
-  };
-}
-
 export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ id: string; slug: string }>;
 }) {
   const { slug } = await params;
-  const mdxProjects = getAllProjects();
-  const mdxProject = mdxProjects.find((p) => p.slug === slug);
-  const fallbackProject = PROJECTS[slug] as Project | undefined;
-  const projectData = mdxProject || fallbackProject;
-  const dbProject = !projectData ? await fetchDbProject(slug) : null;
+  const dbProject = await fetchDbProject(slug);
+  if (!dbProject) notFound();
 
-  if (!projectData && !dbProject) notFound();
+  const content = dbProject.mdx_content ? await getCompiledMDX(dbProject.mdx_content) : null;
+  const ctx = dbToContext(dbProject, content);
+  const renderer = findCustomPageRenderer(dbProject.custom_page);
 
-  const content = dbProject
-    ? dbProject.mdx_content
-      ? await getCompiledMDX(dbProject.mdx_content)
-      : null
-    : mdxProject
-      ? await loadMdxBody(slug)
-      : null;
-
-  const ctx = dbProject
-    ? dbToContext(dbProject, content)
-    : staticToContext(projectData as unknown as Project, content);
-
-  const customKey =
-    dbProject?.custom_page ||
-    (projectData as Project | undefined)?.customPage ||
-    null;
-
-  const renderer = findCustomPageRenderer(customKey);
   if (renderer) {
     return renderer.render(ctx);
   }
 
+  const related = await getRelatedProjects(slug);
+
   return (
     <>
       <CustomProjectPage
-        project={{ ...ctx, id: projectData?.id || dbProject?.id || "" }}
+        project={{ ...ctx, id: dbProject.id }}
         content={ctx.content}
-        related={buildRelated(slug)}
+        related={related}
       />
-      {dbProject?.tags
+      {dbProject.tags
         .filter((t) => t.kind === "github" && t.value?.repo)
         .map((t) => (
           <Container key={t.id} className="pb-12">
