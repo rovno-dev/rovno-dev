@@ -137,7 +137,7 @@ export default async function ClientProfilePage({
               {client.projects.map((p, idx) => (
                 <Link
                   key={p.id}
-                  href={`/projects/${p.slug}`}
+                  href={`/projects/${p.id}/${p.slug}`}
                   className="group block animate-reveal fill-mode-both"
                   style={{ animationDelay: `${idx * 80}ms` }}
                 >

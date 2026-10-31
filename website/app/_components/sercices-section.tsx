@@ -25,7 +25,7 @@ export default function ServicesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-3xl md:text-4xl lg:text-5xl leading-[1.1] font-sans font-medium tracking-[-0.02em] uppercase text-center w-full break-words"
+            className="text-3xl md:text-4xl lg:text- leading-[1.1] font-sans font-medium tracking-[-0.02em] uppercase text-center w-full break-words"
           >
             {t("services.page.title")}
           </motion.h2>
@@ -81,7 +81,7 @@ export default function ServicesSection() {
               <div className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-(--card) via-(--card)/80 to-transparent z-[5] pointer-events-none" />
 
               <div className="relative z-10 w-full md:w-[85%] mt-auto pointer-events-none">
-                <h3 className="text-2xl md:text-3xl font-semibold mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
+                <h3 className="text-4xl md:text-2xl lg:text-4xl xl:text-5xl font-medium mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
                   {t("services.audit.short")}
                 </h3>
                 <p className="text-(--on-bg-medium) leading-relaxed text-sm md:text-base">
@@ -140,7 +140,7 @@ export default function ServicesSection() {
               <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-(--card) via-(--card) to-transparent z-[5] pointer-events-none" />
 
               <div className="relative z-10 mt-auto pointer-events-none">
-                <h3 className="text-2xl md:text-3xl font-semibold mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
+                <h3 className="text-4xl md:text-2xl lg:text-4xl xl:text-5xl font-medium mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
                   {t("services.digitalization.short")}
                 </h3>
                 <p className="text-(--on-bg-medium) leading-relaxed text-sm">
@@ -177,7 +177,7 @@ export default function ServicesSection() {
               <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-(--card) via-(--card)/90 to-transparent pointer-events-none w-full md:w-[50%] z-[5]" />
 
               <div className="relative z-10 max-w-md pointer-events-none mt-auto">
-                <h3 className="text-2xl md:text-3xl font-semibold mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
+                <h3 className="text-4xl md:text-2xl lg:text-4xl xl:text-5xl font-medium mb-2 tracking-tight text-(--on-bg-high) group-hover:text-(--primary) transition-colors duration-300">
                   {t("services.startup.short")}
                 </h3>
                 <p className="text-(--on-bg-medium) leading-relaxed text-sm md:text-base">

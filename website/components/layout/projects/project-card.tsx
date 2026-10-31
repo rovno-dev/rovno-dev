@@ -6,6 +6,7 @@ import { ImageBrokenIcon, ArrowUpRight } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
 import { Project } from "@/app/_data/projects";
 import { CLIENTS } from "@/app/_data/clients";
+import { cn } from "@/lib/utils";
 
 export interface ProjectTagRef {
   id?: string;
@@ -42,9 +43,9 @@ function MarqueeText({
   text,
   className,
   style,
-  speed = 40, // Faster animation
+  speed = 40,
   gap = 40,
-  pause = 2,  // Starts moving almost immediately
+  pause = 2,
 }: {
   text: string;
   className?: string;
@@ -189,11 +190,11 @@ export default function ProjectCard({
         .toUpperCase()
     : "";
 
-  // ── Color Extraction for Featured Variant ─────────────────────────
+  // ── Color Extraction ─────────────────────────────────────────
   const [bgColor, setBgColor] = useState<{ r: number; g: number; b: number } | null>(null);
 
   useEffect(() => {
-    if (variant !== "featured" || !project.cover?.imageSrc || showFallback) return;
+    if (!project.cover?.imageSrc || showFallback) return;
 
     let isCancelled = false;
     const img = new window.Image();
@@ -209,7 +210,6 @@ export default function ProjectCard({
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        // Sample top 30% of the image
         const sampleHeight = img.naturalHeight * 0.3;
         ctx.drawImage(img, 0, 0, img.naturalWidth, sampleHeight, 0, 0, 10, 10);
         
@@ -217,7 +217,7 @@ export default function ProjectCard({
         let r = 0, g = 0, b = 0, count = 0;
         
         for (let i = 0; i < data.length; i += 4) {
-          if (data[i + 3] < 128) continue; // ignore transparent pixels
+          if (data[i + 3] < 128) continue;
           r += data[i];
           g += data[i + 1];
           b += data[i + 2];
@@ -231,166 +231,120 @@ export default function ProjectCard({
             b: Math.round(b / count),
           });
         }
-      } catch (err) {
-        // CORS error, fallback to default black gradient
-      }
+      } catch (err) {}
     };
 
     return () => {
       isCancelled = true;
     };
-  }, [project.cover?.imageSrc, variant, showFallback]);
+  }, [project.cover?.imageSrc, showFallback]);
 
   const isLight = useMemo(() => {
-    if (!bgColor) return false; // Default to dark bg, white text
+    if (!bgColor) return false;
     const luminance = (0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b) / 255;
     return luminance > 0.55; 
   }, [bgColor]);
 
   const gradientStyle = bgColor 
-    ? { background: `linear-gradient(to bottom, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.9) 0%, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.4) 50%, transparent 100%)` }
-    : { background: "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)" };
+    ? { background: `linear-gradient(to bottom, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.95) 0%, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.4) 50%, transparent 100%)` }
+    : { background: "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)" };
 
   const textColorClass = isLight ? "text-[var(--dark-8)]" : "text-[var(--gray-0)]";
   const shadowClass = isLight ? "drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]";
 
-  // ── FEATURED VARIANT ─────────────────────────────────────────────
-  if (variant === "featured") {
-    return (
-      <Link
-        href={`/projects/${project.slug}`}
-        className="group block animate-reveal fill-mode-both relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) transition-colors duration-500 hover:border-(--primary)/40"
-        style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
-      >
-        {showFallback ? (
-          <CoverFallback
-            label={t("projects.cover.fallback")}
-            hint={t("projects.cover.fallback_hint")}
-          />
-        ) : (
-          <Image
-            src={project.cover.imageSrc}
-            alt={project.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-            className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-            onError={() => setFailed(true)}
-          />
-        )}
+  // THE NEW URL FORMAT
+  const href = `/projects/${project.id}/${project.slug}`;
 
-        {/* Dynamic Gradient - uses dominant color of image top */}
-        <div 
-          className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500" 
-          style={gradientStyle}
-        />
-
-        {/* Top Row - Title, Description, Action */}
-        <div className="absolute inset-x-0 top-0 p-3 md:p-4 z-10 flex items-center justify-between gap-4 pointer-events-none">
-          <div className="flex flex-col max-w-[85%] min-w-0">
-            <MarqueeText
-              text={project.title}
-              className={`text-lg md:text-xl font-heading font-semibold leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
-            />
-            {project.shortDescription && (
-              <p className={`mt-1.5 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? 'text-[var(--dark-8)]/80' : 'text-[var(--gray-0)]/80'} ${shadowClass}`}>
-                {project.shortDescription}
-              </p>
-            )}
-          </div>
-
-          {/* Fixed Arrow Container */}
-          <div 
-            className={`flex items-center justify-center shrink-0 size-8 rounded-md shadow-sm transition-transform duration-300 group-hover:scale-105 ${
-              isLight 
-                ? "bg-[var(--dark-8)] text-[var(--gray-0)]" 
-                : "bg-white text-black"
-            }`}
-          >
-            <ArrowUpRight className="size-4!" weight="bold" />
-          </div>
-        </div>
-
-        {/* Bottom Row - Client Logo */}
-        <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 pointer-events-none">
-          {client ? (
-            <div
-              className="size-11 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-lg ring-1 ring-black/10 pointer-events-auto"
-              aria-label={client.name}
-            >
-              {client.logotype ? (
-                <Image
-                  src={client.logotype}
-                  alt={client.name}
-                  width={44}
-                  height={44}
-                  className="object-contain p-1.5"
-                />
-              ) : (
-                <span className="text-black font-bold text-xs tracking-tight">
-                  {clientInitials}
-                </span>
-              )}
-            </div>
-          ) : <div />}
-        </div>
-      </Link>
-    );
-  }
-
-  // ── CLASSIC VARIANT ──────────────────────────────────────────────
   return (
     <Link
-      href={`/projects/${project.slug}`}
-      className="group block animate-reveal fill-mode-both h-full"
+      href={href}
+      className={cn(
+        "group block animate-reveal fill-mode-both relative w-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card) transition-all duration-500 hover:border-(--primary)/40 hover:shadow-2xl hover:shadow-(--primary)/5",
+        variant === "featured" ? "aspect-[4/3]" : "aspect-[4/3] md:aspect-[3/4]"
+      )}
       style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
     >
-      <div className="relative h-full flex flex-col overflow-hidden rounded-3xl bg-(--card) border border-(--outline) transition-all duration-300 hover:border-(--primary)/30 hover:shadow-xl hover:shadow-(--primary)/5">
-        <div className="relative aspect-[4/3] w-full overflow-hidden shrink-0 border-b border-(--outline)">
-          {showFallback ? (
-            <CoverFallback
-              label={t("projects.cover.fallback")}
-              hint={t("projects.cover.fallback_hint")}
-            />
-          ) : (
-            <Image
-              src={project.cover.imageSrc}
-              alt={project.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              onError={() => setFailed(true)}
-            />
+      {showFallback ? (
+        <CoverFallback
+          label={t("projects.cover.fallback")}
+          hint={t("projects.cover.fallback_hint")}
+        />
+      ) : (
+        <Image
+          src={project.cover.imageSrc}
+          alt={project.title}
+          fill
+          sizes={variant === "featured" ? "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"}
+          className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          onError={() => setFailed(true)}
+        />
+      )}
+
+      <div 
+        className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500" 
+        style={gradientStyle}
+      />
+      
+      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
+
+      <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 flex items-start justify-between gap-4 pointer-events-none">
+        <div className="flex flex-col max-w-[85%] min-w-0">
+          <MarqueeText
+            text={project.title}
+            className={`text-xl md:text-2xl font-heading font-semibold leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
+          />
+          {project.shortDescription && (
+            <p className={`mt-2 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? 'text-[var(--dark-8)]/80' : 'text-[var(--gray-0)]/80'} ${shadowClass}`}>
+              {project.shortDescription}
+            </p>
           )}
         </div>
-        <div className="p-6 md:p-8 flex flex-col gap-4 flex-1">
-          {normalizedTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {normalizedTags.map((t, i) => (
-                <span
-                  key={`${t}-${i}`}
-                  className="inline-flex items-center rounded-full border border-(--outline) bg-(--bg) px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-(--on-bg-medium)"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          )}
-          <div className="flex items-start justify-between gap-4 mt-auto">
-            <div className="min-w-0">
-              <h3 className="text-xl md:text-2xl font-heading font-semibold text-(--on-bg-high) leading-[1.2] line-clamp-3 text-balance transition-colors group-hover:text-(--primary)">
-                {project.title}
-              </h3>
-              {project.shortDescription && (
-                <p className="mt-2 text-body-4 text-(--on-bg-medium) line-clamp-2">
-                  {project.shortDescription}
-                </p>
-              )}
-            </div>
-            <div className="size-10 shrink-0 rounded-full border border-(--outline) bg-(--bg) flex items-center justify-center text-(--on-bg-low) group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) transition-all duration-300">
-              <ArrowUpRight className="size-5" />
-            </div>
+
+        <div 
+          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ${
+            isLight 
+              ? "bg-white text-[var(--dark-8)] border-transparent" 
+              : "bg-black/20 backdrop-blur-md text-white border border-white/20"
+          }`}
+        >
+          <ArrowUpRight className="size-5" weight="bold" />
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
+        {client ? (
+          <div
+            className="size-12 rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-lg ring-1 ring-black/10 pointer-events-auto"
+            aria-label={client.name}
+          >
+            {client.logotype ? (
+              <Image
+                src={client.logotype}
+                alt={client.name}
+                width={48}
+                height={48}
+                className="object-contain p-2"
+              />
+            ) : (
+              <span className="text-black font-bold text-xs tracking-tight">
+                {clientInitials}
+              </span>
+            )}
           </div>
-        </div>
+        ) : <div />}
+
+        {normalizedTags.length > 0 && (
+          <div className="flex flex-wrap justify-end gap-2 pointer-events-auto">
+            {normalizedTags.map((t, i) => (
+              <span
+                key={`${t}-${i}`}
+                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </Link>
   );

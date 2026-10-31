@@ -24,8 +24,6 @@ export function MDXHeading({
   children: ReactNode;
   className?: string;
 }) {
-  // React 19 removed the global JSX namespace; build the tag as a template
-  // literal cast to ElementType. Resolves to "h1".."h6" at runtime.
   const Tag = `h${level}` as ElementType;
   const classes = {
     1: "text-display-2 md:text-display-1 mb-6 mt-12",
@@ -39,11 +37,6 @@ export function MDXHeading({
 }
 
 // -------- Image --------
-// Rendered as <span style="display:block"> rather than <div> because markdown
-// wraps standalone `![alt](src)` images inside a <p>. A <div> inside a <p> is
-// invalid HTML - the browser hoists it out, the server and client trees
-// diverge, and React throws a hydration error. A block-display span is
-// phrasing content (legal inside <p>) but renders identically to a div.
 export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) {
   return (
     <span className="my-6 block rounded-2xl overflow-hidden border border-(--outline) bg-(--card)">
@@ -107,9 +100,6 @@ export function MDXListItem({ children }: { children: ReactNode }) {
 }
 
 // -------- Paragraph --------
-// Defensive: if a child renders as a block-level element (a custom component
-// without a phrasing root, a third-party MDX widget), wrap in a fragment to
-// avoid the same hydration error. Cheap check, catches future regressions.
 function hasBlockChild(children: ReactNode): boolean {
   if (!children) return false;
   const arr = Array.isArray(children) ? children : [children];
@@ -131,8 +121,6 @@ function hasBlockChild(children: ReactNode): boolean {
 
 export function MDXParagraph({ children }: { children: ReactNode }) {
   if (hasBlockChild(children)) {
-    // Cannot legally nest a block element inside <p>; fall through to a
-    // plain block wrapper. Visually identical to <p>, no hydration warning.
     return (
       <span className="my-4 block leading-relaxed text-(--on-bg-medium)">
         {children}
@@ -193,11 +181,15 @@ export function MDXCard({
   return <Card className={cn("p-6", className)}>{children}</Card>;
 }
 
-// -------- Gallery (image/video carousel) --------
+// -------- Gallery (image/video grid + lightbox) --------
 export function Gallery({
   media,
+  fullWidth = false,
+  columns = 3,
 }: {
-  media: Array<{ type: "image" | "video"; src: string }>;
+  media: Array<{ type: "image" | "video"; src: string; alt?: string; caption?: string }>;
+  fullWidth?: boolean;
+  columns?: number;
 }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -205,13 +197,25 @@ export function Gallery({
 
   if (!media || media.length === 0) return null;
 
+  // Break out of the container if fullWidth is requested
+  const wrapperClass = fullWidth
+    ? "relative left-1/2 -translate-x-1/2 w-screen max-w-[100vw] px-4 md:px-8 lg:px-12 my-10"
+    : "my-8";
+
+  const gridClass = cn(
+    "grid gap-4",
+    columns === 2 ? "grid-cols-1 md:grid-cols-2" : 
+    columns === 4 ? "grid-cols-2 md:grid-cols-4" :
+    "grid-cols-2 md:grid-cols-3"
+  );
+
   return (
-    <>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className={wrapperClass}>
+      <div className={gridClass}>
         {media.map((item, idx) => (
           <div
             key={idx}
-            className="relative aspect-video rounded-2xl overflow-hidden border border-(--outline) bg-(--card) cursor-pointer hover:scale-[1.02] transition-transform"
+            className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-(--outline) bg-(--card) cursor-zoom-in group/media"
             onClick={() => {
               setActiveIndex(idx);
               setLightboxOpen(true);
@@ -220,23 +224,29 @@ export function Gallery({
             {item.type === "image" ? (
               <Image
                 src={item.src}
-                alt={`Media ${idx + 1}`}
+                alt={item.alt || item.caption || `Media ${idx + 1}`}
                 fill
-                className="object-cover"
+                sizes={columns === 2 ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 33vw"}
+                className="object-cover transition-transform duration-500 group-hover/media:scale-105"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <span className="text-body-2 text-(--on-bg-medium)">▶ Видео</span>
+              <div className="w-full h-full flex items-center justify-center bg-black">
+                <video src={item.src} controls playsInline className="w-full h-full object-cover" />
               </div>
+            )}
+            {/* Hover overlay for images */}
+            {item.type === "image" && (
+              <div className="absolute inset-0 bg-black/0 group-hover/media:bg-black/10 transition-colors pointer-events-none" />
             )}
           </div>
         ))}
       </div>
 
+      {/* Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent
           showCloseButton={false}
-          className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0"
+          className="!fixed !inset-0 !z-[100] !max-w-none !max-h-none !p-0 !border-0 !bg-black/98 !rounded-none !translate-none !top-0 !left-0"
         >
           <Button
             variant="glass"
@@ -257,7 +267,7 @@ export function Gallery({
                     {item.type === "image" ? (
                       <Image
                         src={item.src}
-                        alt={`Media ${idx + 1}`}
+                        alt={item.alt || item.caption || `Media ${idx + 1}`}
                         fill
                         className="object-contain"
                         sizes="100vw"
@@ -265,7 +275,7 @@ export function Gallery({
                       />
                     ) : (
                       <iframe
-                        src={item.src + "?autoplay=1&mute=1"}
+                        src={item.src + (item.src.includes("?") ? "&" : "?") + "autoplay=1&mute=1"}
                         className="m-0 p-0 border-0 w-full h-full"
                         allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                         allowFullScreen
@@ -287,17 +297,19 @@ export function Gallery({
                 <button
                   key={idx}
                   onClick={() => carouselApi?.scrollTo(idx)}
-                  className={`h-2 rounded-full transition-all ${carouselApi?.selectedScrollSnap() === idx
+                  className={cn(
+                    "h-2 rounded-full transition-all",
+                    carouselApi?.selectedScrollSnap() === idx
                       ? "w-6 bg-white"
                       : "w-2 bg-white/30"
-                    }`}
+                  )}
                 />
               ))}
             </div>
           </Carousel>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }
 

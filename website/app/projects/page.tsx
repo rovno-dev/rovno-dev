@@ -20,7 +20,6 @@ export default async function ProjectsPage() {
   ]);
 
   const projects = dbRows.map(dbRowToProject);
-
   const categoryMap = Object.fromEntries(
     categories.map((c) => [c.code, c.labels.en || c.label || c.code]),
   );
@@ -28,11 +27,12 @@ export default async function ProjectsPage() {
   return (
     <main className="min-h-screen bg-(--bg)">
       <Container>
-        {/* Single heading line. No eyebrow, no description. */}
+        {/* Simple, clean heading as requested */}
         <h1 className="pt-6 md:pt-8 text-display-4 md:text-display-3 tracking-[-0.02em] leading-none">
           Проекты
         </h1>
       </Container>
+      
       <FilterBar
         projects={projects}
         categories={categories}

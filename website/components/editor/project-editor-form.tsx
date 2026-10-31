@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,7 +20,7 @@ import { revalidateTags } from "@/utils/revalidate";
 import {
   CUSTOM_PAGES_META,
   findCustomPageMeta,
-} from "@/app/projects/[slug]/_components/custom-pages-meta";
+} from "@/app/projects/[id]/[slug]/_components/custom-pages-meta";
 import { ArticleEditor } from "./article-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -119,7 +118,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   const router = useRouter();
   const isEdit = !!initial;
   const isPublished = initial?.publication_status === "published";
-
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [companies, setCompanies] = useState<ClientListItem[]>([]);
@@ -130,9 +128,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Use the admin endpoints (they return everything). The public
-    // categories endpoint would filter nothing, but admin gives us a
-    // consistent shape and a write-capable pairing.
     Promise.all([
       fetchProjectCategoriesAdmin().catch(() => [] as ProjectCategory[]),
       fetchCompanies().catch(() => [] as ClientListItem[]),
@@ -150,8 +145,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       });
   }, []);
 
-  // Picker-shaped projections of the fetched lists. Memoised shape, so
-  // EntityPicker sees a stable array across renders.
   const categoryItems: PickerItem[] = categories.map((c) => ({
     id: c.id,
     label: c.label,
@@ -166,11 +159,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     label: s.name,
     meta: s.usage_count > 0 ? String(s.usage_count) : null,
   }));
-  // The form stores stack as names (backend resolves names -> rows). The
-  // picker needs id-based items; we bridge by looking up the row for each
-  // name in the current pool. A name not in the pool renders as a synthetic
-  // id "name:<name>" - the picker still shows it, and creating it on save
-  // resolves the collision on the server side.
+
   const selectedStack: MultiPickerItem[] = form.tech_stack.map((name) => {
     const found = stackPool.find((s) => s.name.toLowerCase() === name.toLowerCase());
     return found
@@ -244,40 +233,50 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   };
 
   const githubTags = form.tags.filter((t) => t.kind === "github");
-
-  // A project with a bespoke template ignores MDX content and media -
-  // the template renders its own hard-coded sections. Only the
-  // identity fields need to be filled in.
   const isCustomPage = !!form.custom_page;
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-display-2 mb-1">
+    <div className="space-y-8 pb-24">
+      {/* Header Layout Fixed */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl md:text-3xl font-heading font-semibold mb-1 tracking-tight truncate">
             {isEdit ? "Редактирование проекта" : "Новый проект"}
           </h1>
           {initial && (
-            <p className="text-body-4 text-(--on-bg-low)">
-              {isPublished ? "Опубликован" : "Черновик"} ·{" "}
-              <code className="font-mono">/{initial.slug}</code>
+            <p className="text-sm text-(--on-bg-low) truncate">
+              {isPublished ? "Опубликован" : "Черновик"} · <code className="font-mono">/{initial.slug}</code>
             </p>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {isEdit && (
-            <Button variant="glass-red" size="icon-medium" onClick={handleDelete} disabled={saving}>
+            <Button 
+              variant="glass-red" 
+              size="icon-medium" 
+              onClick={handleDelete} 
+              disabled={saving}
+              className="shrink-0"
+            >
               <TrashIcon className="size-4" />
             </Button>
           )}
-          <Button variant="outlined" onClick={() => handleSave("draft")} disabled={saving}>
+          <Button 
+            variant="outlined" 
+            onClick={() => handleSave("draft")} 
+            disabled={saving}
+            className="flex-1 sm:flex-none"
+          >
             <FloppyDiskIcon className="size-4" />
             Сохранить черновик
           </Button>
-          <Button onClick={() => handleSave("published")} disabled={saving}>
+          <Button 
+            onClick={() => handleSave("published")} 
+            disabled={saving}
+            className="flex-1 sm:flex-none"
+          >
             <RocketIcon className="size-4" />
-            {isPublished ? "Сохранить и опубликовать" : "Опубликовать"}
+            {isPublished ? "Обновить" : "Опубликовать"}
           </Button>
         </div>
       </div>
@@ -310,10 +309,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               placeholder="2024 или 2023 - Present"
             />
           </Field>
-
-          {/* Client - chip picker sourced from the companies table. Creating
-              a new one persists a Company row immediately, so subsequent
-              projects can pick it too. */}
           <Field>
             <FieldLabel>Клиент</FieldLabel>
             <EntityPicker
@@ -331,9 +326,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               }}
             />
           </Field>
-
-          {/* Category - chip picker sourced from project_categories. Same
-              create-on-the-fly behaviour. */}
           <Field>
             <FieldLabel>Категория</FieldLabel>
             <EntityPicker
@@ -345,18 +337,12 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               emptyText="Нет категорий"
               createNoun="Создать категорию"
               onCreate={async (label) => {
-                // createProjectCategory expects { code?, label?, labels? }.
-                // Passing a bare string would land in `code` and produce
-                // a blank display label.
                 const c = await createProjectCategory({ label });
                 setCategories((prev) => [...prev, c]);
                 return { id: c.id, label: c.label };
               }}
             />
           </Field>
-
-          {/* Bespoke template selector. The list is code-defined on the
-              frontend - no backend call required. */}
           <Field className="md:col-span-2">
             <FieldLabel>Кастомная страница</FieldLabel>
             <Select
@@ -384,7 +370,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
                 "Общий премиальный шаблон кейса. Выбирайте один из готовых, если проект должен выглядеть иначе."}
             </p>
           </Field>
-
           <Field className="md:col-span-2">
             <FieldLabel>Платформа</FieldLabel>
             <Input
@@ -393,7 +378,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               placeholder="Web · iOS · Android · Brand system · …"
             />
           </Field>
-
           <Field className="md:col-span-2">
             <FieldLabel>Короткое описание</FieldLabel>
             <Textarea
@@ -445,8 +429,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         <EntityMultiPicker
           value={selectedStack}
           onChange={(next) => {
-            // Persist names, not ids - the backend resolves names to rows
-            // and creates any that don't exist yet.
             update("tech_stack", next.map((n) => n.label));
           }}
           items={stackItems}
@@ -477,20 +459,20 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         )}
       </Card>
 
-      {/* Media gallery - hidden when a premade template owns the visuals. */}
+      {/* Media gallery */}
       {!isCustomPage && (
         <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
           <div>
-            <h2 className="text-heading-3 mb-1">Медиа</h2>
+            <h2 className="text-heading-3 mb-1">Медиа (Галерея)</h2>
             <p className="text-body-4 text-(--on-bg-medium)">
-              Изображения и короткие видео до 10 МБ. Автоматически рендерятся в галерее на странице проекта.
+              Изображения и короткие видео до 20 МБ. Автоматически рендерятся в галерее на странице проекта.
             </p>
           </div>
           <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
         </Card>
       )}
 
-      {/* Content - hidden when a premade template is selected. */}
+      {/* Content */}
       {!isCustomPage && (
         <div className="space-y-3">
           <h2 className="text-heading-3">Содержимое (MDX)</h2>

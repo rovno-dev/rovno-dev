@@ -54,12 +54,14 @@ interface DBProjectTag {
   label: string;
   value?: any;
 }
+
 interface DBProjectMedia {
   id: string;
   type: "image" | "video";
   url: string;
   caption?: string | null;
 }
+
 interface DBProject {
   id: string;
   slug: string;
@@ -104,19 +106,25 @@ export async function generateStaticParams() {
     seen.add(p.slug);
     return true;
   });
-  return all.map((project) => ({ slug: project.slug }));
+  return all.map((project) => ({ id: project.id, slug: project.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string; slug: string }>;
+}) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);
   const mdxProject = getAllProjects().find((p) => p.slug === slug);
   const fallbackProject = PROJECTS[slug];
+
   let title = "Проект Rovno.dev";
   let description = "Кейс цифрового агентства Rovno.dev";
   let image = `/api/og/project/${slug}`;
   let seoTitle: string | null = null;
   let seoDescription: string | null = null;
+
   if (dbProject) {
     seoTitle = dbProject.seo_title || null;
     seoDescription = dbProject.meta_description || null;
@@ -132,6 +140,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description = fallbackProject.shortDescription || fallbackProject.description || description;
     if (fallbackProject.cover?.imageSrc) image = fallbackProject.cover.imageSrc;
   }
+
   return {
     title: seoTitle || `${title} · Rovno.dev`,
     description: seoDescription || description,
@@ -208,6 +217,7 @@ function buildRelated(currentSlug: string, limit = 3): RelatedRef[] {
     .filter((p) => p.slug !== currentSlug)
     .slice(0, limit)
     .map((p) => ({
+      id: p.id,
       slug: p.slug,
       title: p.title,
       coverImage: p.cover.imageSrc,
@@ -257,6 +267,7 @@ function staticToContext(
   const categoryLabel = PROJECT_CATEGORIES.find(
     (c) => c.code === project.category,
   )?.label;
+
   return {
     slug: project.slug,
     title: project.title,
@@ -285,7 +296,7 @@ function staticToContext(
 export default async function ProjectPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string; slug: string }>;
 }) {
   const { slug } = await params;
   const mdxProjects = getAllProjects();
@@ -293,6 +304,7 @@ export default async function ProjectPage({
   const fallbackProject = PROJECTS[slug] as Project | undefined;
   const projectData = mdxProject || fallbackProject;
   const dbProject = !projectData ? await fetchDbProject(slug) : null;
+
   if (!projectData && !dbProject) notFound();
 
   const content = dbProject
@@ -320,7 +332,7 @@ export default async function ProjectPage({
   return (
     <>
       <CustomProjectPage
-        project={ctx}
+        project={{ ...ctx, id: projectData?.id || dbProject?.id || "" }}
         content={ctx.content}
         related={buildRelated(slug)}
       />

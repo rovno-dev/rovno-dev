@@ -153,7 +153,7 @@ export default async function ExpertPage({ params }: { params: Promise<{ slug: s
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {projects.map((project, idx) => (
-                <Link key={project.slug} href={`/projects/${project.slug}`} className="group block">
+                <Link key={project.slug} href={`/projects/${project.id}/${project.slug}`} className="group block">
                   <Card className="relative overflow-hidden rounded-3xl border border-(--outline) bg-(--card) aspect-[16/10]">
                     {project.cover_image_src && <Image fill src={project.cover_image_src} alt={project.title} className="object-cover" />}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-5">

@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import ProjectCard from "@/components/layout/projects/project-card";
@@ -12,23 +11,12 @@ import {
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
-/**
- * Extract the visible tag labels from a project. Tag records come from the
- * backend; the RSC page maps DB rows to `{ title }` entries, so this stays
- * agnostic of the source shape.
- */
 function tagsOf(p: Project): string[] {
   return (p.tags || [])
     .map((t) => (t.title || "").trim())
     .filter((v): v is string => v.length > 0);
 }
 
-/**
- * Filter bar + project grid. Purely presentational: every project comes
- * down as a prop from the RSC page, which fetches them from the DB with an
- * ISR tag. No client-side fetch, no merge with local data - the grid shows
- * exactly what the database returns, subject to the active filters.
- */
 export function FilterBar({
   projects,
   categories,
@@ -43,12 +31,12 @@ export function FilterBar({
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Cache tag labels per slug so filtering doesn't recompute on each render.
   const tagsBySlug = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const p of projects) m.set(p.slug, tagsOf(p));
     return m;
   }, [projects]);
+
   const tagListForSlug = (slug: string) => tagsBySlug.get(slug) ?? [];
 
   const allTags = useMemo(() => {
@@ -77,7 +65,6 @@ export function FilterBar({
       }
       return true;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projects, activeCategory, activeTag, search, tagsBySlug]);
 
   const hasActiveFilters =
@@ -136,26 +123,21 @@ export function FilterBar({
 
   return (
     <>
-      {/* Floating pill - same visual language as the header. */}
-      <div className="sticky top-[68px] md:top-[92px] z-40 mt-4 mb-5">
+      <div className="sticky top-[68px] md:top-[92px] z-40 pt-6 pb-8 backdrop-blur-xl bg-(--bg)/80 border-b border-(--outline)">
         <Container>
-          <div
-            className={cn(
-              "flex items-center gap-1 h-12 md:h-[56px] rounded-full",
-              "border border-(--outline) bg-(--bg)/80 backdrop-blur-glass",
-              "shadow-[0_1px_2px_rgba(0,0,0,0.04)] pl-4 pr-1.5",
-            )}
-          >
-            <div className="relative flex-1 md:flex-initial md:w-[200px] h-full flex items-center">
+          <div className="flex items-center gap-2 h-14 rounded-2xl border border-(--outline) bg-(--card) shadow-sm pl-4 pr-2">
+            
+            {/* Search Input */}
+            <div className="relative flex-1 md:flex-initial md:w-[240px] h-full flex items-center min-w-0">
               <MagnifyingGlassIcon className="absolute left-0 size-4 text-(--on-bg-low) pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Поиск…"
+                placeholder="Поиск по названию..."
                 className={cn(
                   "w-full h-full pl-7 pr-7 bg-transparent outline-none",
-                  "text-body-4 placeholder:text-(--on-bg-low)",
+                  "text-sm font-medium placeholder:text-(--on-bg-low)",
                 )}
               />
               {search && (
@@ -163,14 +145,16 @@ export function FilterBar({
                   type="button"
                   onClick={() => setSearch("")}
                   aria-label="Очистить"
-                  className="absolute right-0 inline-flex items-center justify-center size-5 rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                  className="absolute right-0 inline-flex items-center justify-center size-6 rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                 >
                   <XIcon className="size-3" />
                 </button>
               )}
             </div>
-            <div className="hidden md:flex flex-1 min-w-0 items-center gap-1.5 pl-3 ml-2 border-l border-(--outline) h-8">
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar h-full">
+            
+            {/* Desktop Category Chips */}
+            <div className="hidden md:flex flex-1 min-w-0 items-center gap-2 pl-4 ml-2 border-l border-(--outline) h-8">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar h-full">
                 {categoryChips.map((c) => {
                   const code = c.id === "__all__" ? null : c.id;
                   const count = liveCategoryCount(code);
@@ -185,57 +169,27 @@ export function FilterBar({
                     />
                   );
                 })}
-                {allTags.length > 0 && (
-                  <span
-                    aria-hidden
-                    className="shrink-0 mx-1 size-1 rounded-full bg-(--on-bg-low)/50"
-                  />
-                )}
-                {allTags.map((t) => {
-                  const count = liveTagCount(t.label);
-                  return (
-                    <Pill
-                      key={t.label}
-                      label={t.label}
-                      count={count}
-                      active={activeTag === t.label}
-                      disabled={count === 0 && activeTag !== t.label}
-                      onClick={() =>
-                        setActiveTag(activeTag === t.label ? null : t.label)
-                      }
-                    />
-                  );
-                })}
               </div>
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={resetAll}
-                  aria-label="Сбросить фильтры"
-                  className="shrink-0 inline-flex items-center justify-center size-7 rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
-                  title="Сбросить"
-                >
-                  <XIcon className="size-3.5" />
-                </button>
-              )}
             </div>
+
+            {/* Mobile Filter Toggle */}
             <button
               type="button"
               onClick={() => setMobileOpen((v) => !v)}
               aria-expanded={mobileOpen}
               className={cn(
-                "md:hidden inline-flex items-center gap-1.5 h-9 px-3 rounded-full",
-                "text-body-4 font-medium transition-colors shrink-0",
+                "md:hidden inline-flex shrink-0 items-center justify-center gap-2 h-10 px-4 rounded-xl",
+                "text-sm font-medium transition-colors",
                 mobileOpen
                   ? "bg-(--primary) text-(--on-primary)"
-                  : "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)",
+                  : "bg-(--bg) text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)",
               )}
             >
               <FunnelSimpleIcon className="size-4" />
               {activeFilterCount > 0 && (
                 <span
                   className={cn(
-                    "inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold tabular-nums",
+                    "inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full text-[10px] font-semibold tabular-nums",
                     mobileOpen
                       ? "bg-(--on-primary)/20 text-(--on-primary)"
                       : "bg-(--primary) text-(--on-primary)",
@@ -246,13 +200,10 @@ export function FilterBar({
               )}
             </button>
           </div>
+          
+          {/* Mobile Filters Dropdown */}
           {mobileOpen && (
-            <div
-              className={cn(
-                "md:hidden mt-2 rounded-3xl border border-(--outline)",
-                "bg-(--bg)/92 backdrop-blur-glass p-3 space-y-3",
-              )}
-            >
+            <div className="md:hidden mt-3 rounded-2xl border border-(--outline) bg-(--card) p-4 space-y-4 shadow-lg">
               <ChipRow
                 label="Категория"
                 chips={categoryChips.map((c) => {
@@ -280,14 +231,14 @@ export function FilterBar({
                 />
               )}
               {hasActiveFilters && (
-                <div className="flex items-center justify-between pt-1 border-t border-(--outline)">
-                  <span className="text-body-5 text-(--on-bg-low) tabular-nums">
+                <div className="flex items-center justify-between pt-3 border-t border-(--outline)">
+                  <span className="text-xs text-(--on-bg-low) tabular-nums">
                     {filtered.length} из {projects.length}
                   </span>
                   <button
                     type="button"
                     onClick={resetAll}
-                    className="inline-flex items-center gap-1 text-body-5 text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors"
+                    className="inline-flex items-center gap-1 text-xs text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors"
                   >
                     <XIcon className="size-3" />
                     Сбросить
@@ -299,11 +250,11 @@ export function FilterBar({
         </Container>
       </div>
 
-      <section className="pb-24 md:pb-32">
+      <section className="pt-8 pb-24 md:pb-32">
         <Container>
           {filtered.length === 0 ? (
-            <div className="py-20 text-center">
-              <p className="text-body-2 text-(--on-bg-medium) mb-3">
+            <div className="py-32 text-center">
+              <p className="text-2xl font-heading font-medium text-(--on-bg-medium) mb-4">
                 {projects.length === 0
                   ? "Здесь пока нет проектов"
                   : "Ничего не найдено"}
@@ -312,14 +263,14 @@ export function FilterBar({
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="text-body-4 text-(--on-bg-low) underline underline-offset-4 hover:text-(--on-bg-high) transition-colors"
+                  className="text-sm font-medium text-(--primary) underline underline-offset-4 hover:opacity-80 transition-opacity"
                 >
                   Сбросить фильтры
                 </button>
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
               {filtered.map((project, idx) => (
                 <ProjectCard
                   key={project.id || project.slug}
@@ -340,8 +291,6 @@ export function FilterBar({
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────── */
-
 function Pill({
   label,
   count,
@@ -361,10 +310,10 @@ function Pill({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 h-7",
-        "text-[12px] font-medium whitespace-nowrap transition-colors",
+        "shrink-0 inline-flex items-center gap-2 rounded-xl px-3 h-8",
+        "text-xs font-semibold whitespace-nowrap transition-colors",
         active
-          ? "bg-(--primary) text-(--on-primary)"
+          ? "bg-(--primary) text-(--on-primary) shadow-sm"
           : "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)",
         disabled && "opacity-30 cursor-not-allowed",
       )}

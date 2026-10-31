@@ -13,11 +13,23 @@ import { ArrowRight, CircleNotch } from "@phosphor-icons/react";
 export function QuickOrderDialog({
   serviceName,
   children,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: {
   serviceName: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  
+  const setOpen = (val: boolean) => {
+    if (!isControlled) setUncontrolledOpen(val);
+    controlledOnOpenChange?.(val);
+  };
+
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState<string | undefined>();
@@ -30,7 +42,6 @@ export function QuickOrderDialog({
       return;
     }
     setLoading(true);
-
     const formData = new FormData();
     formData.append("services", JSON.stringify([serviceName]));
     formData.append("user_name", name);
@@ -42,7 +53,6 @@ export function QuickOrderDialog({
         method: "POST",
         body: formData,
       });
-
       if (res.ok) {
         toast.success("Заявка принята! Мы свяжемся с вами в ближайшее время.");
         setOpen(false);
@@ -62,16 +72,14 @@ export function QuickOrderDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden border-(--outline) bg-(--bg) gap-0">
-        {/* Added max-h and overflow-y-auto to fix the scrollbar hiding issue */}
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+      <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden border-(--outline) bg-(--bg) gap-0 z-[10000]">
         <div className="p-6 md:p-8 space-y-6 max-h-[85vh] overflow-y-auto scrollbar-admin">
           <div>
             <h2 className="text-2xl font-heading font-semibold tracking-tight text-(--on-bg-high)">
               Обсудить проект
             </h2>
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-(--on-bg-high)">Ваше имя *</Label>
@@ -96,19 +104,18 @@ export function QuickOrderDialog({
                 className="min-h-[80px] bg-(--card) border-(--outline)" 
               />
             </div>
-            
             <Button type="submit" disabled={loading} className="w-full h-12 text-base font-medium mt-2">
               {loading ? <CircleNotch className="size-5 animate-spin mr-2" /> : null}
               {loading ? "Отправка..." : "Отправить заявку"}
             </Button>
           </form>
-
           <div className="pt-6 border-t border-(--outline) text-center">
             <p className="text-body-5 text-(--on-bg-medium)">
               Нужно прикрепить файлы или выбрать несколько услуг?
             </p>
             <Link 
               href="/order" 
+              onClick={() => setOpen(false)}
               className="text-body-4 text-(--primary) hover:underline mt-1 inline-flex items-center gap-1 font-medium"
             >
               Перейти к полной форме

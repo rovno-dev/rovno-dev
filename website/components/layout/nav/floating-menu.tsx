@@ -1,10 +1,10 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ListIcon, X } from "@phosphor-icons/react";
 import { motion } from "motion/react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
@@ -30,33 +30,50 @@ export function FloatingMenu({
   triggerIconClassName,
 }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isOrderOpen, setIsOrderOpen] = useState(false);
   const { t } = useLanguage();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Prevent SSR hydration issues with Portals
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close menu on route change
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
+  // Handle outside clicks
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent | TouchEvent) => {
       const el = wrapperRef.current;
-      if (!el) return;
-      if (!el.contains(e.target as Node)) setOpen(false);
+      const drop = dropdownRef.current;
+      if (!el || !drop) return;
+      
+      if (el.contains(e.target as Node) || drop.contains(e.target as Node)) return;
+      
+      if (
+        e.target instanceof HTMLElement &&
+        (e.target.closest('[role="dialog"]') || e.target.closest('[data-radix-portal]'))
+      ) {
+        return;
+      }
+
+      setOpen(false);
     };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("touchstart", onDown);
+    
+    const timeout = setTimeout(() => {
+      document.addEventListener("mousedown", onDown);
+      document.addEventListener("touchstart", onDown);
+    }, 10);
+
     return () => {
+      clearTimeout(timeout);
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("touchstart", onDown);
     };
@@ -90,14 +107,15 @@ export function FloatingMenu({
         )}
       </Button>
 
-      {open && (
+      {mounted && open && createPortal(
         <div
           id="floating-menu-panel"
+          ref={dropdownRef}
           className={cn(
-            "z-[60] flex flex-col border border-(--outline) shadow-2xl backdrop-blur-[var(--glass)] bg-(--card)/80",
+            "z-[9999] flex flex-col border border-[color-mix(in_srgb,var(--outline),transparent_50%)] shadow-2xl backdrop-blur-2xl bg-[color-mix(in_srgb,var(--card),transparent_15%)]",
             position === "bottom"
               ? "fixed inset-x-4 bottom-24 mx-auto max-w-sm rounded-[2rem] p-5"
-              : "absolute top-[calc(100%+16px)] right-0 w-64 rounded-3xl p-3"
+              : "fixed top-[80px] right-4 w-64 rounded-3xl p-3"
           )}
         >
           <nav className="flex flex-col gap-1">
@@ -117,7 +135,7 @@ export function FloatingMenu({
                       "block px-4 py-3 rounded-2xl text-lg font-medium transition-colors",
                       isActive
                         ? "bg-(--primary-glass) text-(--primary)"
-                        : "text-(--on-bg-high) hover:bg-(--state-hover)",
+                        : "text-(--on-bg-high) hover:bg-(--state-hover)"
                     )}
                   >
                     {link.label}
@@ -127,13 +145,12 @@ export function FloatingMenu({
             })}
           </nav>
 
-          {/* Mobile-only bottom section */}
           {position === "bottom" && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.25, duration: 0.3 }}
-              className="flex flex-col gap-4 pt-5 border-t border-(--outline) mt-4"
+              className="flex flex-col gap-4 pt-5 border-t border-[color-mix(in_srgb,var(--outline),transparent_50%)] mt-4"
             >
               <div className="flex items-center justify-between px-2 py-2">
                 <span className="text-sm font-medium text-(--on-bg-medium)">
@@ -141,17 +158,32 @@ export function FloatingMenu({
                 </span>
                 <LanguageSwitcher />
               </div>
-
-              <QuickOrderDialog serviceName="Консультация">
-                <Button size="large" className="w-full rounded-xl" onClick={() => setOpen(false)}>
-                  <TelemostStackIcon />
-                  {t("nav.order")}
-                </Button>
-              </QuickOrderDialog>
+              
+              <Button 
+                size="large" 
+                className="w-full rounded-xl"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                  requestAnimationFrame(() => {
+                    setIsOrderOpen(true);
+                  });
+                }}
+              >
+                <TelemostStackIcon />
+                {t("nav.order")}
+              </Button>
             </motion.div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
+
+      <QuickOrderDialog
+        serviceName="Консультация"
+        open={isOrderOpen}
+        onOpenChange={setIsOrderOpen}
+      />
     </div>
   );
 }
