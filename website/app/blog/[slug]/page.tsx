@@ -233,6 +233,17 @@ export default async function ArticlePage({
       </Container>
 
       {/* ── Single-column body ─────────────────────────────────── */}
+      <Container className="pt-4">
+        <div className="max-w-[860px] mx-auto">
+          <ContentMeta 
+            slug={article.slug} 
+            content={article.content_json || article.mdx_content} 
+            updatedAt={article.updated_at || article.date} 
+            imageUrl={article.image_url}
+          />
+        </div>
+      </Container>
+
       <Container className="py-12 md:py-16">
         <article className="max-w-[720px] mx-auto">
           {article.content_json ? (

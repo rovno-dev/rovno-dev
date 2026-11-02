@@ -10,6 +10,7 @@ import { ArrowUpRight, ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 import ProjectCard from "@/components/layout/projects/project-card";
 import type { Project } from "@/utils/api/projects";
+import { ContentMeta } from "@/components/layout/content-meta";
 
 export interface CustomProject {
   id: string;
@@ -165,6 +166,15 @@ export function CustomProjectPage({
                   {project.shortDescription}
                 </p>
               )}
+              
+              <div className="animate-reveal [animation-delay:300ms] fill-mode-both">
+                <ContentMeta 
+                  slug={project.slug} 
+                  content={content} 
+                  updatedAt={project.period || new Date().toISOString()} 
+                  imageUrl={project.coverImage}
+                />
+              </div>
             </div>
           </div>
         </Container>

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import ProjectCard from "@/components/layout/projects/project-card";
 import type { Project } from "@/utils/api/projects";
@@ -30,6 +30,13 @@ export function FilterBar({
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const tagsBySlug = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -67,8 +74,7 @@ export function FilterBar({
     });
   }, [projects, activeCategory, activeTag, search, tagsBySlug]);
 
-  const hasActiveFilters =
-    !!search.trim() || activeCategory !== null || activeTag !== null;
+  const hasActiveFilters = !!search.trim() || activeCategory !== null || activeTag !== null;
   const activeFilterCount = (activeCategory ? 1 : 0) + (activeTag ? 1 : 0);
 
   const resetAll = () => {
@@ -83,10 +89,7 @@ export function FilterBar({
       if (code !== null && p.category !== code) return false;
       if (activeTag && !tagListForSlug(p.slug).includes(activeTag)) return false;
       if (q) {
-        const h = [p.title, p.shortDescription, p.description]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+        const h = [p.title, p.shortDescription, p.description].filter(Boolean).join(" ").toLowerCase();
         if (!h.includes(q)) return false;
       }
       return true;
@@ -99,10 +102,7 @@ export function FilterBar({
       if (!tagListForSlug(p.slug).includes(label)) return false;
       if (activeCategory && p.category !== activeCategory) return false;
       if (q) {
-        const h = [p.title, p.shortDescription, p.description]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+        const h = [p.title, p.shortDescription, p.description].filter(Boolean).join(" ").toLowerCase();
         if (!h.includes(q)) return false;
       }
       return true;
@@ -123,12 +123,22 @@ export function FilterBar({
 
   return (
     <>
-      <div className="sticky top-[68px] md:top-[92px] z-40 pt-6 pb-8 backdrop-blur-xl bg-(--bg)/80 border-b border-(--outline)">
-        <Container>
-          <div className="flex items-center gap-2 h-14 rounded-2xl border border-(--outline) bg-(--card) shadow-sm pl-4 pr-2">
-
+      {/* Sticky Header-Matching Filter Bar */}
+      <div 
+        className={cn(
+          "sticky top-[64px] md:top-[88px] z-40 pt-2 pb-6 pointer-events-none transition-all duration-400 ease-in-out w-full flex justify-center px-4 mx-auto",
+          isScrolled ? "max-w-[900px] xl:max-w-[1100px]" : "max-w-full"
+        )}
+      >
+        <div className="flex flex-col w-full pointer-events-auto">
+          <div 
+            className={cn(
+              // Matching the EXACT header styles
+              "flex items-center gap-2 h-[55px] sm:h-[80px] pl-5 pr-2 transition-all bg-[var(--bg)]/40 backdrop-blur-glass border border-b-(--card-glass) rounded-full shadow-lg"
+            )}
+          >
             {/* Search Input */}
-            <div className="relative flex-1 md:flex-initial md:w-[240px] h-full flex items-center min-w-0">
+            <div className="relative flex-1 md:flex-initial md:w-[280px] h-full flex items-center min-w-0">
               <MagnifyingGlassIcon className="absolute left-0 size-4 text-(--on-bg-low) pointer-events-none" />
               <input
                 type="text"
@@ -137,7 +147,7 @@ export function FilterBar({
                 placeholder="Поиск по названию..."
                 className={cn(
                   "w-full h-full pl-7 pr-7 bg-transparent outline-none",
-                  "text-sm font-medium placeholder:text-(--on-bg-low)",
+                  "text-sm font-medium text-(--on-bg-high) placeholder:text-(--on-bg-medium)",
                 )}
               />
               {search && (
@@ -153,8 +163,8 @@ export function FilterBar({
             </div>
 
             {/* Desktop Category Chips */}
-            <div className="hidden md:flex flex-1 min-w-0 items-center gap-2 pl-4 ml-2 border-l border-(--outline) h-8">
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar h-full">
+            <div className="hidden md:flex flex-1 min-w-0 items-center gap-1 pl-4 ml-2 border-l border-(--outline)/50 h-8">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar h-full">
                 {categoryChips.map((c) => {
                   const code = c.id === "__all__" ? null : c.id;
                   const count = liveCategoryCount(code);
@@ -178,11 +188,11 @@ export function FilterBar({
               onClick={() => setMobileOpen((v) => !v)}
               aria-expanded={mobileOpen}
               className={cn(
-                "md:hidden inline-flex shrink-0 items-center justify-center gap-2 h-10 px-4 rounded-xl",
+                "md:hidden inline-flex shrink-0 items-center justify-center gap-2 h-9 px-4 rounded-full",
                 "text-sm font-medium transition-colors",
                 mobileOpen
-                  ? "bg-(--primary) text-(--on-primary)"
-                  : "bg-(--bg) text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)",
+                  ? "bg-(--on-bg-high) text-(--bg)"
+                  : "text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)",
               )}
             >
               <FunnelSimpleIcon className="size-4" />
@@ -190,9 +200,7 @@ export function FilterBar({
                 <span
                   className={cn(
                     "inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-full text-[10px] font-semibold tabular-nums",
-                    mobileOpen
-                      ? "bg-(--on-primary)/20 text-(--on-primary)"
-                      : "bg-(--primary) text-(--on-primary)",
+                    mobileOpen ? "bg-(--bg)/20 text-(--bg)" : "bg-(--primary) text-(--on-primary)",
                   )}
                 >
                   {activeFilterCount}
@@ -203,7 +211,9 @@ export function FilterBar({
 
           {/* Mobile Filters Dropdown */}
           {mobileOpen && (
-            <div className="md:hidden mt-3 rounded-2xl border border-(--outline) bg-(--card) p-4 space-y-4 shadow-lg">
+            <div 
+              className="md:hidden mt-3 rounded-3xl p-4 space-y-4 shadow-xl bg-[var(--bg)]/40 backdrop-blur-glass border border-(--card-glass)"
+            >
               <ChipRow
                 label="Категория"
                 chips={categoryChips.map((c) => {
@@ -225,13 +235,12 @@ export function FilterBar({
                     label: t.label,
                     active: activeTag === t.label,
                     count: liveTagCount(t.label),
-                    onClick: () =>
-                      setActiveTag(activeTag === t.label ? null : t.label),
+                    onClick: () => setActiveTag(activeTag === t.label ? null : t.label),
                   }))}
                 />
               )}
               {hasActiveFilters && (
-                <div className="flex items-center justify-between pt-3 border-t border-(--outline)">
+                <div className="flex items-center justify-between pt-3 border-t border-(--outline)/50">
                   <span className="text-xs text-(--on-bg-low) tabular-nums">
                     {filtered.length} из {projects.length}
                   </span>
@@ -247,17 +256,15 @@ export function FilterBar({
               )}
             </div>
           )}
-        </Container>
+        </div>
       </div>
 
-      <section className="pt-8 pb-24 md:pb-32">
+      <section className="pt-2 pb-24 md:pb-32">
         <Container>
           {filtered.length === 0 ? (
             <div className="py-32 text-center">
               <p className="text-2xl font-heading font-medium text-(--on-bg-medium) mb-4">
-                {projects.length === 0
-                  ? "Здесь пока нет проектов"
-                  : "Ничего не найдено"}
+                {projects.length === 0 ? "Здесь пока нет проектов" : "Ничего не найдено"}
               </p>
               {hasActiveFilters && (
                 <button
@@ -293,17 +300,9 @@ export function FilterBar({
 }
 
 function Pill({
-  label,
-  count,
-  active,
-  disabled,
-  onClick,
+  label, count, active, disabled, onClick,
 }: {
-  label: string;
-  count: number;
-  active: boolean;
-  disabled?: boolean;
-  onClick: () => void;
+  label: string; count: number; active: boolean; disabled?: boolean; onClick: () => void;
 }) {
   return (
     <button
@@ -311,21 +310,16 @@ function Pill({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "shrink-0 inline-flex items-center gap-2 rounded-xl px-3 h-8",
-        "text-xs font-semibold whitespace-nowrap transition-colors",
+        "shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 h-8",
+        "text-xs font-medium whitespace-nowrap transition-all duration-200",
         active
-          ? "bg-(--primary) text-(--on-primary) shadow-sm"
-          : "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)",
+          ? "bg-(--on-bg-high) text-(--bg) shadow-sm"
+          : "bg-transparent text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)",
         disabled && "opacity-30 cursor-not-allowed",
       )}
     >
       <span>{label}</span>
-      <span
-        className={cn(
-          "tabular-nums text-[10px] leading-none",
-          active ? "text-(--on-primary)/60" : "text-(--on-bg-low)",
-        )}
-      >
+      <span className={cn("tabular-nums text-[10px] leading-none", active ? "text-(--bg)/60" : "text-(--on-bg-low)")}>
         {count}
       </span>
     </button>
@@ -333,17 +327,10 @@ function Pill({
 }
 
 function ChipRow({
-  label,
-  chips,
+  label, chips,
 }: {
   label: string;
-  chips: {
-    key: string;
-    label: string;
-    active: boolean;
-    count: number;
-    onClick: () => void;
-  }[];
+  chips: { key: string; label: string; active: boolean; count: number; onClick: () => void; }[];
 }) {
   return (
     <div className="space-y-2">
