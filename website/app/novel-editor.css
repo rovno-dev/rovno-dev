@@ -96,3 +96,131 @@
 .tippy-box {
   z-index: 99999 !important;
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   Стили для Slash Menu (EditorCommand)
+   Novel не поставляет CSS из коробки, поэтому Tippy-попап
+   без этих правил рендерится как пустая точка.
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Контейнер попапа (Tippy), в котором Novel рендерит EditorCommand */
+.tippy-box {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.tippy-content {
+  padding: 0 !important;
+}
+
+/* Сам блок меню (cmdk) */
+#slash-command {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  max-height: 360px;
+  overflow: hidden;
+  background: var(--card);
+  color: var(--on-bg-high);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  padding: 6px;
+  z-index: 99999;
+}
+
+/* Заголовки групп (Базовые блоки / Медиа) */
+#slash-command [cmdk-group-heading] {
+  padding: 6px 8px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-bg-low);
+}
+
+/* Скроллируемая область */
+#slash-command [cmdk-list] {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 2px;
+}
+
+/* Пункт меню */
+#slash-command [cmdk-item] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--on-bg-high);
+  transition: background-color 0.15s ease;
+}
+
+/* Иконка пункта */
+#slash-command [cmdk-item] > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid var(--outline);
+  background: var(--bg);
+  color: var(--on-bg-high);
+}
+
+/* Текст пункта */
+#slash-command [cmdk-item] > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#slash-command [cmdk-item] > div:last-child > span:first-child {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-bg-high);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#slash-command [cmdk-item] > div:last-child > span:last-child {
+  font-size: 11px;
+  color: var(--on-bg-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Активный (выделенный) пункт */
+#slash-command [cmdk-item][data-selected="true"],
+#slash-command [cmdk-item]:hover {
+  background: var(--state-hover);
+}
+
+/* Пустое состояние */
+#slash-command [cmdk-empty] {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--on-bg-low);
+}
+
+/* Ensure the Tippy container has no default padding/margin that could clip the portal */
+.tippy-box[data-theme~='novel'] {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.tippy-content {
+  padding: 0;
+}
