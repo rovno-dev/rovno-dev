@@ -1,15 +1,26 @@
-/* Scoped Novel / ProseMirror styling. Mirrors the site's token system. */
+@import 'tippy.js/dist/tippy.css';
+
+/* Scoped Novel / ProseMirror styling. */
 .novel-editor {
   overflow: hidden;
+  position: relative;
 }
+
 .novel-editor .novel-prosemirror {
-  min-height: 340px;
-  padding: 20px 24px;
+  min-height: 400px;
+  padding: 48px 64px;
   outline: none;
   color: var(--on-bg-high);
-  font-size: 15px;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.7;
 }
+
+@media (max-width: 768px) {
+  .novel-editor .novel-prosemirror {
+    padding: 24px 20px;
+  }
+}
+
 .novel-reader .novel-prosemirror {
   min-height: 0;
   padding: 0;
@@ -18,84 +29,59 @@
   font-size: 17px;
   line-height: 1.75;
 }
-.novel-prosemirror > * + * { margin-top: 0.85em; }
 
-.novel-prosemirror h1 { font-size: 2rem;    font-weight: 600; letter-spacing: -0.02em; color: var(--on-bg-high); margin-top: 1.6em; }
-.novel-prosemirror h2 { font-size: 1.5rem;  font-weight: 600; letter-spacing: -0.015em; color: var(--on-bg-high); margin-top: 1.5em; }
-.novel-prosemirror h3 { font-size: 1.25rem; font-weight: 600; color: var(--on-bg-high); margin-top: 1.4em; }
-.novel-prosemirror h1:first-child,
-.novel-prosemirror h2:first-child,
-.novel-prosemirror h3:first-child { margin-top: 0; }
+.novel-prosemirror > * + * {
+  margin-top: 1em;
+}
 
-.novel-prosemirror p { color: inherit; }
-.novel-prosemirror strong { color: var(--on-bg-high); font-weight: 600; }
-.novel-prosemirror em { font-style: italic; }
-.novel-prosemirror a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.novel-prosemirror h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; margin-top: 2em; margin-bottom: 0.5em; line-height: 1.2; }
+.novel-prosemirror h2 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; margin-top: 1.8em; margin-bottom: 0.4em; line-height: 1.3; }
+.novel-prosemirror h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.3em; }
+.novel-prosemirror h1:first-child, .novel-prosemirror h2:first-child, .novel-prosemirror h3:first-child { margin-top: 0; }
 
-.novel-prosemirror ul { list-style: disc; padding-left: 1.4em; }
-.novel-prosemirror ol { list-style: decimal; padding-left: 1.4em; }
-.novel-prosemirror li { margin-top: 0.35em; }
+.novel-prosemirror ul { list-style: disc; padding-left: 1.5em; }
+.novel-prosemirror ol { list-style: decimal; padding-left: 1.5em; }
+.novel-prosemirror li { margin-top: 0.4em; }
 .novel-prosemirror li::marker { color: var(--primary); }
 
 .novel-prosemirror blockquote {
-  border-left: 2px solid var(--outline);
-  padding-left: 1.1em;
-  color: var(--on-bg-high);
+  border-left: 3px solid var(--outline);
+  padding-left: 1.2em;
+  color: var(--on-bg-medium);
   font-style: italic;
+  margin: 1.5em 0;
 }
 
+/* Inline Code */
 .novel-prosemirror code {
   background: var(--bg-disabled);
-  color: var(--on-bg-high);
-  padding: 0.15em 0.35em;
+  color: var(--primary);
+  padding: 0.2em 0.4em;
   border-radius: 4px;
-  font-size: 0.9em;
+  font-family: 'Geist Mono', 'SF Mono', monospace;
+  font-size: 0.85em;
+  font-weight: 500;
 }
-.novel-prosemirror pre {
-  background: var(--bg-disabled);
-  color: var(--on-bg-high);
-  padding: 1em;
-  border-radius: 12px;
-  overflow-x: auto;
-  font-size: 0.875rem;
-}
-.novel-prosemirror pre code { background: transparent; padding: 0; }
 
 .novel-prosemirror hr {
   border: 0;
   height: 1px;
   background: var(--outline);
-  margin: 2.5em 0;
+  margin: 3em 0;
 }
 
 .novel-prosemirror img {
   max-width: 100%;
   height: auto;
-  border-radius: 12px;
+  border-radius: 4px;
   border: 1px solid var(--outline);
 }
+
 .novel-prosemirror img.ProseMirror-selectednode {
   outline: 2px solid var(--primary);
 }
-.img-placeholder {
-  position: relative;
-}
-.img-placeholder::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 32px;
-  height: 32px;
-  margin: -16px 0 0 -16px;
-  border-radius: 50%;
-  border: 3px solid var(--outline);
-  border-top-color: var(--primary);
-  animation: novel-spin 0.6s linear infinite;
-}
-@keyframes novel-spin { to { transform: rotate(360deg); } }
 
-/* Placeholder for empty blocks (Tiptap Placeholder extension). */
+/* Placeholder */
 .novel-prosemirror p.is-editor-empty:first-child::before,
 .novel-prosemirror .is-empty::before {
   content: attr(data-placeholder);
@@ -103,4 +89,10 @@
   height: 0;
   pointer-events: none;
   color: var(--on-bg-low);
+  font-style: italic;
+}
+
+/* Force Tippy menu to the top */
+.tippy-box {
+  z-index: 99999 !important;
 }

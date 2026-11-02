@@ -1,14 +1,13 @@
 "use client";
-
 import { EditorContent, EditorRoot } from "novel";
-import { extensions } from "./extensions";
+import { readonlyExtensions } from "./readonly-extensions";
 import { cn } from "@/lib/utils";
 import "@/app/novel-editor.css";
 
 /**
  * Read-only renderer for Tiptap JSON stored in `content_json`.
- * Tiptap validates the JSON against the schema, so unknown/malicious nodes
- * are dropped instead of being rendered — no dangerouslySetInnerHTML needed.
+ * Uses static extensions (no React NodeViews) so the public page
+ * renders beautiful HTML without interactive overlays.
  */
 export function NovelReadOnly({
   content,
@@ -22,7 +21,7 @@ export function NovelReadOnly({
     <EditorRoot>
       <EditorContent
         initialContent={content}
-        extensions={extensions}
+        extensions={readonlyExtensions as any}
         editable={false}
         className={cn("novel-reader", className)}
         editorProps={{

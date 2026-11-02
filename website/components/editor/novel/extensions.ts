@@ -3,94 +3,45 @@ import {
   HorizontalRule,
   Placeholder,
   StarterKit,
-  TiptapImage,
   TiptapLink,
   UploadImagesPlugin,
+  renderItems,
 } from "novel";
-import { Node, mergeAttributes } from "@tiptap/core";
+import { CustomImage, VideoNode, GalleryNode } from "./custom-nodes";
+import { suggestionItems } from "./suggestion-items";
+import CodeBlock from "@tiptap/extension-code-block";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { CodeBlockNodeView } from "./code-block-view";
 
-// ── Custom Video Node (Local uploads only) ──────────────────────────────
-export const VideoNode = Node.create({
-  name: "video",
-  group: "block",
-  atom: true,
-  addAttributes() {
-    return {
-      src: { default: null },
-      poster: { default: null },
-    };
-  },
-  parseHTML() {
-    return [{ tag: "video" }];
-  },
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "video",
-      mergeAttributes(HTMLAttributes, {
-        controls: true,
-        class: "rounded-lg border border-(--outline) w-full my-4",
-      }),
-    ];
-  },
-});
-
-// ── Custom Grid Gallery Node ────────────────────────────────────────────
-export const GalleryNode = Node.create({
-  name: "gallery",
-  group: "block",
-  atom: true,
-  addAttributes() {
-    return {
-      images: { default: [] },
-    };
-  },
-  parseHTML() {
-    return [
-      {
-        tag: "div[data-gallery]",
-        getAttrs: (element) => {
-          if (!(element instanceof HTMLElement)) return false;
-          const imgs = element.querySelectorAll("img");
-          const images = Array.from(imgs)
-            .map((img) => img.getAttribute("src"))
-            .filter(Boolean);
-          return { images };
-        },
-      },
-    ];
-  },
-  renderHTML({ HTMLAttributes, node }) {
-    const images = node.attrs.images || [];
-    return [
-      "div",
-      mergeAttributes(HTMLAttributes, {
-        "data-gallery": "true",
-        class: "grid grid-cols-2 md:grid-cols-3 gap-2 my-6",
-      }),
-      ...images.map((url: string) => [
-        "img",
-        {
-          src: url,
-          class:
-            "rounded-lg border border-(--outline) object-cover w-full h-full aspect-video",
-        },
-      ]),
-    ];
-  },
-});
-
-// ── Base Extensions ─────────────────────────────────────────────────────
-const tiptapImage = TiptapImage.extend({
+const tiptapImage = CustomImage.extend({
   addProseMirrorPlugins() {
     return [
       UploadImagesPlugin({
-        imageClass: "opacity-40 rounded-lg border border-(--outline)",
+        imageClass: "opacity-40 rounded-sm border border-(--outline)",
       }),
     ];
   },
 }).configure({
   allowBase64: true,
-  HTMLAttributes: { class: "rounded-lg border border-(--outline)" },
+  HTMLAttributes: { class: "rounded-sm border border-(--outline)" },
+});
+
+const CustomCodeBlock = CodeBlock.extend({
+  addAttributes() {
+    return {
+      language: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-language"),
+        renderHTML: (attributes) => {
+          if (!attributes.language) return {};
+          return { "data-language": attributes.language };
+        },
+      },
+    };
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(CodeBlockNodeView);
+  },
 });
 
 export const extensions = [
@@ -101,21 +52,15 @@ export const extensions = [
     orderedList: {
       HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" },
     },
-    listItem: {
-      HTMLAttributes: { class: "leading-normal" },
-    },
+    listItem: { HTMLAttributes: { class: "leading-normal" } },
     blockquote: {
       HTMLAttributes: { class: "border-l-2 border-(--outline) pl-4 italic" },
     },
-    codeBlock: {
-      HTMLAttributes: {
-        class:
-          "rounded-lg bg-(--bg-disabled) border border-(--outline) p-4 font-mono text-sm",
-      },
-    },
+    codeBlock: false,
     code: {
       HTMLAttributes: {
-        class: "rounded bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm",
+        class:
+          "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)",
         spellcheck: "false",
       },
     },
@@ -132,6 +77,9 @@ export const extensions = [
   Command.configure({
     suggestion: {
       char: "/",
+      startOfLine: false,
+      items: () => suggestionItems,
+      render: renderItems,
     },
   }),
   TiptapLink.configure({
@@ -142,7 +90,8 @@ export const extensions = [
   tiptapImage,
   VideoNode,
   GalleryNode,
+  CustomCodeBlock,
   HorizontalRule.configure({
-    HTMLAttributes: { class: "mt-4 mb-6 border-t border-(--outline)" },
+    HTMLAttributes: { class: "mt-8 mb-8 border-t border-(--outline)" },
   }),
 ];
