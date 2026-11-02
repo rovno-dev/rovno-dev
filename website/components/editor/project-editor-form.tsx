@@ -21,7 +21,7 @@ import {
   CUSTOM_PAGES_META,
   findCustomPageMeta,
 } from "@/app/projects/[id]/[slug]/_components/custom-pages-meta";
-import { ArticleEditor } from "./article-editor";
+import { NovelEditor } from "./novel/novel-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import {
@@ -56,6 +56,7 @@ interface FormState {
   period: string;
   tech_stack: string[];
   mdx_content: string;
+  content_json: any | null;
   seo_title: string;
   meta_description: string;
   is_featured: boolean;
@@ -81,6 +82,7 @@ function toFormState(p?: ProjectDetail | null): FormState {
       period: String(new Date().getFullYear()),
       tech_stack: [],
       mdx_content: "",
+      content_json: null,
       seo_title: "",
       meta_description: "",
       is_featured: false,
@@ -104,6 +106,7 @@ function toFormState(p?: ProjectDetail | null): FormState {
     period: p.period || "",
     tech_stack: p.tech_stack || [],
     mdx_content: p.mdx_content || "",
+    content_json: (p as any).content_json ?? null,
     seo_title: p.seo_title || "",
     meta_description: p.meta_description || "",
     is_featured: p.is_featured || false,
@@ -184,6 +187,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     period: form.period.trim() || null,
     tech_stack: form.tech_stack,
     mdx_content: form.mdx_content,
+    content_json: form.content_json,
     seo_title: form.seo_title.trim() || null,
     meta_description: form.meta_description.trim() || null,
     is_featured: form.is_featured,
@@ -233,7 +237,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   };
 
   const githubTags = form.tags.filter((t) => t.kind === "github");
-  const isCustomPage = !!form.custom_page;
 
   return (
     <div className="space-y-8 pb-24">
@@ -460,29 +463,24 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       </Card>
 
       {/* Media gallery */}
-      {!isCustomPage && (
-        <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-          <div>
-            <h2 className="text-heading-3 mb-1">Медиа (Галерея)</h2>
-            <p className="text-body-4 text-(--on-bg-medium)">
-              Изображения и короткие видео до 20 МБ. Автоматически рендерятся в галерее на странице проекта.
-            </p>
-          </div>
-          <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
-        </Card>
-      )}
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
+        <div>
+          <h2 className="text-heading-3 mb-1">Медиа (Галерея)</h2>
+          <p className="text-body-4 text-(--on-bg-medium)">
+            Изображения и короткие видео до 20 МБ. Автоматически рендерятся в галерее на странице проекта.
+          </p>
+        </div>
+        <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
+      </Card>
 
       {/* Content */}
-      {!isCustomPage && (
-        <div className="space-y-3">
-          <h2 className="text-heading-3">Содержимое (MDX)</h2>
-          <ArticleEditor
-            value={form.mdx_content}
-            onChange={(v) => update("mdx_content", v)}
-            placeholder="Опишите процесс, результаты, добавьте галереи и метрики…"
-          />
-        </div>
-      )}
+      <div className="space-y-3">
+        <h2 className="text-heading-3">Содержимое</h2>
+        <NovelEditor
+          initialContent={form.content_json}
+          onChange={(json) => update("content_json", json)}
+        />
+      </div>
 
       {/* SEO */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">

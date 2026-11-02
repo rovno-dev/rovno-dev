@@ -9,7 +9,7 @@ export default function AdminRootClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen py-6 md:py-8">
+    <div className="min-h-screen pb-6 md:pb-8 mt-header">
       <Container variant="full-width">
         {/*
           Two-column layout that owns its own scroll height.

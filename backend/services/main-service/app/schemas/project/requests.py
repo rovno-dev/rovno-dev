@@ -30,6 +30,7 @@ class ProjectCreate(BaseModel):
     period: Optional[str] = None
     stack: Optional[List[str]] = None
     mdx_content: Optional[str] = ""
+    content_json: Optional[Any] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     is_featured: Optional[bool] = False
@@ -59,6 +60,7 @@ class ProjectUpdate(BaseModel):
     period: Optional[str] = None
     stack: Optional[List[str]] = None
     mdx_content: Optional[str] = None
+    content_json: Optional[Any] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     is_featured: Optional[bool] = None

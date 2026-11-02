@@ -8,7 +8,7 @@ export default function ProfileRootClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-(--bg) py-12 md:py-16">
+    <div className="min-h-screen pb-6 md:pb-8 mt-header">
       <Container>
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
           {/* Width is owned by <Sidebar />, not this wrapper, so collapse

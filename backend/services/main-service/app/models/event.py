@@ -53,6 +53,8 @@ class Event(Base):
     )
 
     mdx_content = Column(Text, nullable=True)
+    # Tiptap / Novel JSON document. Source of truth for the editor.
+    content_json = Column(JSON, nullable=True)
     seo_title = Column(String, nullable=True)
     meta_description = Column(String, nullable=True)
 

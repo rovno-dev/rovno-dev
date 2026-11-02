@@ -19,6 +19,8 @@ class Article(Base):
     # TeamMember. Blog-authors who want to appear must have a user account.
     author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     mdx_content = Column(Text, nullable=False, default="")
+    # Tiptap / Novel JSON document. Source of truth for the editor.
+    content_json = Column(JSON, nullable=True)
 
     # Unstructured payload the author pastes in from an AI tool. Persisted
     # verbatim so it can be re-applied later or audited, but never rendered.

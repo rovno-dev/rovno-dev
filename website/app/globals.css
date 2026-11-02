@@ -613,13 +613,16 @@
   scrollbar-width: thin;
   scrollbar-color: var(--outline) transparent;
 }
+
 .scrollbar-admin::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
+
 .scrollbar-admin::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .scrollbar-admin::-webkit-scrollbar-thumb {
   background: var(--outline);
   border-radius: 9999px;
@@ -627,11 +630,13 @@
   background-clip: padding-box;
   transition: background-color 0.15s;
 }
+
 .scrollbar-admin::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--on-bg-low), transparent 30%);
   background-clip: padding-box;
   border: 3px solid transparent;
 }
+
 .scrollbar-admin::-webkit-scrollbar-corner {
   background: transparent;
 }
@@ -686,17 +691,31 @@
 }
 
 @keyframes service-progress {
-  0% { width: 0%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
+
 .animate-service-progress {
   animation: service-progress 6s linear forwards;
 }
 
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(30px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
+
 .animate-slide-in {
   animation: slide-in 0.6s ease-out;
 }
@@ -707,11 +726,13 @@
     opacity: 0;
     transform: scale(0.98) translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
+
 .animate-media-swap {
   animation: media-swap 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -725,13 +746,27 @@
 /* Skeleton shimmer — used by <ProjectGridSkeleton> and any other loading
    placeholder that wants the same premium sweep instead of a pulse. */
 @keyframes shimmer {
-  0%   { transform: translateX(-100%); }
-  60%  { transform: translateX(100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  60% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  @keyframes shimmer { 0%, 100% { transform: translateX(-100%); } }
+  @keyframes shimmer {
+
+    0%,
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 /* ─── Case-study body typography ─────────────────────────────────────────
@@ -746,7 +781,7 @@
   line-height: 1.75;
 }
 
-.prose-case > * + * {
+.prose-case>*+* {
   margin-top: 1.25em;
 }
 
@@ -797,8 +832,13 @@
   margin-top: 1rem;
 }
 
-.prose-case ul { list-style: disc; }
-.prose-case ol { list-style: decimal; }
+.prose-case ul {
+  list-style: disc;
+}
+
+.prose-case ol {
+  list-style: decimal;
+}
 
 .prose-case li {
   padding-left: 0.25rem;
@@ -829,11 +869,23 @@
   margin: 2rem 0;
 }
 
-.prose-case > :first-child {
+.prose-case> :first-child {
   margin-top: 0;
 }
 
 /* Tighter variant used inside <Callout>. */
-.prose-case-tight p { margin: 0.5em 0; }
-.prose-case-tight > :first-child { margin-top: 0; }
-.prose-case-tight > :last-child { margin-bottom: 0; }
+.prose-case-tight p {
+  margin: 0.5em 0;
+}
+
+.prose-case-tight> :first-child {
+  margin-top: 0;
+}
+
+.prose-case-tight> :last-child {
+  margin-bottom: 0;
+}
+
+.mt-header {
+  @apply mt-[46px] md:mt-[96px];
+}

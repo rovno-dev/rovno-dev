@@ -151,6 +151,7 @@ def create_article(
         image_url=payload.image_url or "",
         date=payload.date or datetime.utcnow(),
         mdx_content=payload.mdx_content or "",
+        content_json=payload.content_json,
         raw_json=payload.raw_json,
         attachments=payload.attachments,
         seo_title=payload.seo_title,

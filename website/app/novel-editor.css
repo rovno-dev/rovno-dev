@@ -1,0 +1,106 @@
+/* Scoped Novel / ProseMirror styling. Mirrors the site's token system. */
+.novel-editor {
+  overflow: hidden;
+}
+.novel-editor .novel-prosemirror {
+  min-height: 340px;
+  padding: 20px 24px;
+  outline: none;
+  color: var(--on-bg-high);
+  font-size: 15px;
+  line-height: 1.75;
+}
+.novel-reader .novel-prosemirror {
+  min-height: 0;
+  padding: 0;
+  outline: none;
+  color: var(--on-bg-medium);
+  font-size: 17px;
+  line-height: 1.75;
+}
+.novel-prosemirror > * + * { margin-top: 0.85em; }
+
+.novel-prosemirror h1 { font-size: 2rem;    font-weight: 600; letter-spacing: -0.02em; color: var(--on-bg-high); margin-top: 1.6em; }
+.novel-prosemirror h2 { font-size: 1.5rem;  font-weight: 600; letter-spacing: -0.015em; color: var(--on-bg-high); margin-top: 1.5em; }
+.novel-prosemirror h3 { font-size: 1.25rem; font-weight: 600; color: var(--on-bg-high); margin-top: 1.4em; }
+.novel-prosemirror h1:first-child,
+.novel-prosemirror h2:first-child,
+.novel-prosemirror h3:first-child { margin-top: 0; }
+
+.novel-prosemirror p { color: inherit; }
+.novel-prosemirror strong { color: var(--on-bg-high); font-weight: 600; }
+.novel-prosemirror em { font-style: italic; }
+.novel-prosemirror a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+
+.novel-prosemirror ul { list-style: disc; padding-left: 1.4em; }
+.novel-prosemirror ol { list-style: decimal; padding-left: 1.4em; }
+.novel-prosemirror li { margin-top: 0.35em; }
+.novel-prosemirror li::marker { color: var(--primary); }
+
+.novel-prosemirror blockquote {
+  border-left: 2px solid var(--outline);
+  padding-left: 1.1em;
+  color: var(--on-bg-high);
+  font-style: italic;
+}
+
+.novel-prosemirror code {
+  background: var(--bg-disabled);
+  color: var(--on-bg-high);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.novel-prosemirror pre {
+  background: var(--bg-disabled);
+  color: var(--on-bg-high);
+  padding: 1em;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+.novel-prosemirror pre code { background: transparent; padding: 0; }
+
+.novel-prosemirror hr {
+  border: 0;
+  height: 1px;
+  background: var(--outline);
+  margin: 2.5em 0;
+}
+
+.novel-prosemirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--outline);
+}
+.novel-prosemirror img.ProseMirror-selectednode {
+  outline: 2px solid var(--primary);
+}
+.img-placeholder {
+  position: relative;
+}
+.img-placeholder::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-radius: 50%;
+  border: 3px solid var(--outline);
+  border-top-color: var(--primary);
+  animation: novel-spin 0.6s linear infinite;
+}
+@keyframes novel-spin { to { transform: rotate(360deg); } }
+
+/* Placeholder for empty blocks (Tiptap Placeholder extension). */
+.novel-prosemirror p.is-editor-empty:first-child::before,
+.novel-prosemirror .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--on-bg-low);
+}

@@ -68,6 +68,8 @@ export interface ArticleListItem {
 
 export interface Article extends ArticleListItem {
   mdx_content: string;
+  /** Tiptap JSON authored in Novel. Null for legacy MDX-only rows. */
+  content_json?: any;
   raw_json?: any;
   attachments?: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[] | null;
   seo_title?: string | null;
@@ -88,7 +90,8 @@ export interface ArticlePayload {
   tags?: string[];
   categories?: string[];
   brands?: string[];
-  mdx_content: string;
+  mdx_content?: string;
+  content_json?: any;
   raw_json?: any;
   attachments?: { type: "image" | "video"; url: string; caption?: string | null; sort_order?: number }[];
   seo_title?: string | null;

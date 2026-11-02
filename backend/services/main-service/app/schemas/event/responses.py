@@ -45,6 +45,7 @@ class EventDetail(EventListItem):
     address: Optional[str] = None
     metro: Optional[str] = None
     mdx_content: Optional[str] = None
+    content_json: Optional[Any] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
 

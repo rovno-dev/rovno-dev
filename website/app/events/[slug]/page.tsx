@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchEventServer, type EventDetail } from "@/utils/api/events";
+import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import {
   findEventCustomPageRenderer,
   type EventCustomContext,
@@ -122,15 +123,17 @@ export default async function EventPage({
 
   // Bespoke template takes priority.
   const renderer = findEventCustomPageRenderer(ev.custom_page);
-  const mdxContent = ev.mdx_content
-    ? (
-        await compileMDX({
-          source: ev.mdx_content,
-          components: mdxComponents,
-          options: { parseFrontmatter: false },
-        })
-      ).content
-    : null;
+  const mdxContent = ev.content_json ? (
+    <NovelReadOnly content={ev.content_json} />
+  ) : ev.mdx_content ? (
+    (
+      await compileMDX({
+        source: ev.mdx_content,
+        components: mdxComponents,
+        options: { parseFrontmatter: false },
+      })
+    ).content
+  ) : null;
 
   if (renderer) {
     const ctx: EventCustomContext = {

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeftIcon, PencilSimpleIcon, EyeIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
+import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import {
   Gallery,
   MetricCard,
@@ -48,6 +49,7 @@ interface PreviewArticle {
   tags: TagRef[] | null;
   publication_status: string;
   mdx_content: string;
+  content_json?: any;
 }
 
 type FetchOutcome =
@@ -216,11 +218,15 @@ export default async function PreviewArticlePage({
   const article = result.article;
   const isPublished = article.publication_status === "published";
 
-  const { content } = await compileMDX({
-    source: article.mdx_content || "",
-    components: mdxComponents,
-    options: { parseFrontmatter: false },
-  });
+  const legacyContent = article.content_json
+    ? null
+    : (
+        await compileMDX({
+          source: article.mdx_content || "",
+          components: mdxComponents,
+          options: { parseFrontmatter: false },
+        })
+      ).content;
 
   return (
     <div className="space-y-6">
@@ -309,8 +315,10 @@ export default async function PreviewArticlePage({
 
       {/* Body */}
       <article className="rounded-3xl border border-(--outline) bg-(--card) p-6 md:p-10">
-        {article.mdx_content ? (
-          content
+        {article.content_json ? (
+          <NovelReadOnly content={article.content_json} />
+        ) : article.mdx_content ? (
+          legacyContent
         ) : (
           <p className="text-body-3 text-(--on-bg-medium)">Содержимое пустое.</p>
         )}

@@ -182,6 +182,7 @@ def create_project(
         platform=payload.platform,
         period=payload.period,
         mdx_content=payload.mdx_content or "",
+        content_json=payload.content_json,
         seo_title=payload.seo_title,
         meta_description=payload.meta_description,
         is_featured=payload.is_featured or False,

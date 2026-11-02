@@ -38,8 +38,7 @@ export default function ClientRootLayout({
       <div className="relative" key={lang}>
         <main
           className={cn(
-            isFullscreenTop ? "mt-0" : "mt-[46px] md:mt-[88px]",
-            "mb-0 overflow-x-clip",
+            "mb-0 mt-0 overflow-x-clip",
           )}
         >
           {children}

@@ -1,26 +1,30 @@
 "use client";
-import dynamic from "next/dynamic";
-// LLM context: MDXEditor pulls in CodeMirror and cannot be SSR'd. The dynamic
-// wrapper keeps the ~200KB editor bundle out of the initial page load; it
-// only downloads when the article form mounts.
-const EditorImpl = dynamic(() => import("./editor-impl"), {
-  ssr: false,
-  loading: () => (
-    <div className="rounded-xl border border-(--outline) bg-(--card) p-5 min-h-[420px] flex items-center justify-center">
-      <span className="text-body-3 text-(--on-bg-low) animate-pulse">Loading editor…</span>
-    </div>
-  ),
-});
-import React from "react";
 
-export const ArticleEditor = React.memo(function ArticleEditor({
-  value,
-  onChange,
-  placeholder,
-}: {
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+
+interface ArticleEditorProps {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
-}) {
-  return <EditorImpl markdown={value} onChange={onChange} placeholder={placeholder} />;
-});
+  className?: string;
+}
+
+export function ArticleEditor({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: ArticleEditorProps) {
+  return (
+    <Textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className={cn(
+        "min-h-[320px] font-mono text-sm leading-relaxed",
+        className,
+      )}
+    />
+  );
+}

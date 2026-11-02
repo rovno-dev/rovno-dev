@@ -59,6 +59,7 @@ export interface ProjectDetail {
   period?: string | null;
   tech_stack?: string[] | null;
   mdx_content?: string | null;
+  content_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
   is_featured: boolean;
@@ -90,6 +91,7 @@ export interface ProjectPayload {
   period?: string | null;
   tech_stack?: string[];
   mdx_content?: string;
+  content_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
   is_featured?: boolean;

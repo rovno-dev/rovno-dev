@@ -32,6 +32,8 @@ class Project(Base):
     seo_title = Column(String, nullable=True)
     meta_description = Column(String, nullable=True)
     mdx_content = Column(Text, nullable=True)
+    # Tiptap / Novel JSON document. Source of truth for the editor.
+    content_json = Column(JSON, nullable=True)
     is_featured = Column(Boolean, default=False)
     publication_status = Column(Enum(PublicationStatus, name="publication_status"), default=PublicationStatus.draft)
     created_at = Column(DateTime, default=datetime.utcnow)

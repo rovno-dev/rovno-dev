@@ -3,6 +3,7 @@ import { cache } from "react";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { Container } from "@/components/ui/container";
 import { CustomProjectPage, type RelatedRef } from "./_components/custom-project-page";
+import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import { findCustomPageRenderer, type CustomPageContext } from "./_components/custom-pages";
 import { GithubReadmeBlock } from "./_components/github-readme-block";
 import {
@@ -61,6 +62,7 @@ interface DBProject {
   period?: string | null;
   tech_stack?: string[] | null;
   mdx_content?: string | null;
+  content_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
   publication_status: string;
@@ -202,7 +204,11 @@ export default async function ProjectPage({
   const dbProject = await fetchDbProject(slug);
   if (!dbProject) notFound();
 
-  const content = dbProject.mdx_content ? await getCompiledMDX(dbProject.mdx_content) : null;
+  const content = dbProject.content_json ? (
+    <NovelReadOnly content={dbProject.content_json} />
+  ) : dbProject.mdx_content ? (
+    await getCompiledMDX(dbProject.mdx_content)
+  ) : null;
   const ctx = dbToContext(dbProject, content);
   const renderer = findCustomPageRenderer(dbProject.custom_page);
 

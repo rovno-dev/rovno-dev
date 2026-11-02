@@ -51,6 +51,7 @@ class ArticleListItem(BaseModel):
 
 class ArticleResponse(ArticleListItem):
     mdx_content: str
+    content_json: Optional[Any] = None
     raw_json: Optional[Any] = None
     attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None

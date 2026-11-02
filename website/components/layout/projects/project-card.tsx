@@ -110,7 +110,7 @@ function MarqueeText({
       </span>
 
       {isMarquee ? (
-        <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+        <div className="overflow-hidden pl-2 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
           <style>{`
             @keyframes ${animName} {
               0%, ${holdPct}% { transform: translateX(0); }
@@ -210,7 +210,7 @@ export default function ProjectCard({
             b: Math.round(b / count),
           });
         }
-      } catch (err) {}
+      } catch (err) { }
     };
     return () => {
       isCancelled = true;
@@ -220,10 +220,10 @@ export default function ProjectCard({
   const isLight = useMemo(() => {
     if (!bgColor) return false;
     const luminance = (0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b) / 255;
-    return luminance > 0.55; 
+    return luminance > 0.55;
   }, [bgColor]);
 
-  const gradientStyle = bgColor 
+  const gradientStyle = bgColor
     ? { background: `linear-gradient(to bottom, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.95) 0%, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.4) 50%, transparent 100%)` }
     : { background: "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)" };
 
@@ -257,8 +257,8 @@ export default function ProjectCard({
         />
       )}
 
-      <div 
-        className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500" 
+      <div
+        className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500"
         style={gradientStyle}
       />
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
@@ -275,12 +275,11 @@ export default function ProjectCard({
             </p>
           )}
         </div>
-        <div 
-          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ${
-            isLight 
-              ? "bg-white text-[var(--dark-8)] border-transparent" 
-              : "bg-black/20 backdrop-blur-md text-white border border-white/20"
-          }`}
+        <div
+          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ${isLight
+            ? "bg-white text-[var(--dark-8)] border-transparent"
+            : "bg-black/20 backdrop-blur-md text-white border border-white/20"
+            }`}
         >
           <ArrowUpRight className="size-5" weight="bold" />
         </div>

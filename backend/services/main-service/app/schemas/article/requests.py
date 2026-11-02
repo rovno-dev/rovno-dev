@@ -13,6 +13,7 @@ class ArticleCreate(BaseModel):
     categories: Optional[List[str]] = None
     brands: Optional[List[str]] = None
     mdx_content: str = ""
+    content_json: Optional[Any] = None
     raw_json: Optional[Any] = None
     attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None
@@ -36,6 +37,7 @@ class ArticleUpdate(BaseModel):
     categories: Optional[List[str]] = None
     brands: Optional[List[str]] = None
     mdx_content: Optional[str] = None
+    content_json: Optional[Any] = None
     raw_json: Optional[Any] = None
     attachments: Optional[List[dict]] = None
     seo_title: Optional[str] = None

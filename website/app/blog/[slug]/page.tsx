@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
+import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import {
   fetchArticleServer,
   fetchPublishedArticlesServer,
@@ -137,11 +138,15 @@ export default async function ArticlePage({
   const article = await fetchArticleServer(slug);
   if (!article) notFound();
 
-  const { content } = await compileMDX({
-    source: article.mdx_content || "",
-    components: mdxComponents,
-    options: { parseFrontmatter: false },
-  });
+  const legacyContent = article.content_json
+    ? null
+    : (
+        await compileMDX({
+          source: article.mdx_content || "",
+          components: mdxComponents,
+          options: { parseFrontmatter: false },
+        })
+      ).content;
 
   const authorName =
     article.author?.name || article.author?.username || "Rovno.dev";
@@ -230,7 +235,11 @@ export default async function ArticlePage({
       {/* ── Single-column body ─────────────────────────────────── */}
       <Container className="py-12 md:py-16">
         <article className="max-w-[720px] mx-auto">
-          {content}
+          {article.content_json ? (
+            <NovelReadOnly content={article.content_json} />
+          ) : (
+            legacyContent
+          )}
 
           {article.attachments && article.attachments.length > 0 && (
             <div className="mt-12 pt-8 border-t border-(--outline)">

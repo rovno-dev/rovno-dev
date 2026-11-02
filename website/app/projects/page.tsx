@@ -25,14 +25,14 @@ export default async function ProjectsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-(--bg)">
+    <main className="min-h-screen bg-(--bg) mt-header">
       <Container>
         {/* Simple, clean heading as requested */}
         <h1 className="pt-6 md:pt-8 text-display-4 md:text-display-3 tracking-[-0.02em] leading-none">
           Проекты
         </h1>
       </Container>
-      
+
       <FilterBar
         projects={projects}
         categories={categories}

@@ -24,6 +24,7 @@ class EventCreate(BaseModel):
     is_featured: Optional[bool] = False
     publication_status: Optional[str] = "draft"
     mdx_content: Optional[str] = ""
+    content_json: Optional[Any] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     tags: Optional[List[str]] = None
@@ -49,6 +50,7 @@ class EventUpdate(BaseModel):
     is_featured: Optional[bool] = None
     publication_status: Optional[str] = None
     mdx_content: Optional[str] = None
+    content_json: Optional[Any] = None
     seo_title: Optional[str] = None
     meta_description: Optional[str] = None
     tags: Optional[List[str]] = None

@@ -101,6 +101,7 @@ def create_event(payload: EventCreate, db: Session = Depends(get_db), _: User = 
         is_featured=payload.is_featured or False,
         publication_status=PublicationStatus(status_val),
         mdx_content=payload.mdx_content or "",
+        content_json=payload.content_json,
         seo_title=payload.seo_title,
         meta_description=payload.meta_description,
     )

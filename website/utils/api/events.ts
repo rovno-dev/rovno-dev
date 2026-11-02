@@ -30,6 +30,7 @@ export interface EventDetail extends EventListItem {
   address?: string | null;
   metro?: string | null;
   mdx_content?: string | null;
+  content_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
 }
@@ -54,6 +55,7 @@ export interface EventPayload {
   is_featured?: boolean;
   publication_status?: "draft" | "published";
   mdx_content?: string;
+  content_json?: any;
   seo_title?: string | null;
   meta_description?: string | null;
   tags?: string[];

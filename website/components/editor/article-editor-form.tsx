@@ -20,7 +20,7 @@ import {
 import { ArrowUUpLeftIcon, CaretDownIcon, CaretUpIcon, ClockIcon, FloppyDiskIcon, RocketIcon, SparkleIcon, TrashIcon, XCircleIcon } from "@phosphor-icons/react";;
 import { useLanguage } from "@/providers/language-provider";
 import { useUser } from "@/entities/user/model/user-context";
-import { ArticleEditor } from "./article-editor";
+import { NovelEditor } from "./novel/novel-editor";
 import { TagsAutocomplete } from "./tags-autocomplete";
 import { ImageUploadField } from "./image-upload-field";
 import { ProjectMediaUploader } from "./media-uploader";
@@ -41,7 +41,7 @@ interface FormState {
   image_url: string;
   date: string;
   tags: string[];
-  mdx_content: string;
+  content_json: any | null;
   seo_title: string;
   meta_description: string;
   raw_json: string;
@@ -70,7 +70,7 @@ function toFormState(article?: Article | null): FormState {
     description: article.description || "",
     image_url: article.image_url || "",
     date: (article.date || new Date().toISOString()).slice(0, 10),
-    mdx_content: article.mdx_content || "",
+    content_json: article.content_json ?? null,
     seo_title: article.seo_title || "",
     meta_description: article.meta_description || "",
     raw_json: article.raw_json ? JSON.stringify(article.raw_json, null, 2) : "",
@@ -117,14 +117,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       slug: typeof parsed.slug === "string" ? parsed.slug : prev.slug,
       description: typeof parsed.description === "string" ? parsed.description : prev.description,
       image_url: typeof parsed.image_url === "string" ? parsed.image_url : prev.image_url,
-      mdx_content:
-        typeof parsed.mdx_content === "string"
-          ? parsed.mdx_content
-          : typeof parsed.content === "string"
-            ? parsed.content
-            : typeof parsed.body === "string"
-              ? parsed.body
-              : prev.mdx_content,
       tags: Array.isArray(parsed.tags)
         ? parsed.tags
         : typeof parsed.tags === "string"
@@ -153,7 +145,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       image_url: form.image_url.trim(),
       date: form.date ? new Date(form.date).toISOString() : undefined,
       tags: form.tags,
-      mdx_content: form.mdx_content,
+      content_json: form.content_json,
       raw_json: rawJson,
       seo_title: form.seo_title.trim() || null,
       meta_description: form.meta_description.trim() || null,
@@ -417,12 +409,26 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         )}
       </Card>
 
+      {isEdit && initial?.mdx_content && !initial?.content_json && (
+        <Card className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 flex items-start gap-4">
+          <WarningIcon className="size-5 text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-heading-5 text-(--on-bg-high) mb-1">
+              Контент в старом формате
+            </p>
+            <p className="text-body-4 text-(--on-bg-medium)">
+              Эта статья была написана в MDX-редакторе. Старый текст останется
+              на сайте до первой правки, но здесь он не отображается.
+              Сохранение заменит содержимое новым редактором.
+            </p>
+          </div>
+        </Card>
+      )}
       <div className="space-y-3">
         <h2 className="text-heading-3">{t("editor.section_content")}</h2>
-        <ArticleEditor
-          value={form.mdx_content}
-          onChange={(v) => update("mdx_content", v)}
-          placeholder={t("editor.placeholder")}
+        <NovelEditor
+          initialContent={form.content_json}
+          onChange={(json) => update("content_json", json)}
         />
       </div>
 
