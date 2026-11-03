@@ -337,7 +337,7 @@ export default function OrderPage() {
         </DialogContent>
       </Dialog>
 
-      {/* ───────── Success dialog ───────── */}
+      {/* ------------─ Success dialog ------------─ */}
       <Dialog open={successOpen} onOpenChange={(open) => {
         setSuccessOpen(open);
         if (!open) router.push("/");

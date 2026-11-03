@@ -87,7 +87,7 @@ export function BreadProjectPage({
 }) {
   return (
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high)">
-      {/* ────────────────  HERO  ──────────────── */}
+      {/* ------------------------  HERO  ------------------------ */}
       <section className="relative min-h-[92dvh] flex flex-col justify-between overflow-hidden border-b border-(--outline)">
         <div className="absolute inset-0 z-0">
           {project.coverVideo ? (
@@ -224,7 +224,7 @@ export function BreadProjectPage({
         </Container>
       </section>
 
-      {/* ────────────────  MARQUEE  ──────────────── */}
+      {/* ------------------------  MARQUEE  ------------------------ */}
       <div className="relative border-b border-(--outline) py-5 overflow-hidden select-none bg-(--bg)">
         <div className="flex whitespace-nowrap animate-marquee w-max">
           {[0, 1].map((k) => (
@@ -246,7 +246,7 @@ export function BreadProjectPage({
         </div>
       </div>
 
-      {/* ────────────────  FILM (embedded)  ──────────────── */}
+      {/* ------------------------  FILM (embedded)  ------------------------ */}
       {project.coverVideo && (
         <ScrollReveal threshold={0.02}>
           <section id="film" className="py-24 md:py-32 border-b border-(--outline)">
@@ -287,7 +287,7 @@ export function BreadProjectPage({
         </ScrollReveal>
       )}
 
-      {/* ────────────────  MANIFESTO  ──────────────── */}
+      {/* ------------------------  MANIFESTO  ------------------------ */}
       {project.description && (
         <ScrollReveal threshold={0.05}>
           <section className="py-24 md:py-36 border-b border-(--outline)">
@@ -307,7 +307,7 @@ export function BreadProjectPage({
         </ScrollReveal>
       )}
 
-      {/* ────────────────  PROCESS  ──────────────── */}
+      {/* ------------------------  PROCESS  ------------------------ */}
       <ScrollReveal threshold={0.02}>
         <section className="py-24 md:py-32 border-b border-(--outline)">
           <Container variant="full-width">
@@ -355,7 +355,7 @@ export function BreadProjectPage({
         </section>
       </ScrollReveal>
 
-      {/* ────────────────  CASE BODY (MDX)  ──────────────── */}
+      {/* ------------------------  CASE BODY (MDX)  ------------------------ */}
       {/* Only renders when the admin supplied MDX content. Projects that
           rely solely on the template's hard-coded sections (process,
           manifesto, film) skip this block entirely. */}
@@ -427,7 +427,7 @@ export function BreadProjectPage({
         </ScrollReveal>
       )}
 
-      {/* ────────────────  MEDIA GALLERY  ──────────────── */}
+      {/* ------------------------  MEDIA GALLERY  ------------------------ */}
       {project.media.length > 0 && (
         <ScrollReveal threshold={0.02}>
           <section className="py-24 md:py-32 border-b border-(--outline)">
@@ -493,7 +493,7 @@ export function BreadProjectPage({
         </ScrollReveal>
       )}
 
-      {/* ────────────────  IMPACT  ──────────────── */}
+      {/* ------------------------  IMPACT  ------------------------ */}
       <ScrollReveal threshold={0.02}>
         <section className="py-24 md:py-32 border-b border-(--outline)">
           <Container variant="full-width">
@@ -526,7 +526,7 @@ export function BreadProjectPage({
         </section>
       </ScrollReveal>
 
-      {/* ────────────────  CLOSING CTA  ──────────────── */}
+      {/* ------------------------  CLOSING CTA  ------------------------ */}
       <section className="py-32 md:py-44 relative overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"

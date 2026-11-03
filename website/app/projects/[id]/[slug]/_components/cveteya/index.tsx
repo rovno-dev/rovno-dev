@@ -11,17 +11,17 @@ import { MaxLogoIcon } from "@/components/icons/logotypes/max-logo-icon";
 import { CustomVideoPlayer } from "@/components/ui/custom-video-player";
 import PixelTransition from "@/components/ui/pixel-transition";
 
-// ─────────────────────────────────────────────────────────────
+// ——————------─
 // Design Tokens
-// ─────────────────────────────────────────────────────────────
+// ——————------─
 const BG_COLOR = "#F8F6F4"; // Warm paper
 const INK = "#1A1A1A"; // Deep ink
 const MUTED = "#7A7571"; // Warm grey
 const ACCENT = "#C76575"; // Muted rose
 
-// ─────────────────────────────────────────────────────────────
+// ——————------─
 // Animated Number (Triggers when visible)
-// ─────────────────────────────────────────────────────────────
+// ——————------─
 function AnimatedNumber({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => latest.toFixed(decimals));
@@ -89,7 +89,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
       className="min-h-screen font-sans selection:bg-[#C76575] selection:text-white overflow-x-clip"
       style={{ backgroundColor: BG_COLOR, color: INK }}
     >
-      {/* ──────────────── HERO ──────────────── */}
+      {/* ------------------------ HERO ------------------------ */}
       <section
         ref={heroRef}
         className="relative h-[100svh] min-h-[700px] w-full overflow-hidden flex flex-col items-center justify-center bg-black"
@@ -131,7 +131,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         </motion.div>
       </section>
 
-      {/* ──────────────── INTRO / MANIFESTO ──────────────── */}
+      {/* ------------------------ INTRO / MANIFESTO ------------------------ */}
       <section className="py-24 md:py-40 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif leading-[1.1] tracking-tight max-w-4xl">
@@ -144,7 +144,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         </div>
       </section>
 
-      {/* ──────────────── LOOKBOOK / GALLERY ──────────────── */}
+      {/* ------------------------ LOOKBOOK / GALLERY ------------------------ */}
       <section className="pb-24 md:pb-40 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
@@ -173,7 +173,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         </div>
       </section>
 
-      {/* ──────────────── APP SHOWCASE (TELEGRAM/MAX) ──────────────── */}
+      {/* ------------------------ APP SHOWCASE (TELEGRAM/MAX) ------------------------ */}
       <section className="py-24 md:py-32 bg-[#EBE5DE] text-[#1A1A1A] overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
@@ -237,7 +237,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         </div>
       </section>
 
-      {/* ──────────────── IMPACT / NUMBERS (SCROLL ANIMATED) ──────────────── */}
+      {/* ------------------------ IMPACT / NUMBERS (SCROLL ANIMATED) ------------------------ */}
       <section className="relative py-32 md:py-48 px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-24 gap-x-8 text-left py-20">
@@ -302,7 +302,7 @@ export function CveteyaProjectPage({ project, content }: { project: CustomPageCo
         </div>
       </section>
 
-      {/* ──────────────── CTA (PIXEL TRANSITION) ──────────────── */}
+      {/* ------------------------ CTA (PIXEL TRANSITION) ------------------------ */}
       <section className="pb-24 px-6 md:px-12">
         <div className="max-w-4xl mx-auto h-[320px] md:h-[400px] rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)]">
           <PixelTransition

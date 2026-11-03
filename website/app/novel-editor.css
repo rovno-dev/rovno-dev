@@ -30,19 +30,58 @@
   line-height: 1.75;
 }
 
-.novel-prosemirror > * + * {
+.novel-prosemirror>*+* {
   margin-top: 1em;
 }
 
-.novel-prosemirror h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; margin-top: 2em; margin-bottom: 0.5em; line-height: 1.2; }
-.novel-prosemirror h2 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; margin-top: 1.8em; margin-bottom: 0.4em; line-height: 1.3; }
-.novel-prosemirror h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.3em; }
-.novel-prosemirror h1:first-child, .novel-prosemirror h2:first-child, .novel-prosemirror h3:first-child { margin-top: 0; }
+.novel-prosemirror h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  line-height: 1.2;
+}
 
-.novel-prosemirror ul { list-style: disc; padding-left: 1.5em; }
-.novel-prosemirror ol { list-style: decimal; padding-left: 1.5em; }
-.novel-prosemirror li { margin-top: 0.4em; }
-.novel-prosemirror li::marker { color: var(--primary); }
+.novel-prosemirror h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 1.8em;
+  margin-bottom: 0.4em;
+  line-height: 1.3;
+}
+
+.novel-prosemirror h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.3em;
+}
+
+.novel-prosemirror h1:first-child,
+.novel-prosemirror h2:first-child,
+.novel-prosemirror h3:first-child {
+  margin-top: 0;
+}
+
+.novel-prosemirror ul {
+  list-style: disc;
+  padding-left: 1.5em;
+}
+
+.novel-prosemirror ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+}
+
+.novel-prosemirror li {
+  margin-top: 0.4em;
+}
+
+.novel-prosemirror li::marker {
+  color: var(--primary);
+}
 
 .novel-prosemirror blockquote {
   border-left: 3px solid var(--outline);
@@ -97,11 +136,11 @@
   z-index: 99999 !important;
 }
 
-/* ─────────────────────────────────────────────────────────────────────
+/* ———---------
    Стили для Slash Menu (EditorCommand)
    Novel не поставляет CSS из коробки, поэтому Tippy-попап
    без этих правил рендерится как пустая точка.
-   ───────────────────────────────────────────────────────────────────── */
+   ———--------- */
 
 /* Контейнер попапа (Tippy), в котором Novel рендерит EditorCommand */
 .tippy-box {
@@ -164,7 +203,7 @@
 }
 
 /* Иконка пункта */
-#slash-command [cmdk-item] > div:first-child {
+#slash-command [cmdk-item]>div:first-child {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,13 +217,13 @@
 }
 
 /* Текст пункта */
-#slash-command [cmdk-item] > div:last-child {
+#slash-command [cmdk-item]>div:last-child {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-#slash-command [cmdk-item] > div:last-child > span:first-child {
+#slash-command [cmdk-item]>div:last-child>span:first-child {
   font-size: 13px;
   font-weight: 500;
   color: var(--on-bg-high);
@@ -193,7 +232,7 @@
   text-overflow: ellipsis;
 }
 
-#slash-command [cmdk-item] > div:last-child > span:last-child {
+#slash-command [cmdk-item]>div:last-child>span:last-child {
   font-size: 11px;
   color: var(--on-bg-medium);
   white-space: nowrap;
@@ -221,6 +260,159 @@
   border: none;
   box-shadow: none;
 }
+
 .tippy-content {
   padding: 0;
 }
+
+/* Reset generic pre/code inside the novel editor to avoid conflicts with NodeViews */
+.novel-prosemirror pre {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+  margin: 0;
+  font-family: inherit;
+}
+
+.novel-prosemirror pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+  font-size: inherit;
+}
+
+/* --- Syntax Highlighting (Highlight.js - Atom One Dark Theme) ------------─ */
+.hljs {
+  color: #abb2bf;
+  background: #1e1e24;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #56b6c2;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61afef;
+}
+
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+/* ── Syntax Highlighting (VS Code / Atom One Dark) ───────── */
+.hljs {
+  color: #e2e2e6;
+  background: transparent;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd; /* purple */
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75; /* red */
+}
+.hljs-literal {
+  color: #56b6c2; /* cyan */
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379; /* green */
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66; /* orange */
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61afef; /* blue */
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b; /* yellow */
+}
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: bold; }
+.hljs-link { text-decoration: underline; }

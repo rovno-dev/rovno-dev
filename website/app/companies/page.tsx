@@ -46,7 +46,7 @@ export default async function ClientsPage() {
 
   return (
     <main className="min-h-screen bg-(--bg)">
-      {/* ─────────────────────────── HERO ─────────────────────────── */}
+      {/* ——— HERO ——— */}
       <section className="relative border-b border-(--outline) pt-20 md:pt-28 pb-14 md:pb-20 overflow-hidden">
         {/* Blueprint grid, faded to a radial so it dissolves at the edges. */}
         <div
@@ -106,7 +106,7 @@ export default async function ClientsPage() {
         </Container>
       </section>
 
-      {/* ─────────────────────────── BODY ─────────────────────────── */}
+      {/* ——— BODY ——— */}
       <section className="py-14 md:py-20">
         <Container>
           {clients.length === 0 ? (
@@ -121,7 +121,7 @@ export default async function ClientsPage() {
         </Container>
       </section>
 
-      {/* ─────────────────────────── CTA ──────────────────────────── */}
+      {/* ——— CTA ——— */}
       {clients.length > 0 && (
         <section className="pb-24">
           <Container>
@@ -140,7 +140,7 @@ export default async function ClientsPage() {
                     Хотите в этот список?
                   </h2>
                   <p className="text-body-3 text-(--on-bg-medium) max-w-xl">
-                    Расскажите о задаче - ответим в течение 3 часов.
+                    Расскажите о задаче - ответим в течение рабочего дня.
                   </p>
                 </div>
                 <QuickOrderDialog serviceName="Разработка проекта">
@@ -158,7 +158,7 @@ export default async function ClientsPage() {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────── */
+/* ——— */
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (

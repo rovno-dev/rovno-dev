@@ -1,4 +1,5 @@
 """Admin-only team membership management."""
+
 from typing import Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,7 +13,7 @@ from app.schemas.team.responses import TeamMemberWithUser
 from app.shared.auth import get_current_user
 from database.database import get_db
 
-# ── Project pinning imports ──────────────────────────────────────────────
+# --- Project pinning imports ———---------------------------
 from app.models.project import Project
 from app.models.project_role import ProjectRole
 from app.models.project_team_assignment import ProjectTeamAssignment
@@ -221,9 +222,7 @@ def _list_member_projects(db: Session, team_member_id) -> list[ProjectAssignment
     out: list[ProjectAssignmentOut] = []
     for asg, proj in rows:
         labels = (
-            asg.role.labels
-            if asg.role and isinstance(asg.role.labels, dict)
-            else None
+            asg.role.labels if asg.role and isinstance(asg.role.labels, dict) else None
         )
         out.append(
             ProjectAssignmentOut(

@@ -3,6 +3,7 @@
 Both tables have the same shape — `code` (unique slug) + `labels` (JSON dict)
 — so the read/write logic lives here once. Endpoints call these.
 """
+
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
@@ -61,7 +62,8 @@ def _serialize(row) -> dict:
     }
 
 
-# ── Categories ────────────────────────────────────────────────────────────
+# --- Categories ——————------
+
 
 def list_categories(db: Session) -> List[dict]:
     rows = db.query(ProjectCategory).order_by(ProjectCategory.label.asc()).all()
@@ -70,7 +72,9 @@ def list_categories(db: Session) -> List[dict]:
 
 def create_category(db: Session, payload: dict) -> dict:
     labels = _normalize_labels(payload.get("labels"), payload.get("label", ""))
-    base_code = slugify(payload.get("code") or labels["en"], max_len=60, fallback="category")
+    base_code = slugify(
+        payload.get("code") or labels["en"], max_len=60, fallback="category"
+    )
     code = _unique_code(db, ProjectCategory, base_code)
     cat = ProjectCategory(code=code, label=labels["en"], labels=labels)
     db.add(cat)
@@ -88,7 +92,9 @@ def update_category(db: Session, category_id, payload: dict) -> dict:
         cat.labels = labels
         cat.label = labels["en"]
     if "code" in payload and payload["code"]:
-        cat.code = _unique_code(db, ProjectCategory, slugify(payload["code"]), exclude_id=cat.id)
+        cat.code = _unique_code(
+            db, ProjectCategory, slugify(payload["code"]), exclude_id=cat.id
+        )
     db.commit()
     db.refresh(cat)
     return _serialize(cat)
@@ -102,7 +108,8 @@ def delete_category(db: Session, category_id) -> None:
     db.commit()
 
 
-# ── Roles ─────────────────────────────────────────────────────────────────
+# --- Roles ———---
+
 
 def list_roles(db: Session) -> List[dict]:
     rows = db.query(ProjectRole).order_by(ProjectRole.code.asc()).all()
@@ -111,7 +118,9 @@ def list_roles(db: Session) -> List[dict]:
 
 def create_role(db: Session, payload: dict) -> dict:
     labels = _normalize_labels(payload.get("labels"), payload.get("label", ""))
-    base_code = slugify(payload.get("code") or labels["en"], max_len=60, fallback="role")
+    base_code = slugify(
+        payload.get("code") or labels["en"], max_len=60, fallback="role"
+    )
     code = _unique_code(db, ProjectRole, base_code)
     role = ProjectRole(code=code, labels=labels)
     db.add(role)
@@ -125,9 +134,13 @@ def update_role(db: Session, role_id, payload: dict) -> dict:
     if not role:
         raise HTTPException(404, "Role not found")
     if "labels" in payload:
-        role.labels = _normalize_labels(payload["labels"], (role.labels or {}).get("en") or role.code)
+        role.labels = _normalize_labels(
+            payload["labels"], (role.labels or {}).get("en") or role.code
+        )
     if "code" in payload and payload["code"]:
-        role.code = _unique_code(db, ProjectRole, slugify(payload["code"]), exclude_id=role.id)
+        role.code = _unique_code(
+            db, ProjectRole, slugify(payload["code"]), exclude_id=role.id
+        )
     db.commit()
     db.refresh(role)
     return _serialize(role)

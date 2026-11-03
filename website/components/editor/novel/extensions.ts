@@ -5,13 +5,15 @@ import {
   StarterKit,
   TiptapLink,
   UploadImagesPlugin,
-  renderItems,
 } from "novel";
 import { CustomImage, VideoNode, GalleryNode } from "./custom-nodes";
-import { suggestionItems } from "./suggestion-items";
-import CodeBlock from "@tiptap/extension-code-block";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import { CodeBlockNodeView } from "./code-block-view";
+
+// Initialize lowlight with common languages (js, ts, html, css, python, etc.)
+const lowlight = createLowlight(common);
 
 const tiptapImage = CustomImage.extend({
   addProseMirrorPlugins() {
@@ -26,43 +28,38 @@ const tiptapImage = CustomImage.extend({
   HTMLAttributes: { class: "rounded-sm border border-(--outline)" },
 });
 
-const CustomCodeBlock = CodeBlock.extend({
+const CustomCodeBlock = CodeBlockLowlight.extend({
   addAttributes() {
     return {
       language: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-language"),
-        renderHTML: (attributes) => {
-          if (!attributes.language) return {};
-          return { "data-language": attributes.language };
+        parseHTML: element => element.getAttribute('data-language'),
+        renderHTML: attributes => {
+          if (!attributes.language) return {}
+          return { 'data-language': attributes.language }
         },
       },
-    };
+    }
   },
   addNodeView() {
     return ReactNodeViewRenderer(CodeBlockNodeView);
+  },
+}).configure({
+  lowlight,
+  HTMLAttributes: {
+    class: "hljs",
   },
 });
 
 export const extensions = [
   StarterKit.configure({
-    bulletList: {
-      HTMLAttributes: { class: "list-disc list-outside leading-relaxed" },
-    },
-    orderedList: {
-      HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" },
-    },
+    bulletList: { HTMLAttributes: { class: "list-disc list-outside leading-relaxed" } },
+    orderedList: { HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" } },
     listItem: { HTMLAttributes: { class: "leading-normal" } },
-    blockquote: {
-      HTMLAttributes: { class: "border-l-2 border-(--outline) pl-4 italic" },
-    },
-    codeBlock: false,
+    blockquote: { HTMLAttributes: { class: "border-l-2 border-(--outline) pl-4 italic" } },
+    codeBlock: false, // Disabled in favor of CustomCodeBlock
     code: {
-      HTMLAttributes: {
-        class:
-          "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)",
-        spellcheck: "false",
-      },
+      HTMLAttributes: { class: "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)", spellcheck: "false" },
     },
     horizontalRule: false,
     dropcursor: { color: "#336DFF", width: 3 },
@@ -70,22 +67,15 @@ export const extensions = [
   }),
   Placeholder.configure({
     placeholder: ({ node }) =>
-      node.type.name === "heading"
-        ? "Заголовок…"
-        : "Введите '/' для меню или начните писать…",
+      node.type.name === "heading" ? "Заголовок…" : "Введите '/' для меню или начните писать…",
   }),
   Command.configure({
     suggestion: {
       char: "/",
-      startOfLine: false,
-      items: () => suggestionItems,
-      render: renderItems,
     },
   }),
   TiptapLink.configure({
-    HTMLAttributes: {
-      class: "text-(--primary) underline underline-offset-2",
-    },
+    HTMLAttributes: { class: "text-(--primary) underline underline-offset-2" },
   }),
   tiptapImage,
   VideoNode,

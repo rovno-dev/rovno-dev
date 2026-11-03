@@ -172,7 +172,7 @@ export default function AdminDashboard() {
   return (
     <CheckUser>
       <div className="space-y-5">
-        {/* ── Header: title + range toggle + refresh ─────────────── */}
+        {/* --- Header: title + range toggle + refresh ---------------------─ */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-display-2 tracking-tight">Обзор</h1>
           <div className="flex items-center gap-2">
@@ -215,7 +215,7 @@ export default function AdminDashboard() {
           </Card>
         )}
 
-        {/* ── Activity chart + key metrics ────────────────────────── */}
+        {/* --- Activity chart + key metrics --------------------------------------- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Card className="lg:col-span-2 rounded-3xl border-(--outline) bg-(--card) p-5 space-y-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -383,7 +383,7 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* ── Metric cards, row 1 (4 up) ──────────────────────────── */}
+        {/* --- Metric cards, row 1 (4 up) ——— */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <MetricCard
             icon={<Buildings className="size-5" />}
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* ── Metric cards, row 2 (3 up, with caption) ────────────── */}
+        {/* --- Metric cards, row 2 (3 up, with caption) --------------------- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <MetricCard
             icon={<Receipt className="size-5" />}
@@ -440,7 +440,7 @@ export default function AdminDashboard() {
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────── */
+/* ———------ */
 
 function MetricRow({
   icon,

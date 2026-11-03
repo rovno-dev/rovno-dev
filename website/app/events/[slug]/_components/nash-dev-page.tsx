@@ -13,7 +13,7 @@ const LIME = "#CCFF00";
 const BLACK = "#000000";
 const WHITE = "#FFFFFF";
 
-// ── Media links ───────────────────────────────────────────────────
+// --- Media links ------
 // TODO: replace the empty VK/OID/ID and YouTube ID after publishing.
 // The VideoEmbed component auto-falls back to YouTube after 4s if VK
 // doesn't load or is missing credentials.
@@ -42,7 +42,7 @@ const GALLERY = [
   "/images/events/nash-dev-2026/speaker-secret.png",
 ];
 
-// ── Shared UI primitives ─────────────────────────────────────────
+// --- Shared UI primitives ———------------------─
 function Prompt({ children }: { children: React.ReactNode }) {
   return (
     <span style={{ color: LIME }} className="mr-2 select-none">
@@ -61,7 +61,7 @@ function Cursor() {
   );
 }
 
-// ── Hero (post-event) ────────────────────────────────────────────
+// --- Hero (post-event) ———------------------------
 const HERO_LINE = "> СОБЫТИЕ ЗАВЕРШЕНО_";
 
 function Hero({ ctx }: { ctx: EventCustomContext }) {
@@ -173,10 +173,10 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
           {ctx.locationName || "МЦК КИТС"}_{" "}
           {ctx.startAt
             ? new Date(ctx.startAt).toLocaleDateString("ru-RU", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              }).toUpperCase()
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }).toUpperCase()
             : "23 ОКТЯБРЯ 2026"}
         </p>
 
@@ -267,7 +267,7 @@ function Hero({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-// ── Marquee ──────────────────────────────────────────────────────
+// --- Marquee ---------─
 function Marquee() {
   const items = ["НАШ.DEV", "23 ОКТЯБРЯ 2026", "МЦК КИТС", "СОСТОЯЛОСЬ", "ЗАПИСЬ ДОСТУПНА"];
   const line = items.join("  //  ") + "  //  ";
@@ -284,7 +284,7 @@ function Marquee() {
   );
 }
 
-// ── Video recording (VK → YouTube fallback) ──────────────────────
+// --- Video recording (VK → YouTube fallback) ---------------------------------
 function VideoEmbed() {
   const [provider, setProvider] = useState<"vk" | "youtube">("vk");
   const [loaded, setLoaded] = useState(false);
@@ -352,7 +352,7 @@ function VideoSection() {
   );
 }
 
-// ── Gallery (preview + VK album link) ────────────────────────────
+// --- Gallery (preview + VK album link) ———
 function GallerySection() {
   return (
     <section id="gallery" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
@@ -394,7 +394,7 @@ function GallerySection() {
   );
 }
 
-// ── Presentation (iframe) ───────────────────────────────────────
+// --- Presentation (iframe) ———---------------─
 function PresentationSection() {
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
@@ -436,7 +436,7 @@ function PresentationSection() {
   );
 }
 
-// ── Reels carousel (5 vertical videos) ──────────────────────────
+// --- Reels carousel (5 vertical videos) ---------------------------------------
 function ReelsSection() {
   return (
     <section className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
@@ -475,7 +475,7 @@ function ReelsSection() {
   );
 }
 
-// ── Manifesto ────────────────────────────────────────────────────
+// --- Manifesto ------─
 function Manifesto({ ctx }: { ctx: EventCustomContext }) {
   return (
     <section id="about" className="border-b py-20 md:py-28" style={{ borderColor: "#222", background: BLACK }}>
@@ -509,7 +509,7 @@ function Manifesto({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-// ── Audience ────────────────────────────────────────────────────
+// --- Audience ------─
 const AUDIENCE = [
   { code: "STUDENT_16-20", title: "Студент 16–20", desc: "Учишься, хочешь понять, куда идти дальше. Приходи посмотреть, как это устроено на практике." },
   { code: "NEWBIE_CODER", title: "Начинающий разработчик", desc: "Знаешь основы, но пока не понимаешь, как из этого сделать работу. Здесь — живые примеры." },
@@ -544,7 +544,7 @@ function Audience() {
   );
 }
 
-// ── Speakers ────────────────────────────────────────────────────
+// --- Speakers ------─
 interface Speaker {
   name: string;
   role: string;
@@ -731,7 +731,7 @@ function Speakers() {
   );
 }
 
-// ── Timeline ────────────────────────────────────────────────────
+// --- Timeline ------─
 const TIMELINE = [
   { time: "13:10", cmd: "./Презентация-Юнидоки --speakers 'Niyaz Gimadiev'" },
   { time: "13:25", cmd: "./Менеджмент_rovno_dev --speakers 'Mikhail Lapaev' 'Danil Kitkin'" },
@@ -801,7 +801,7 @@ function Timeline() {
   );
 }
 
-// ── Location ────────────────────────────────────────────────────
+// --- Location ------─
 const YANDEX_MAP_SRC =
   "https://yandex.ru/map-widget/v1/?um=constructor%3Ac65a3696f6811e8fdf9a467d8657d05efab313aee6808b886bebb2138cf28370&source=constructor";
 const GOOGLE_MAP_SRC =
@@ -929,7 +929,7 @@ function Location({ ctx }: { ctx: EventCustomContext }) {
   );
 }
 
-// ── Footer ──────────────────────────────────────────────────────
+// --- Footer ---------─
 function EventFooter() {
   return (
     <footer className="border-t py-12 font-mono" style={{ borderColor: "#222", background: BLACK }}>
@@ -948,7 +948,7 @@ function EventFooter() {
   );
 }
 
-// ── Root ────────────────────────────────────────────────────────
+// --- Root ——————
 export function NashDevPage({ ctx }: { ctx: EventCustomContext }) {
   return (
     <div className="min-h-screen" style={{ background: BLACK, color: WHITE }}>

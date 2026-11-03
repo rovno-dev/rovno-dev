@@ -1,6 +1,6 @@
 import { $fetch } from "@/utils/fetch";
 
-// ── Expert-profile shapes (JSON columns on team_members) ────────────
+// --- Expert-profile shapes (JSON columns on team_members) ------------------
 // `icon_key` / `kind` are string keys the frontend maps to React
 // components via components/icons/expert-icon-map.tsx. Never store
 // rendered markup or component names in the DB.
@@ -222,10 +222,10 @@ export async function fetchTeamMemberProjectsPublic(
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────
+// ———---------------
 // Server-side fetchers. Used by Server Components (about page, expert page).
 // Plain `fetch` with ISR - no $fetch, no cookie storage, no client deps.
-// ─────────────────────────────────────────────────────────────────────────
+// ———---------------
 
 const API_BASE =
   process.env.API_BASE_URL_INTERNAL ||

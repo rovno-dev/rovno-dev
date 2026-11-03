@@ -160,7 +160,7 @@ export async function deleteEvent(slug: string): Promise<void> {
   if (!res?.response?.ok) throw new Error(res?.json?.detail || "Failed to delete event");
 }
 
-// ── Registration ─────────────────────────────────────────────────────────
+// --- Registration ——————─
 
 export interface EventRegistrationPayload {
   name?: string;
@@ -188,7 +188,7 @@ export async function registerForEvent(
   return res.json;
 }
 
-// ── Admin: requests ──────────────────────────────────────────────────────
+// --- Admin: requests ---------─
 
 export interface EventRequestRow {
   id: string;

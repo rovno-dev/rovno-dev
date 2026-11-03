@@ -161,7 +161,7 @@ export default function AdminOrdersPage() {
     }
   };
 
-  // ── Derived: counts + filtered list ──────────────────────────────
+  // --- Derived: counts + filtered list ———---
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: orders.length };
     for (const s of STATUS_ORDER) counts[s] = 0;
@@ -692,9 +692,9 @@ export default function AdminOrdersPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // StatusChip - status filter with a count pill
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 
 function StatusChip({
   label,

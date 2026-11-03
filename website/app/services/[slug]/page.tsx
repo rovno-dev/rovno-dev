@@ -125,7 +125,7 @@ export default async function ServicePage({
               "radial-gradient(ellipse 60% 80% at 20% 20%, black 40%, transparent 90%)",
           }}
         />
-        
+
         <Container className="relative z-10">
           <div className="max-w-[860px] animate-reveal">
             <Link
@@ -135,11 +135,11 @@ export default async function ServicePage({
               <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
               Все услуги
             </Link>
-            
+
             <h1 className="text-5xl md:text-7xl font-heading font-semibold text-(--on-bg-high) leading-[1.05] tracking-[-0.03em] mb-6">
               {doc.shortTitle}
             </h1>
-            
+
             <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-[640px] mb-10">
               {doc.description}
             </p>
@@ -151,7 +151,7 @@ export default async function ServicePage({
                   <ArrowUpRight className="size-5 ml-2" />
                 </Button>
               </QuickOrderDialog>
-              
+
               <div className="flex gap-8 sm:pl-8 sm:border-l border-(--outline)">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">Срок</p>
@@ -171,12 +171,12 @@ export default async function ServicePage({
       <section className="py-16 md:py-24 relative">
         <Container>
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-start relative">
-            
+
             {/* Main Article */}
             <article className="flex-1 w-full min-w-0 max-w-[760px] prose-case">
               {content}
             </article>
-            
+
             {/* Sidebar */}
             <aside className="hidden lg:block w-[260px] shrink-0 sticky top-32">
               {doc.headings.length > 0 && (
@@ -218,7 +218,7 @@ export default async function ServicePage({
                   Нужна {doc.shortTitle.toLowerCase()}?
                 </h2>
                 <p className="text-body-3 text-(--on-bg-medium) max-w-lg">
-                  Опишите задачу — ответим в течение 3 часов и предложим план.
+                  Опишите задачу - ответим в течение 24 часов и предложим план.
                 </p>
               </div>
               <QuickOrderDialog serviceName={doc.shortTitle}>

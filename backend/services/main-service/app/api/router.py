@@ -6,6 +6,7 @@ from app.api.v1 import admin_articles
 from app.api.v1 import admin_projects
 from app.api.v1 import admin_team
 from app.api.v1 import admin_events
+
 # from app.api.v1 import admin_presentations
 # from app.api.v1 import presentations
 from app.api.v1 import admin_event_requests
@@ -29,7 +30,7 @@ from app.api.v1 import team
 
 router = APIRouter(prefix="/v1")
 
-# ── Auth + current user ─────────────────────────────────────────────
+# --- Auth + current user ———------------------------─
 router.include_router(auth.router)
 router.include_router(me.router)
 # /me/notifications (per-user channel toggles + Telegram deep link).
@@ -37,7 +38,7 @@ router.include_router(me.router)
 # full path so the more specific prefix wins cleanly.
 router.include_router(notifications.router)
 
-# ── Admin ───────────────────────────────────────────────────────────
+# --- Admin ——————---─
 router.include_router(admin.router)
 router.include_router(admin_articles.router)
 router.include_router(admin_projects.router)
@@ -50,11 +51,11 @@ router.include_router(admin_catalog.router)
 # Root-only: order-notification recipients + template editor.
 router.include_router(admin_notifications.router)
 
-# ── Bot bridge ──────────────────────────────────────────────────────
+# --- Bot bridge ---------─
 # Called by the tg-bot container; authenticated via X-Bot-Secret header.
 router.include_router(bot.router)
 
-# ── Public ──────────────────────────────────────────────────────────
+# --- Public ——————---
 router.include_router(categories.router)
 router.include_router(companies.router)
 router.include_router(mentions.router)

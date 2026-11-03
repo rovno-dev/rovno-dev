@@ -78,7 +78,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
   return (
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-blue-500/30">
 
-      {/* ──────────────── HERO ──────────────── */}
+      {/* ------------------------ HERO ------------------------ */}
       <section ref={heroRef} className="relative h-[100svh] min-h-[700px] overflow-hidden flex items-center justify-center bg-black">
 
         {/* Parallax Background Video */}
@@ -133,7 +133,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
         </motion.div>
       </section>
 
-      {/* ──────────────── WEB APP SHOWCASE ──────────────── */}
+      {/* ------------------------ WEB APP SHOWCASE ------------------------ */}
       <section className="py-24 border-b border-(--outline)">
         <Container>
           <div className="flex flex-col gap-16 md:gap-24">
@@ -201,7 +201,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
         </Container>
       </section>
 
-      {/* ──────────────── LIVE CAMERAS (2 CAMERAS) ──────────────── */}
+      {/* ------------------------ LIVE CAMERAS (2 CAMERAS) ------------------------ */}
       <section id="live" className="py-24 bg-(--card)/30 border-b border-(--outline)">
         <Container>
           <ScrollReveal>
@@ -269,7 +269,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
         </Container>
       </section>
 
-      {/* ──────────────── FEATURES (4 CARDS, INFORMATIVE MOCKUPS) ──────────────── */}
+      {/* ------------------------ FEATURES (4 CARDS, INFORMATIVE MOCKUPS) ------------------------ */}
       <section className="py-24">
         <Container>
           <ScrollReveal>
@@ -385,7 +385,7 @@ export function JungleBreadSecurityPage({ project, content }: { project: CustomP
         </Container>
       </section>
 
-      {/* ──────────────── CTA ──────────────── */}
+      {/* ------------------------ CTA ------------------------ */}
       <section className="py-24 border-t border-(--outline) bg-(--card)/50 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-[400px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
         <Container className="relative z-10 text-center">

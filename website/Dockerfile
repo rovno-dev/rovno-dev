@@ -8,7 +8,7 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     NPM_CONFIG_FUND=false \
     NPM_CONFIG_AUDIT=false
 
-# ── deps ─────────────────────────────────────────────────────────────
+# --- deps ——————------─
 FROM base AS deps
 COPY package.json package-lock.json ./
 # Cache mount keeps the npm tarball cache across builds — the 2nd build
@@ -16,7 +16,7 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --prefer-offline --no-audit --no-fund
 
-# ── builder ──────────────────────────────────────────────────────────
+# --- builder ——————---
 FROM base AS builder
 
 ARG NEXT_PUBLIC_ROOT_DOMAIN
@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/app/.next/cache \
     npm run build
 
-# ── prod ─────────────────────────────────────────────────────────────
+# --- prod ——————------─
 FROM node:22-alpine AS prod
 WORKDIR /app
 ENV NODE_ENV=production \

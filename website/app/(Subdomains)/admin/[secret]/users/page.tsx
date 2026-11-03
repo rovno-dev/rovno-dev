@@ -56,9 +56,9 @@ import {
   fetchTeamMembers,
 } from "@/utils/api/team";
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // Types + constants
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 
 interface User {
   id: string;
@@ -106,9 +106,9 @@ const ROLE_STYLE: Record<string, { label: string; className: string }> = {
 
 type ViewMode = "cards" | "table";
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // Helpers
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 
 function fullName(u: User): string {
   return [u.name, u.surname].filter(Boolean).join(" ").trim();
@@ -128,9 +128,9 @@ function initials(u: User): string {
   return (u.email[0] ?? "?").toUpperCase();
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // Page
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 
 export default function AdminUsersPage() {
   const { user: currentUser, isLoading: userLoading } = useUser();
@@ -228,7 +228,7 @@ export default function AdminUsersPage() {
     return u.role !== "admin";
   };
 
-  // ── Filtering ─────────────────────────────────────────────────────
+  // --- Filtering ---------
   // Every dimension ANDs together. Team membership is derived from the
   // teamRoles map loaded alongside the user list.
   const filtered = useMemo(() => {
@@ -284,7 +284,7 @@ export default function AdminUsersPage() {
     setTeamFilter("all");
   };
 
-  // ── Actions ───────────────────────────────────────────────────────
+  // --- Actions ——————
   const handleDelete = async (u: User) => {
     if (
       !confirm(`Удалить пользователя ${u.email}? Действие нельзя отменить.`)
@@ -336,7 +336,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  // ── Render ────────────────────────────────────────────────────────
+  // --- Render ——————
   return (
     <CheckUser>
       <div className="space-y-6">
@@ -622,9 +622,9 @@ export default function AdminUsersPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // ViewSwitcher - segmented control, single group
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 function ViewSwitcher({
   value,
   onChange,
@@ -664,9 +664,9 @@ function ViewSwitcher({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // FilterGroup - small-caps label + a single segmented chip row
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 function FilterGroup({
   label,
   value,
@@ -704,9 +704,9 @@ function FilterGroup({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // RoleTag - thin outline, monochrome except root
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 function RoleTag({ role }: { role: string }) {
   const s = ROLE_STYLE[role] ?? ROLE_STYLE.user;
   return (
@@ -721,9 +721,9 @@ function RoleTag({ role }: { role: string }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // UserCard - cards view entry
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 function UserCard({
   user,
   teamRole,
@@ -880,9 +880,9 @@ function UserCard({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // UserTable - table view
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 function UserTable({
   users,
   teamRoles,
@@ -1093,9 +1093,9 @@ function Td({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // UserEditorDialog
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 interface FormState {
   email: string;
   password: string;

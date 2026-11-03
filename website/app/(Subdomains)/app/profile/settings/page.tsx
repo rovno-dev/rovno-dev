@@ -140,7 +140,7 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* ── Notifications card ──────────────────────────────────── */}
+        {/* --- Notifications card ———------------ */}
         <Card className="rounded-3xl border-(--outline) p-6 space-y-5">
           <div className="flex items-center gap-2">
             <Bell className="size-5 text-(--primary)" />
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              {/* ── Marketing opt-in ─────────────────────────────── */}
+              {/* --- Marketing opt-in ———---─ */}
               <div className="pt-3 border-t border-(--outline)">
                 <div className="flex items-center justify-between gap-4 py-3">
                   <div className="flex items-center gap-3 min-w-0">
@@ -306,7 +306,7 @@ export default function SettingsPage() {
           )}
         </Card>
 
-        {/* ── Account card ────────────────────────────────────────── */}
+        {/* --- Account card ———--------------------- */}
         <Card className="rounded-3xl border-(--outline) p-6">
           <h2 className="text-heading-3 mb-2">Аккаунт</h2>
           <p className="text-body-4 text-(--on-bg-medium)">
@@ -316,7 +316,7 @@ export default function SettingsPage() {
         </Card>
       </div>
 
-      {/* ── Telegram link dialog ──────────────────────────────────── */}
+      {/* --- Telegram link dialog ———------------ */}
       <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

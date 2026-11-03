@@ -26,7 +26,7 @@ export function pickLabel(
   return labels[lang] || labels.en || t.label || t.code || "";
 }
 
-// ── Categories ────────────────────────────────────────────────────────────
+// --- Categories ——————------
 
 export async function fetchProjectCategories(): Promise<Taxonomy[]> {
   const res = await $fetch("/api/v1/categories/projects", { isToast: false });
@@ -68,7 +68,7 @@ export async function deleteProjectCategory(id: string): Promise<void> {
   if (!res?.response?.ok) throw new Error(res?.json?.detail || "Failed to delete");
 }
 
-// ── Roles ─────────────────────────────────────────────────────────────────
+// --- Roles ———---
 
 export async function fetchProjectRoles(): Promise<Taxonomy[]> {
   const res = await $fetch("/api/v1/categories/roles", { isToast: false });

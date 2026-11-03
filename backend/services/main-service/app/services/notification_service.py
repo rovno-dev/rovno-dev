@@ -26,9 +26,7 @@ logger = logging.getLogger(__name__)
 # Template syntax:
 #   {{var}}           → value, empty string when missing
 #   {{var|fallback}}  → value, or `fallback` when the value is empty/missing
-_VAR_RE = re.compile(
-    r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:\|\s*([^}]*?))?\s*\}\}"
-)
+_VAR_RE = re.compile(r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:\|\s*([^}]*?))?\s*\}\}")
 
 
 def render_template(template: str, context: Dict[str, Any]) -> str:
@@ -39,10 +37,11 @@ def render_template(template: str, context: Dict[str, Any]) -> str:
         if value in (None, ""):
             return (fallback or "").strip()
         return str(value)
+
     return _VAR_RE.sub(repl, template)
 
 
-# ── Human-readable enum labels ────────────────────────────────────────
+# --- Human-readable enum labels ———------------------
 _DEADLINE_LABELS = {
     "asap": "Как можно скорее",
     "under_1_month": "До 1 месяца",
@@ -86,7 +85,7 @@ def get_or_create_prefs(db: Session, user: User) -> UserNotificationPreference:
 
 def _parse_ids(raw: Iterable | None) -> List[UUID]:
     out: List[UUID] = []
-    for i in (raw or []):
+    for i in raw or []:
         try:
             out.append(UUID(str(i)))
         except (ValueError, TypeError, AttributeError):
@@ -113,7 +112,9 @@ def _resolve_recipients(db: Session, ids: Iterable | None, channel: str) -> List
         if missing:
             logger.warning(
                 "%s recipients: %d id(s) skipped (unknown or non-admin): %s",
-                channel, len(missing), missing,
+                channel,
+                len(missing),
+                missing,
             )
         return [u for u in users if not u.blocked]
     users = (
@@ -122,8 +123,11 @@ def _resolve_recipients(db: Session, ids: Iterable | None, channel: str) -> List
         .filter(User.blocked.is_(False))
         .all()
     )
-    logger.info("%s recipients: empty list — defaulting to %d admin/root user(s)",
-                channel, len(users))
+    logger.info(
+        "%s recipients: empty list — defaulting to %d admin/root user(s)",
+        channel,
+        len(users),
+    )
     return users
 
 
@@ -132,7 +136,9 @@ def resolve_email_recipients(db: Session, settings: NotificationSettings) -> Lis
     return _resolve_recipients(db, ids, "Email")
 
 
-def resolve_telegram_recipients(db: Session, settings: NotificationSettings) -> List[User]:
+def resolve_telegram_recipients(
+    db: Session, settings: NotificationSettings
+) -> List[User]:
     ids = settings.order_telegram_recipient_ids or settings.order_recipient_ids
     return _resolve_recipients(db, ids, "Telegram")
 
@@ -147,7 +153,9 @@ def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
     return {
         "order_id": str(order.id),
         "short_id": str(order.id)[:8],
-        "created_at": order.created_at.strftime("%d.%m.%Y %H:%M") if order.created_at else "",
+        "created_at": (
+            order.created_at.strftime("%d.%m.%Y %H:%M") if order.created_at else ""
+        ),
         "name": (getattr(c, "name", None) or ""),
         "phone": (getattr(c, "phone", None) or ""),
         "email": (getattr(c, "email", None) or ""),
@@ -159,13 +167,19 @@ def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
         "services": ", ".join(order.service_types_json or []),
         "budget": (
             _BUDGET_LABELS.get(order.estimate_budget.value, order.estimate_budget.value)
-            if order.estimate_budget else ""
+            if order.estimate_budget
+            else ""
         ),
         "deadline": (
-            _DEADLINE_LABELS.get(order.estimate_deadline.value, order.estimate_deadline.value)
-            if order.estimate_deadline else ""
+            _DEADLINE_LABELS.get(
+                order.estimate_deadline.value, order.estimate_deadline.value
+            )
+            if order.estimate_deadline
+            else ""
         ),
-        "naming_help": _NAMING_LABELS.get(order.naming_help or "", order.naming_help or ""),
+        "naming_help": _NAMING_LABELS.get(
+            order.naming_help or "", order.naming_help or ""
+        ),
         "about": order.about or "",
         "company_name": company_name,
         "files_count": str(len(order.files or [])),
@@ -173,11 +187,11 @@ def build_order_context(db: Session, order: OrderRequest) -> Dict[str, str]:
     }
 
 
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 # Telegram — plain text only, no parse_mode
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 
-# Section header on its own line: **Title** → `─── Title ───`
+# Section header on its own line: **Title** → `---─ Title ---─`
 _HEADER_RE = re.compile(r"^\*\*(.+?)\*\*\s*$", re.MULTILINE)
 # Remaining inline bold and code markers get stripped.
 _INLINE_BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
@@ -194,11 +208,13 @@ def _render_telegram_plain(text: str) -> str:
     Section headers get a light unicode rule so they still read as
     headers once the markdown markers are gone:
 
-        **👤 Клиент**   →   ─── 👤 КЛИЕНТ ───
+        **👤 Клиент**   →   ---─ 👤 КЛИЕНТ ---─
     """
+
     def repl_header(m: re.Match) -> str:
         title = m.group(1).strip().upper()
-        return f"─── {title} ───"
+        return f"---─ {title} ---─"
+
     out = _HEADER_RE.sub(repl_header, text)
     # Any remaining inline markdown markers are dropped — the content stays.
     out = _INLINE_BOLD_RE.sub(r"\1", out)
@@ -241,7 +257,9 @@ async def _send_telegram(chat_id: str, text: str) -> bool:
                     logger.error(
                         "Telegram delivery FAILED → chat %s — %s %s "
                         "(client error, not retrying)",
-                        chat_id, r.status_code, r.text,
+                        chat_id,
+                        r.status_code,
+                        r.text,
                     )
                     return False
                 last_error = f"HTTP {r.status_code}: {r.text}"
@@ -252,20 +270,24 @@ async def _send_telegram(chat_id: str, text: str) -> bool:
             backoff = 2 ** (attempt - 1)
             logger.warning(
                 "Telegram attempt %d/3 → chat %s failed (%s); retry in %ds",
-                attempt, chat_id, last_error, backoff,
+                attempt,
+                chat_id,
+                last_error,
+                backoff,
             )
             await asyncio.sleep(backoff)
 
     logger.error(
         "Telegram delivery FAILED after 3 attempts → chat %s — %s",
-        chat_id, last_error,
+        chat_id,
+        last_error,
     )
     return False
 
 
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 # Email — plain text + styled HTML alternative
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 
 _INLINE_BOLD_EMAIL = re.compile(r"\*\*(.+?)\*\*")
 _INLINE_CODE_EMAIL = re.compile(r"`([^`]+?)`")
@@ -329,10 +351,10 @@ def _render_email_html(subject: str, body: str) -> str:
             rendered_blocks.append(
                 '<tr><td style="padding:22px 0 8px 0;">'
                 '<div style="font-size:11px;letter-spacing:0.18em;'
-                'text-transform:uppercase;color:#72727e;'
-                'font-family:\'SF Mono\',Menlo,Consolas,monospace;">'
+                "text-transform:uppercase;color:#72727e;"
+                "font-family:'SF Mono',Menlo,Consolas,monospace;\">"
                 f'{html.escape(b["text"])}'
-                '</div></td></tr>'
+                "</div></td></tr>"
             )
         elif b["type"] == "rows":
             row_html = "".join(
@@ -348,7 +370,7 @@ def _render_email_html(subject: str, body: str) -> str:
                 '<tr><td style="padding:12px 16px;">'
                 '<table role="presentation" cellspacing="0" cellpadding="0" '
                 f'border="0" width="100%">{row_html}</table>'
-                '</td></tr></table></td></tr>'
+                "</td></tr></table></td></tr>"
             )
         elif b["type"] == "paragraph":
             rendered_blocks.append(
@@ -356,10 +378,14 @@ def _render_email_html(subject: str, body: str) -> str:
                 f'line-height:1.65;color:#e2e2e6;">{b["html"]}</td></tr>'
             )
 
-    blocks_html = "".join(rendered_blocks) if rendered_blocks else (
-        '<tr><td style="font-size:14px;color:#e2e2e6;">'
-        + _inline_md_to_html(body)
-        + '</td></tr>'
+    blocks_html = (
+        "".join(rendered_blocks)
+        if rendered_blocks
+        else (
+            '<tr><td style="font-size:14px;color:#e2e2e6;">'
+            + _inline_md_to_html(body)
+            + "</td></tr>"
+        )
     )
 
     year = __import__("datetime").datetime.utcnow().year
@@ -417,7 +443,9 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
     if not (sender and password and server):
         logger.error(
             "Email config incomplete — MAIL_SENDER=%r MAIL_SERVER=%r MAIL_PASSWORD=%s",
-            sender, server, "set" if password else "MISSING",
+            sender,
+            server,
+            "set" if password else "MISSING",
         )
         return False
 
@@ -437,31 +465,43 @@ def _send_email_sync(to_email: str, subject: str, body: str) -> bool:
     try:
         if port == 465:
             with smtplib.SMTP_SSL(server, port, timeout=15) as s:
-                s.ehlo(); s.login(sender, password); s.send_message(msg)
+                s.ehlo()
+                s.login(sender, password)
+                s.send_message(msg)
         else:
             with smtplib.SMTP(server, port, timeout=15) as s:
-                s.ehlo(); s.starttls(); s.ehlo()
-                s.login(sender, password); s.send_message(msg)
+                s.ehlo()
+                s.starttls()
+                s.ehlo()
+                s.login(sender, password)
+                s.send_message(msg)
         logger.info("Email delivery OK → %s (subject=%r)", to_email, subject)
         return True
     except smtplib.SMTPAuthenticationError as e:
         logger.error(
             "Email auth FAILED for %s — server said %s %r. If this is "
             "Gmail/Yandex/Mail.ru, MAIL_PASSWORD must be an App Password.",
-            sender, e.smtp_code, e.smtp_error,
+            sender,
+            e.smtp_code,
+            e.smtp_error,
         )
         return False
     except Exception as e:
         logger.error(
             "Email delivery FAILED → %s via %s:%s — %s: %s",
-            to_email, server, port, type(e).__name__, e,
+            to_email,
+            server,
+            port,
+            type(e).__name__,
+            e,
         )
         return False
 
 
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 # Orchestrator
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
+
 
 async def notify_new_order(db: Session, order: OrderRequest) -> None:
     logger.info("notify_new_order: order %s — building notification", order.id)
@@ -469,19 +509,23 @@ async def notify_new_order(db: Session, order: OrderRequest) -> None:
     settings = get_or_create_settings(db)
     logger.info(
         "notify_new_order: email_enabled=%s telegram_enabled=%s",
-        settings.order_notify_email, settings.order_notify_telegram,
+        settings.order_notify_email,
+        settings.order_notify_telegram,
     )
 
     email_recipients = (
         resolve_email_recipients(db, settings) if settings.order_notify_email else []
     )
     telegram_recipients = (
-        resolve_telegram_recipients(db, settings) if settings.order_notify_telegram else []
+        resolve_telegram_recipients(db, settings)
+        if settings.order_notify_telegram
+        else []
     )
 
     logger.info(
         "notify_new_order: resolved %d email / %d telegram recipient(s)",
-        len(email_recipients), len(telegram_recipients),
+        len(email_recipients),
+        len(telegram_recipients),
     )
 
     if not email_recipients and not telegram_recipients:
@@ -512,20 +556,32 @@ async def notify_new_order(db: Session, order: OrderRequest) -> None:
 
         if uid in telegram_ids:
             if not prefs.telegram_enabled:
-                logger.info("notify_new_order: user %s opted OUT of telegram", user.email)
+                logger.info(
+                    "notify_new_order: user %s opted OUT of telegram", user.email
+                )
             elif not prefs.telegram_chat_id:
-                logger.warning("notify_new_order: user %s has NO telegram_chat_id", user.email)
+                logger.warning(
+                    "notify_new_order: user %s has NO telegram_chat_id", user.email
+                )
             else:
                 tasks.append(
                     _send_telegram(prefs.telegram_chat_id, f"{subject}\n\n{body}")
                 )
 
     if not tasks:
-        logger.warning("notify_new_order: NO delivery tasks scheduled for order %s", order.id)
+        logger.warning(
+            "notify_new_order: NO delivery tasks scheduled for order %s", order.id
+        )
         return
 
-    logger.info("notify_new_order: dispatching %d task(s) for order %s", len(tasks), order.id)
+    logger.info(
+        "notify_new_order: dispatching %d task(s) for order %s", len(tasks), order.id
+    )
     results = await asyncio.gather(*tasks, return_exceptions=True)
     ok = sum(1 for r in results if r is True)
-    logger.info("notify_new_order: DONE for order %s — %d/%d delivered",
-                order.id, ok, len(tasks))
+    logger.info(
+        "notify_new_order: DONE for order %s — %d/%d delivered",
+        order.id,
+        ok,
+        len(tasks),
+    )

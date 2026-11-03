@@ -4,6 +4,7 @@ Both endpoints use the shared taxonomy_service so behaviour is identical
 across the two tables. The payload shape is the same: either pass a `label`
 (legacy single-language string, treated as labels.en) or a `labels` dict.
 """
+
 from typing import Any, Dict, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
@@ -30,7 +31,8 @@ class TaxonomyUpdate(BaseModel):
     labels: Optional[Dict[str, str]] = None
 
 
-# ── Categories ────────────────────────────────────────────────────────────
+# --- Categories ——————------
+
 
 @router.get("/project-categories")
 def admin_list_categories(
@@ -69,7 +71,8 @@ def admin_delete_category(
     return None
 
 
-# ── Roles ─────────────────────────────────────────────────────────────────
+# --- Roles ———---
+
 
 @router.get("/project-roles")
 def admin_list_roles(

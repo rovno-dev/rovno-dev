@@ -73,7 +73,7 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.view_all_projects': 'Все проекты',
     'home.socials_title': 'Наши залипательные медиа',
     'home.cta.title': 'Мы найдем решение',
-    'home.cta.subtitle': 'Напишите нам - ответим в течение 3 часов.',
+    'home.cta.subtitle': 'Напишите нам - ответим в течение рабочего дня.',
     'home.cta.note': '8 - 22 МСК',
     'home.cta.or': 'или',
     'home.cta.max': 'Написать в Max',

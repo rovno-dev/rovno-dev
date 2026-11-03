@@ -2,7 +2,7 @@ import type { Language } from './translations';
 
 export const servicesTranslations: Record<Language, Record<string, string>> = {
   en: {
-    // ── Home Page Services Section ──
+    // --- Home Page Services Section ---
     'services.page.title': 'Services',
 
     'services.audit.short': 'Audit',
@@ -21,7 +21,7 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'services.startup.short': 'Startup',
     'services.startup.desc': 'We build digital products and help you win investment rounds.',
 
-    // ── Other Services Meta ──
+    // --- Other Services Meta ---
     'services.from': 'from',
     'services.avg_label': 'average',
     'services.dev_sub1': 'Websites',
@@ -96,7 +96,7 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'tech.detail.cta': 'Need a project on',
   },
   ru: {
-    // ── Home Page Services Section ──
+    // --- Home Page Services Section ---
     'services.page.title': 'Услуги',
 
     'services.audit.short': 'Аудит',
@@ -115,7 +115,7 @@ export const servicesTranslations: Record<Language, Record<string, string>> = {
     'services.startup.short': 'Стартап',
     'services.startup.desc': 'Реализуем цифровой продукт, поможем выйграть инвестиционные раунды.',
 
-    // ── Other Services Meta ──
+    // --- Other Services Meta ---
     'services.from': 'от',
     'services.avg_label': 'в среднем',
     'services.dev_sub1': 'Сайты',

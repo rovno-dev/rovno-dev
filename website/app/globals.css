@@ -769,7 +769,7 @@
   }
 }
 
-/* ─── Case-study body typography ─────────────────────────────────────────
+/* ---─ Case-study body typography ———------------------─
    Scoped to .prose-case so it only affects the MDX body inside a project
    page. Distinct from .prose-mdx (the editor theme) and from Tailwind's
    default typography plugin — this is a hand-tuned editorial scale that

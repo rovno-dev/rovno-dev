@@ -9,9 +9,9 @@ import {
 import { cn } from "@/lib/utils";
 import { FloatingDropdown } from "@/components/ui/floating-dropdown";
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // Country catalogue
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 //
 // Each entry defines the national number layout via `groups` - the
 // number is split into those chunk sizes, the first chunk wrapped in
@@ -153,9 +153,9 @@ function nationalDisplay(c: Country, digits: string): string {
   return formatNational(digits, c);
 }
 
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 // Component
-// ─────────────────────────────────────────────────────────────────────
+// ———---------
 
 export interface PhoneInputFieldProps {
   value: string | undefined;
@@ -196,7 +196,7 @@ export function PhoneInputField({
   // dropdown apart from a click anywhere else on the page.
   const dropdownRef = React.useRef<HTMLDivElement | null>(null);
 
-  // ── External value sync ────────────────────────────────────────────
+  // --- External value sync ———------------------------
   // Only runs when the parent hands us a value that differs from what
   // we last emitted. Sorted by dial length descending so longer prefixes
   // (`+375`) are matched before shorter ones (`+7`).
@@ -223,7 +223,7 @@ export function PhoneInputField({
     }
   }, [value]);
 
-  // ── Outside-click close for the country dropdown ───────────────────
+  // --- Outside-click close for the country dropdown ---------------------------─
   React.useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
@@ -237,7 +237,7 @@ export function PhoneInputField({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  // ── Emit helper ────────────────────────────────────────────────────
+  // --- Emit helper ------─
   const emit = (c: Country, nat: string) => {
     const complete = nat.length === maxDigits(c);
     const next = complete ? `${c.dial}${nat}` : undefined;
@@ -245,7 +245,7 @@ export function PhoneInputField({
     onChange(next);
   };
 
-  // ── Input change ───────────────────────────────────────────────────
+  // --- Input change ------
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // The field holds only the national number now - dial is on the
     // button - so every digit the user types belongs to the national
@@ -255,7 +255,7 @@ export function PhoneInputField({
     emit(country, nat);
   };
 
-  // ── Backspace fix ──────────────────────────────────────────────────
+  // --- Backspace fix ---─
   // Without this, hitting backspace while the cursor sits right after a
   // mask character (space, `(`, `)`, `-`) only removes that mask, the
   // formatter instantly re-inserts it, and the display appears frozen.
@@ -288,7 +288,7 @@ export function PhoneInputField({
     }
   };
 
-  // ── Country selection ──────────────────────────────────────────────
+  // --- Country selection ———---------------------------
   const selectCountry = (c: Country) => {
     setCountry(c);
     setOpen(false);
@@ -298,7 +298,7 @@ export function PhoneInputField({
     emit(c, nat);
   };
 
-  // ── Dropdown filtering ─────────────────────────────────────────────
+  // --- Dropdown filtering ———------------------------─
   const filteredCountries = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return COUNTRIES;

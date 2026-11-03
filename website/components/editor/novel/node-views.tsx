@@ -15,7 +15,7 @@ const uploadImageBlob = async (blob: Blob, filename: string) => {
   return res.json.url;
 };
 
-// ── 1. Image Node View ──────────────────────────────────────────────────
+// --- 1. Image Node View ---─
 export function ImageNodeView({ node, deleteNode, updateAttributes }: any) {
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const { src, alt } = node.attrs;
@@ -24,7 +24,7 @@ export function ImageNodeView({ node, deleteNode, updateAttributes }: any) {
     <NodeViewWrapper className="relative group my-6 flex flex-col items-center w-full max-w-full">
       <div className="relative overflow-hidden rounded-sm border border-(--outline) max-w-full">
         <img src={src} alt={alt} className="w-full h-auto block max-h-[800px] object-contain" />
-        
+
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-sm">
           <button type="button" onClick={() => setCropSrc(src)} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-md backdrop-blur-sm" title="Обрезать">
             <Crop className="size-5" />
@@ -53,7 +53,7 @@ export function ImageNodeView({ node, deleteNode, updateAttributes }: any) {
   );
 }
 
-// ── 2. Video Node View ──────────────────────────────────────────────────
+// --- 2. Video Node View ---─
 export function VideoNodeView({ node, deleteNode }: any) {
   const { src, poster } = node.attrs;
   return (
@@ -70,7 +70,7 @@ export function VideoNodeView({ node, deleteNode }: any) {
   );
 }
 
-// ── 3. Gallery Node View ────────────────────────────────────────────────
+// --- 3. Gallery Node View ———------------------------------
 export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
   const { images = [], isFullWidth = false } = node.attrs;
   const [replaceIndex, setReplaceIndex] = useState<number | null>(null);
@@ -96,7 +96,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
           fd.append("file", file);
           const res = await $fetch("/api/v1/uploads/images", { method: "POST", body: fd, isToast: false });
           if (res?.json?.url) newImages.push(res.json.url);
-        } catch (err) {}
+        } catch (err) { }
       }
       updateAttributes({ images: newImages });
       toast.success("Добавлено", { id: tId });
@@ -107,10 +107,10 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
   return (
     <NodeViewWrapper className="my-6 group/gallery w-full max-w-full">
       <div className={cn(
-        "rounded-sm border border-(--outline) p-3 bg-(--bg)/30 transition-all w-full overflow-hidden", 
+        "rounded-sm border border-(--outline) p-3 bg-(--bg)/30 transition-all w-full overflow-hidden",
         isFullWidth ? "max-w-full" : "max-w-[800px] mx-auto"
       )}>
-        
+
         <div className="flex items-center justify-between mb-3 opacity-0 group-hover/gallery:opacity-100 transition-opacity">
           <span className="text-xs font-semibold text-(--on-bg-medium) uppercase tracking-wider">
             Галерея ({images.length})
@@ -139,7 +139,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
               </div>
             </div>
           ))}
-          
+
           <button onClick={handleAdd} className="aspect-[4/3] rounded-sm border-2 border-dashed border-(--outline) flex flex-col items-center justify-center gap-2 text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) transition-colors bg-(--card)/50 w-full">
             <Plus className="size-6" />
             <span className="text-xs font-medium">Добавить</span>

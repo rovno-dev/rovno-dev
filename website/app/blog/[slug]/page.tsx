@@ -141,12 +141,12 @@ export default async function ArticlePage({
   const legacyContent = article.content_json
     ? null
     : (
-        await compileMDX({
-          source: article.mdx_content || "",
-          components: mdxComponents,
-          options: { parseFrontmatter: false },
-        })
-      ).content;
+      await compileMDX({
+        source: article.mdx_content || "",
+        components: mdxComponents,
+        options: { parseFrontmatter: false },
+      })
+    ).content;
 
   const authorName =
     article.author?.name || article.author?.username || "Rovno.dev";
@@ -155,11 +155,11 @@ export default async function ArticlePage({
     <main className="min-h-screen bg-(--bg) pb-24">
       <Container className="pt-4 md:pt-8">
         <div className="max-w-[860px] mx-auto">
-          {/* ── 4:3 banner: full-bleed cover, dark gradient for text ── */}
+          {/* --- 4:3 banner: full-bleed cover, dark gradient for text --- */}
           <div className="relative w-full aspect-[4/3] rounded-4xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
             {article.image_url ? (
               article.image_url.endsWith(".webm") ||
-              article.image_url.endsWith(".mp4") ? (
+                article.image_url.endsWith(".mp4") ? (
                 <video
                   src={article.image_url}
                   autoPlay
@@ -232,13 +232,13 @@ export default async function ArticlePage({
         </div>
       </Container>
 
-      {/* ── Single-column body ─────────────────────────────────── */}
+      {/* --- Single-column body ———---------─ */}
       <Container className="pt-4">
         <div className="max-w-[860px] mx-auto">
-          <ContentMeta 
-            slug={article.slug} 
-            content={article.content_json || article.mdx_content} 
-            updatedAt={article.updated_at || article.date} 
+          <ContentMeta
+            slug={article.slug}
+            content={article.content_json || article.mdx_content}
+            updatedAt={article.updated_at || article.date}
             imageUrl={article.image_url}
           />
         </div>
@@ -291,7 +291,7 @@ export default async function ArticlePage({
         </article>
       </Container>
 
-      {/* ── Footer nav ─────────────────────────────────────────── */}
+      {/* --- Footer nav ———---------------------─ */}
       <Container>
         <div className="max-w-[720px] mx-auto">
           <Button variant="outlined" size="medium" shape="round" asChild>

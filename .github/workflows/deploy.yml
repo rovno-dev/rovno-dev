@@ -33,18 +33,18 @@ jobs:
             set -euo pipefail
             cd "${{ secrets.PROJECT_PATH }}"
 
-            # ── 1. Capture the currently-deployed commit ─────────────
+            # --- 1. Capture the currently-deployed commit ------------------─
             # Must happen BEFORE git reset, or the diff below has
             # nothing to compare against. First-ever deploy lands here
             # with an empty OLD_SHA.
             OLD_SHA=$(git rev-parse HEAD 2>/dev/null || echo "")
 
-            # ── 2. Pull latest main ─────────────────────────────────
+            # --- 2. Pull latest main ———------─
             git fetch --quiet origin main
             git reset --hard origin/main
             NEW_SHA=$(git rev-parse HEAD)
 
-            # ── 3. Work out which files changed ─────────────────────
+            # --- 3. Work out which files changed ------------------------------─
             # Three cases fall back to "rebuild everything":
             #   - first deploy (no OLD_SHA)
             #   - manual force_rebuild input
@@ -62,7 +62,7 @@ jobs:
               echo "$CHANGED" | sed 's/^/  /'
             fi
 
-            # ── 4. Map changed paths → services to rebuild ──────────
+            # --- 4. Map changed paths → services to rebuild ---------------
             # A service rebuilds when anything under its build context
             # changed. Compose file and .env changes rebuild everything
             # so that build args (NEXT_PUBLIC_*) and runtime env stay
@@ -87,7 +87,7 @@ jobs:
               fi
             fi
 
-            # ── 5. Build only what changed ──────────────────────────
+            # --- 5. Build only what changed ---------------------------------------
             # No `source .env` — the file holds values with parentheses
             # (company names, addresses) that bash tries to execute as
             # subshell syntax. Docker Compose reads ./.env from the
@@ -110,7 +110,7 @@ jobs:
               echo "==> No buildable services changed"
             fi
 
-            # ── 6. Reconcile running containers ─────────────────────
+            # --- 6. Reconcile running containers ------------------------------─
             # `up -d` without --build or --force-recreate:
             #   - recreates only containers whose image ID or config
             #     changed since the last run
@@ -121,7 +121,7 @@ jobs:
             echo "==> Reconciling compose state"
             docker compose --profile prod up -d
 
-            # ── 7. Wait for health ──────────────────────────────────
+            # --- 7. Wait for health ———---------
             echo "==> Waiting for services to become healthy"
             for i in $(seq 1 40); do
               ps_json=$(docker compose ps --format json 2>/dev/null || echo "")

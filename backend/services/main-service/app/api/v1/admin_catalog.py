@@ -6,6 +6,7 @@ so a single router with a dispatch table is cleaner than five near-identical
 handlers. Client uses one API surface; adding a new catalog is one entry in
 CATALOGS.
 """
+
 from typing import Any, Callable, Dict, List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
@@ -26,7 +27,8 @@ from database.database import get_db
 router = APIRouter(prefix="/admin/catalog", tags=["admin-catalog"])
 
 
-# ── Generic payload ───────────────────────────────────────────────────────
+# --- Generic payload ——————
+
 
 class CatalogIn(BaseModel):
     code: Optional[str] = None
@@ -42,7 +44,8 @@ class CatalogUpdate(BaseModel):
     kind: Optional[str] = None
 
 
-# ── Per-catalog adapters ──────────────────────────────────────────────────
+# --- Per-catalog adapters ---─
+
 
 def _serialize_labels(labels, fallback_label=None, fallback_code=None):
     out = labels if isinstance(labels, dict) and labels else {}
@@ -68,7 +71,9 @@ def _row_out(row) -> dict:
     }
 
 
-def _unique_code(db: Session, model, base: str, exclude_id=None, code_col="code") -> str:
+def _unique_code(
+    db: Session, model, base: str, exclude_id=None, code_col="code"
+) -> str:
     col = getattr(model, code_col)
     code = base or "item"
     n = 2
@@ -94,8 +99,9 @@ def _normalize_labels(payload: dict, fallback: str = "") -> dict:
     return labels
 
 
-# ── Catalog registry ──────────────────────────────────────────────────────
+# --- Catalog registry ---------─
 # Each entry: (model, code column name, getter, creator, updater, deleter).
+
 
 def _stack_list(db: Session):
     rows = db.query(StackItem).order_by(StackItem.name.asc()).all()
@@ -115,11 +121,7 @@ def _stack_create(db: Session, payload: dict):
     name = name.strip()
     if not name:
         raise HTTPException(422, "Name is required")
-    existing = (
-        db.query(StackItem)
-        .filter(StackItem.name.ilike(name))
-        .first()
-    )
+    existing = db.query(StackItem).filter(StackItem.name.ilike(name)).first()
     if existing:
         raise HTTPException(409, f"«{existing.name}» уже в стеке")
     base = slugify(name, max_len=60, fallback="stack")
@@ -128,7 +130,12 @@ def _stack_create(db: Session, payload: dict):
     db.add(row)
     db.commit()
     db.refresh(row)
-    return {"id": str(row.id), "code": row.slug, "labels": {"en": row.name}, "kind": None}
+    return {
+        "id": str(row.id),
+        "code": row.slug,
+        "labels": {"en": row.name},
+        "kind": None,
+    }
 
 
 def _stack_update(db: Session, id_: UUID, payload: dict):
@@ -140,10 +147,17 @@ def _stack_update(db: Session, id_: UUID, payload: dict):
         if name:
             row.name = name
     if "code" in payload and payload["code"]:
-        row.slug = _unique_code(db, StackItem, slugify(payload["code"]), exclude_id=row.id, code_col="slug")
+        row.slug = _unique_code(
+            db, StackItem, slugify(payload["code"]), exclude_id=row.id, code_col="slug"
+        )
     db.commit()
     db.refresh(row)
-    return {"id": str(row.id), "code": row.slug, "labels": {"en": row.name}, "kind": None}
+    return {
+        "id": str(row.id),
+        "code": row.slug,
+        "labels": {"en": row.name},
+        "kind": None,
+    }
 
 
 def _stack_delete(db: Session, id_: UUID):
@@ -178,7 +192,12 @@ def _article_category_create(db: Session, payload: dict):
     db.add(row)
     db.commit()
     db.refresh(row)
-    return {"id": str(row.id), "code": row.code, "labels": {"en": row.label}, "kind": None}
+    return {
+        "id": str(row.id),
+        "code": row.code,
+        "labels": {"en": row.label},
+        "kind": None,
+    }
 
 
 def _article_category_update(db: Session, id_: UUID, payload: dict):
@@ -190,10 +209,21 @@ def _article_category_update(db: Session, id_: UUID, payload: dict):
         if label:
             row.label = label
     if "code" in payload and payload["code"]:
-        row.code = _unique_code(db, ArticleCategory, slugify(payload["code"]), exclude_id=row.id, code_col="code")
+        row.code = _unique_code(
+            db,
+            ArticleCategory,
+            slugify(payload["code"]),
+            exclude_id=row.id,
+            code_col="code",
+        )
     db.commit()
     db.refresh(row)
-    return {"id": str(row.id), "code": row.code, "labels": {"en": row.label}, "kind": None}
+    return {
+        "id": str(row.id),
+        "code": row.code,
+        "labels": {"en": row.label},
+        "kind": None,
+    }
 
 
 def _article_category_delete(db: Session, id_: UUID):
@@ -229,11 +259,7 @@ def _tag_create(db: Session, payload: dict):
         kind = TagKind(kind_raw)
     except ValueError:
         raise HTTPException(422, f"Unknown tag kind: {kind_raw}")
-    existing = (
-        db.query(Tag)
-        .filter(Tag.kind == kind, Tag.name.ilike(name))
-        .first()
-    )
+    existing = db.query(Tag).filter(Tag.kind == kind, Tag.name.ilike(name)).first()
     if existing:
         raise HTTPException(409, f"«{existing.name}» уже есть в этой категории")
     base = slugify(name, max_len=60, fallback="tag")
@@ -264,7 +290,9 @@ def _tag_update(db: Session, id_: UUID, payload: dict):
         except ValueError:
             raise HTTPException(422, f"Unknown tag kind: {payload['kind']}")
     if "code" in payload and payload["code"]:
-        row.slug = _unique_code(db, Tag, slugify(payload["code"]), exclude_id=row.id, code_col="slug")
+        row.slug = _unique_code(
+            db, Tag, slugify(payload["code"]), exclude_id=row.id, code_col="slug"
+        )
     db.commit()
     db.refresh(row)
     return {
@@ -285,43 +313,43 @@ def _tag_delete(db: Session, id_: UUID):
 
 CATALOGS: Dict[str, Dict[str, Any]] = {
     "project-categories": {
-        "list":   svc.list_categories,
+        "list": svc.list_categories,
         "create": svc.create_category,
         "update": svc.update_category,
         "delete": svc.delete_category,
-        "model":  ProjectCategory,
+        "model": ProjectCategory,
         "code_col": "code",
     },
     "project-roles": {
-        "list":   svc.list_roles,
+        "list": svc.list_roles,
         "create": svc.create_role,
         "update": svc.update_role,
         "delete": svc.delete_role,
-        "model":  ProjectRole,
+        "model": ProjectRole,
         "code_col": "code",
     },
     "stack": {
-        "list":   _stack_list,
+        "list": _stack_list,
         "create": _stack_create,
         "update": _stack_update,
         "delete": _stack_delete,
-        "model":  StackItem,
+        "model": StackItem,
         "code_col": "slug",
     },
     "article-categories": {
-        "list":   _article_category_list,
+        "list": _article_category_list,
         "create": _article_category_create,
         "update": _article_category_update,
         "delete": _article_category_delete,
-        "model":  ArticleCategory,
+        "model": ArticleCategory,
         "code_col": "code",
     },
     "tags": {
-        "list":   _tag_list,
+        "list": _tag_list,
         "create": _tag_create,
         "update": _tag_update,
         "delete": _tag_delete,
-        "model":  Tag,
+        "model": Tag,
         "code_col": "slug",
     },
 }
@@ -333,7 +361,8 @@ def _adapter(name: str) -> Dict[str, Any]:
     return CATALOGS[name]
 
 
-# ── Routes ────────────────────────────────────────────────────────────────
+# --- Routes ———─
+
 
 @router.get("/{catalog}")
 def list_catalog(
@@ -363,7 +392,9 @@ def update_catalog_item(
     db: Session = Depends(get_db),
     _: User = Depends(get_admin_user),
 ):
-    return _adapter(catalog)["update"](db, item_id, payload.model_dump(exclude_unset=True))
+    return _adapter(catalog)["update"](
+        db, item_id, payload.model_dump(exclude_unset=True)
+    )
 
 
 @router.delete("/{catalog}/{item_id}", status_code=204)

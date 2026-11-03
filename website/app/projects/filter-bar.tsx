@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import ProjectCard from "@/components/layout/projects/project-card";
 import type { Project } from "@/utils/api/projects";
@@ -10,6 +10,7 @@ import {
   FunnelSimpleIcon,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react";
 
 function tagsOf(p: Project): string[] {
   return (p.tags || [])
@@ -30,13 +31,13 @@ export function FilterBar({
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  
+
+  // Apple-style scroll tracking
+  const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 20);
+  });
 
   const tagsBySlug = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -123,18 +124,29 @@ export function FilterBar({
 
   return (
     <>
-      {/* Sticky Header-Matching Filter Bar */}
-      <div 
-        className={cn(
-          "sticky top-[64px] md:top-[88px] z-40 pt-2 pb-6 pointer-events-none transition-all duration-400 ease-in-out w-full flex justify-center px-4 mx-auto",
-          isScrolled ? "max-w-[900px] xl:max-w-[1100px]" : "max-w-full"
-        )}
-      >
-        <div className="flex flex-col w-full pointer-events-auto">
-          <div 
+      {/* 
+        Sticky Header-Matching Filter Bar 
+        The container has no background, it acts as the structural dock.
+      */}
+      <div className="sticky z-40 flex justify-center w-full pointer-events-none transition-all duration-500 ease-in-out top-[63px] md:top-[88px] pt-2 pb-6 px-4">
+        
+        {/* The Magic Motion Wrapper */}
+        <motion.div
+          initial={false}
+          animate={{
+            maxWidth: isScrolled ? "900px" : "1500px", // Matches Header exact constraints
+            scale: isScrolled ? 0.98 : 1,
+            y: isScrolled ? 2 : 0, // Tucks it perfectly under the header
+          }}
+          transition={{ type: "spring", stiffness: 450, damping: 30, mass: 0.8 }}
+          className="w-full pointer-events-auto origin-top"
+        >
+          <div
             className={cn(
-              // Matching the EXACT header styles
-              "flex items-center gap-2 h-[55px] sm:h-[80px] pl-5 pr-2 transition-all bg-[var(--bg)]/40 backdrop-blur-glass border border-b-(--card-glass) rounded-full shadow-lg"
+              // EXACT MATCH to the header's visual style
+              "flex items-center gap-2 h-[55px] sm:h-[80px] pl-6 pr-2 transition-all",
+              "bg-[var(--bg)]/40 backdrop-blur-glass border border-(--card-glass) rounded-full",
+              isScrolled ? "shadow-[0_8px_30px_rgba(0,0,0,0.12)]" : "shadow-sm"
             )}
           >
             {/* Search Input */}
@@ -210,53 +222,58 @@ export function FilterBar({
           </div>
 
           {/* Mobile Filters Dropdown */}
-          {mobileOpen && (
-            <div 
-              className="md:hidden mt-3 rounded-3xl p-4 space-y-4 shadow-xl bg-[var(--bg)]/40 backdrop-blur-glass border border-(--card-glass)"
-            >
-              <ChipRow
-                label="Категория"
-                chips={categoryChips.map((c) => {
-                  const code = c.id === "__all__" ? null : c.id;
-                  return {
-                    key: c.id,
-                    label: c.label,
-                    active: c.active,
-                    count: liveCategoryCount(code),
-                    onClick: () => setActiveCategory(c.active ? null : code),
-                  };
-                })}
-              />
-              {allTags.length > 0 && (
+          <AnimatePresence>
+            {mobileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                className="md:hidden mt-3 rounded-[32px] p-4 space-y-4 shadow-xl bg-[var(--bg)]/60 backdrop-blur-xl border border-(--card-glass)"
+              >
                 <ChipRow
-                  label="Метки"
-                  chips={allTags.map((t) => ({
-                    key: t.label,
-                    label: t.label,
-                    active: activeTag === t.label,
-                    count: liveTagCount(t.label),
-                    onClick: () => setActiveTag(activeTag === t.label ? null : t.label),
-                  }))}
+                  label="Категория"
+                  chips={categoryChips.map((c) => {
+                    const code = c.id === "__all__" ? null : c.id;
+                    return {
+                      key: c.id,
+                      label: c.label,
+                      active: c.active,
+                      count: liveCategoryCount(code),
+                      onClick: () => setActiveCategory(c.active ? null : code),
+                    };
+                  })}
                 />
-              )}
-              {hasActiveFilters && (
-                <div className="flex items-center justify-between pt-3 border-t border-(--outline)/50">
-                  <span className="text-xs text-(--on-bg-low) tabular-nums">
-                    {filtered.length} из {projects.length}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={resetAll}
-                    className="inline-flex items-center gap-1 text-xs text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors"
-                  >
-                    <XIcon className="size-3" />
-                    Сбросить
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                {allTags.length > 0 && (
+                  <ChipRow
+                    label="Метки"
+                    chips={allTags.map((t) => ({
+                      key: t.label,
+                      label: t.label,
+                      active: activeTag === t.label,
+                      count: liveTagCount(t.label),
+                      onClick: () => setActiveTag(activeTag === t.label ? null : t.label),
+                    }))}
+                  />
+                )}
+                {hasActiveFilters && (
+                  <div className="flex items-center justify-between pt-3 border-t border-(--outline)/50">
+                    <span className="text-xs text-(--on-bg-low) tabular-nums">
+                      {filtered.length} из {projects.length}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={resetAll}
+                      className="inline-flex items-center gap-1 text-xs text-(--on-bg-medium) hover:text-(--on-bg-high) transition-colors"
+                    >
+                      <XIcon className="size-3" />
+                      Сбросить
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
       <section className="pt-2 pb-24 md:pb-32">

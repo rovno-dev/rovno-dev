@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
-import { ArrowUpRight, ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight, ArrowLeft, Sparkle, Diamond, CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 import ProjectCard from "@/components/layout/projects/project-card";
 import type { Project } from "@/utils/api/projects";
@@ -116,7 +116,7 @@ export function CustomProjectPage({
 
   return (
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary)">
-      {/* ── HERO (Чистый, без полноэкранного градиента) ─────────────── */}
+      {/* --- HERO (Чистый, без полноэкранного градиента) ---------------------─ */}
       <section className="relative w-full h-[80vh] md:h-[85vh] flex flex-col justify-end overflow-hidden bg-black">
         <div className="absolute inset-0 z-0">
           {isVideo ? (
@@ -166,12 +166,12 @@ export function CustomProjectPage({
                   {project.shortDescription}
                 </p>
               )}
-              
+
               <div className="animate-reveal [animation-delay:300ms] fill-mode-both">
-                <ContentMeta 
-                  slug={project.slug} 
-                  content={content} 
-                  updatedAt={project.period || new Date().toISOString()} 
+                <ContentMeta
+                  slug={project.slug}
+                  content={content}
+                  updatedAt={project.period || new Date().toISOString()}
                   imageUrl={project.coverImage}
                 />
               </div>
@@ -180,9 +180,9 @@ export function CustomProjectPage({
         </Container>
       </section>
 
-      {/* ── CONTENT ─────────────────────────────────────────────────── */}
+      {/* --- CONTENT ------ */}
       {content && (
-        <section className="py-16 md:py-24">
+        <section className="py-12">
           <Container>
             <div className="max-w-[720px] mx-auto prose-case">
               {content}
@@ -191,9 +191,9 @@ export function CustomProjectPage({
         </section>
       )}
 
-      {/* ── GALLERY ─────────────────────────────────────────────────── */}
+      {/* --- GALLERY ------ */}
       {project.media.length > 0 && (
-        <section className="py-16 md:py-24 border-t border-(--outline)">
+        <section className="py-12 border-(--outline)">
           <Container>
             <div className="max-w-[1200px] mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
@@ -232,29 +232,60 @@ export function CustomProjectPage({
         </section>
       )}
 
-      {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <section className="py-24 border-t border-(--outline)">
-        <Container>
-          <div className="max-w-[800px] mx-auto text-center rounded-4xl border border-(--outline) bg-(--card) p-8 md:p-16">
-            <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight mb-4">
-              Хотите такой же проект?
-            </h2>
-            <p className="text-body-2 text-(--on-bg-medium) mb-8 max-w-lg mx-auto">
-              Расскажите о задаче - ответим в течение 3 часов и предложим план.
-            </p>
-            <QuickOrderDialog serviceName={project.title || "Разработка"}>
-              <Button size="xlarge" variant="filled">
-                Обсудить задачу
-                <ArrowUpRight className="size-5" />
-              </Button>
-            </QuickOrderDialog>
+      {/* --- FANCY CTA --- */}
+      <section className="py-12 border-(--outline) relative overflow-hidden">
+        {/* Ambient background glow */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, var(--primary-glass), transparent 70%)" }}
+        />
+
+        <Container className="relative z-10">
+          <div className="max-w-[900px] mx-auto">
+
+            {/* Dotted Blueprint Frame */}
+            <div className="relative rounded-3xl border-3 border-dashed border-(--on-bg-low)/30 p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
+
+              {/* Top breaking icon */}
+              <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 px-4">
+                <div className="flex size-11 items-center justify-center rounded-full border border-(--outline) bg-(--card) text-(--on-bg-high) shadow-sm">
+                  <Sparkle className="size-5" weight="fill" />
+                </div>
+              </div>
+
+              {/* Editorial Headlines */}
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading tracking-tighter text-(--on-bg-high) mb-6 leading-[1.05]">
+                Хотите <span className="italic font-serif text-(--on-bg-medium)">такой же</span> <br />
+                проект?
+              </h2>
+
+              <p className="text-body-2 text-(--on-bg-medium) max-w-md mx-auto mb-10 leading-relaxed">
+                Расскажите о задаче. Мы ответим в течение рабочего дня, обсудим детали и предложим пошаговый план реализации.
+              </p>
+
+              {/* Pill CTA */}
+              <QuickOrderDialog serviceName={project.title || "Разработка"}>
+                <Button size="xlarge" shape="round" className="group px-8 hover:scale-105 transition-transform">
+                  Обсудить задачу
+                  <ArrowUpRight className="size-5 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Button>
+              </QuickOrderDialog>
+
+              {/* <div className="absolute -bottom-[22px] left-1/2 -translate-x-1/2 bg-(--bg) px-4">
+                <div className="flex size-11 items-center justify-center rounded-full border border-(--outline) bg-(--card) text-(--on-bg-low) shadow-sm">
+                  <Diamond className="size-5" weight="fill" />
+                </div>
+              </div> */}
+
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* ── RELATED ─────────────────────────────────────────────────── */}
+      {/* --- RELATED ------ */}
       {related.length > 0 && (
-        <section className="py-24 border-t border-(--outline)">
+        <section className="py-12 pb-24 border-(--outline)">
           <Container>
             <div className="max-w-[1200px] mx-auto">
               <div className="flex items-end justify-between mb-12">

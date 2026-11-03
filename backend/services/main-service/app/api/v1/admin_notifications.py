@@ -105,14 +105,13 @@ def update_settings(
     s.order_template_subject = (
         payload.order_template_subject.strip() or DEFAULT_ORDER_SUBJECT
     )
-    s.order_template_body = (
-        payload.order_template_body.strip() or DEFAULT_ORDER_BODY
-    )
+    s.order_template_body = payload.order_template_body.strip() or DEFAULT_ORDER_BODY
     db.commit()
     db.refresh(s)
     return _to_out(s)
 
-# ── Manual resend / debug ─────────────────────────────────────────────
+
+# --- Manual resend / debug ———------------------------─
 @router.post("/test-order/{order_id}")
 async def resend_order_notification(
     order_id: UUID,

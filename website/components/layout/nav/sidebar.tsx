@@ -250,7 +250,7 @@ export function Sidebar({
           const anyActive = selfActive || childActive;
           const Icon = item.icon;
 
-          // ── Plain link ─────────────────────────────────────────────
+          // --- Plain link ———------------------------─
           if (!hasChildren) {
             return (
               <Tooltip
@@ -288,7 +288,7 @@ export function Sidebar({
             );
           }
 
-          // ── Foldable group (collapsed state) ───────────────────────
+          // --- Foldable group (collapsed state) ---------------------------------─
           // When folded, we render a hover tooltip that contains the sub-items.
           if (isCollapsed && hasChildren) {
             return (
@@ -340,7 +340,7 @@ export function Sidebar({
             );
           }
 
-          // ── Foldable group (expanded state) ────────────────────────
+          // --- Foldable group (expanded state) ------------------------------------
           const groupOpen = !!openGroups[item.href];
           return (
             <div key={item.href} className="flex flex-col">

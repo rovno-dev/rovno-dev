@@ -39,9 +39,9 @@ from sqlalchemy.orm import sessionmaker
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as XLImage
 
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 # Config
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s: %(message)s",
@@ -75,31 +75,39 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False)
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher(storage=MemoryStorage())
 
-# ─────────────────────────────────────────────────────────────────────
+
+# ———---------
 # Filters & states
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 class AdminFilter(BaseFilter):
     async def __call__(self, message: types.Message) -> bool:
         return message.from_user.id in ALLOWED_USERS
 
+
 class SearchFSM(StatesGroup):
     waiting_query = State()
 
-# ─────────────────────────────────────────────────────────────────────
+
+# ———---------
 # Helpers
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 def esc(value) -> str:
     """Escape user-controlled text for Telegram's HTML parse mode."""
     return html.escape(str(value)) if value not in (None, "") else "—"
 
+
 def get_main_menu() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📊 Последние 10"), KeyboardButton(text="📅 Текущий месяц")],
+            [
+                KeyboardButton(text="📊 Последние 10"),
+                KeyboardButton(text="📅 Текущий месяц"),
+            ],
             [KeyboardButton(text="🔍 Поиск заказа")],
         ],
         resize_keyboard=True,
     )
+
 
 STATUS_LABELS = {
     "new": "Новая",
@@ -122,12 +130,14 @@ ORDERS_SELECT = """
     LEFT JOIN clients c ON c.id = o.client_id
 """
 
+
 def fetch_recent(limit: int):
     with SessionLocal() as s:
         return s.execute(
             text(f"{ORDERS_SELECT} ORDER BY o.created_at DESC LIMIT :lim"),
             {"lim": limit},
         ).fetchall()
+
 
 def fetch_month(month: str):
     with SessionLocal() as s:
@@ -139,6 +149,7 @@ def fetch_month(month: str):
             ),
             {"m": month},
         ).fetchall()
+
 
 def search_orders(query: str, limit: int = 20):
     """Single-field search across order id, client name, phone, email, telegram."""
@@ -161,12 +172,15 @@ def search_orders(query: str, limit: int = 20):
             {"like": like, "lim": limit},
         ).fetchall()
 
+
 def format_order(row) -> str:
     m = row._mapping
     short_id = str(m["id"])[:8]
     date_str = m["created_at"].strftime("%d.%m.%Y %H:%M") if m["created_at"] else "—"
     services = m["service_types_json"]
-    services_str = ", ".join(services) if isinstance(services, list) and services else ""
+    services_str = (
+        ", ".join(services) if isinstance(services, list) and services else ""
+    )
 
     parts = [
         f"<b>#{esc(short_id)}</b> · {esc(STATUS_LABELS.get(m['status'], m['status']))}",
@@ -193,6 +207,7 @@ def format_order(row) -> str:
     parts.append(f"<code>{esc(m['id'])}</code>")
     return "\n".join(parts)
 
+
 async def send_order_results(message: types.Message, rows, header: str) -> None:
     """Send order blocks in chunks small enough for Telegram's 4 KB message cap."""
     if not rows:
@@ -208,14 +223,24 @@ async def send_order_results(message: types.Message, rows, header: str) -> None:
     if chunk.strip():
         await message.answer(chunk)
 
+
 def create_excel_report(rows, filename: str) -> None:
     wb = Workbook()
     ws = wb.active
     ws.title = "Orders"
     ws.append(
         [
-            "ID", "Дата", "Статус", "Клиент", "Телефон", "Email",
-            "Telegram", "Бюджет", "Срок", "Услуги", "Описание",
+            "ID",
+            "Дата",
+            "Статус",
+            "Клиент",
+            "Телефон",
+            "Email",
+            "Telegram",
+            "Бюджет",
+            "Срок",
+            "Услуги",
+            "Описание",
         ]
     )
     for i, row in enumerate(rows, start=2):
@@ -262,10 +287,14 @@ def create_excel_report(rows, filename: str) -> None:
     wb.save(filename)
     wb.close()
 
+
 async def link_chat(code: str, chat_id: int, username: str | None) -> tuple[bool, str]:
     """POST the link code to the main service and bind this chat_id to the user."""
     if not BOT_SECRET:
-        return False, "Мост с ботом не настроен на сервере (нет TELEGRAM_BOT_WEBHOOK_SECRET)."
+        return (
+            False,
+            "Мост с ботом не настроен на сервере (нет TELEGRAM_BOT_WEBHOOK_SECRET).",
+        )
     url = f"{MAIN_SERVICE_URL}/api/v1/bot/link"
     payload = {"code": code, "chat_id": str(chat_id), "telegram_username": username}
     try:
@@ -279,22 +308,31 @@ async def link_chat(code: str, chat_id: int, username: str | None) -> tuple[bool
     if r.status_code == 200:
         return True, "ok"
     if r.status_code == 410:
-        return False, "Код устарел или уже был использован. Создайте новый в настройках на сайте."
+        return (
+            False,
+            "Код устарел или уже был использован. Создайте новый в настройках на сайте.",
+        )
     if r.status_code == 403:
-        return False, "Сервер отклонил секрет бота. Проверьте TELEGRAM_BOT_WEBHOOK_SECRET."
+        return (
+            False,
+            "Сервер отклонил секрет бота. Проверьте TELEGRAM_BOT_WEBHOOK_SECRET.",
+        )
     if r.status_code == 503:
         return False, "Привязка через бота временно недоступна на сервере."
     return False, f"Сервер вернул ошибку {r.status_code}."
 
-# ─────────────────────────────────────────────────────────────────────
+
+# ———---------
 # Handlers
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, command: CommandObject):
     # Deep-link binding — the /start <code> path takes priority.
     if command.args:
         code = command.args.strip()
-        ok, msg = await link_chat(code, message.from_user.id, message.from_user.username)
+        ok, msg = await link_chat(
+            code, message.from_user.id, message.from_user.username
+        )
         if ok:
             await message.answer(
                 "✅ <b>Уведомления подключены</b>\n\n"
@@ -330,6 +368,7 @@ async def cmd_start(message: types.Message, command: CommandObject):
             "Проверить, какие уведомления вы получаете: /notifications",
         )
 
+
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
     if message.from_user.id in ALLOWED_USERS:
@@ -341,6 +380,7 @@ async def cmd_help(message: types.Message):
             "/start &lt;код&gt; — привязать Telegram для уведомлений\n"
             "/notifications — как настроить уведомления\n"
         )
+
 
 @dp.message(Command("notifications"))
 async def cmd_notifications(message: types.Message):
@@ -355,6 +395,7 @@ async def cmd_notifications(message: types.Message):
         "• Отключить Telegram\n"
     )
 
+
 @dp.message(Command("cancel"), AdminFilter())
 async def cmd_cancel(message: types.Message, state: FSMContext):
     if await state.get_state() is not None:
@@ -363,7 +404,8 @@ async def cmd_cancel(message: types.Message, state: FSMContext):
     else:
         await message.answer("Нечего отменять.", reply_markup=get_main_menu())
 
-# ── Search ────────────────────────────────────────────────────────────
+
+# --- Search ——————------
 # The FSM state handler MUST be registered before the button handler so
 # that while in `waiting_query` every incoming message routes here.
 @dp.message(SearchFSM.waiting_query, AdminFilter())
@@ -380,6 +422,7 @@ async def handle_search_query(message: types.Message, state: FSMContext):
     await send_order_results(message, rows, header)
     await message.answer("Вернуться в меню:", reply_markup=get_main_menu())
 
+
 @dp.message(F.text == "🔍 Поиск заказа", AdminFilter())
 async def ask_search(message: types.Message, state: FSMContext):
     await state.set_state(SearchFSM.waiting_query)
@@ -387,6 +430,7 @@ async def ask_search(message: types.Message, state: FSMContext):
         "Введите запрос: ID заказа, имя клиента, телефон, email или Telegram.\n\n"
         "Отмена — /cancel",
     )
+
 
 @dp.message(Command("search"), AdminFilter())
 async def cmd_search(message: types.Message, command: CommandObject):
@@ -404,7 +448,8 @@ async def cmd_search(message: types.Message, command: CommandObject):
         header += " — ничего не найдено."
     await send_order_results(message, rows, header)
 
-# ── Dumps ─────────────────────────────────────────────────────────────
+
+# --- Dumps ——————------─
 @dp.message(F.text == "📊 Последние 10", AdminFilter())
 @dp.message(Command("dump_last"), AdminFilter())
 async def dump_last(message: types.Message, command: CommandObject = None):
@@ -417,27 +462,35 @@ async def dump_last(message: types.Message, command: CommandObject = None):
         return
     fname = f"dump_last_{limit}.xlsx"
     create_excel_report(rows, fname)
-    await message.reply_document(FSInputFile(fname), caption=f"Выгрузка: {len(rows)} шт.")
+    await message.reply_document(
+        FSInputFile(fname), caption=f"Выгрузка: {len(rows)} шт."
+    )
     if os.path.exists(fname):
         os.remove(fname)
+
 
 @dp.message(F.text == "📅 Текущий месяц", AdminFilter())
 @dp.message(Command("dump_month"), AdminFilter())
 async def dump_month(message: types.Message, command: CommandObject = None):
-    month = command.args if command and command.args else datetime.now().strftime("%Y-%m")
+    month = (
+        command.args if command and command.args else datetime.now().strftime("%Y-%m")
+    )
     rows = fetch_month(month)
     if not rows:
         await message.answer(f"За {month} заказов нет.")
         return
     fname = f"orders_{month}.xlsx"
     create_excel_report(rows, fname)
-    await message.reply_document(FSInputFile(fname), caption=f"За {month}: {len(rows)} шт.")
+    await message.reply_document(
+        FSInputFile(fname), caption=f"За {month}: {len(rows)} шт."
+    )
     if os.path.exists(fname):
         os.remove(fname)
 
-# ─────────────────────────────────────────────────────────────────────
+
+# ———---------
 # Entry point
-# ─────────────────────────────────────────────────────────────────────
+# ———---------
 async def main():
     if not TOKEN:
         log.error("TELEGRAM_BOT_TOKEN is not set")
@@ -445,19 +498,28 @@ async def main():
     # Wrap set_my_commands in a try/except. If Telegram is slow or unreachable
     # on startup (e.g. network timeout), we don't want to crash the bot.
     try:
-        await bot.set_my_commands([
-            BotCommand(command="start", description="Меню / привязка уведомлений"),
-            BotCommand(command="search", description="Найти заказ по ID или имени"),
-            BotCommand(command="dump_last", description="Последние N заказов (Excel)"),
-            BotCommand(command="dump_month", description="Заказы за месяц (Excel)"),
-            BotCommand(command="notifications", description="Как настроить уведомления"),
-            BotCommand(command="cancel", description="Отменить действие"),
-        ], request_timeout=30)  # Give it more time on cold starts
+        await bot.set_my_commands(
+            [
+                BotCommand(command="start", description="Меню / привязка уведомлений"),
+                BotCommand(command="search", description="Найти заказ по ID или имени"),
+                BotCommand(
+                    command="dump_last", description="Последние N заказов (Excel)"
+                ),
+                BotCommand(command="dump_month", description="Заказы за месяц (Excel)"),
+                BotCommand(
+                    command="notifications", description="Как настроить уведомления"
+                ),
+                BotCommand(command="cancel", description="Отменить действие"),
+            ],
+            request_timeout=30,
+        )  # Give it more time on cold starts
     except Exception as e:
-        log.warning(f"Failed to set bot commands on startup: {e}. Continuing to polling...")
+        log.warning(
+            f"Failed to set bot commands on startup: {e}. Continuing to polling..."
+        )
 
     log.info("Bot started. Admin IDs: %s", ALLOWED_USERS)
-    
+
     # Wrap polling in try/finally to ensure the aiohttp session is always closed cleanly,
     # which fixes the "Unclosed client session" memory leak warning.
     try:
@@ -465,6 +527,7 @@ async def main():
     finally:
         log.info("Shutting down bot session...")
         await bot.session.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
