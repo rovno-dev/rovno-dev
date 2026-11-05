@@ -30,7 +30,8 @@ export interface Project {
   title: string;
   description?: string;
   shortDescription?: string;
-  tags?: { title: string; href?: string }[];
+  tags?: { title: string; href?: string; kind?: string }[];
+  isFeatured?: boolean;
   cover: {
     videoSrc?: string;
     imageSrc: string;
@@ -203,7 +204,7 @@ export async function fetchPublishedProjectsServer(): Promise<DbProjectList[]> {
 
 export function dbRowToProject(r: DbProjectList): Project {
   const tags = (r.tags || [])
-    .map((t) => ({ title: (t.label || "").trim() }))
+    .map((t) => ({ title: (t.label || "").trim(), kind: t.kind }))
     .filter((t) => t.title.length > 0);
   return {
     id: r.id,
@@ -221,5 +222,6 @@ export function dbRowToProject(r: DbProjectList): Project {
     clientId: "",
     period: r.period || "",
     techStack: [],
+    isFeatured: !!r.is_featured,
   };
 }

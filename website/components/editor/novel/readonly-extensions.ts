@@ -103,6 +103,22 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
   }
 }).configure({ lowlight });
 
+// filename + icon per language, mirroring code-block-view.tsx so a code
+// block looks identical in the editor and on the published page.
+const READONLY_LANG_META: Record<string, { filename: string; iconSvg: string; tint: string }> = {
+  typescript: { filename: "index.tsx", iconSvg: "M40 200h176V40H40v160Z M72 128h80v12H96v24h48v12H96v24h56v12H72v-84Z M172 128h40v12h-14v60h-14v-60h-14v-12Z", tint: "#3178c6" },
+  javascript: { filename: "index.js", iconSvg: "M40 200h176V40H40v160Z M100 100v64c0 16-10 22-24 22-8 0-14-2-20-6l6-14c4 2 8 4 12 4 6 0 10-3 10-10v-60h16Z M180 96c-10 0-16 4-16 12 0 6 4 10 14 14l6 2c18 6 26 16 26 30 0 20-16 30-38 30-14 0-26-4-34-12l10-14c8 6 16 10 24 10 10 0 14-4 14-10 0-6-4-10-14-14l-6-2c-16-6-24-16-24-30 0-16 14-28 34-28 12 0 22 4 30 10l-10 14c-6-4-12-6-16-6Z", tint: "#f7df1e" },
+  html: { filename: "index.html", iconSvg: "M40 200l16-176h144l16 176-88 24-88-24Z M80 56h96l-2 24H82l-2 24h92l-4 64-40 10-40-10-2-24", tint: "#e34c26" },
+  css: { filename: "styles.css", iconSvg: "M40 200l16-176h144l16 176-88 24-88-24Z M80 56h96l-6 68H96l2 24h70l-6 68-40 10-36-10", tint: "#264de4" },
+  python: { filename: "main.py", iconSvg: "M130 0c-30 0-50 12-50 34v26h52v8H56c-28 0-44 20-44 50 0 30 16 50 44 50h24v-30c0-28 20-42 48-42h52c20 0 34-14 34-34V34c0-20-18-34-50-34h-34Zm-24 16c6 0 10 4 10 10s-4 10-10 10-10-4-10-10 4-10 10-10Z M126 256c30 0 50-12 50-34v-26h-52v-8h74c28 0 44-20 44-50 0-30-16-50-44-50h-24v30c0 28-20 42-48 42H74c-20 0-34 14-34 34v56c0 20 18 34 50 34h36Zm24-16c-6 0-10-4-10-10s4-10 10-10 10 4 10 10-4 10-10 10Z", tint: "#3776ab" },
+  null: { filename: "notes.txt", iconSvg: "M56 40h96l48 48v128H56V40Z M152 40v48h48", tint: "#8c9c9a" },
+};
+
+function metaFor(lang: string | null | undefined) {
+  const key = lang || "null";
+  return READONLY_LANG_META[key] ?? READONLY_LANG_META.null;
+}
+
 export const readonlyExtensions = [
   StarterKit.configure({
     bulletList: { HTMLAttributes: { class: "list-disc list-outside leading-relaxed" } },

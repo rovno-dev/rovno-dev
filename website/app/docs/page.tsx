@@ -4,15 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LEGAL_DOCS, LEGAL_DOC_ORDER } from "@/app/_data/legal";
 import {
-import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
-
-export const metadata = pageMetadata({
-  title: "Документы",
-  description:
-    "Правовая информация сайта rovno.dev: политика конфиденциальности, согласие на обработку ПДн, политика cookie и пользовательское соглашение.",
-  path: "/docs",
-  ogImage: buildOgImageUrl("Документы", "Rovno.dev"),
-});
   ShieldCheck,
   Cookie,
   HandshakeIcon,
@@ -20,6 +11,7 @@ export const metadata = pageMetadata({
   FileText,
   ArrowRight,
 } from "@phosphor-icons/react/dist/ssr";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 
 // Icons are imported with their canonical names (no `Icon` suffix) and
 // referenced directly in the map - importing `ShieldCheckIcon` but using
@@ -33,6 +25,14 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   terms: HandshakeIcon,
   "reviews-consent": EnvelopeIcon,
 };
+
+export const metadata = pageMetadata({
+  title: "Документы",
+  description:
+    "Правовая информация сайта rovno.dev: политика конфиденциальности, согласие на обработку ПДн, политика cookie, пользовательское соглашение и согласие на публикацию отзывов.",
+  path: "/docs",
+  ogImage: buildOgImageUrl("Документы", "Rovno.dev"),
+});
 
 export default function DocsIndexPage() {
   return (

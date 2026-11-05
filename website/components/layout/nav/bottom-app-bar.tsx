@@ -20,15 +20,15 @@ export default function BottomAppBar() {
           size="small"
           shape="square"
           variant="tonal-card"
-          className="h-14! w-fit justify-center"
+          className="h-14! w-fit justify-center gap-1.5"
         >
+          <TelemostStackIcon className="-ml-0.5" />
           <CycleText
             labels={[
               t("nav.order_cycle_1"),
               t("nav.order_cycle_2"),
               t("nav.order_cycle_3"),
             ]}
-            leading={<TelemostStackIcon className="mr-1.5 -ml-0.5" />}
           />
         </Button>
       </QuickOrderDialog>

@@ -1,16 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  experimental: {
-    // Enables the browser's native View Transitions API on every route
-    // change Next.js performs (Link clicks and router.push). The old
-    // page and the new page are captured as pseudo-elements and
-    // crossfaded by the browser - the outgoing content never
-    // disappears, which is what makes navigation read as seamless
-    // rather than "instant blank -> fade in".
-    viewTransition: true,
-  },
+  output: "standalone",
+  // NOTE: `experimental.viewTransition` was removed from NextConfig in
+  // Next.js 16.3. It was an inert flag - nothing in the runtime ever
+  // read it. `ViewTransition` ships in the bundled React canary and
+  // every <Link> navigation already runs inside React.startTransition,
+  // so view transitions work with no configuration. The
+  // `::view-transition-old/new(root)` CSS in globals.css still applies.
 };
 
 export default nextConfig;

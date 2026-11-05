@@ -8,54 +8,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
 import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
+import { ContentMeta } from "@/components/layout/content-meta";
 import {
   fetchArticleServer,
   fetchPublishedArticlesServer,
 } from "@/utils/api/articles";
 import {
-import { resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const article = await fetchArticleServer(slug);
-  if (!article) return { title: "Статья не найдена · Rovno.dev" };
-  const title = article.seo_title || article.title;
-  const description = article.meta_description || article.description || "";
-  const ogImage = resolveOgImage(
-    article.image_url,
-    `/api/og/article/${slug}`,
-  );
-  const url = absoluteUrl(`/blog/${slug}`);
-  const fullTitle = title.includes("Rovno.dev")
-    ? title
-    : `${title} · ${SITE_NAME}`;
-  return {
-    title: { absolute: fullTitle },
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: "article",
-      locale: "ru_RU",
-      siteName: SITE_NAME,
-      url,
-      title: fullTitle,
-      description,
-      images: [
-        { url: ogImage, width: 1200, height: 630, alt: article.title },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: fullTitle,
-      description,
-      images: [ogImage],
-    },
-  };
-}
   Gallery,
   MetricCard,
   MDXImage,
@@ -73,6 +31,7 @@ export async function generateMetadata({
   MDXTd,
   MDXCard,
 } from "@/components/mdx";
+import { resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
 
 export const revalidate = 60;
 
@@ -133,6 +92,45 @@ const mdxComponents = {
   MetricCard,
 };
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const article = await fetchArticleServer(slug);
+  if (!article) return { title: "Статья не найдена · Rovno.dev" };
+  const title = article.seo_title || article.title;
+  const description = article.meta_description || article.description || "";
+  const ogImage = resolveOgImage(article.image_url, `/api/og/article/${slug}`);
+  const url = absoluteUrl(`/blog/${slug}`);
+  const fullTitle = title.includes("Rovno.dev")
+    ? title
+    : `${title} · ${SITE_NAME}`;
+  return {
+    title: { absolute: fullTitle },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      locale: "ru_RU",
+      siteName: SITE_NAME,
+      url,
+      title: fullTitle,
+      description,
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: article.title },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description,
+      images: [ogImage],
+    },
+  };
+}
+
 function formatDate(iso: string) {
   try {
     return new Date(iso).toLocaleDateString("ru-RU", {
@@ -171,7 +169,6 @@ export default async function ArticlePage({
     <main className="min-h-screen bg-(--bg) pb-24">
       <Container className="pt-4 md:pt-8">
         <div className="max-w-[860px] mx-auto">
-          {/* --- 4:3 banner: full-bleed cover, dark gradient for text --- */}
           <div className="relative w-full aspect-[4/3] rounded-4xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
             {article.image_url ? (
               article.image_url.endsWith(".webm") ||
@@ -198,12 +195,8 @@ export default async function ArticlePage({
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
             )}
-
-            {/* Auto-contrast gradient (same recipe as project page) */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
-
-            {/* Back button */}
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
               <Button variant="glass" size="icon-medium" shape="round" asChild>
                 <Link href="/blog" aria-label="Все статьи">
@@ -211,8 +204,6 @@ export default async function ArticlePage({
                 </Link>
               </Button>
             </div>
-
-            {/* Tags */}
             {article.tags && article.tags.length > 0 && (
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
                 {article.tags.slice(0, 4).map((tag) => (
@@ -227,8 +218,6 @@ export default async function ArticlePage({
                 ))}
               </div>
             )}
-
-            {/* Title / description / byline over the gradient */}
             <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
               <h1 className="text-display-3 md:text-display-2 text-white leading-[1.05] tracking-tight mb-3 max-w-2xl animate-reveal">
                 {article.title}
@@ -247,8 +236,6 @@ export default async function ArticlePage({
           </div>
         </div>
       </Container>
-
-      {/* --- Single-column body ———---------─ */}
       <Container className="pt-4">
         <div className="max-w-[860px] mx-auto">
           <ContentMeta
@@ -260,7 +247,6 @@ export default async function ArticlePage({
           />
         </div>
       </Container>
-
       <Container className="py-12 md:py-16">
         <article className="max-w-[720px] mx-auto">
           {article.content_json ? (
@@ -268,7 +254,6 @@ export default async function ArticlePage({
           ) : (
             legacyContent
           )}
-
           {article.attachments && article.attachments.length > 0 && (
             <div className="mt-12 pt-8 border-t border-(--outline)">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -307,8 +292,6 @@ export default async function ArticlePage({
           )}
         </article>
       </Container>
-
-      {/* --- Footer nav ———---------------------─ */}
       <Container>
         <div className="max-w-[720px] mx-auto">
           <Button variant="outlined" size="medium" shape="round" asChild>

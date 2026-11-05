@@ -185,23 +185,23 @@ export function CustomProjectPage({
           className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
           style={{
             WebkitMaskImage: `linear-gradient(to bottom,
-              transparent 0%,
-              rgba(0,0,0,0.35) 6%,
-              rgba(0,0,0,0.7) 13%,
-              rgba(0,0,0,0.9) 19%,
-              black 26%,
-              black 88%,
-              rgba(0,0,0,0.7) 94%,
+              rgba(0,0,0,0.92) 0%,
+              black 5%,
+              black 72%,
+              rgba(0,0,0,0.85) 88%,
               transparent 100%)`,
             maskImage: `linear-gradient(to bottom,
-              transparent 0%,
-              rgba(0,0,0,0.35) 6%,
-              rgba(0,0,0,0.7) 13%,
-              rgba(0,0,0,0.9) 19%,
-              black 26%,
-              black 88%,
-              rgba(0,0,0,0.7) 94%,
+              rgba(0,0,0,0.92) 0%,
+              black 5%,
+              black 72%,
+              rgba(0,0,0,0.85) 88%,
               transparent 100%)`,
+            // Instant swap - no transition. The 900ms fade used to run
+            // concurrently with body's transition-colors on every theme
+            // toggle, producing a muddy intermediate state. Hidden while
+            // hue is null (during extraction), shown the moment it
+            // resolves.
+            opacity: hue === null ? 0 : 1,
           }}
         >
           {/* Base fill */}

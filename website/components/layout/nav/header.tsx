@@ -282,16 +282,15 @@ export default function Header() {
               size="small"
               shape="square"
               variant="tonal-card"
-              className="h-12! w-fit justify-center"
-              style={dockShadow}
+              className="h-12! w-fit justify-center gap-1.5"
             >
+              <TelemostStackIcon className="-ml-0.5" />
               <CycleText
                 labels={[
                   t("nav.order_cycle_1"),
                   t("nav.order_cycle_2"),
                   t("nav.order_cycle_3"),
                 ]}
-                leading={<TelemostStackIcon className="mr-1.5 -ml-0.5" />}
               />
             </Button>
           </QuickOrderDialog>

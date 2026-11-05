@@ -248,7 +248,10 @@
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    /* No transition-colors. The project hero layers a palette-driven
+       mesh over --bg; a 300ms body colour fade on top of the mesh's
+       own fade put the two into a conflict during theme switches. */
+    @apply bg-background text-foreground;
   }
 
   html {
@@ -1062,4 +1065,57 @@
   .hero-light-sweep {
     animation: none;
   }
+}
+
+/* ── Scroll lock without layout shift ───────────────────────────────
+   Radix Dialog/Sheet lock body scroll by setting `overflow: hidden` on
+   <body> and compensating with `padding-right: <scrollbar width>` so
+   content doesn't jump left. On a page with a visible scrollbar, the
+   compensation double-reserves: the scrollbar goes away, Radix pads in
+   its place, and any other padding/margin on body still applies - the
+   result is a visible pop when the sheet opens and again when it
+   closes.
+
+   `scrollbar-gutter: stable` on <html> reserves the scrollbar track
+   for the whole page lifetime, so hiding the scrollbar changes nothing
+   about layout. That makes Radix's compensation redundant and, since
+   it now overcorrects, actively wrong - hence the !important reset. */
+html {
+  /* Non-`visible` overflow on <html> stops body's `overflow: hidden`
+     from propagating to the viewport. Combined with the always-on
+     `scrollbar-gutter: stable`, this gives us a permanent scrollbar
+     that nothing can toggle — so a dialog opening changes zero pixels
+     of layout. */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+/* Radix's react-remove-scroll pads the body by the scrollbar width to
+   compensate for a scrollbar it thinks disappeared. It hasn't: both
+   html's overflow-y and scrollbar-gutter keep it permanently reserved.
+   Without resetting the padding, that padding pushes content left by
+   the scrollbar width when the dialog opens.
+
+   Matches `[data-scroll-locked]` on any element, not just body — the
+   attribute can move between library versions. `padding: 0` and
+   `padding-right: 0` are both present because the override has to win
+   whether Radix uses the shorthand or the longhand. */
+[data-scroll-locked],
+body[data-scroll-locked],
+html[data-scroll-locked] {
+  padding: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 !important;
+  margin-right: 0 !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Code blocks: explicit light-on-dark text.
+   See comment in `.novel-prosemirror pre { color: inherit }` — the
+   specificity chain was hiding the code in light mode. `.hljs` is on
+   every code block we render, so this override is scoped to code. */
+.novel-prosemirror pre.hljs {
+  color: #e2e2e6;
+}
+.novel-prosemirror pre.hljs code {
+  color: inherit;
 }

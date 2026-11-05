@@ -172,7 +172,14 @@ export function NovelEditor({
 
   const editorProps = useMemo(
     () => ({
-      attributes: { class: "novel-prosemirror focus:outline-none" },
+      attributes: {
+        class: "novel-prosemirror focus:outline-none",
+        // Disables the red squiggly on identifiers, filenames and code
+        // text. The browser's spellchecker is user-locale-dependent and
+        // fires on every camelCase or snake_case token, which is wrong
+        // for every code editor ever built.
+        spellcheck: "false",
+      },
       handleDOMEvents: {
         keydown: (_view: any, event: KeyboardEvent) =>
           handleCommandNavigation(event),

@@ -22,31 +22,17 @@ import {
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 
-function tagsOf(p: Project): string[] {
-  return (p.tags || [])
-    .map((t) => (t.title || "").trim())
-    .filter((v): v is string => v.length > 0);
-}
+/** Russian labels for `project_tag_kind` - the DB enum values. */
+const TAG_KIND_LABELS: Record<string, string> = {
+  from_chief: "От авторов",
+  license: "Лицензия",
+  github: "Open source",
+  custom: "Дополнительно",
+};
 
-/**
- * Projects filter surface.
- *
- * Layout: a single control row (search + Filter button + result tally),
- * then a removable-chip row when filters are active. All filter content
- * lives inside a Sheet drawer rather than inline chips.
- *
- * The inline chips were removed on purpose. Two reasons:
- *  - they competed with the grid for horizontal attention on every load
- *    even when the user wasn't filtering;
- *  - they duplicated the taxonomy the drawer already has to render,
- *    which meant two code paths to keep in sync.
- * The drawer is the single source of filter UI. The button says how many
- * filters are active so the state is never hidden.
- *
- * No background on any surface here: the search is a plain <input> and
- * the button is the site's own `Button`. The strip reads as part of the
- * page, not as a floating widget.
- */
+/** Order the kind groups appear in the drawer. Unknown kinds fall to the end. */
+const TAG_KIND_ORDER = ["from_chief", "github", "license", "custom"];
+
 export function FilterBar({
   projects,
   categories,
@@ -58,34 +44,80 @@ export function FilterBar({
 }) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activePeriod, setActivePeriod] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<{ kind: string; label: string } | null>(null);
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const tagsBySlug = useMemo(() => {
-    const m = new Map<string, string[]>();
-    for (const p of projects) m.set(p.slug, tagsOf(p));
-    return m;
+  // ── Derived filter data, straight from the projects' own columns ──
+  // (Period and is_featured are plain columns; tags come from
+  // project_tags with its `kind` discriminator.)
+
+  /** Distinct `projects.period` values, newest first. Years sort
+   *  naturally as strings, so reverse-alpha gives the newest first. */
+  const periods = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of projects) if (p.period) set.add(p.period);
+    return Array.from(set).sort().reverse();
   }, [projects]);
 
-  const tagListForSlug = (slug: string) => tagsBySlug.get(slug) ?? [];
-
-  const allTags = useMemo(() => {
-    const counts = new Map<string, number>();
+  /** Tags grouped by `project_tags.kind`, each group with usage counts.
+   *  Groups with zero tags are omitted so the drawer only shows what
+   *  the DB actually contains. */
+  const tagsByKind = useMemo(() => {
+    const grouped = new Map<string, Map<string, number>>();
     for (const p of projects) {
-      for (const t of tagsBySlug.get(p.slug) ?? []) {
-        counts.set(t, (counts.get(t) ?? 0) + 1);
+      for (const t of p.tags || []) {
+        if (!t.kind || !t.title) continue;
+        const m = grouped.get(t.kind) || new Map<string, number>();
+        m.set(t.title, (m.get(t.title) || 0) + 1);
+        grouped.set(t.kind, m);
       }
     }
-    return Array.from(counts.entries())
-      .map(([label, count]) => ({ label, count }))
-      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-  }, [projects, tagsBySlug]);
+    const ordered: { kind: string; label: string; entries: [string, number][] }[] = [];
+    for (const kind of TAG_KIND_ORDER) {
+      const m = grouped.get(kind);
+      if (!m || m.size === 0) continue;
+      ordered.push({
+        kind,
+        label: TAG_KIND_LABELS[kind] ?? kind,
+        entries: Array.from(m.entries()).sort(
+          (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+        ),
+      });
+    }
+    // Any kind the DB might grow later that isn't in the order list.
+    for (const [kind, m] of grouped) {
+      if (TAG_KIND_ORDER.includes(kind)) continue;
+      ordered.push({
+        kind,
+        label: TAG_KIND_LABELS[kind] ?? kind,
+        entries: Array.from(m.entries()).sort(
+          (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+        ),
+      });
+    }
+    return ordered;
+  }, [projects]);
 
+  const featuredCount = useMemo(
+    () => projects.filter((p) => p.isFeatured).length,
+    [projects],
+  );
+
+  // ── Filtering ─────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return projects.filter((p) => {
       if (activeCategory && p.category !== activeCategory) return false;
-      if (activeTag && !tagListForSlug(p.slug).includes(activeTag)) return false;
+      if (activePeriod && p.period !== activePeriod) return false;
+      if (featuredOnly && !p.isFeatured) return false;
+      if (activeTag) {
+        const has = (p.tags || []).some(
+          (t) => t.kind === activeTag.kind && t.title === activeTag.label,
+        );
+        if (!has) return false;
+      }
       if (q) {
         const haystack = [p.title, p.shortDescription, p.description]
           .filter(Boolean)
@@ -95,23 +127,44 @@ export function FilterBar({
       }
       return true;
     });
-  }, [projects, activeCategory, activeTag, search, tagsBySlug]);
+  }, [
+    projects,
+    activeCategory,
+    activePeriod,
+    activeTag,
+    featuredOnly,
+    search,
+  ]);
 
   const activeFilterCount =
-    (activeCategory ? 1 : 0) + (activeTag ? 1 : 0);
+    (activeCategory ? 1 : 0) +
+    (activePeriod ? 1 : 0) +
+    (activeTag ? 1 : 0) +
+    (featuredOnly ? 1 : 0);
   const hasActiveFilters = !!search.trim() || activeFilterCount > 0;
 
   const resetAll = () => {
     setSearch("");
     setActiveCategory(null);
+    setActivePeriod(null);
     setActiveTag(null);
+    setFeaturedOnly(false);
   };
 
+  // Per-group "how many match if I pick this" counts, so a chip can say
+  // "12" meaning "picking me leaves 12 visible in the whole set".
   const liveCategoryCount = (code: string | null) => {
     const q = search.trim().toLowerCase();
     return projects.filter((p) => {
       if (code !== null && p.category !== code) return false;
-      if (activeTag && !tagListForSlug(p.slug).includes(activeTag)) return false;
+      if (activePeriod && p.period !== activePeriod) return false;
+      if (featuredOnly && !p.isFeatured) return false;
+      if (activeTag) {
+        const has = (p.tags || []).some(
+          (t) => t.kind === activeTag.kind && t.title === activeTag.label,
+        );
+        if (!has) return false;
+      }
       if (q) {
         const h = [p.title, p.shortDescription, p.description]
           .filter(Boolean)
@@ -123,11 +176,39 @@ export function FilterBar({
     }).length;
   };
 
-  const liveTagCount = (label: string) => {
+  const livePeriodCount = (period: string | null) => {
     const q = search.trim().toLowerCase();
     return projects.filter((p) => {
-      if (!tagListForSlug(p.slug).includes(label)) return false;
+      if (period !== null && p.period !== period) return false;
       if (activeCategory && p.category !== activeCategory) return false;
+      if (featuredOnly && !p.isFeatured) return false;
+      if (activeTag) {
+        const has = (p.tags || []).some(
+          (t) => t.kind === activeTag.kind && t.title === activeTag.label,
+        );
+        if (!has) return false;
+      }
+      if (q) {
+        const h = [p.title, p.shortDescription, p.description]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!h.includes(q)) return false;
+      }
+      return true;
+    }).length;
+  };
+
+  const liveTagCount = (kind: string, label: string) => {
+    const q = search.trim().toLowerCase();
+    return projects.filter((p) => {
+      const has = (p.tags || []).some(
+        (t) => t.kind === kind && t.title === label,
+      );
+      if (!has) return false;
+      if (activeCategory && p.category !== activeCategory) return false;
+      if (activePeriod && p.period !== activePeriod) return false;
+      if (featuredOnly && !p.isFeatured) return false;
       if (q) {
         const h = [p.title, p.shortDescription, p.description]
           .filter(Boolean)
@@ -155,9 +236,9 @@ export function FilterBar({
     ? categoryChips.find((c) => c.id === activeCategory)?.label ?? activeCategory
     : null;
 
+  // ──────────────────────────────────────────────────────────────────
   return (
     <>
-      {/* ── Control row ─────────────────────────────────────────────── */}
       <div className="pb-10">
         <Container>
           <div className="flex flex-col gap-4">
@@ -236,9 +317,21 @@ export function FilterBar({
                         onRemove={() => setActiveCategory(null)}
                       />
                     )}
+                    {activePeriod && (
+                      <RemovableChip
+                        label={activePeriod}
+                        onRemove={() => setActivePeriod(null)}
+                      />
+                    )}
+                    {featuredOnly && (
+                      <RemovableChip
+                        label="Избранные"
+                        onRemove={() => setFeaturedOnly(false)}
+                      />
+                    )}
                     {activeTag && (
                       <RemovableChip
-                        label={`#${activeTag}`}
+                        label={`${TAG_KIND_LABELS[activeTag.kind] ?? activeTag.kind}: ${activeTag.label}`}
                         onRemove={() => setActiveTag(null)}
                       />
                     )}
@@ -257,7 +350,6 @@ export function FilterBar({
         </Container>
       </div>
 
-      {/* ── Grid ────────────────────────────────────────────────────── */}
       <section className="pb-24 md:pb-32">
         <Container>
           {filtered.length === 0 ? (
@@ -286,10 +378,12 @@ export function FilterBar({
                   index={idx}
                   variant="featured"
                   categoryMap={categoryMap}
-                  tags={tagListForSlug(project.slug).map((label, i) => ({
-                    id: `${project.slug}-tag-${i}`,
-                    label,
-                  }))}
+                  tags={(project.tags || [])
+                    .filter((t) => t.title)
+                    .map((t, i) => ({
+                      id: `${project.slug}-tag-${i}`,
+                      label: t.title,
+                    }))}
                 />
               ))}
             </div>
@@ -297,7 +391,11 @@ export function FilterBar({
         </Container>
       </section>
 
-      {/* ── Filters drawer ──────────────────────────────────────────── */}
+      {/* ── Filters drawer ──────────────────────────────────────────
+          Sections mirror the DB: `project_categories` (via category_id),
+          `projects.period`, `projects.is_featured`, `project_tags`
+          split by its `kind` enum. Only sections with actual content
+          render, so the drawer scales down to a bare site automatically. */}
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent
           side="right"
@@ -330,63 +428,90 @@ export function FilterBar({
 
           <div className="flex-1 overflow-y-auto scrollbar-admin">
             <div className="px-6 py-6 space-y-8">
+              {/* Category — projects.category_id → project_categories */}
               {categoryChips.length > 1 && (
-                <section className="space-y-3">
-                  <h4 className="text-[11px] uppercase tracking-[0.18em] font-medium text-(--on-bg-low)">
-                    Категория
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {categoryChips.map((c) => {
-                      const code = c.id === "__all__" ? null : c.id;
-                      const count = liveCategoryCount(code);
-                      return (
-                        <DrawerChip
-                          key={c.id}
-                          label={c.label}
-                          count={count}
-                          active={c.active}
-                          disabled={count === 0 && !c.active}
-                          onClick={() =>
-                            setActiveCategory(c.active ? null : code)
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                </section>
+                <FilterSection title="Категория">
+                  {categoryChips.map((c) => {
+                    const code = c.id === "__all__" ? null : c.id;
+                    const count = liveCategoryCount(code);
+                    return (
+                      <DrawerChip
+                        key={c.id}
+                        label={c.label}
+                        count={count}
+                        active={c.active}
+                        disabled={count === 0 && !c.active}
+                        onClick={() =>
+                          setActiveCategory(c.active ? null : code)
+                        }
+                      />
+                    );
+                  })}
+                </FilterSection>
               )}
 
-              {allTags.length > 0 && (
-                <section className="space-y-3">
-                  <h4 className="text-[11px] uppercase tracking-[0.18em] font-medium text-(--on-bg-low)">
-                    Метки
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allTags.map((t) => {
-                      const count = liveTagCount(t.label);
-                      const active = activeTag === t.label;
-                      return (
-                        <DrawerChip
-                          key={t.label}
-                          label={t.label}
-                          count={count}
-                          active={active}
-                          disabled={count === 0 && !active}
-                          onClick={() =>
-                            setActiveTag(active ? null : t.label)
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                </section>
+              {/* Period — projects.period */}
+              {periods.length > 1 && (
+                <FilterSection title="Период">
+                  {periods.map((p) => {
+                    const count = livePeriodCount(p);
+                    const active = activePeriod === p;
+                    return (
+                      <DrawerChip
+                        key={p}
+                        label={p}
+                        count={count}
+                        active={active}
+                        disabled={count === 0 && !active}
+                        onClick={() => setActivePeriod(active ? null : p)}
+                      />
+                    );
+                  })}
+                </FilterSection>
               )}
 
-              {categoryChips.length <= 1 && allTags.length === 0 && (
-                <p className="text-body-4 text-(--on-bg-low) text-center py-12">
-                  Пока нет фильтров, которые можно применить.
-                </p>
+              {/* Featured — projects.is_featured */}
+              {featuredCount > 0 && (
+                <FilterSection title="Особенности">
+                  <DrawerChip
+                    label="Только избранные"
+                    count={featuredCount}
+                    active={featuredOnly}
+                    onClick={() => setFeaturedOnly((v) => !v)}
+                  />
+                </FilterSection>
               )}
+
+              {/* Tags — project_tags grouped by its `kind` enum */}
+              {tagsByKind.map((group) => (
+                <FilterSection key={group.kind} title={group.label}>
+                  {group.entries.map(([label, count]) => {
+                    const active =
+                      activeTag?.kind === group.kind && activeTag?.label === label;
+                    return (
+                      <DrawerChip
+                        key={label}
+                        label={label}
+                        count={count}
+                        active={active}
+                        disabled={count === 0 && !active}
+                        onClick={() =>
+                          setActiveTag(active ? null : { kind: group.kind, label })
+                        }
+                      />
+                    );
+                  })}
+                </FilterSection>
+              ))}
+
+              {categoryChips.length <= 1 &&
+                periods.length <= 1 &&
+                featuredCount === 0 &&
+                tagsByKind.length === 0 && (
+                  <p className="text-body-4 text-(--on-bg-low) text-center py-12">
+                    Пока нет фильтров, которые можно применить.
+                  </p>
+                )}
             </div>
           </div>
 
@@ -412,6 +537,23 @@ export function FilterBar({
   );
 }
 
+function FilterSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-3">
+      <h4 className="text-[11px] uppercase tracking-[0.18em] font-medium text-(--on-bg-low)">
+        {title}
+      </h4>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </section>
+  );
+}
+
 function RemovableChip({
   label,
   onRemove,
@@ -421,7 +563,7 @@ function RemovableChip({
 }) {
   return (
     <span className="inline-flex items-center gap-1 h-8 pl-3 pr-1 rounded-full border border-(--outline) text-body-5 font-medium text-(--on-bg-high)">
-      <span className="truncate max-w-[200px]">{label}</span>
+      <span className="truncate max-w-[240px]">{label}</span>
       <button
         type="button"
         onClick={onRemove}
