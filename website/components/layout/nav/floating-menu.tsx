@@ -54,9 +54,9 @@ export function FloatingMenu({
       const el = wrapperRef.current;
       const drop = dropdownRef.current;
       if (!el || !drop) return;
-      
+
       if (el.contains(e.target as Node) || drop.contains(e.target as Node)) return;
-      
+
       if (
         e.target instanceof HTMLElement &&
         (e.target.closest('[role="dialog"]') || e.target.closest('[data-radix-portal]'))
@@ -66,7 +66,7 @@ export function FloatingMenu({
 
       setOpen(false);
     };
-    
+
     const timeout = setTimeout(() => {
       document.addEventListener("mousedown", onDown);
       document.addEventListener("touchstart", onDown);
@@ -144,46 +144,9 @@ export function FloatingMenu({
               );
             })}
           </nav>
-
-          {position === "bottom" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.25, duration: 0.3 }}
-              className="flex flex-col gap-4 pt-5 border-t border-[color-mix(in_srgb,var(--outline),transparent_50%)] mt-4"
-            >
-              <div className="flex items-center justify-between px-2 py-2">
-                <span className="text-sm font-medium text-(--on-bg-medium)">
-                  {t("nav.language")}
-                </span>
-                <LanguageSwitcher />
-              </div>
-              
-              <Button 
-                size="large" 
-                className="w-full rounded-xl"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(false);
-                  requestAnimationFrame(() => {
-                    setIsOrderOpen(true);
-                  });
-                }}
-              >
-                <TelemostStackIcon />
-                {t("nav.order")}
-              </Button>
-            </motion.div>
-          )}
         </div>,
         document.body
       )}
-
-      <QuickOrderDialog
-        serviceName="Консультация"
-        open={isOrderOpen}
-        onOpenChange={setIsOrderOpen}
-      />
     </div>
   );
 }

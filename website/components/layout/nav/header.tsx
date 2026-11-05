@@ -1,6 +1,4 @@
 "use client";
-
-import { Container } from "@/components/ui/container";
 import Link from "next/link";
 import Logo from "@/components/layout/logo/logo";
 import { Button } from "@/components/ui/button";
@@ -19,13 +17,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminSecret } from "@/hooks/use-admin-secret";
 import { useRootHref } from "@/hooks/use-root-href";
 import { crossSubdomainUrl, rootDomainUrl } from "@/utils/root-domain";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { FloatingMenu } from "./floating-menu";
-import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
+import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
+import { Container } from "@/components/ui/container";
 
 export default function Header() {
   const { user, isLoading, logout } = useUser();
@@ -40,76 +37,89 @@ export default function Header() {
   }, []);
 
   const { secret: adminSecret } = useAdminSecret(user?.id ?? null);
-  const pathname = usePathname();
-  const isFullWidth =
-    pathname?.startsWith("/admin") || pathname?.startsWith("/app/profile");
-
   const adminHref = adminSecret
     ? crossSubdomainUrl("admin", `/${adminSecret}`)
     : null;
   const profileHref = crossSubdomainUrl("app", "/profile");
   const rootLink = (path: string) => rootDomainUrl(path);
 
+  // Scroll shadow lives here instead of inside the class so `.bg-card `
+  // stays static. Inline style wins over the utility's box-shadow, which
+  // is what we want — the base shadow is the resting state.
+  const dockShadow = isScrolled
+    ? { boxShadow: "0 6px 28px -4px rgba(0, 0, 0, 0.14)" }
+    : undefined;
+
+  const navLinkClass =
+    "inline-flex items-center h-8 px-2.5 text-[13px] leading-none whitespace-nowrap transition-colors";
+  const navActiveClass = "text-(--on-bg-high) font-medium";
+  const navInactiveClass = "text-(--on-bg-medium) hover:text-(--on-bg-high)";
+
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 justify-center w-full flex items-center mx-auto transition-width duration-400 ease-in-out",
-        isScrolled ? "max-w-[900px] xl:max-w-[1100px]" : "max-w-full",
-      )}
-    >
-      <Container
-        variant={isFullWidth ? "full-width" : "default"}
-        className="flex justify-center gap-6 sm:justify-between
-        bg-[var(--bg)]/40 backdrop-blur-glass border-b border-b-(--card-glass)
-        rounded-full mx-4 sm:px-6 sm:mx-0 mt-2 h-[55px] sm:h-[80px] px-6
-        "
-      >
-        <div className="w-full flex items-center gap-6 justify-between">
-          <Link href={logoHref} className="shrink-0">
-            <Logo className="!h-[24px] sm:h-[40px]" />
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-3 pt-3">
+      <Container className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] items-center justify-center gap-2">
+        <div className="hidden sm:block"></div>
+        <div
+          className="bg-card mx-auto flex items-center h-12 w-fit pl-4 pr-3 rounded-3xl gap-2"
+          style={dockShadow}
+        >
+          <Link
+            href={logoHref}
+          >
+            <Logo className="!h-5" />
           </Link>
-          <nav className="hidden lg:flex gap-4 text-sm">
-            <NavLink href={rootLink(ROUTES.projects.href)}>
+          <nav className="hidden lg:flex items-center h-8">
+            <NavLink
+              href={rootLink(ROUTES.projects.href)}
+              className={navLinkClass}
+              activeClassName={navActiveClass}
+              inactiveClassName={navInactiveClass}
+            >
               {t("nav.projects")}
             </NavLink>
-            <NavLink href={rootLink(ROUTES.services.href)}>
+            <NavLink
+              href={rootLink(ROUTES.services.href)}
+              className={navLinkClass}
+              activeClassName={navActiveClass}
+              inactiveClassName={navInactiveClass}
+            >
               {t("nav.services")}
             </NavLink>
-            <NavLink href={rootLink(ROUTES.events.href)}>
+            <NavLink
+              href={rootLink(ROUTES.events.href)}
+              className={navLinkClass}
+              activeClassName={navActiveClass}
+              inactiveClassName={navInactiveClass}
+            >
               {t("nav.events")}
             </NavLink>
-            <NavLink href={rootLink(ROUTES.about.href)}>
+            <NavLink
+              href={rootLink(ROUTES.about.href)}
+              className={navLinkClass}
+              activeClassName={navActiveClass}
+              inactiveClassName={navInactiveClass}
+            >
               {t("nav.about")}
             </NavLink>
-            <NavLink href={rootLink(ROUTES.blog.href)}>
+            <NavLink
+              href={rootLink(ROUTES.blog.href)}
+              className={navLinkClass}
+              activeClassName={navActiveClass}
+              inactiveClassName={navInactiveClass}
+            >
               {t("nav.blog")}
             </NavLink>
           </nav>
-        </div>
-        
-        <div className="flex items-center gap-2 shrink-0">
-          <QuickOrderDialog serviceName="Консультация">
-            <Button size={"small"} className="hidden md:flex">
-              <TelemostStackIcon className="mr-1 -ml-1" />
-              {t("nav.order")}
-            </Button>
-          </QuickOrderDialog>
-
-          {/* Language Switcher hidden on mobile */}
-          <div className="hidden sm:block">
-            <LanguageSwitcher />
-          </div>
-
           {isLoading ? (
-            <Skeleton className="size-9 rounded-full ml-1" />
+            <Skeleton className="size-8 rounded-3xl" />
           ) : (
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="glass" 
-                  size="icon-small" 
-                  shape="round" 
-                  className="ml-1 size-9 border-(--outline) hover:bg-(--state-hover)"
+                <Button
+                  variant="text"
+                  size="icon-small"
+                  shape="round"
+                  className="size-8 rounded-3xl hover:bg-(--state-hover)"
                 >
                   <User className="size-4" />
                 </Button>
@@ -145,12 +155,27 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          
-          {/* Hidden on mobile, visible on tablet */}
-          <FloatingMenu
-            position="top"
-            triggerClassName="hidden md:flex lg:hidden ml-1"
-          />
+          <div
+            className="hidden sm:flex lg:hidden"
+          >
+            <FloatingMenu
+              position="top"
+            />
+          </div>
+        </div>
+        <div className="hidden sm:block">
+          <QuickOrderDialog serviceName="Консультация">
+            <Button
+              size="small"
+              shape="square"
+              variant={'tonal-card'}
+              className="h-12! w-fit ml-auto"
+              style={dockShadow}
+            >
+              <TelemostStackIcon className="mr-1 -ml-1" />
+              {t("nav.order")}
+            </Button>
+          </QuickOrderDialog>
         </div>
       </Container>
     </header>

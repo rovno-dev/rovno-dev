@@ -245,11 +245,11 @@ export function CustomProjectPage({
           <div className="max-w-[900px] mx-auto">
 
             {/* Dotted Blueprint Frame */}
-            <div className="relative rounded-3xl border-3 border-dashed border-(--on-bg-low)/30 p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
+            <div className="relative rounded-3xl border-2 border-dotted border-(--on-bg-low)/30 p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
 
               {/* Top breaking icon */}
               <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 px-4">
-                <div className="flex size-11 items-center justify-center rounded-full border border-(--outline) bg-(--card) text-(--on-bg-high) shadow-sm">
+                <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high) shadow-sm">
                   <Sparkle className="size-5" weight="fill" />
                 </div>
               </div>

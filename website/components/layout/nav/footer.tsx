@@ -20,6 +20,7 @@ import { useRootHref } from "@/hooks/use-root-href";
 import { rootDomainUrl } from "@/utils/root-domain";
 import { SERVICES_META } from "@/app/_data/services/meta";
 import { MadeOnAmorfa } from "@/components/made-on-amorfa";
+import { LanguageSwitcher } from "../language-switcher";
 
 const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
 
@@ -139,17 +140,16 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <span className="text-body-5 text-(--on-bg-low)">
               {t("footer.copyright").replace("{year}", String(year))}
             </span>
             <MadeOnAmorfa />
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex flex-col items-end">
-              <ThemeSwitcher />
-            </div>
+          <div className="flex flex gap-3">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
           </div>
         </div>
       </Container>

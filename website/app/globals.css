@@ -889,3 +889,16 @@
 .mt-header {
   @apply mt-[46px] md:mt-[96px];
 }
+/* Glass dock — floating pill chrome shared by every header island
+   (nav, CTA, utilities). Opaque-leaning background (94%) so the pill
+   reads as a solid surface instead of a see-through ghost; the
+   backdrop-filter is retained in the class so raising the alpha later
+   re-enables the frosted edge without touching call sites. */
+@utility glass-dock {
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--outline), transparent 25%);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 300ms ease;
+}
