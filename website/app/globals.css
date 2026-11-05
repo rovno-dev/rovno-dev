@@ -902,3 +902,27 @@
   box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
   transition: box-shadow 300ms ease;
 }
+
+/* ── View Transitions ──────────────────────────────────────────────────
+   Next.js triggers document.startViewTransition() on every navigation
+   when `experimental.viewTransition` is enabled. The browser then
+   captures the old DOM and the new DOM as `::view-transition-old(root)`
+   and `::view-transition-new(root)` pseudo-elements, and crossfades
+   between them.
+
+   The defaults use a linear 0.25s crossfade. Overriding only the
+   duration + easing keeps the native crossfade maths intact (old and
+   new sum to ~1 opacity at every frame, so the page never dips through
+   a blank state) while making the motion feel intentional. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 450ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms;
+  }
+}

@@ -15,6 +15,7 @@ import { crossSubdomainUrl, rootDomainUrl } from "@/utils/root-domain";
 import { useLanguage } from "@/providers/language-provider";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { FloatingMenu } from "./floating-menu";
+import { CycleText } from "./cycle-text";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 import { Container } from "@/components/ui/container";
@@ -72,10 +73,19 @@ export default function Header() {
           className="bg-card mx-auto flex items-center h-12 w-fit pl-4 pr-3 rounded-3xl gap-2"
           style={dockShadow}
         >
-          <Link
-            href={logoHref}
-          >
-            <Logo className="!h-5" />
+          <Link href={logoHref} className="inline-flex items-center">
+            <motion.span
+              initial={{ opacity: 0, scale: 0.82, filter: "blur(6px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{
+                duration: 0.9,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.12,
+              }}
+              className="inline-flex items-center"
+            >
+              <Logo className="!h-5" />
+            </motion.span>
           </Link>
           <nav className="hidden lg:flex items-center h-8">
             <NavLink
@@ -192,7 +202,13 @@ export default function Header() {
               style={dockShadow}
             >
               <TelemostStackIcon className="mr-1 -ml-1" />
-              {t("nav.order")}
+              <CycleText
+                labels={[
+                  t("nav.order_cycle_1"),
+                  t("nav.order_cycle_2"),
+                  t("nav.order_cycle_3"),
+                ]}
+              />
             </Button>
           </QuickOrderDialog>
         </div>

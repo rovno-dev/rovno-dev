@@ -1,6 +1,7 @@
 "use client";
 
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
+import { CycleText } from "@/components/layout/nav/cycle-text";
 import { FloatingMenu } from "./floating-menu";
 import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,13 @@ export default function BottomAppBar() {
           className="h-14! w-fit"
         >
           <TelemostStackIcon className="mr-1 -ml-1" />
-          {t("nav.order")}
+          <CycleText
+            labels={[
+              t("nav.order_cycle_1"),
+              t("nav.order_cycle_2"),
+              t("nav.order_cycle_3"),
+            ]}
+          />
         </Button>
       </QuickOrderDialog>
 

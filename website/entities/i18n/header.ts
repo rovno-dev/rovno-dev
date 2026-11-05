@@ -28,6 +28,9 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'admin.events': 'Events',
     'admin.event_requests': 'Event Requests',
     'admin.catalog': 'Catalog',
+    'nav.order_cycle_1': 'Book call',
+    'nav.order_cycle_2': 'Discuss a project',
+    'nav.order_cycle_3': 'CTO consultation',
   },
   ru: {
     'nav.about': 'О нас',
@@ -56,5 +59,8 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'admin.events': 'События',
     'admin.event_requests': 'Заявки на события',
     'admin.catalog': 'Каталоги',
+    'nav.order_cycle_1': 'Оставить заявку',
+    'nav.order_cycle_2': 'Обсудить проект',
+    'nav.order_cycle_3': 'Консультация от CTO',
   },
 };
