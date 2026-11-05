@@ -1,14 +1,15 @@
 "use client";
 
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
-import { CycleText } from "@/components/layout/nav/cycle-text";
 import { FloatingMenu } from "./floating-menu";
+import { CycleText } from "./cycle-text";
 import { TelemostStackIcon } from "@/components/icons/telemost-stack-icon";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/providers/language-provider";
 
 export default function BottomAppBar() {
   const { t } = useLanguage();
+
   return (
     <nav
       aria-label="Bottom app bar"
@@ -18,20 +19,19 @@ export default function BottomAppBar() {
         <Button
           size="small"
           shape="square"
-          variant={'tonal-card'}
-          className="h-14! w-fit"
+          variant="tonal-card"
+          className="h-14! w-fit justify-center"
         >
-          <TelemostStackIcon className="mr-1 -ml-1" />
           <CycleText
             labels={[
               t("nav.order_cycle_1"),
               t("nav.order_cycle_2"),
               t("nav.order_cycle_3"),
             ]}
+            leading={<TelemostStackIcon className="mr-1.5 -ml-0.5" />}
           />
         </Button>
       </QuickOrderDialog>
-
       <FloatingMenu
         position="bottom"
         triggerSize="icon-medium"

@@ -4,11 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Code } from "@phosphor-icons/react/dist/ssr";
 import { TECH_STACK } from "@/app/_data/tech";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 
-export const metadata = {
-  title: "Технологии, которые мы используем | Rovno.dev",
-  description: "Стек технологий агентства Rovno.dev: 1С, Python, Next.js, React, PostgreSQL. Разработка надежных решений под ключ.",
-};
+export const metadata = pageMetadata({
+  title: "Технологии",
+  description:
+    "Стек технологий агентства Rovno.dev: 1С, Python, Next.js, React, PostgreSQL. Разработка надёжных решений под ключ.",
+  path: "/tech",
+  ogImage: buildOgImageUrl("Технологии", "Стек Rovno.dev"),
+});
 
 export default function TechIndexPage() {
   return (

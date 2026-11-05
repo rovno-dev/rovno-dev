@@ -776,7 +776,7 @@
    sits well next to the case-page's chrome (mono labels, thin rules). */
 
 .prose-case {
-  color: var(--on-bg-medium);
+  color: var(--on-bg-high);
   font-size: 17px;
   line-height: 1.75;
 }
@@ -806,7 +806,7 @@
 }
 
 .prose-case p {
-  color: var(--on-bg-medium);
+  color: var(--on-bg-high);
 }
 
 .prose-case strong {
@@ -904,25 +904,162 @@
 }
 
 /* ── View Transitions ──────────────────────────────────────────────────
-   Next.js triggers document.startViewTransition() on every navigation
-   when `experimental.viewTransition` is enabled. The browser then
-   captures the old DOM and the new DOM as `::view-transition-old(root)`
-   and `::view-transition-new(root)` pseudo-elements, and crossfades
-   between them.
+   Next.js wires document.startViewTransition() when
+   experimental.viewTransition is enabled. The browser captures the old
+   and the new DOM as `::view-transition-old(root)` and
+   `::view-transition-new(root)` pseudo-elements.
 
-   The defaults use a linear 0.25s crossfade. Overriding only the
-   duration + easing keeps the native crossfade maths intact (old and
-   new sum to ~1 opacity at every frame, so the page never dips through
-   a blank state) while making the motion feel intentional. */
-::view-transition-old(root),
+   The defaults crossfade both at once, which reads as instantaneous.
+   This staggers them: the old page blurs out over 260ms while the new
+   page holds invisible, then the new page fades + blurs in over 620ms
+   starting at 160ms. Perceived total ~780ms - long enough that the
+   navigation feels intentional, short enough that it never blocks a
+   returning user.
+
+   No transform on either pseudo-element: the snapshot includes the
+   fixed header, so a scale or translate would visibly displace the
+   header itself. Blur + opacity move nothing. */
+::view-transition-old(root) {
+  animation: 260ms cubic-bezier(0.4, 0, 1, 1) both vt-old;
+}
 ::view-transition-new(root) {
-  animation-duration: 450ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation: 620ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both vt-new;
+}
+
+@keyframes vt-old {
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+@keyframes vt-new {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 0.01ms;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ── Project hero mesh drift ─────────────────────────────────────────
+   Each mesh blob lives in its own absolutely-positioned div, animated
+   here on its own timeline. Separate divs rather than one composite
+   background whose `at X% Y%` anchors animate - CSS has no way to
+   animate those anchors, so the divs are the only option.
+
+   Different durations per blob mean the composition never visibly
+   loops as a whole: 22/28/32/26 seconds share no common period under
+   90 s. `translate3d` promotes each blob to its own compositor layer,
+   so the drift costs nothing on the main thread. */
+@keyframes mesh-drift-1 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(3%, -2%, 0); }
+}
+@keyframes mesh-drift-2 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(-2%, 3%, 0); }
+}
+@keyframes mesh-drift-3 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(2%, -3%, 0); }
+}
+@keyframes mesh-drift-4 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(-3%, 2%, 0); }
+}
+.mesh-blob-1 {
+  animation: mesh-drift-1 22s ease-in-out infinite;
+  will-change: transform;
+}
+.mesh-blob-2 {
+  animation: mesh-drift-2 28s ease-in-out infinite;
+  will-change: transform;
+}
+.mesh-blob-3 {
+  animation: mesh-drift-3 32s ease-in-out infinite;
+  will-change: transform;
+}
+.mesh-blob-4 {
+  animation: mesh-drift-4 26s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob-1,
+  .mesh-blob-2,
+  .mesh-blob-3,
+  .mesh-blob-4 {
+    animation: none;
+  }
+}
+
+/* ── Project hero pattern animation ─────────────────────────────────
+   Three animations that share no common period under 30s, so the hero
+   never visibly repeats:
+
+   1. .mesh-blob-*  (22/28/32/26s) already drift the four colour blobs.
+   2. .hero-grain-drift (7s, steps(8)) shifts the film grain. `steps`
+      rather than a smooth translate is deliberate - real film grain
+      jumps frame-to-frame, a smooth glide reads as a rendered effect.
+      The <rect> is oversized 140%/-20% in the JSX so no edge shows
+      when it shifts within that margin.
+   3. .hero-dot-drift (20s, linear) moves the dot pattern diagonally.
+      Animating `background-position` (not transform) keeps this off
+      the compositor: a raster image the browser can tile for free is
+      cheaper than a promoted layer full of dots.
+   4. .hero-light-sweep (26s, ease-in-out) drifts the soft light. This
+      is the "magic": one oversized soft radial at 18% opacity in
+      soft-light blend, moving slowly enough to read as light passing
+      behind clouds rather than as an animated overlay. */
+@keyframes hero-grain-drift {
+  0%    { transform: translate3d(0, 0, 0); }
+  12.5% { transform: translate3d(-2%, -3%, 0); }
+  25%   { transform: translate3d(3%, -1%, 0); }
+  37.5% { transform: translate3d(-1%, 2%, 0); }
+  50%   { transform: translate3d(2%, 3%, 0); }
+  62.5% { transform: translate3d(-3%, 1%, 0); }
+  75%   { transform: translate3d(1%, -2%, 0); }
+  87.5% { transform: translate3d(-2%, -1%, 0); }
+  100%  { transform: translate3d(0, 0, 0); }
+}
+.hero-grain-drift {
+  animation: hero-grain-drift 7s steps(8) infinite;
+  will-change: transform;
+}
+
+@keyframes hero-dot-drift {
+  to { background-position: 22px 22px; }
+}
+.hero-dot-drift {
+  animation: hero-dot-drift 20s linear infinite;
+}
+
+@keyframes hero-light-sweep {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(8%, -6%, 0); }
+  50%  { transform: translate3d(-4%, 10%, 0); }
+  75%  { transform: translate3d(6%, 4%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.hero-light-sweep {
+  animation: hero-light-sweep 26s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grain-drift,
+  .hero-dot-drift,
+  .hero-light-sweep {
+    animation: none;
   }
 }

@@ -6,6 +6,15 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Users } from "@phosphor-icons/react/dist/ssr";
 import { fetchPublicTeamServer, type PublicTeamMember } from "@/utils/api/team";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export const metadata = pageMetadata({
+  title: "О нас",
+  description:
+    "Команда экспертов Rovno.dev — дизайн, разработка, 3D и продуктовые решения.",
+  path: "/about",
+  ogImage: buildOgImageUrl("О нас", "Эксперты Rovno.dev"),
+});
 
 export const revalidate = 60;
 

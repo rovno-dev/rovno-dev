@@ -27,6 +27,8 @@ from app.api.v1 import uploads
 from app.api.v1 import tags
 from app.api.v1 import stack
 from app.api.v1 import team
+from app.api.v1 import views
+from app.api.v1 import stats
 
 router = APIRouter(prefix="/v1")
 
@@ -68,3 +70,6 @@ router.include_router(uploads.router)
 router.include_router(tags.router)
 router.include_router(stack.router)
 router.include_router(team.router)
+# Real counters: per-page view hits (public) and the home-page totals.
+router.include_router(views.router)
+router.include_router(stats.router)

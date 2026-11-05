@@ -8,6 +8,15 @@ import {
   fetchPublishedProjectsServer,
   dbRowToProject,
 } from "@/utils/api/projects";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export const metadata = pageMetadata({
+  title: "Проекты",
+  description:
+    "Портфолио Rovno.dev — кейсы по дизайну, разработке и 3D для российских и международных брендов.",
+  path: "/projects",
+  ogImage: buildOgImageUrl("Проекты", "Портфолио Rovno.dev"),
+});
 
 export const revalidate = 60;
 

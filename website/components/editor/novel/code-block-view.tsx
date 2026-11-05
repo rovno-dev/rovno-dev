@@ -17,7 +17,7 @@ export function CodeBlockNodeView(props: any) {
   return (
     <NodeViewWrapper className="relative my-8 rounded-xl border border-[#2a2a35] bg-[#111114] overflow-hidden group/code shadow-2xl">
       {/* Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#2a2a35] bg-[#18181b]">
+      <div className="flex items-center justify-between px-6 py-3 border-b border-[#2a2a35] bg-[#18181b]">
         {/* Left Side: File Icon & Name */}
         <div className="flex items-center gap-2 text-[#e2e2e6]">
           <FileTs className="size-4 text-[#3178c6]" weight="fill" />
@@ -67,7 +67,7 @@ export function CodeBlockNodeView(props: any) {
       </div>
 
       {/* Code Content Area */}
-      <pre className="p-5 m-0 overflow-x-auto text-[14px] font-mono text-[#e2e2e6] bg-transparent focus:outline-none border-none leading-[1.7] hljs">
+      <pre className="px-6 py-5 m-0 overflow-x-auto text-[14px] font-mono text-[#e2e2e6] bg-transparent focus:outline-none border-none leading-[1.8] hljs">
         <NodeViewContent as={"code" as any} className="bg-transparent border-none text-inherit p-0" />
       </pre>
     </NodeViewWrapper>

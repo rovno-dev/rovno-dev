@@ -5,55 +5,52 @@ import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
- * Cycles through a set of labels on a slow cadence, and *animates* the
- * container's width to fit the current label - so a wrapping `w-fit`
- * button grows and shrinks smoothly instead of snapping between sizes.
+ * Cross-fades between labels on a slow cadence inside a box whose width
+ * is pinned to the WIDEST label.
  *
- * How the width animation works:
- *   - every label is rendered once in an off-flow, invisible measurer
- *   - `useLayoutEffect` reads each label's natural pixel width before paint
- *   - on label change, the outer span animates `width` to the new label's
- *     width. `width` is a real layout property, so the parent button's
- *     `w-fit` content-box follows frame-by-frame.
+ * Pinning to the max width (not the current label's width) is what keeps
+ * the surrounding `w-fit` button from growing and shrinking: `1fr` grid
+ * tracks are `minmax(auto, 1fr)`, so a wider item expands its track and
+ * shoves its neighbours. With a stable width the button never reflows and
+ * the label simply fades inside it.
  *
- * `layout` (FLIP scale) is deliberately NOT used here: it would scale the
- * button horizontally, distorting the label text. Animating `width` keeps
- * the text at its true aspect ratio and reads as a real resize.
+ * `leading` renders inside the measured and animated span, so an icon
+ * travels with its text and stays centred. An icon rendered outside would
+ * sit at the left edge of a box wider than the current label, and the
+ * icon-to-text gap would breathe on every tick.
  */
 export function CycleText({
   labels,
+  leading,
   intervalMs = 8000,
   transitionMs = 1600,
   className,
 }: {
   labels: string[];
+  leading?: React.ReactNode;
   intervalMs?: number;
   transitionMs?: number;
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
   const measureRef = useRef<HTMLSpanElement>(null);
-  const [widths, setWidths] = useState<number[] | null>(null);
+  const [width, setWidth] = useState<number | null>(null);
   const reduce = useReducedMotion();
 
-  // Measure every label's natural width once. useLayoutEffect (not
-  // useEffect) so the measured widths land before paint, preventing a
-  // one-frame flash of the wrong width on first mount.
+  // useLayoutEffect so the reserved width is applied before the first
+  // paint. A useEffect here would paint one frame at the wrong width and
+  // flash exactly the grid shift this component exists to prevent.
   useLayoutEffect(() => {
     const el = measureRef.current;
     if (!el) return;
     const kids = Array.from(el.children) as HTMLElement[];
-    const next = kids.map((k) => k.getBoundingClientRect().width);
-    setWidths((prev) => {
-      if (
-        prev &&
-        prev.length === next.length &&
-        prev.every((w, i) => Math.abs(w - next[i]) < 0.5)
-      ) {
-        return prev;
-      }
-      return next;
-    });
+    const widest = kids.reduce(
+      (max, k) => Math.max(max, k.getBoundingClientRect().width),
+      0,
+    );
+    setWidth((prev) =>
+      prev !== null && Math.abs(prev - widest) < 0.5 ? prev : widest,
+    );
   }, [labels.join("|")]);
 
   useEffect(() => {
@@ -64,27 +61,24 @@ export function CycleText({
     return () => clearInterval(id);
   }, [labels.length, intervalMs, reduce]);
 
-  const targetWidth = widths?.[index];
-  const dur = transitionMs / 1000;
-
   return (
-    <motion.span
+    <span
       className={cn(
-        "relative inline-flex items-center overflow-hidden",
+        "relative inline-flex items-center justify-center overflow-hidden",
         className,
       )}
-      animate={targetWidth ? { width: targetWidth } : undefined}
-      transition={{ duration: dur, ease: [0.16, 1, 0.3, 1] }}
+      style={width ? { width } : undefined}
     >
-      {/* Off-flow measurer: invisible, never participates in layout, but
-          getBoundingClientRect() still returns each child's true width. */}
+      {/* Off-flow measurer. Invisible, contributes nothing to layout, but
+          getBoundingClientRect() still reports each child's true width. */}
       <span
         ref={measureRef}
         aria-hidden="true"
-        className="absolute top-0 left-0 invisible whitespace-nowrap pointer-events-none"
+        className="pointer-events-none absolute top-0 left-0 invisible whitespace-nowrap"
       >
         {labels.map((l, i) => (
-          <span key={i} className="inline-block">
+          <span key={i} className="inline-flex items-center">
+            {leading}
             {l}
           </span>
         ))}
@@ -96,12 +90,16 @@ export function CycleText({
           initial={reduce ? false : { opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: dur, ease: [0.16, 1, 0.3, 1] }}
-          className="whitespace-nowrap"
+          transition={{
+            duration: reduce ? 0 : transitionMs / 1000,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="inline-flex items-center justify-center whitespace-nowrap"
         >
+          {leading}
           {labels[index]}
         </motion.span>
       </AnimatePresence>
-    </motion.span>
+    </span>
   );
 }

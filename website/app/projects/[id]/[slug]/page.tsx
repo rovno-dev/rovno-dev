@@ -26,6 +26,55 @@ import {
   MDXCard,
 } from "@/components/mdx";
 import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
+import { pageMetadata, resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string; slug: string }>;
+}) {
+  const { slug } = await params;
+  const dbProject = await fetchDbProject(slug);
+  if (!dbProject) return { title: "Проект не найден · Rovno.dev" };
+  const title = dbProject.seo_title || dbProject.title;
+  const description =
+    dbProject.meta_description ||
+    dbProject.short_description ||
+    dbProject.description ||
+    "";
+  // Fall back to the generated project card when the cover is a video -
+  // social crawlers drop video URLs from og:image without warning.
+  const ogImage = resolveOgImage(
+    dbProject.cover_image_src,
+    `/api/og/project/${slug}`,
+  );
+  const url = absoluteUrl(`/projects/${dbProject.id}/${slug}`);
+  const fullTitle = title.includes("Rovno.dev")
+    ? title
+    : `${title} · ${SITE_NAME}`;
+  return {
+    title: { absolute: fullTitle },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      locale: "ru_RU",
+      siteName: SITE_NAME,
+      url,
+      title: fullTitle,
+      description,
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: dbProject.title },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -103,27 +152,6 @@ async function getRelatedProjects(currentSlug: string, limit = 3): Promise<Relat
   } catch {
     return [];
   }
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string; slug: string }>;
-}) {
-  const { slug } = await params;
-  const dbProject = await fetchDbProject(slug);
-  if (!dbProject) return { title: "Проект не найден · Rovno.dev" };
-
-  const image = dbProject.cover_image_src || `/api/og/project/${slug}`;
-  return {
-    title: dbProject.seo_title || `${dbProject.title} · Rovno.dev`,
-    description: dbProject.meta_description || dbProject.short_description,
-    openGraph: {
-      title: dbProject.seo_title || dbProject.title,
-      description: dbProject.meta_description || dbProject.short_description,
-      images: [image],
-    },
-  };
 }
 
 const components = {

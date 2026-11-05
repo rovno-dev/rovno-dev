@@ -13,6 +13,49 @@ import {
   fetchPublishedArticlesServer,
 } from "@/utils/api/articles";
 import {
+import { resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const article = await fetchArticleServer(slug);
+  if (!article) return { title: "Статья не найдена · Rovno.dev" };
+  const title = article.seo_title || article.title;
+  const description = article.meta_description || article.description || "";
+  const ogImage = resolveOgImage(
+    article.image_url,
+    `/api/og/article/${slug}`,
+  );
+  const url = absoluteUrl(`/blog/${slug}`);
+  const fullTitle = title.includes("Rovno.dev")
+    ? title
+    : `${title} · ${SITE_NAME}`;
+  return {
+    title: { absolute: fullTitle },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      locale: "ru_RU",
+      siteName: SITE_NAME,
+      url,
+      title: fullTitle,
+      description,
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: article.title },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description,
+      images: [ogImage],
+    },
+  };
+}
   Gallery,
   MetricCard,
   MDXImage,
@@ -89,33 +132,6 @@ const mdxComponents = {
   Gallery,
   MetricCard,
 };
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const article = await fetchArticleServer(slug);
-  if (!article) return { title: "Article not found · Rovno.dev" };
-  const fallbackImage = `/api/og/article/${article.slug}`;
-  const ogImage = article.image_url || fallbackImage;
-  return {
-    title: article.seo_title || `${article.title} · Rovno.dev`,
-    description: article.meta_description || article.description,
-    openGraph: {
-      title: article.seo_title || article.title,
-      description: article.meta_description || article.description,
-      images: [ogImage],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.seo_title || article.title,
-      description: article.meta_description || article.description,
-      images: [ogImage],
-    },
-  };
-}
 
 function formatDate(iso: string) {
   try {
@@ -236,7 +252,8 @@ export default async function ArticlePage({
       <Container className="pt-4">
         <div className="max-w-[860px] mx-auto">
           <ContentMeta
-            slug={article.slug}
+            entityType="article"
+            entityId={article.slug}
             content={article.content_json || article.mdx_content}
             updatedAt={article.updated_at || article.date}
             imageUrl={article.image_url}

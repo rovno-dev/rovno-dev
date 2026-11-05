@@ -11,6 +11,30 @@ import { ExpertCTA } from "./_components/expert-cta";
 import TatarstanIcon from "@/components/icons/experts-icons/Tatarstan-icon";
 import { resolveExpertSocialIcon, resolveExpertTagIcon } from "@/components/icons/expert-icon-map";
 import { fetchTeamMemberServer, fetchTeamMemberProjectsServer, type TeamMemberPublicProject } from "@/utils/api/team";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const member = await fetchTeamMemberServer(slug);
+  if (!member) return { title: "Эксперт не найден · Rovno.dev" };
+  const name =
+    [member.name, member.surname].filter(Boolean).join(" ") ||
+    member.username ||
+    "Эксперт";
+  return pageMetadata({
+    title: `${name} — ${member.role}`,
+    description:
+      member.bio ||
+      member.short_bio ||
+      `Профиль эксперта Rovno.dev — ${name}, ${member.role}`,
+    path: `/${slug}`,
+    ogImage: buildOgImageUrl(name, member.role),
+  });
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

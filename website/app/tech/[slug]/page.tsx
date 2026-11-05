@@ -4,19 +4,26 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowUpRight, ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { TECH_STACK, findTech } from "@/app/_data/tech";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const tech = findTech(slug);
+  if (!tech) return { title: "Технология не найдена · Rovno.dev" };
+  return pageMetadata({
+    title: tech.titleRu,
+    description: tech.descRu,
+    path: `/tech/${slug}`,
+    ogImage: buildOgImageUrl(tech.titleRu, tech.descRu.slice(0, 120)),
+  });
+}
 
 export function generateStaticParams() {
   return TECH_STACK.map((t) => ({ slug: t.slug }));
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const tech = findTech(slug);
-  if (!tech) return { title: "Not found" };
-  return {
-    title: tech.seoTitleRu,
-    description: tech.seoDescRu,
-  };
 }
 
 export default async function TechPage({ params }: { params: Promise<{ slug: string }> }) {

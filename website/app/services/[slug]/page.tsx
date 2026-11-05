@@ -9,10 +9,7 @@ import { slugify } from "@/utils/slugify";
 import { SERVICES_META, loadServiceDoc } from "@/app/_data/services";
 import { MDXParagraph } from "@/components/mdx";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
-
-export function generateStaticParams() {
-  return SERVICES_META.map((s) => ({ slug: s.slug }));
-}
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -22,10 +19,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const doc = loadServiceDoc(slug) as any;
   if (!doc) return { title: "Услуга не найдена · Rovno.dev" };
-  return {
-    title: `${doc.title} · Rovno.dev`,
+  return pageMetadata({
+    title: doc.shortTitle || doc.title,
     description: doc.description,
-  };
+    path: `/services/${slug}`,
+    ogImage: buildOgImageUrl(doc.shortTitle || doc.title, doc.tagline),
+  });
+}
+
+export function generateStaticParams() {
+  return SERVICES_META.map((s) => ({ slug: s.slug }));
 }
 
 function extractText(node: React.ReactNode): string {

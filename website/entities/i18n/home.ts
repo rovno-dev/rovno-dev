@@ -17,8 +17,10 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_spec_btn': 'See for yourself',
 
     'home.stats.projects_label': 'projects completed',
-    'home.stats.experience_label': 'average team experience',
+    'home.stats.experience_label': 'avg. years of experience',
     'home.stats.companies_label': 'companies trust us',
+    'home.stats.uptime_label': 'average uptime',
+    'home.stats.team_label': 'people on the team',
     'home.stats.specs_label': 'day to prepare tech specs',
 
     'home.best_works_title': 'Featured Projects',
@@ -64,9 +66,11 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.stats_clients_btn': 'Отзывы клиентов',
     'home.stats_spec_btn': 'Убедитесь сами',
 
-    'home.stats.projects_label': 'проекта завершено',
-    'home.stats.experience_label': 'средний стаж команды',
+    'home.stats.projects_label': 'проектов завершено',
+    'home.stats.experience_label': 'года опыта в команде',
     'home.stats.companies_label': 'компаний доверяют нам',
+    'home.stats.uptime_label': 'средний аптайм',
+    'home.stats.team_label': 'человек в команде',
     'home.stats.specs_label': 'день чтобы понять задачи',
 
     'home.best_works_title': 'Избранные проекты',

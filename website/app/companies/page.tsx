@@ -9,14 +9,17 @@ import {
 } from "@/utils/api/companies";
 import { ArrowUpRight, HandshakeIcon } from "@phosphor-icons/react/dist/ssr";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export const metadata = pageMetadata({
+  title: "Компании",
+  description:
+    "Организации, с которыми работали — от брендинга и айдентики до продуктовых сайтов и 3D.",
+  path: "/companies",
+  ogImage: buildOgImageUrl("Компании", "Rovno.dev"),
+});
 
 export const revalidate = 300;
-export const metadata = {
-  title: "Компании · Rovno.dev",
-  description:
-    "Организации, с которыми мы работали - от брендинга и айдентики до продуктовых сайтов и 3D.",
-};
-
 /** Two-letter initials for the fallback tile when no logotype is set. */
 function initials(name: string): string {
   return name

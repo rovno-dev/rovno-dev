@@ -10,10 +10,7 @@ import {
 } from "@/app/_data/legal";
 import { slugify } from "@/utils/slugify";
 import { DocsTOC } from "../_components/docs-toc";
-
-export function generateStaticParams() {
-  return LEGAL_DOC_ORDER.map((slug) => ({ slug }));
-}
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -23,10 +20,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const doc = LEGAL_DOCS[slug];
   if (!doc) return { title: "Документ не найден · Rovno.dev" };
-  return {
-    title: `${doc.shortTitle} · Rovno.dev`,
+  return pageMetadata({
+    title: doc.shortTitle,
     description: doc.description,
-  };
+    path: `/docs/${slug}`,
+    ogImage: buildOgImageUrl(doc.shortTitle, "Правовая информация"),
+  });
+}
+
+export function generateStaticParams() {
+  return LEGAL_DOC_ORDER.map((slug) => ({ slug }));
 }
 
 /** Extract plain text from a React children tree (for slugifying headings). */

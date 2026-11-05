@@ -72,7 +72,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
       // Header Bar
       [
         "div",
-        { class: "flex items-center justify-between px-4 py-2.5 border-b border-[#2a2a35] bg-[#18181b]" },
+        { class: "flex items-center justify-between px-6 py-3 border-b border-[#2a2a35] bg-[#18181b]" },
         // Left: Icon + Filename
         [
           "div",
@@ -96,7 +96,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
       // Code Content
       [
         "pre",
-        mergeAttributes(HTMLAttributes, { class: "p-5 m-0 overflow-x-auto text-[14px] font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.7] hljs" }),
+        mergeAttributes(HTMLAttributes, { class: "px-6 py-5 m-0 overflow-x-auto text-[14px] font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.8] hljs" }),
         ["code", 0]
       ]
     ];

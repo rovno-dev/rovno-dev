@@ -61,6 +61,6 @@ export const headerTranslations: Record<Language, Record<string, string>> = {
     'admin.catalog': 'Каталоги',
     'nav.order_cycle_1': 'Оставить заявку',
     'nav.order_cycle_2': 'Обсудить проект',
-    'nav.order_cycle_3': 'Консультация от CTO',
+    'nav.order_cycle_3': 'Аудит от CTO',
   },
 };

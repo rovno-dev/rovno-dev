@@ -4,6 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LEGAL_DOCS, LEGAL_DOC_ORDER } from "@/app/_data/legal";
 import {
+import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+
+export const metadata = pageMetadata({
+  title: "Документы",
+  description:
+    "Правовая информация сайта rovno.dev: политика конфиденциальности, согласие на обработку ПДн, политика cookie и пользовательское соглашение.",
+  path: "/docs",
+  ogImage: buildOgImageUrl("Документы", "Rovno.dev"),
+});
   ShieldCheck,
   Cookie,
   HandshakeIcon,
@@ -23,12 +32,6 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   cookies: Cookie,
   terms: HandshakeIcon,
   "reviews-consent": EnvelopeIcon,
-};
-
-export const metadata = {
-  title: "Документы · Rovno.dev",
-  description:
-    "Правовая информация сайта rovno.dev: политика конфиденциальности, согласие на обработку персональных данных, политика cookie, пользовательское соглашение и согласие на публикацию отзывов.",
 };
 
 export default function DocsIndexPage() {

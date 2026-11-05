@@ -19,8 +19,7 @@ import {
   findEventCustomPageRenderer,
   type EventCustomContext,
 } from "./_components/event-custom-pages";
-
-export const revalidate = 60;
+import { resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -30,47 +29,42 @@ export async function generateMetadata({
   const { slug } = await params;
   const ev = await fetchEventServer(slug);
   if (!ev) return { title: "Событие не найдено · Rovno.dev" };
-  const baseUrl = process.env.NEXT_PUBLIC_ROOT_DOMAIN
-    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-    : "http://localhost:3000";
-
-  const fallbackImage = `/api/og/event/${ev.slug}`;
-  
-  // Telegram requires absolute URLs and cannot render videos as previews.
-  const isVideo = ev.cover_image_src?.match(/\.(webm|mp4|mov)$/i);
-  const rawImage = ev.cover_image_src && !isVideo ? ev.cover_image_src : fallbackImage;
-  
-  const ogImage = rawImage.startsWith("http") 
-    ? rawImage 
-    : `${baseUrl}${rawImage}`;
-
+  const title = ev.seo_title || ev.title;
+  const description =
+    ev.meta_description || ev.short_description || ev.description || "";
+  const ogImage = resolveOgImage(
+    ev.cover_image_src,
+    `/api/og/event/${slug}`,
+  );
+  const url = absoluteUrl(`/events/${slug}`);
+  const fullTitle = title.includes("Rovno.dev")
+    ? title
+    : `${title} · ${SITE_NAME}`;
   return {
-    title: ev.seo_title || `${ev.title} · Rovno.dev`,
-    description: ev.meta_description || ev.short_description || ev.description,
+    title: { absolute: fullTitle },
+    description,
+    alternates: { canonical: url },
     openGraph: {
-      title: ev.seo_title || ev.title,
-      description: ev.meta_description || ev.short_description || ev.description,
-      url: `${baseUrl}/events/${ev.slug}`,
-      siteName: "Rovno.dev",
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: ev.title,
-        }
-      ],
+      type: "article",
       locale: "ru_RU",
-      type: "website",
+      siteName: SITE_NAME,
+      url,
+      title: fullTitle,
+      description,
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: ev.title },
+      ],
     },
     twitter: {
       card: "summary_large_image",
-      title: ev.seo_title || ev.title,
-      description: ev.meta_description || ev.short_description || ev.description,
+      title: fullTitle,
+      description,
       images: [ogImage],
     },
   };
 }
+
+export const revalidate = 60;
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -153,7 +147,7 @@ export default async function EventPage({
       registrationUrl: ev.registration_url || undefined,
 
       registeredCount: ev.registered_count ?? 0,
-    seatTypes: ev.seat_types || [],
+      seatTypes: ev.seat_types || [],
 
       tags: (ev.tags || []).map((t) => ({ id: t.id, name: t.name })),
       content: mdxContent,
