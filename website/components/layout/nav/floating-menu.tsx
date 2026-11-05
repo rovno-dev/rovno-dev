@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ListIcon, X } from "@phosphor-icons/react";
-import { motion } from "motion/react";
-import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/utils/constants/routes";
 import { useLanguage } from "@/providers/language-provider";
@@ -30,17 +29,12 @@ export function FloatingMenu({
   triggerIconClassName,
 }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isOrderOpen, setIsOrderOpen] = useState(false);
+    const [isOrderOpen, setIsOrderOpen] = useState(false);
   const { t } = useLanguage();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Prevent SSR hydration issues with Portals
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Close menu on route change
   useEffect(() => {
@@ -107,46 +101,51 @@ export function FloatingMenu({
         )}
       </Button>
 
-      {mounted && open && createPortal(
-        <div
-          id="floating-menu-panel"
-          ref={dropdownRef}
-          className={cn(
-            "z-[9999] flex flex-col border border-[color-mix(in_srgb,var(--outline),transparent_50%)] shadow-2xl backdrop-blur-2xl bg-[color-mix(in_srgb,var(--card),transparent_15%)]",
-            position === "bottom"
-              ? "fixed inset-x-4 bottom-24 mx-auto max-w-sm rounded-[2rem] p-5"
-              : "fixed top-[80px] right-4 w-64 rounded-3xl p-3"
-          )}
-        >
-          <nav className="flex flex-col gap-1">
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="floating-menu-panel"
+            ref={dropdownRef}
+            initial={{ opacity: 0, y: position === "bottom" ? 10 : -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: position === "bottom" ? 10 : -10, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className={cn(
+              "absolute z-[9999] flex flex-col border border-[color-mix(in_srgb,var(--outline),transparent_50%)] shadow-2xl backdrop-blur-2xl bg-[color-mix(in_srgb,var(--card),transparent_15%)] w-64 max-w-[calc(100vw-3rem)] rounded-3xl p-3",
+              position === "bottom"
+                ? "bottom-full right-0 mb-4"
+                : "top-full right-0 mt-4"
+            )}
+          >
+            {/* Arrow */}
+            <div className={cn(
+              "absolute right-3 w-3 h-3 rotate-45 bg-[color-mix(in_srgb,var(--card),transparent_15%)] border-t border-l border-[color-mix(in_srgb,var(--outline),transparent_50%)]",
+              position === "bottom" ? "-bottom-1.5 border-b border-r border-t-0 border-l-0" : "-top-1.5"
+            )} />
+
+            <nav className="flex flex-col gap-1">
             {links.map((link, i) => {
               const isActive = pathname === link.href;
               return (
-                <motion.div
+                <Link
                   key={link.href}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05, duration: 0.3, ease: "easeOut" }}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "block px-4 py-3 rounded-2xl text-base font-medium text-center transition-colors",
+                    isActive
+                      ? "bg-(--primary-glass) text-(--primary)"
+                      : "text-(--on-bg-high) hover:bg-(--state-hover)"
+                  )}
                 >
-                  <Link
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "block px-4 py-3 rounded-2xl text-lg font-medium transition-colors",
-                      isActive
-                        ? "bg-(--primary-glass) text-(--primary)"
-                        : "text-(--on-bg-high) hover:bg-(--state-hover)"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
+                  {link.label}
+                </Link>
               );
             })}
-          </nav>
-        </div>,
-        document.body
-      )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

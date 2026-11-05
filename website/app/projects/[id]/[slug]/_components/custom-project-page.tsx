@@ -116,8 +116,8 @@ export function CustomProjectPage({
 
   return (
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary)">
-      {/* --- HERO (Чистый, без полноэкранного градиента) ---------------------─ */}
-      <section className="relative w-full h-[80vh] md:h-[85vh] flex flex-col justify-end overflow-hidden bg-black">
+      {/* --- HERO --- */}
+      <Container className="relative w-full aspect-4/3 flex flex-col justify-end overflow-hidden bg-black">
         <div className="absolute inset-0 z-0">
           {isVideo ? (
             <video
@@ -178,7 +178,7 @@ export function CustomProjectPage({
             </div>
           </div>
         </Container>
-      </section>
+      </Container>
 
       {/* --- CONTENT ------ */}
       {content && (
@@ -245,11 +245,15 @@ export function CustomProjectPage({
           <div className="max-w-[900px] mx-auto">
 
             {/* Dotted Blueprint Frame */}
-            <div className="relative rounded-3xl border-2 border-dotted border-(--on-bg-low)/30 p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
+            <div className="relative rounded-3xl p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%236366f1' stroke-width='3' stroke-dasharray='2%2c 12' stroke-linecap='round'/%3e%3c/svg%3e")`,
+              }}
+            >
 
               {/* Top breaking icon */}
               <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 px-4">
-                <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high) shadow-sm">
+                <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high)">
                   <Sparkle className="size-5" weight="fill" />
                 </div>
               </div>

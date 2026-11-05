@@ -267,7 +267,7 @@ export default function ProjectCard({
         <div className="flex flex-col max-w-[85%] min-w-0">
           <MarqueeText
             text={project.title}
-            className={`text-xl md:text-2xl font-heading font-semibold leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
+            className={`text-xl md:text-2xl font-heading font-medium leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
           />
           {project.shortDescription && (
             <p className={`mt-2 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? 'text-[var(--dark-8)]/80' : 'text-[var(--gray-0)]/80'} ${shadowClass}`}>

@@ -129,7 +129,7 @@ export function FilterBar({
         The container has no background, it acts as the structural dock.
       */}
       <div className="sticky z-40 flex justify-center w-full pointer-events-none transition-all duration-500 ease-in-out top-[63px] md:top-[88px] pt-2 pb-6 px-4">
-        
+
         {/* The Magic Motion Wrapper */}
         <motion.div
           initial={false}
@@ -294,7 +294,7 @@ export function FilterBar({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map((project, idx) => (
                 <ProjectCard
                   key={project.id || project.slug}
