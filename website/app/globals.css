@@ -890,7 +890,7 @@
 }
 
 .mt-header {
-  @apply mt-[46px] md:mt-[96px];
+  @apply mt-[60px];
 }
 
 /* Glass dock — floating pill chrome shared by every header island
