@@ -161,8 +161,7 @@ export function CustomProjectPage({
   const headingOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary)">
-      {/* ──────────────────────────── HERO ──────────────────────────── */}
+    <>
       <section ref={heroRef} className="relative isolate overflow-hidden">
         {/* ── Dia-style mesh backdrop ──────────────────────────────────
             Mask changes since the last pass:
@@ -288,7 +287,7 @@ export function CustomProjectPage({
         <Container variant="full-width" className="relative z-10">
           <motion.div
             style={{ y: headingY, opacity: headingOpacity }}
-            className="mx-auto max-w-[1400px] pt-16 md:pt-24 pb-16 md:pb-20 lg:pb-28 text-center"
+            className="mx-auto max-w-[1400px] pt-24 sm:pt-36 md:pt-38 lg:pt-30 pb-16 md:pb-20 lg:pb-28 text-center"
           >
             {/* Title fades + lifts on mount. This is the extra "magic"
                 on top of the drifting field: one orchestrated entrance
@@ -339,42 +338,46 @@ export function CustomProjectPage({
       </Container>
 
       {/* ──────────────────────────── CONTENT ──────────────────────────── */}
-      {content && (
-        <section className="py-12">
-          <Container>
-            <div className="max-w-[720px] mx-auto prose-case">{content}</div>
-          </Container>
-        </section>
-      )}
+      {
+        content && (
+          <section className="py-12">
+            <Container>
+              <div className="max-w-[720px] mx-auto prose-case">{content}</div>
+            </Container>
+          </section>
+        )
+      }
 
       {/* ──────────────────────────── GALLERY ──────────────────────────── */}
-      {project.media.length > 0 && (
-        <section className="py-12 border-(--outline)">
-          <Container>
-            <div className="max-w-[1200px] mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                {project.media.map((m) => (
-                  <figure
-                    key={m.id}
-                    className="group rounded-2xl overflow-hidden border border-(--outline) bg-(--card) relative aspect-[4/3]"
-                  >
-                    {m.type === "video" ? (
-                      <video src={m.url} controls playsInline preload="metadata" className="w-full h-full object-cover bg-black" />
-                    ) : (
-                      <Image src={m.url} alt={m.caption || ""} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                    )}
-                    {m.caption && (
-                      <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
-                        {m.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
+      {
+        project.media.length > 0 && (
+          <section className="py-12 border-(--outline)">
+            <Container>
+              <div className="max-w-[1200px] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                  {project.media.map((m) => (
+                    <figure
+                      key={m.id}
+                      className="group rounded-2xl overflow-hidden border border-(--outline) bg-(--card) relative aspect-[4/3]"
+                    >
+                      {m.type === "video" ? (
+                        <video src={m.url} controls playsInline preload="metadata" className="w-full h-full object-cover bg-black" />
+                      ) : (
+                        <Image src={m.url} alt={m.caption || ""} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      )}
+                      {m.caption && (
+                        <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
+                          {m.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Container>
-        </section>
-      )}
+            </Container>
+          </section>
+        )
+      }
 
       {/* ──────────────────────────── CTA ──────────────────────────── */}
       <section className="py-12 border-(--outline) relative overflow-hidden">
@@ -417,33 +420,35 @@ export function CustomProjectPage({
       </section>
 
       {/* ──────────────────────────── RELATED ──────────────────────────── */}
-      {related.length > 0 && (
-        <section className="py-12 pb-24 border-(--outline)">
-          <Container>
-            <div className="max-w-[1200px] mx-auto">
-              <div className="flex items-end justify-between mb-12">
-                <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight">
-                  Следующие проекты
-                </h2>
-                <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">
-                  Все проекты
-                  <ArrowUpRight className="size-4" />
-                </Link>
+      {
+        related.length > 0 && (
+          <section className="py-12 pb-24 border-(--outline)">
+            <Container>
+              <div className="max-w-[1200px] mx-auto">
+                <div className="flex items-end justify-between mb-12">
+                  <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight">
+                    Следующие проекты
+                  </h2>
+                  <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">
+                    Все проекты
+                    <ArrowUpRight className="size-4" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {related.map((r, idx) => {
+                    const rp: Project = {
+                      id: r.id, slug: r.slug, title: r.title, description: "",
+                      shortDescription: "", cover: { imageSrc: r.coverImage },
+                      category: r.categoryLabel || "", clientId: "",
+                    };
+                    return <ProjectCard key={r.id || r.slug} project={rp} index={idx} variant="featured" />;
+                  })}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {related.map((r, idx) => {
-                  const rp: Project = {
-                    id: r.id, slug: r.slug, title: r.title, description: "",
-                    shortDescription: "", cover: { imageSrc: r.coverImage },
-                    category: r.categoryLabel || "", clientId: "",
-                  };
-                  return <ProjectCard key={r.id || r.slug} project={rp} index={idx} variant="featured" />;
-                })}
-              </div>
-            </div>
-          </Container>
-        </section>
-      )}
-    </main>
+            </Container>
+          </section>
+        )
+      }
+    </>
   );
 }

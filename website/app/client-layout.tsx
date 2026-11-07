@@ -13,29 +13,12 @@ export default function ClientRootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
   const { lang } = useLanguage();
-
-  // Pages whose topmost section is designed to sit behind the fixed header
-  // - the home hero, every project case study, and every event landing
-  // (the Nash.Dev terminal opens at the top of the viewport, its first
-  // line painted behind the header bar).
-  //
-  // Detail pages match on `/projects/<slug>` and `/events/<slug>`:
-  // split('/').filter(Boolean) → ["projects", "<slug>"] → length 2.
-  // The list pages `/projects` and `/events` are length 1 and keep the
-  // offset.
-  const segments = pathname?.split("/").filter(Boolean) ?? [];
-  const isDetailRoute = segments.length === 2;
-  const isFullscreenTop =
-    pathname === "/" ||
-    (isDetailRoute &&
-      (segments[0] === "projects" || segments[0] === "events"));
 
   return (
     <>
       <Header />
-      <div className="relative" key={lang}>
+      <div className="relative -mt-[60px]" key={lang}>
         <main
           className={cn(
             "mb-0 mt-0 overflow-x-clip",
