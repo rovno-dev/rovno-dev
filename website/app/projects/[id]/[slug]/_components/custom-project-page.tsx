@@ -87,7 +87,7 @@ function designMesh(hue: number) {
   };
 }
 
-const FALLBACK_HUE = 42;
+const FALLBACK_HUE = 223;
 
 function useCoverHue(src?: string): number | null {
   const [hue, setHue] = useState<number | null>(null);
@@ -187,15 +187,11 @@ export function CustomProjectPage({
             WebkitMaskImage: `linear-gradient(to bottom,
               rgba(0,0,0,0.92) 0%,
               black 5%,
-              black 72%,
-              rgba(0,0,0,0.85) 88%,
-              transparent 100%)`,
+              black 100%)`,
             maskImage: `linear-gradient(to bottom,
               rgba(0,0,0,0.92) 0%,
               black 5%,
-              black 72%,
-              rgba(0,0,0,0.85) 88%,
-              transparent 100%)`,
+              black 100%)`,
             // Instant swap - no transition. The 900ms fade used to run
             // concurrently with body's transition-colors on every theme
             // toggle, producing a muddy intermediate state. Hidden while

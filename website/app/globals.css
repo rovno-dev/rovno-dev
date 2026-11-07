@@ -892,6 +892,7 @@
 .mt-header {
   @apply mt-[46px] md:mt-[96px];
 }
+
 /* Glass dock — floating pill chrome shared by every header island
    (nav, CTA, utilities). Opaque-leaning background (94%) so the pill
    reads as a solid surface instead of a see-through ghost; the
@@ -925,6 +926,7 @@
 ::view-transition-old(root) {
   animation: 260ms cubic-bezier(0.4, 0, 1, 1) both vt-old;
 }
+
 ::view-transition-new(root) {
   animation: 620ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both vt-new;
 }
@@ -935,11 +937,13 @@
     filter: blur(6px);
   }
 }
+
 @keyframes vt-new {
   from {
     opacity: 0;
     filter: blur(8px);
   }
+
   to {
     opacity: 1;
     filter: blur(0);
@@ -947,6 +951,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation-duration: 0.01ms !important;
@@ -965,39 +970,75 @@
    90 s. `translate3d` promotes each blob to its own compositor layer,
    so the drift costs nothing on the main thread. */
 @keyframes mesh-drift-1 {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(3%, -2%, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(3%, -2%, 0);
+  }
 }
+
 @keyframes mesh-drift-2 {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(-2%, 3%, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(-2%, 3%, 0);
+  }
 }
+
 @keyframes mesh-drift-3 {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(2%, -3%, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(2%, -3%, 0);
+  }
 }
+
 @keyframes mesh-drift-4 {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(-3%, 2%, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(-3%, 2%, 0);
+  }
 }
+
 .mesh-blob-1 {
   animation: mesh-drift-1 22s ease-in-out infinite;
   will-change: transform;
 }
+
 .mesh-blob-2 {
   animation: mesh-drift-2 28s ease-in-out infinite;
   will-change: transform;
 }
+
 .mesh-blob-3 {
   animation: mesh-drift-3 32s ease-in-out infinite;
   will-change: transform;
 }
+
 .mesh-blob-4 {
   animation: mesh-drift-4 26s ease-in-out infinite;
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .mesh-blob-1,
   .mesh-blob-2,
   .mesh-blob-3,
@@ -1025,88 +1066,92 @@
       soft-light blend, moving slowly enough to read as light passing
       behind clouds rather than as an animated overlay. */
 @keyframes hero-grain-drift {
-  0%    { transform: translate3d(0, 0, 0); }
-  12.5% { transform: translate3d(-2%, -3%, 0); }
-  25%   { transform: translate3d(3%, -1%, 0); }
-  37.5% { transform: translate3d(-1%, 2%, 0); }
-  50%   { transform: translate3d(2%, 3%, 0); }
-  62.5% { transform: translate3d(-3%, 1%, 0); }
-  75%   { transform: translate3d(1%, -2%, 0); }
-  87.5% { transform: translate3d(-2%, -1%, 0); }
-  100%  { transform: translate3d(0, 0, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  12.5% {
+    transform: translate3d(-2%, -3%, 0);
+  }
+
+  25% {
+    transform: translate3d(3%, -1%, 0);
+  }
+
+  37.5% {
+    transform: translate3d(-1%, 2%, 0);
+  }
+
+  50% {
+    transform: translate3d(2%, 3%, 0);
+  }
+
+  62.5% {
+    transform: translate3d(-3%, 1%, 0);
+  }
+
+  75% {
+    transform: translate3d(1%, -2%, 0);
+  }
+
+  87.5% {
+    transform: translate3d(-2%, -1%, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
 }
+
 .hero-grain-drift {
   animation: hero-grain-drift 7s steps(8) infinite;
   will-change: transform;
 }
 
 @keyframes hero-dot-drift {
-  to { background-position: 22px 22px; }
+  to {
+    background-position: 22px 22px;
+  }
 }
+
 .hero-dot-drift {
   animation: hero-dot-drift 20s linear infinite;
 }
 
 @keyframes hero-light-sweep {
-  0%   { transform: translate3d(0, 0, 0); }
-  25%  { transform: translate3d(8%, -6%, 0); }
-  50%  { transform: translate3d(-4%, 10%, 0); }
-  75%  { transform: translate3d(6%, 4%, 0); }
-  100% { transform: translate3d(0, 0, 0); }
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate3d(8%, -6%, 0);
+  }
+
+  50% {
+    transform: translate3d(-4%, 10%, 0);
+  }
+
+  75% {
+    transform: translate3d(6%, 4%, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
 }
+
 .hero-light-sweep {
   animation: hero-light-sweep 26s ease-in-out infinite;
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .hero-grain-drift,
   .hero-dot-drift,
   .hero-light-sweep {
     animation: none;
   }
-}
-
-/* ── Scroll lock without layout shift ───────────────────────────────
-   Radix Dialog/Sheet lock body scroll by setting `overflow: hidden` on
-   <body> and compensating with `padding-right: <scrollbar width>` so
-   content doesn't jump left. On a page with a visible scrollbar, the
-   compensation double-reserves: the scrollbar goes away, Radix pads in
-   its place, and any other padding/margin on body still applies - the
-   result is a visible pop when the sheet opens and again when it
-   closes.
-
-   `scrollbar-gutter: stable` on <html> reserves the scrollbar track
-   for the whole page lifetime, so hiding the scrollbar changes nothing
-   about layout. That makes Radix's compensation redundant and, since
-   it now overcorrects, actively wrong - hence the !important reset. */
-html {
-  /* Non-`visible` overflow on <html> stops body's `overflow: hidden`
-     from propagating to the viewport. Combined with the always-on
-     `scrollbar-gutter: stable`, this gives us a permanent scrollbar
-     that nothing can toggle — so a dialog opening changes zero pixels
-     of layout. */
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
-}
-/* Radix's react-remove-scroll pads the body by the scrollbar width to
-   compensate for a scrollbar it thinks disappeared. It hasn't: both
-   html's overflow-y and scrollbar-gutter keep it permanently reserved.
-   Without resetting the padding, that padding pushes content left by
-   the scrollbar width when the dialog opens.
-
-   Matches `[data-scroll-locked]` on any element, not just body — the
-   attribute can move between library versions. `padding: 0` and
-   `padding-right: 0` are both present because the override has to win
-   whether Radix uses the shorthand or the longhand. */
-[data-scroll-locked],
-body[data-scroll-locked],
-html[data-scroll-locked] {
-  padding: 0 !important;
-  padding-right: 0 !important;
-  margin: 0 !important;
-  margin-right: 0 !important;
-  --removed-body-scroll-bar-size: 0px !important;
 }
 
 /* Code blocks: explicit light-on-dark text.
@@ -1116,6 +1161,7 @@ html[data-scroll-locked] {
 .novel-prosemirror pre.hljs {
   color: #e2e2e6;
 }
+
 .novel-prosemirror pre.hljs code {
   color: inherit;
 }
