@@ -76,12 +76,12 @@ export function GalleryPreviewModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="!fixed !inset-0 !top-0 !left-0 !translate-none !max-w-none !max-h-none !w-screen !h-screen !p-0 !border-0 !rounded-none !bg-black/95 flex items-center justify-center"
+        className="!fixed !inset-0 !top-0 !left-0 !translate-none !max-w-none !max-h-none !w-screen !h-screen !p-0 !border-0 !rounded-none !bg-black/95 flex items-center justify-center duration-300 data-open:zoom-in-95 data-closed:zoom-out-95"
       >
         <Button
           variant="glass"
           size="icon-medium"
-          className="absolute top-4 right-4 z-[60] rounded-full border-white/20"
+          className="absolute top-4 right-4 z-[60] rounded-full border-white/20 hover:bg-white/20 transition-all duration-200"
           onClick={() => onOpenChange(false)}
           aria-label="Закрыть"
         >
@@ -103,7 +103,7 @@ export function GalleryPreviewModal({
                   <img
                     src={item.src}
                     alt={item.caption || ""}
-                    className="max-w-[92vw] max-h-[88vh] object-contain select-none"
+                    className="max-w-[92vw] max-h-[88vh] object-contain select-none animate-in fade-in duration-500"
                   />
                 </div>
               </CarouselItem>
@@ -111,16 +111,16 @@ export function GalleryPreviewModal({
           </CarouselContent>
           {items.length > 1 && (
             <>
-              <CarouselPrevious className="left-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0" />
-              <CarouselNext className="right-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0" />
+              <CarouselPrevious className="left-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0 backdrop-blur-md transition-all duration-200" />
+              <CarouselNext className="right-6 z-50 bg-white/10 hover:bg-white/20 text-white size-12! border-0 backdrop-blur-md transition-all duration-200" />
             </>
           )}
-          <div className="absolute bottom-0 inset-x-0 z-50 px-6 py-4 bg-gradient-to-t from-black/80 to-transparent">
+          <div className="absolute bottom-0 inset-x-0 z-50 px-6 py-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent animate-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-end justify-between gap-4 max-w-[1400px] mx-auto">
               <p className="text-body-4 text-white/90 truncate max-w-[60vw]">
                 {items[current]?.caption || ""}
               </p>
-              <span className="font-mono text-xs text-white/60 tabular-nums shrink-0">
+              <span className="font-mono text-xs text-white/60 tabular-nums shrink-0 bg-white/10 px-2 py-1 rounded backdrop-blur-sm">
                 {current + 1} / {items.length}
               </span>
             </div>

@@ -47,8 +47,8 @@ export const ReadonlyGalleryNode = Node.create({
       captions: { default: [] },
       isFullWidth: { default: false },
       layout: { default: "grid" },
-      gap: { default: "md" },
-      columns: { default: 3 },
+      columns: { default: 2 },
+      gap: { default: "none", rendered: false },
     };
   },
 
@@ -62,8 +62,7 @@ export const ReadonlyGalleryNode = Node.create({
       captions: node.attrs.captions || [],
       isFullWidth: !!node.attrs.isFullWidth,
       layout: node.attrs.layout || "grid",
-      gap: node.attrs.gap || "md",
-      columns: node.attrs.columns || 3,
+      columns: node.attrs.columns || 2,
     });
     const [tag, attrs, ...children] = out;
     return [tag, mergeAttributes(HTMLAttributes, attrs), ...children];

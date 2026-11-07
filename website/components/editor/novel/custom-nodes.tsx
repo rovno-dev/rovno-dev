@@ -42,20 +42,13 @@ export const GalleryNode = Node.create({
   addAttributes() {
     return {
       images: { default: [] },
-      // Parallel array of per-image titles/captions. Optional. Missing
-      // entries render as empty alt text; the lightbox shows the index
-      // as the title fallback.
       captions: { default: [] },
-      // Break out of the article's max-width and span the viewport on
-      // the public page.
       isFullWidth: { default: false },
-      // "grid" (uniform 4:3 tiles) or "masonry" (natural heights in
-      // CSS columns — irregular rhythm).
       layout: { default: "grid" },
-      // Space between tiles: "none" (edge-to-edge), "sm", "md".
-      gap: { default: "md" },
-      // 2..6 columns for grid, or CSS multi-column count for masonry.
-      columns: { default: 3 },
+      columns: { default: 2 },
+      // Kept only so old JSON with a `gap` value stays parseable; it is
+      // ignored by the renderer (gap is always zero).
+      gap: { default: "none", rendered: false },
     };
   },
 
@@ -69,8 +62,7 @@ export const GalleryNode = Node.create({
       captions: node.attrs.captions || [],
       isFullWidth: !!node.attrs.isFullWidth,
       layout: node.attrs.layout || "grid",
-      gap: node.attrs.gap || "md",
-      columns: node.attrs.columns || 3,
+      columns: node.attrs.columns || 2,
     });
     const [tag, attrs, ...children] = out;
     return [tag, mergeAttributes(HTMLAttributes, attrs), ...children];

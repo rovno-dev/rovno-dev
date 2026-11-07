@@ -33,10 +33,10 @@ export function ImageNodeView({ node, deleteNode, updateAttributes }: any) {
       <div className="relative overflow-hidden rounded-sm border border-(--outline) max-w-full">
         <img src={src} alt={alt} className="w-full h-auto block max-h-[800px] object-contain" />
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-sm">
-          <button type="button" onClick={() => setCropSrc(src)} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-md backdrop-blur-sm" title="Обрезать">
+          <button type="button" onClick={() => setCropSrc(src)} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-md backdrop-blur-sm transition-colors" title="Обрезать">
             <Crop className="size-5" />
           </button>
-          <button type="button" onClick={deleteNode} className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-md backdrop-blur-sm" title="Удалить">
+          <button type="button" onClick={deleteNode} className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-md backdrop-blur-sm transition-colors" title="Удалить">
             <Trash className="size-5" />
           </button>
         </div>
@@ -67,7 +67,7 @@ export function VideoNodeView({ node, deleteNode }: any) {
       <div className="relative overflow-hidden rounded-sm border border-(--outline) w-full bg-black">
         <video src={src} poster={poster} controls className="w-full h-auto block" />
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button type="button" onClick={deleteNode} className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-md backdrop-blur-sm" title="Удалить">
+          <button type="button" onClick={deleteNode} className="p-2 bg-red-500/80 hover:bg-red-500 text-white rounded-md backdrop-blur-sm transition-colors" title="Удалить">
             <Trash className="size-4" />
           </button>
         </div>
@@ -78,21 +78,17 @@ export function VideoNodeView({ node, deleteNode }: any) {
 
 // --- 3. Gallery Node View ------------------------------------------------
 //
-// The editor renders a live preview of the gallery that matches what the
-// public page will show. Controls:
-//   - layout toggle (grid / masonry)
-//   - column count (2..6)
-//   - gap (none / sm / md — "none" tiles images edge-to-edge)
-//   - full-width toggle (breaks out of the article max-width on publish)
-//   - per-tile: preview / replace / edit caption / delete
+// The editor preview always renders at the editor column width (never
+// breaks out to viewport) so the admin layout stays intact. The
+// "Edge-to-edge" toggle is a publish-time flag — the badge explains what
+// will happen on the public page.
 export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
   const {
     images = [],
     captions = [],
     isFullWidth = false,
     layout = "grid",
-    gap = "md",
-    columns = 3,
+    columns = 2,
   } = node.attrs;
 
   const [replaceIndex, setReplaceIndex] = useState<number | null>(null);
@@ -102,24 +98,10 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
   const [captionDraft, setCaptionDraft] = useState("");
 
   const gridColsClass = (c: number) =>
-    c === 1 ? "grid-cols-1" :
-    c === 2 ? "grid-cols-2" :
-    c === 4 ? "grid-cols-2 md:grid-cols-4" :
-    c === 5 ? "grid-cols-2 md:grid-cols-5" :
-    c === 6 ? "grid-cols-2 md:grid-cols-6" :
-    "grid-cols-2 md:grid-cols-3";
+    c === 1 ? "grid-cols-1" : "grid-cols-2";
 
   const masonryColsClass = (c: number) =>
-    c === 1 ? "columns-1" :
-    c === 2 ? "columns-1 md:columns-2" :
-    c === 4 ? "columns-2 md:columns-4" :
-    c === 5 ? "columns-2 md:columns-5" :
-    c === 6 ? "columns-2 md:columns-6" :
-    "columns-2 md:columns-3";
-
-  const gapClass = gap === "none" ? "gap-0" : gap === "sm" ? "gap-1" : "gap-3";
-  const colGapClass = gap === "none" ? "gap-x-0" : gap === "sm" ? "gap-x-1" : "gap-x-3";
-  const masonryMbClass = gap === "none" ? "mb-0" : gap === "sm" ? "mb-1" : "mb-3";
+    c === 1 ? "columns-1" : "columns-1 md:columns-2";
 
   const handleRemove = (idx: number) => {
     const nextImages = [...images];
@@ -174,10 +156,10 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
   }));
 
   return (
-    <NodeViewWrapper className="my-6 group/gallery w-full max-w-full">
-      <div className="rounded-sm border border-(--outline) p-3 bg-(--bg)/30 transition-all w-full overflow-hidden">
+    <NodeViewWrapper className="my-8 group/gallery w-full max-w-full">
+      <div className="rounded-xl border border-(--outline) p-4 bg-(--bg)/40 transition-all w-full overflow-hidden shadow-sm">
         {/* Toolbar */}
-        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-(--on-bg-medium) uppercase tracking-wider">
               Галерея {images.length > 0 && `(${images.length})`}
@@ -185,17 +167,17 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
             {isFullWidth && (
               <span
                 className="text-[10px] uppercase tracking-wider text-(--primary) px-1.5 py-0.5 rounded bg-(--primary-glass) border border-(--primary)/30"
-                title="Галерея растянется на всю ширину экрана при публикации"
+                title="На публичной странице галерея растянется на всю ширину экрана без отступов"
               >
-                Full page
+                Edge-to-edge
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-1 items-center" data-gallery-control>
+          <div className="flex flex-wrap gap-1.5 items-center" data-gallery-control>
             <button
               type="button"
               onClick={() => updateAttributes({ layout: layout === "masonry" ? "grid" : "masonry" })}
-              className="px-2 py-1 text-[11px] rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium)"
+              className="px-2.5 py-1 text-[11px] rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium) transition-colors"
               title="Раскладка"
             >
               {layout === "masonry" ? "Мозаика" : "Сетка"}
@@ -203,33 +185,30 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
             <select
               value={columns}
               onChange={(e) => updateAttributes({ columns: Number(e.target.value) })}
-              className="px-1.5 py-1 text-[11px] rounded border border-(--outline) bg-transparent text-(--on-bg-medium)"
+              className="px-2 py-1 text-[11px] rounded border border-(--outline) bg-transparent text-(--on-bg-medium) outline-none"
               title="Количество колонок"
             >
-              {[2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>{n}</option>
+              {[1, 2].map((n) => (
+                <option key={n} value={n}>{n} кол.</option>
               ))}
             </select>
             <button
               type="button"
-              onClick={() => updateAttributes({ gap: gap === "none" ? "sm" : gap === "sm" ? "md" : "none" })}
-              className="px-2 py-1 text-[11px] rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium)"
-              title="Отступы между картинками"
-            >
-              Отступы: {gap === "none" ? "0" : gap === "sm" ? "S" : "M"}
-            </button>
-            <button
-              type="button"
               onClick={() => updateAttributes({ isFullWidth: !isFullWidth })}
-              className="px-2 py-1 text-[11px] rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium)"
-              title="Ширина"
+              className={cn(
+                "px-2.5 py-1 text-[11px] rounded border transition-colors",
+                isFullWidth
+                  ? "border-(--primary) bg-(--primary-glass) text-(--primary)"
+                  : "border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium)"
+              )}
+              title="На всю ширину экрана без отступов (Fullpage)"
             >
-              {isFullWidth ? "Обычная" : "Full"}
+              {isFullWidth ? "Edge-to-edge" : "В ширину статьи"}
             </button>
             <button
               type="button"
               onClick={deleteNode}
-              className="px-2 py-1 text-[11px] rounded border border-red-500/40 text-red-500 hover:bg-red-500/10"
+              className="px-2.5 py-1 text-[11px] rounded border border-red-500/40 text-red-500 hover:bg-red-500/10 transition-colors"
               title="Удалить галерею"
             >
               Удалить
@@ -239,14 +218,14 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
 
         {/* Preview grid */}
         {images.length === 0 ? (
-          <p className="text-xs text-(--on-bg-low) py-6 text-center">Нет изображений. Нажмите «Добавить».</p>
+          <p className="text-xs text-(--on-bg-low) py-8 text-center">Нет изображений. Нажмите «Добавить».</p>
         ) : (
           <div
             className={cn(
               "w-full",
               layout === "masonry"
-                ? cn(masonryColsClass(columns), colGapClass)
-                : cn("grid", gridColsClass(columns), gapClass),
+                ? masonryColsClass(columns)
+                : cn("grid", gridColsClass(columns)),
             )}
           >
             {images.map((src: string, i: number) => {
@@ -255,20 +234,21 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                 <div
                   key={i}
                   className={cn(
-                    "relative group/img",
-                    layout === "masonry" && `${masonryMbClass} break-inside-avoid`,
+                    "relative group/img overflow-hidden animate-in fade-in zoom-in-95 duration-300",
+                    layout === "masonry" && "break-inside-avoid",
                   )}
                 >
                   <img
                     src={src}
                     alt={captions[i] || ""}
                     className={cn(
-                      "w-full block rounded-sm border border-(--outline)",
+                      "w-full block transition-transform duration-500 ease-out group-hover/img:scale-105",
                       layout === "grid" ? "aspect-[4/3] object-cover" : "h-auto",
                     )}
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors duration-300 pointer-events-none" />
                   {captions[i] && !isEditingCaption && (
-                    <div className="absolute inset-x-0 bottom-0 px-2 py-1 bg-black/60 backdrop-blur-sm">
+                    <div className="absolute inset-x-0 bottom-0 px-2 py-1 bg-black/60 backdrop-blur-sm transform translate-y-full group-hover/img:translate-y-0 transition-transform duration-300">
                       <p className="text-[10px] text-white truncate">{captions[i]}</p>
                     </div>
                   )}
@@ -284,18 +264,18 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                         }}
                         onBlur={() => saveCaption(i)}
                         placeholder="Заголовок..."
-                        className="w-full px-2 py-1 text-xs rounded bg-black/50 text-white border border-white/20 outline-none"
+                        className="w-full px-2 py-1 text-xs rounded bg-black/50 text-white border border-white/20 outline-none focus:border-(--primary)"
                       />
                     </div>
                   )}
                   <div
-                    className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover/img:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200"
                     data-gallery-control
                   >
                     <button
                       type="button"
                       onClick={() => { setPreviewIndex(i); setPreviewOpen(true); }}
-                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm"
+                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm transition-colors"
                       title="Просмотр"
                     >
                       <Eye className="size-3.5" />
@@ -303,7 +283,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                     <button
                       type="button"
                       onClick={() => setReplaceIndex(i)}
-                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm"
+                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm transition-colors"
                       title="Заменить"
                     >
                       <Crop className="size-3.5" />
@@ -311,7 +291,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                     <button
                       type="button"
                       onClick={() => startCaptionEdit(i)}
-                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm"
+                      className="size-7 flex items-center justify-center rounded bg-black/70 hover:bg-black text-white backdrop-blur-sm transition-colors"
                       title="Подпись"
                     >
                       <PencilSimple className="size-3.5" />
@@ -319,7 +299,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                     <button
                       type="button"
                       onClick={() => handleRemove(i)}
-                      className="size-7 flex items-center justify-center rounded bg-red-500/80 hover:bg-red-500 text-white backdrop-blur-sm"
+                      className="size-7 flex items-center justify-center rounded bg-red-500/80 hover:bg-red-500 text-white backdrop-blur-sm transition-colors"
                       title="Удалить"
                     >
                       <Trash className="size-3.5" />
@@ -332,14 +312,14 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
         )}
 
         {/* Add more */}
-        <div className="mt-3 flex justify-end" data-gallery-control>
+        <div className="mt-4 flex justify-end" data-gallery-control>
           <button
             type="button"
             onClick={handleAdd}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs rounded border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) hover:bg-(--primary-glass) transition-all duration-200"
           >
-            <Plus className="size-3.5" />
-            Добавить
+            <Plus className="size-4" />
+            Добавить изображения
           </button>
         </div>
       </div>
