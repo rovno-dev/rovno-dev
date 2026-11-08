@@ -313,15 +313,16 @@ export function PhoneInputField({
   const display = nationalDisplay(country, digits);
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className="w-full">
       <div
         ref={wrapRef}
         className={cn(
-          "relative flex h-10 w-full items-stretch rounded-lg border border-input bg-transparent",
+          "relative flex h-10 w-full items-stretch rounded-lg border border-input bg-transparent dark:bg-input/30",
           "transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
           "hover:border-(--primary-card)",
           disabled && "opacity-50 pointer-events-none",
           error && "border-destructive focus-within:ring-destructive/30",
+          className
         )}
       >
         {/* Country trigger */}
@@ -334,7 +335,7 @@ export function PhoneInputField({
           className={cn(
             "flex items-center gap-1.5 px-2.5 shrink-0 rounded-l-lg",
             "text-body-4 text-(--on-bg-high)",
-            "hover:bg-(--state-hover) transition-colors",
+            "hover:bg-(--state-hover) transition-colors outline-none focus:outline-none focus-visible:outline-none",
           )}
         >
           <span className="text-base leading-none">{country.flag}</span>
@@ -374,7 +375,7 @@ export function PhoneInputField({
           anchorRef={wrapRef}
           dropdownRef={(el) => (dropdownRef.current = el)}
           sideOffset={6}
-          className="z-50 w-[320px] max-w-[calc(100vw-2rem)]"
+          className="z-[99999] w-[320px] max-w-[calc(100vw-2rem)]"
         >
           <div className="rounded-xl border border-(--outline) bg-(--card) shadow-xl overflow-hidden">
             <div className="relative border-b border-(--outline)">

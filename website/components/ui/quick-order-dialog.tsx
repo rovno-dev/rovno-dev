@@ -73,7 +73,15 @@ export function QuickOrderDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-      <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden border-(--outline) bg-(--bg) gap-0 z-[10000]">
+      <DialogContent
+        className="sm:max-w-[440px] p-0 overflow-hidden border-(--outline) bg-(--bg) gap-0 z-[10000]"
+        onInteractOutside={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-floating-dropdown]")) {
+            e.preventDefault();
+          }
+        }}
+      >
         <div className="p-6 md:p-8 space-y-6 max-h-[85vh] overflow-y-auto scrollbar-admin">
           <div>
             <h2 className="text-2xl font-heading font-semibold tracking-tight text-(--on-bg-high)">
@@ -93,7 +101,7 @@ export function QuickOrderDialog({
             </div>
             <div className="space-y-2">
               <Label className="text-(--on-bg-high)">Телефон *</Label>
-              <PhoneInputField value={phone} onChange={setPhone} className="h-11" />
+              <PhoneInputField value={phone} onChange={setPhone} className="bg-(--card) border-(--outline) h-11" />
             </div>
             <div className="space-y-2">
               <Label className="text-(--on-bg-high)">Комментарий</Label>

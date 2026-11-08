@@ -71,6 +71,7 @@ export function FloatingDropdown({
         width: coords.width,
       }}
       className={className}
+      data-floating-dropdown
     >
       {children}
     </div>,
