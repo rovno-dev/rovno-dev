@@ -6,6 +6,9 @@ import { CustomProjectPage, type RelatedRef } from "./_components/custom-project
 import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import { findCustomPageRenderer, type CustomPageContext } from "./_components/custom-pages";
 import { GithubReadmeBlock } from "./_components/github-readme-block";
+import { extractMdxHeadings } from "@/utils/mdx-headings";
+import { extractTiptapHeadings } from "@/utils/tiptap-headings";
+import { Toc } from "@/components/layout/toc/toc";
 import {
   Gallery,
   MetricCard,
@@ -42,8 +45,6 @@ export async function generateMetadata({
     dbProject.short_description ||
     dbProject.description ||
     "";
-  // Fall back to the generated project card when the cover is a video -
-  // social crawlers drop video URLs from og:image without warning.
   const ogImage = resolveOgImage(
     dbProject.cover_image_src,
     `/api/og/project/${slug}`,
@@ -89,14 +90,12 @@ interface DBProjectTag {
   label: string;
   value?: any;
 }
-
 interface DBProjectMedia {
   id: string;
   type: "image" | "video";
   url: string;
   caption?: string | null;
 }
-
 interface DBProject {
   id: string;
   slug: string;
@@ -237,11 +236,28 @@ export default async function ProjectPage({
   ) : dbProject.mdx_content ? (
     await getCompiledMDX(dbProject.mdx_content)
   ) : null;
+
+  const headings = dbProject.content_json
+    ? extractTiptapHeadings(dbProject.content_json)
+    : extractMdxHeadings(dbProject.mdx_content || "");
+
   const ctx = dbToContext(dbProject, content);
   const renderer = findCustomPageRenderer(dbProject.custom_page);
 
   if (renderer) {
-    return renderer.render(ctx);
+    return (
+      <>
+        {renderer.render(ctx)}
+        {headings.length > 0 && (
+          <Toc
+            variant="floating"
+            headings={headings}
+            label="Содержание"
+            ariaLabel="Содержание проекта"
+          />
+        )}
+      </>
+    );
   }
 
   const related = await getRelatedProjects(slug);
@@ -251,7 +267,9 @@ export default async function ProjectPage({
       <CustomProjectPage
         project={{ ...ctx, id: dbProject.id }}
         content={ctx.content}
+        contentJson={dbProject.content_json}
         related={related}
+        headings={headings}
       />
       {dbProject.tags
         .filter((t) => t.kind === "github" && t.value?.repo)

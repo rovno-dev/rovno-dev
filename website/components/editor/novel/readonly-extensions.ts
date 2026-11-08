@@ -6,11 +6,66 @@ import {
   TiptapLink,
 } from "novel";
 import { Node, mergeAttributes } from "@tiptap/core";
+import { TableOfContents } from "@tiptap/extension-table-of-contents";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { renderGalleryHTML } from "./gallery-render";
+import { slugify } from "@/utils/slugify";
 
 const lowlight = createLowlight(common);
+
+// Custom Heading node built directly from @tiptap/core to avoid the
+// missing @tiptap/extension-heading dependency. It injects the slugified
+// text as the `id` attribute so the TOC can scroll to it, and adds the
+// exact Tailwind classes used by the MDX renderer so they look identical.
+export const ReadonlyHeading = Node.create({
+  name: "heading",
+  group: "block",
+  content: "inline*",
+  defining: true,
+
+  addAttributes() {
+    return {
+      level: {
+        default: 1,
+        rendered: false,
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      { tag: "h1", attrs: { level: 1 } },
+      { tag: "h2", attrs: { level: 2 } },
+      { tag: "h3", attrs: { level: 3 } },
+      { tag: "h4", attrs: { level: 4 } },
+      { tag: "h5", attrs: { level: 5 } },
+      { tag: "h6", attrs: { level: 6 } },
+    ];
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    // node is a ProseMirror Node, not a JSON object. textContent is the
+    // native getter for the plain text inside it.
+    const text = node.textContent || "";
+    const id = slugify(text);
+    const level = node.attrs.level;
+
+    let className = "";
+    if (level === 1) className = "text-display-2 text-(--on-bg-high) mt-16 mb-6 tracking-tight scroll-mt-28";
+    if (level === 2) className = "text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28";
+    if (level === 3) className = "text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28";
+    if (level === 4) className = "text-heading-4 text-(--on-bg-high) mt-6 mb-2 scroll-mt-28";
+    if (level === 5) className = "text-heading-5 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
+    if (level === 6) className = "text-heading-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
+
+    return [
+      `h${level}`,
+      mergeAttributes(HTMLAttributes, { id, class: className }),
+      0,
+    ];
+  },
+});
 
 export const ReadonlyVideoNode = Node.create({
   name: "video",
@@ -105,6 +160,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
 
 export const readonlyExtensions = [
   StarterKit.configure({
+    heading: false, // Replaced by our custom ReadonlyHeading
     bulletList: { HTMLAttributes: { class: "list-disc list-outside leading-relaxed" } },
     orderedList: { HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" } },
     listItem: { HTMLAttributes: { class: "leading-normal" } },
@@ -117,6 +173,7 @@ export const readonlyExtensions = [
     dropcursor: false,
     gapcursor: false,
   }),
+  ReadonlyHeading,
   Placeholder.configure({
     placeholder: ({ node }) => node.type.name === "heading" ? "Заголовок…" : "Начните писать…",
   }),
@@ -131,5 +188,12 @@ export const readonlyExtensions = [
   ReadonlyCodeBlock,
   HorizontalRule.configure({
     HTMLAttributes: { class: "mt-8 mb-8 border-t border-(--outline)" },
+  }),
+  // TOC: walks the parsed document and stores every heading in
+  // editor.storage.tableOfContents.content. getId must match the id
+  // ReadonlyHeading.renderHTML writes so anchor links resolve.
+  TableOfContents.configure({
+    getText: (node) => node.textContent,
+    getId: (node) => slugify(node.textContent || ""),
   }),
 ];

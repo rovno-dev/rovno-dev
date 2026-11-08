@@ -43,15 +43,9 @@ export default async function TechPage({ params }: { params: Promise<{ slug: str
             <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 tracking-tight">
               {tech.titleRu}
             </h1>
-            <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed mb-10">
+            <p className="text-body-1 md:text-display-5 text-(--on-bg-medium) leading-relaxed">
               {tech.descRu}
             </p>
-            <Button size="large" asChild>
-              <Link href="/order">
-                Заказать разработку
-                <ArrowUpRight className="size-4" />
-              </Link>
-            </Button>
           </div>
         </Container>
       </section>
@@ -62,7 +56,7 @@ export default async function TechPage({ params }: { params: Promise<{ slug: str
             <h2 className="text-display-3 text-(--on-bg-high) mb-8">
               Почему мы используем {tech.titleRu.replace("Разработка на ", "")}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {tech.featuresRu.map((feature, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <CheckCircle className="size-5 text-(--primary) shrink-0 mt-0.5" weight="fill" />
@@ -71,6 +65,15 @@ export default async function TechPage({ params }: { params: Promise<{ slug: str
                   </p>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-(--outline)">
+              <Button size="large" asChild>
+                <Link href="/order">
+                  Заказать разработку
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
             </div>
           </div>
         </Container>

@@ -263,8 +263,8 @@ export default function ProjectCard({
       />
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
 
-      <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 flex items-start justify-between gap-4 pointer-events-none">
-        <div className="flex flex-col max-w-[85%] min-w-0">
+      <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 pointer-events-none">
+        <div className="flex flex-col max-w-full min-w-0">
           <MarqueeText
             text={project.title}
             className={`text-xl md:text-2xl font-heading font-medium leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
@@ -275,29 +275,29 @@ export default function ProjectCard({
             </p>
           )}
         </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
+        {normalizedTags.length > 0 && (
+          <div className="flex flex-wrap justify-start gap-2 pointer-events-auto min-w-0">
+            {normalizedTags.map((tag, i) => (
+              <span
+                key={`${tag}-${i}`}
+                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
         <div
-          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ${isLight
+          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ml-auto pointer-events-auto ${isLight
             ? "bg-white text-[var(--dark-8)] border-transparent"
             : "bg-black/20 backdrop-blur-md text-white border border-white/20"
             }`}
         >
           <ArrowUpRight className="size-5" weight="bold" />
         </div>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-end gap-4 pointer-events-none">
-        {normalizedTags.length > 0 && (
-          <div className="flex flex-wrap justify-end gap-2 pointer-events-auto">
-            {normalizedTags.map((t, i) => (
-              <span
-                key={`${t}-${i}`}
-                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </Link>
   );

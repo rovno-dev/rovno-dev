@@ -13,13 +13,22 @@ interface TocProps {
   label: string;
   /** aria-label for the aside. Translated by the caller. */
   ariaLabel: string;
+  /**
+   * Where the TOC appears.
+   *   - "sidebar"  (default): sticky aside on lg+, floating button below lg.
+   *   - "floating":          floating button on every viewport, no aside.
+   * Use "floating" on long-form pages (article/project) that opted out of
+   * the sidebar column — the button is the only way to reach the TOC.
+   */
+  variant?: "sidebar" | "floating";
 }
 /**
  * Scroll-spy TOC. Desktop: sticky sidebar. Mobile: floating button bottom-right
  * that expands into a scrollable panel. Uses IntersectionObserver-free
  * scroll-spy (top-band crossing) so it stays dependency-free and accurate.
  */
-export function Toc({ headings, label, ariaLabel }: TocProps) {
+export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProps) {
+  const isFloating = variant === "floating";
   const [activeId, setActiveId] = useState<string>(headings[0]?.id ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
   const headingIds = useMemo(() => headings.map((h) => h.id), [headings]);
@@ -62,7 +71,8 @@ export function Toc({ headings, label, ariaLabel }: TocProps) {
   const activeHeading = headings.find((h) => h.id === activeId);
   return (
     <>
-      <aside aria-label={ariaLabel} className="hidden lg:block lg:sticky lg:top-32 h-fit bg-[var(--primary-glass)] backdrop-blur-[var(--blur-glass)] p-3 rounded-xl">
+      {!isFloating && (
+        <aside aria-label={ariaLabel} className="hidden lg:block lg:sticky lg:top-32 h-fit bg-[var(--primary-glass)] backdrop-blur-[var(--blur-glass)] p-3 rounded-xl">
         <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">{label}</p>
         <nav>
           <ul className="space-y-1.5 text-body-4">
@@ -88,15 +98,16 @@ export function Toc({ headings, label, ariaLabel }: TocProps) {
             })}
           </ul>
         </nav>
-      </aside>
-      <div className="lg:hidden">
+        </aside>
+      )}
+      <div className={isFloating ? "" : "lg:hidden"}>
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
           aria-expanded={mobileOpen}
           aria-controls="toc-mobile-panel"
           className={cn(
-            "fixed bottom-24 right-4 z-40 inline-flex items-center gap-2 rounded-full",
+            "fixed bottom-24 md:bottom-8 right-4 md:right-8 z-40 inline-flex items-center gap-2 rounded-full",
             "border border-(--outline) bg-(--card) shadow-lg px-4 py-3",
             "text-body-4 font-medium text-(--on-bg-high) transition-all active:scale-[0.97]",
             "max-w-[min(80vw,320px)]"

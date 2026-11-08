@@ -2,6 +2,7 @@
 
 import { EditorContent, EditorRoot } from "novel";
 import { readonlyExtensions } from "./readonly-extensions";
+import type { TocHeading } from "@/components/layout/toc/toc";
 import { GalleryLightbox } from "./gallery-lightbox";
 import { cn } from "@/lib/utils";
 import "@/app/novel-editor.css";

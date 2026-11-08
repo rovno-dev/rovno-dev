@@ -9,6 +9,9 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
 import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import { ContentMeta } from "@/components/layout/content-meta";
+import { Toc } from "@/components/layout/toc/toc";
+import { extractMdxHeadings } from "@/utils/mdx-headings";
+import { extractTiptapHeadings } from "@/utils/tiptap-headings";
 import {
   fetchArticleServer,
   fetchPublishedArticlesServer,
@@ -162,6 +165,10 @@ export default async function ArticlePage({
       })
     ).content;
 
+  const headings = article.content_json
+    ? extractTiptapHeadings(article.content_json)
+    : extractMdxHeadings(article.mdx_content || "");
+
   const authorName =
     article.author?.name || article.author?.username || "Rovno.dev";
 
@@ -236,6 +243,7 @@ export default async function ArticlePage({
           </div>
         </div>
       </Container>
+
       <Container className="pt-4">
         <div className="max-w-[860px] mx-auto">
           <ContentMeta
@@ -247,59 +255,72 @@ export default async function ArticlePage({
           />
         </div>
       </Container>
+
       <Container className="py-12 md:py-16">
-        <article className="max-w-[720px] mx-auto">
-          {article.content_json ? (
-            <NovelReadOnly content={article.content_json} />
-          ) : (
-            legacyContent
-          )}
-          {article.attachments && article.attachments.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-(--outline)">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {article.attachments.map((m: any, i: number) => (
-                  <figure
-                    key={i}
-                    className="rounded-3xl border border-(--outline) overflow-hidden bg-(--card)"
-                  >
-                    {m.type === "image" ? (
-                      <div className="relative aspect-video">
-                        <Image
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
+          <article className="min-w-0 max-w-[760px] prose-case">
+            {article.content_json ? (
+              <NovelReadOnly content={article.content_json} />
+            ) : (
+              legacyContent
+            )}
+
+            {article.attachments && article.attachments.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-(--outline)">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {article.attachments.map((m: any, i: number) => (
+                    <figure
+                      key={i}
+                      className="rounded-3xl border border-(--outline) overflow-hidden bg-(--card)"
+                    >
+                      {m.type === "image" ? (
+                        <div className="relative aspect-video">
+                          <Image
+                            src={m.url}
+                            alt={m.caption || ""}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <video
                           src={m.url}
-                          alt={m.caption || ""}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
+                          controls
+                          preload="metadata"
+                          className="w-full aspect-video bg-black"
                         />
-                      </div>
-                    ) : (
-                      <video
-                        src={m.url}
-                        controls
-                        preload="metadata"
-                        className="w-full aspect-video bg-black"
-                      />
-                    )}
-                    {m.caption && (
-                      <figcaption className="px-4 py-2 text-body-5 text-(--on-bg-medium)">
-                        {m.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
+                      )}
+                      {m.caption && (
+                        <figcaption className="px-4 py-2 text-body-5 text-(--on-bg-medium)">
+                          {m.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  ))}
+                </div>
               </div>
+            )}
+
+            <div className="mt-12 pt-8 border-t border-(--outline)">
+              <Button variant="outlined" size="medium" shape="round" asChild>
+                <Link href="/blog">
+                  <ArrowLeftIcon className="size-4" />
+                  Все статьи
+                </Link>
+              </Button>
             </div>
-          )}
-        </article>
-      </Container>
-      <Container>
-        <div className="max-w-[720px] mx-auto">
-          <Button variant="outlined" size="medium" shape="round" asChild>
-            <Link href="/blog">
-              <ArrowLeftIcon className="size-4" />
-              Все статьи
-            </Link>
-          </Button>
+          </article>
+
+          <div className="space-y-8">
+            {headings.length > 0 && (
+              <Toc
+                headings={headings}
+                label="Содержание"
+                ariaLabel="Содержание статьи"
+              />
+            )}
+          </div>
         </div>
       </Container>
     </main>

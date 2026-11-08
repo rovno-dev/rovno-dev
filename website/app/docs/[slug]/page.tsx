@@ -116,21 +116,11 @@ export default async function LegalDocPage({
   const otherDocs = LEGAL_DOC_ORDER.filter((s) => s !== slug);
 
   return (
-    <main className="min-h-screen bg-(--bg)">
+    <div className="min-h-screen mt-header bg-(--bg)">
       {/* Header */}
       <section className="border-b border-(--outline) pt-12 md:pt-20 pb-10">
         <Container>
           <div className="max-w-[900px]">
-            <Link
-              href="/docs"
-              className="inline-flex items-center gap-1.5 text-body-4 text-(--on-bg-low) hover:text-(--primary) transition-colors mb-6"
-            >
-              <ArrowLeftIcon className="size-4" />
-              Все документы
-            </Link>
-            <p className="text-body-5 uppercase tracking-[0.3em] text-(--on-bg-low) mb-3">
-              Правовая информация
-            </p>
             <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) leading-[1.15] mb-4">
               {doc.title}
             </h1>
@@ -180,6 +170,6 @@ export default async function LegalDocPage({
           </div>
         </Container>
       </section>
-    </main>
+    </div>
   );
 }

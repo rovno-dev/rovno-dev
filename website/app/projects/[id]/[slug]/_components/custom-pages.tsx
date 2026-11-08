@@ -1,7 +1,4 @@
 import React from "react";
-import { AlxProjectPage } from "./alx-project-page";
-import { JungleBreadSecurityPage } from "./jungle-bread-security";
-import { CveteyaProjectPage } from "./cveteya";
 import { BreadProjectPage } from "./bread-project-page";
 import type { ProjectTagKind } from "@/components/ui/project-tag-chip";
 
@@ -37,29 +34,6 @@ export interface CustomPageRenderer {
 }
 
 export const CUSTOM_PAGE_RENDERERS: CustomPageRenderer[] = [
-  {
-    key: "jungle-bread-security",
-    render: (ctx) => <JungleBreadSecurityPage project={ctx} content={ctx.content} />,
-  },
-  {
-    key: "cveteya",
-    render: (ctx) => <CveteyaProjectPage project={ctx} content={ctx.content} />,
-  },
-  {
-    key: "alx",
-    render: (ctx) => (
-      <AlxProjectPage
-        project={{
-          title: ctx.title,
-          description: ctx.description,
-          cover: { imageSrc: ctx.coverImage, videoSrc: ctx.coverVideo },
-          href: ctx.href,
-          period: ctx.period,
-          techStack: ctx.techStack,
-        }}
-      />
-    ),
-  },
   {
     key: "bread",
     render: (ctx) => (
