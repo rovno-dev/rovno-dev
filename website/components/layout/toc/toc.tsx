@@ -130,7 +130,7 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
               role="dialog"
               aria-label={ariaLabel}
               className={cn(
-                "fixed bottom-40 right-4 z-50 w-[min(88vw,360px)] max-h-[55vh] overflow-y-auto",
+                "fixed bottom-40 md:bottom-24 right-4 md:right-8 z-50 w-[min(88vw,360px)] max-h-[55vh] overflow-y-auto",
                 "rounded-2xl border border-(--outline) bg-(--card) shadow-2xl p-3",
                 "animate-in fade-in slide-in-from-bottom-2 duration-200"
               )}

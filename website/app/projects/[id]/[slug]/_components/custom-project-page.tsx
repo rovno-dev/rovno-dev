@@ -141,12 +141,16 @@ function useCoverHue(src?: string): number | null {
 
 export function CustomProjectPage({
   project, content, contentJson, related, headings,
+  forceMobileToc = true,
 }: {
   project: CustomProject & { id: string };
   content: React.ReactNode;
   contentJson?: any;
   related: RelatedRef[];
   headings?: TocHeading[];
+  /** Render the TOC as the mobile-style floating button on every viewport.
+   *  Set to false to fall back to the sticky sidebar on lg+. */
+  forceMobileToc?: boolean;
 }) {
   useEffect(() => {
     console.log(headings);
@@ -330,6 +334,7 @@ export function CustomProjectPage({
             <div className="space-y-8">
               {effectiveHeadings.length > 0 && (
                 <Toc
+                  variant={forceMobileToc ? "floating" : "sidebar"}
                   headings={effectiveHeadings}
                   label="Содержание"
                   ariaLabel="Содержание проекта"
