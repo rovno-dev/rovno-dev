@@ -15,8 +15,10 @@ import {
 } from "novel";
 import { extensions } from "./extensions";
 import { uploadFn } from "./image-upload";
+import { suggestionItems, registerUploadCallbacks } from "./suggestion-items";
 import { cn } from "@/lib/utils";
 import "@/app/novel-editor.css";
+import "tippy.js/dist/tippy.css";
 import {
   TextB,
   TextItalic,
@@ -170,6 +172,15 @@ export function NovelEditor({
     input.click();
   };
 
+  useEffect(() => {
+    if (!editor) return;
+    registerUploadCallbacks({
+      image: () => handleImageUpload(editor.view.state.selection.from),
+      video: () => handleVideoUpload(editor.view.state.selection.from),
+      gallery: () => handleGalleryUpload(editor.view.state.selection.from),
+    });
+  }, [editor]);
+
   const editorProps = useMemo(
     () => ({
       attributes: {
@@ -181,8 +192,14 @@ export function NovelEditor({
         spellcheck: "false",
       },
       handleDOMEvents: {
-        keydown: (_view: any, event: KeyboardEvent) =>
-          handleCommandNavigation(event),
+        keydown: (_view: any, event: KeyboardEvent) => {
+          try {
+            return handleCommandNavigation(event);
+          } catch (err) {
+            console.error("Command navigation error:", err);
+            return false;
+          }
+        },
       },
       handlePaste: (view: any, event: ClipboardEvent) =>
         handleImagePaste(view, event, uploadFn),
@@ -250,276 +267,30 @@ export function NovelEditor({
               </div>
             </EditorBubbleItem>
           </EditorBubble>
-
-          {/* Notion-Styled Slash Menu - hardcoded items */}
-          <EditorCommand className="z-[99999] h-auto max-h-[360px] w-[320px] overflow-y-auto rounded-xl border border-(--outline) bg-(--card) shadow-2xl transition-all">
+          <EditorCommand className="z-50 h-auto max-h-[360px] w-[320px] overflow-y-auto rounded-xl border border-(--outline) bg-(--card) shadow-2xl p-2">
             <EditorCommandEmpty className="px-3 py-4 text-center text-sm text-(--on-bg-medium)">
               Ничего не найдено
             </EditorCommandEmpty>
-            <EditorCommandList className="p-2">
-              <div className="text-[11px] font-semibold text-(--on-bg-medium) mb-1 px-2 uppercase tracking-wider">
-                Базовые блоки
-              </div>
-
-              <EditorCommandItem
-                value="text"
-                onCommand={({ editor: ed, range }) =>
-                  ed.chain().focus().deleteRange(range).setParagraph().run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <TextT className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Текст
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Обычный текстовый блок
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="heading1"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .setNode("heading", { level: 1 })
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <TextHOne className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Заголовок 1
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Большой заголовок
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="heading2"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .setNode("heading", { level: 2 })
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <TextHTwo className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Заголовок 2
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Средний заголовок
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="heading3"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .setNode("heading", { level: 3 })
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <TextHThree className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Заголовок 3
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Маленький заголовок
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="bulletList"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .toggleBulletList()
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <ListBullets className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Маркированный список
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Список с точками
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="numberedList"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .toggleOrderedList()
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <ListNumbers className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Нумерованный список
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Список с номерами
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="codeBlock"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .toggleCodeBlock()
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <CodeBlock className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">Код</span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Блок с кодом
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="divider"
-                onCommand={({ editor: ed, range }) =>
-                  ed
-                    .chain()
-                    .focus()
-                    .deleteRange(range)
-                    .setHorizontalRule()
-                    .run()
-                }
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <Minus className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Разделитель
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Разделяет блоки
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <div className="text-[11px] font-semibold text-(--on-bg-medium) mt-3 mb-1 px-2 uppercase tracking-wider">
-                Медиа
-              </div>
-
-              <EditorCommandItem
-                value="image"
-                onCommand={({ editor: ed, range }) => {
-                  ed.chain().focus().deleteRange(range).run();
-                  handleImageUpload(ed.view.state.selection.from);
-                }}
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <ImageSquare className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Изображение
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Загрузить и обрезать
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="video"
-                onCommand={({ editor: ed, range }) => {
-                  ed.chain().focus().deleteRange(range).run();
-                  handleVideoUpload(ed.view.state.selection.from);
-                }}
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <VideoCamera className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">Видео</span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Загрузить mp4 или webm
-                  </span>
-                </div>
-              </EditorCommandItem>
-
-              <EditorCommandItem
-                value="gallery"
-                onCommand={({ editor: ed, range }) => {
-                  ed.chain().focus().deleteRange(range).run();
-                  handleGalleryUpload(ed.view.state.selection.from);
-                }}
-                className="flex items-center gap-3 px-2 py-1.5 text-sm rounded-lg hover:bg-(--state-hover) cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-              >
-                <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm">
-                  <SquaresFour className="size-5 text-(--on-bg-high)" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-medium text-(--on-bg-high)">
-                    Галерея
-                  </span>
-                  <span className="text-xs text-(--on-bg-medium)">
-                    Сетка из изображений
-                  </span>
-                </div>
-              </EditorCommandItem>
+            <EditorCommandList>
+              {suggestionItems.map((item) => (
+                <EditorCommandItem
+                  key={item.title}
+                  value={`${item.title} ${item.searchTerms.join(" ")}`}
+                  onCommand={(val) => item.command(val as any)}
+                  className="w-full flex items-center text-left gap-3 px-2 py-1.5 text-sm rounded-lg cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
+                >
+                  <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-medium text-(--on-bg-high) truncate">{item.title}</span>
+                    <span className="text-xs text-(--on-bg-medium) truncate">{item.description}</span>
+                  </div>
+                </EditorCommandItem>
+              ))}
             </EditorCommandList>
           </EditorCommand>
+
         </EditorContent>
       </div>
 

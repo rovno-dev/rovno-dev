@@ -1,3 +1,4 @@
+import { ReactNodeViewRenderer } from "@tiptap/react";
 import {
   Command,
   HorizontalRule,
@@ -7,12 +8,11 @@ import {
   UploadImagesPlugin,
 } from "novel";
 import { CustomImage, VideoNode, GalleryNode } from "./custom-nodes";
+import { suggestionItems } from "./suggestion-items";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
-import { ReactNodeViewRenderer } from "@tiptap/react";
 import { CodeBlockNodeView } from "./code-block-view";
 
-// Initialize lowlight with common languages (js, ts, html, css, python, etc.)
 const lowlight = createLowlight(common);
 
 const tiptapImage = CustomImage.extend({
@@ -33,13 +33,13 @@ const CustomCodeBlock = CodeBlockLowlight.extend({
     return {
       language: {
         default: null,
-        parseHTML: element => element.getAttribute('data-language'),
-        renderHTML: attributes => {
-          if (!attributes.language) return {}
-          return { 'data-language': attributes.language }
+        parseHTML: (element) => element.getAttribute("data-language"),
+        renderHTML: (attributes) => {
+          if (!attributes.language) return {};
+          return { "data-language": attributes.language };
         },
       },
-    }
+    };
   },
   addNodeView() {
     return ReactNodeViewRenderer(CodeBlockNodeView);
@@ -57,9 +57,12 @@ export const extensions = [
     orderedList: { HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" } },
     listItem: { HTMLAttributes: { class: "leading-normal" } },
     blockquote: { HTMLAttributes: { class: "border-l-2 border-(--outline) pl-4 italic" } },
-    codeBlock: false, // Disabled in favor of CustomCodeBlock
+    codeBlock: false,
     code: {
-      HTMLAttributes: { class: "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)", spellcheck: "false" },
+      HTMLAttributes: {
+        class: "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)",
+        spellcheck: "false",
+      },
     },
     horizontalRule: false,
     dropcursor: { color: "#336DFF", width: 3 },
@@ -72,6 +75,16 @@ export const extensions = [
   Command.configure({
     suggestion: {
       char: "/",
+      items: ({ query }: { query: string }) => {
+        const q = query.toLowerCase();
+        return suggestionItems
+          .filter(
+            (item) =>
+              item.title.toLowerCase().includes(q) ||
+              item.searchTerms.some((term) => term.includes(q)),
+          )
+          .slice(0, 10);
+      },
     },
   }),
   TiptapLink.configure({

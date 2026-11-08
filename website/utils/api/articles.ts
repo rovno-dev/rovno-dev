@@ -12,6 +12,7 @@ export interface TagRef {
   id: string;
   name: string;
   slug: string;
+  kind?: "tag" | "category" | "brand";
 }
 
 /**
@@ -32,14 +33,18 @@ function normalizeTag(raw: unknown): TagRef {
       id: `legacy:${name.toLowerCase()}`,
       name,
       slug: name.toLowerCase().replace(/\s+/g, "-"),
+      kind: "tag",
     };
   }
   const obj = (raw ?? {}) as Partial<TagRef> & { name?: string; id?: string };
   const name = String(obj.name ?? "").trim();
+  const kind: "tag" | "category" | "brand" =
+    obj.kind === "category" || obj.kind === "brand" ? obj.kind : "tag";
   return {
     id: String(obj.id ?? `legacy:${name.toLowerCase()}`),
     name,
     slug: String(obj.slug ?? name.toLowerCase().replace(/\s+/g, "-")),
+    kind,
   };
 }
 

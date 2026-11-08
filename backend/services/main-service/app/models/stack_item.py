@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Table, ForeignKey
+from sqlalchemy import Column, String, DateTime, Table, ForeignKey, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from database.database import Base
 
@@ -19,4 +19,5 @@ class StackItem(Base):
     name = Column(String(60), nullable=False)
     slug = Column(String(60), nullable=False, index=True)
     icon_url = Column(String, nullable=True)
+    labels = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

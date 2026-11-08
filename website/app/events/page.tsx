@@ -5,7 +5,7 @@ import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 export const metadata = pageMetadata({
   title: "События",
   description:
-    "Мероприятия агентства Rovno.dev — воркшопы, митапы и конференции для IT-сообщества.",
+    "Мероприятия агентства Rovno.dev - воркшопы, митапы и конференции для IT и бизнес сообщества.",
   path: "/events",
   ogImage: buildOgImageUrl("События", "Rovno.dev"),
 });

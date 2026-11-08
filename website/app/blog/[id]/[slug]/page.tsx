@@ -11,6 +11,7 @@ import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import { ContentMeta } from "@/components/layout/content-meta";
 import { Toc } from "@/components/layout/toc/toc";
 import { extractMdxHeadings } from "@/utils/mdx-headings";
+import { ArticleCard } from "../../_components/article-card";
 import { extractTiptapHeadings } from "@/utils/tiptap-headings";
 import {
   fetchArticleServer,
@@ -98,7 +99,7 @@ const mdxComponents = {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string; slug: string }>;
 }) {
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
@@ -149,11 +150,18 @@ function formatDate(iso: string) {
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string; slug: string }>;
 }) {
   const { slug } = await params;
-  const article = await fetchArticleServer(slug);
+  const [article, recentArticles] = await Promise.all([
+    fetchArticleServer(slug),
+    fetchPublishedArticlesServer({ limit: 4 }),
+  ]);
   if (!article) notFound();
+
+  const otherArticles = recentArticles
+    .filter((a) => a.slug !== article.slug)
+    .slice(0, 2);
 
   const legacyContent = article.content_json
     ? null
@@ -173,7 +181,7 @@ export default async function ArticlePage({
     article.author?.name || article.author?.username || "Rovno.dev";
 
   return (
-    <main className="min-h-screen bg-(--bg) pb-24">
+    <div className="mt-header bg-(--bg) pb-24">
       <Container className="pt-4 md:pt-8">
         <div className="max-w-[860px] mx-auto">
           <div className="relative w-full aspect-[4/3] rounded-4xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
@@ -302,14 +310,16 @@ export default async function ArticlePage({
               </div>
             )}
 
-            <div className="mt-12 pt-8 border-t border-(--outline)">
-              <Button variant="outlined" size="medium" shape="round" asChild>
-                <Link href="/blog">
-                  <ArrowLeftIcon className="size-4" />
-                  Все статьи
-                </Link>
-              </Button>
-            </div>
+            {otherArticles.length > 0 && (
+              <div className="mt-16 pt-12 border-t border-(--outline) not-prose">
+                <h2 className="text-display-4 mb-6 tracking-tight">Другие статьи</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {otherArticles.map((a, idx) => (
+                    <ArticleCard key={a.id} article={a} index={idx} lang="ru" />
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
           <div className="space-y-8">
@@ -323,6 +333,6 @@ export default async function ArticlePage({
           </div>
         </div>
       </Container>
-    </main>
+    </div>
   );
 }

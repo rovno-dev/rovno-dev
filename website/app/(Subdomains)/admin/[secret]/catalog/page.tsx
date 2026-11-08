@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { CheckUser } from "@/entities/user/model/check-user";
 import { useUser } from "@/entities/user/model/user-context";
 import { Card } from "@/components/ui/card";
@@ -150,10 +151,10 @@ function CatalogPageInner() {
                 shape="round"
                 asChild
               >
-                <a href={`?tab=${c.id}`}>
+                <Link href={`?tab=${c.id}`} scroll={false}>
                   <Icon className="size-4" />
                   {c.label}
-                </a>
+                </Link>
               </Button>
             );
           })}

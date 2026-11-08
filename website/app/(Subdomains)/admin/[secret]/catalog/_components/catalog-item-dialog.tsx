@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -29,13 +30,10 @@ const TAG_KINDS = [
 
 interface Props {
   catalog: CatalogName;
-  /** `null` opens in create mode. */
   item: CatalogItem | null;
-  /** Controlled by the URL param in the parent. */
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: () => void;
-  /** Only rendered for the tags catalog. */
   supportsKind?: boolean;
 }
 
@@ -45,6 +43,7 @@ export function CatalogItemDialog({
   const isEdit = !!item;
   const [labels, setLabels] = useState<Record<string, string>>({ en: "", ru: "" });
   const [kind, setKind] = useState("tag");
+  const [code, setCode] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -52,9 +51,11 @@ export function CatalogItemDialog({
     if (item) {
       setLabels({ en: item.labels?.en || "", ru: item.labels?.ru || "" });
       setKind(item.kind || "tag");
+      setCode(item.code || "");
     } else {
       setLabels({ en: "", ru: "" });
       setKind("tag");
+      setCode("");
     }
   }, [item, open]);
 
@@ -67,9 +68,10 @@ export function CatalogItemDialog({
     try {
       const cleanLabels: Record<string, string> = { en: labels.en.trim() };
       if (labels.ru?.trim()) cleanLabels.ru = labels.ru.trim();
-
+      
       const payload: any = { labels: cleanLabels };
       if (supportsKind) payload.kind = kind;
+      if (code.trim()) payload.code = code.trim();
 
       if (isEdit && item) {
         await updateCatalogItem(catalog, item.id, payload);
@@ -93,7 +95,6 @@ export function CatalogItemDialog({
         <DialogHeader>
           <DialogTitle>{isEdit ? "Редактировать" : "Создать"}</DialogTitle>
         </DialogHeader>
-
         <div className="space-y-4 py-2">
           {LANGS.map((l) => (
             <Field key={l.code}>
@@ -111,7 +112,14 @@ export function CatalogItemDialog({
               />
             </Field>
           ))}
-
+          <Field>
+            <FieldLabel>Код (Slug)</FieldLabel>
+            <Input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="auto-generated if empty"
+            />
+          </Field>
           {supportsKind && (
             <Field>
               <FieldLabel>Тип</FieldLabel>
@@ -129,14 +137,7 @@ export function CatalogItemDialog({
               </Select>
             </Field>
           )}
-
-          {item?.code && (
-            <div className="text-body-5 text-(--on-bg-low)">
-              Код: <code className="font-mono">{item.code}</code>
-            </div>
-          )}
         </div>
-
         <DialogFooter>
           <Button variant="outlined" onClick={() => onOpenChange(false)} disabled={saving}>
             Отмена

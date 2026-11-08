@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ListIcon, XIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { AnimatePresence, motion } from "motion/react";
 export interface TocHeading {
   id: string;
   text: string;
@@ -73,104 +75,126 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
     <>
       {!isFloating && (
         <aside aria-label={ariaLabel} className="hidden lg:block lg:sticky lg:top-32 h-fit bg-[var(--primary-glass)] backdrop-blur-[var(--blur-glass)] p-3 rounded-xl">
-        <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">{label}</p>
-        <nav>
-          <ul className="space-y-1.5 text-body-4">
-            {headings.map((h) => {
-              const isActive = h.id === activeId;
-              return (
-                <li key={h.id}>
-                  <button
-                    type="button"
-                    onClick={() => handleJump(h.id)}
-                    className={cn(
-                      "text-left w-full leading-snug py-1 transition-colors border-l-2 pl-3",
-                      h.level === 3 && "pl-6 text-body-5",
-                      isActive
-                        ? "border-(--primary) text-(--primary) font-medium"
-                        : "border-transparent text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--outline)"
-                    )}
-                  >
-                    {h.text}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+          <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low) mb-3">{label}</p>
+          <nav>
+            <ul className="space-y-1.5 text-body-4">
+              {headings.map((h) => {
+                const isActive = h.id === activeId;
+                return (
+                  <li key={h.id}>
+                    <button
+                      type="button"
+                      onClick={() => handleJump(h.id)}
+                      className={cn(
+                        "text-left w-full leading-snug py-1 transition-colors border-l-2 pl-3",
+                        h.level === 3 && "pl-6 text-body-5",
+                        isActive
+                          ? "border-(--primary) text-(--primary) font-medium"
+                          : "border-transparent text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--outline)"
+                      )}
+                    >
+                      {h.text}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </aside>
       )}
-      <div className={isFloating ? "" : "lg:hidden"}>
+      <div className={cn("fixed bottom-24 md:bottom-8 right-4 md:right-8 z-40 flex flex-col items-end", !isFloating && "lg:hidden")}>
+        <AnimatePresence>
+          {mobileOpen && (
+            <>
+              {/* Invisible overlay to catch outside clicks */}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setMobileOpen(false)}
+              />
+              {/* The Island */}
+              <motion.div
+                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className={cn(
+                  "absolute bottom-full right-0 mb-4 w-[min(85vw,320px)]",
+                  "flex flex-col overflow-hidden rounded-2xl",
+                  "bg-(--card) border border-(--outline) shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)]",
+                  "z-50"
+                )}
+                style={{ transformOrigin: "bottom right" }}
+              >
+                {/* Pointer/Arrow */}
+                <div className="absolute -bottom-[6px] right-6 size-3 rotate-45 bg-(--card) border-b border-r border-(--outline) z-0" />
+
+                <div className="relative z-10 flex flex-col h-full bg-(--card) rounded-2xl">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-(--outline)">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-(--on-bg-low)">
+                      {label}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setMobileOpen(false)}
+                      className="text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors p-1 -mr-1"
+                      aria-label="Закрыть"
+                    >
+                      <XIcon className="size-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="max-h-[55vh] overflow-y-auto p-2 scrollbar-admin">
+                    <nav>
+                      <ul className="flex flex-col gap-0.5">
+                        {headings.map((h) => {
+                          const isActive = h.id === activeId;
+                          return (
+                            <li key={h.id}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleJump(h.id);
+                                  setMobileOpen(false);
+                                }}
+                                className={cn(
+                                  "w-full text-left leading-snug py-2 px-3 rounded-xl transition-all duration-200",
+                                  h.level === 3 && "pl-6 text-[13px]",
+                                  isActive
+                                    ? "bg-(--primary-glass) text-(--primary) font-medium"
+                                    : "text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)"
+                                )}
+                              >
+                                {h.text}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Trigger Button */}
         <button
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
           aria-expanded={mobileOpen}
-          aria-controls="toc-mobile-panel"
           className={cn(
-            "fixed bottom-24 md:bottom-8 right-4 md:right-8 z-40 inline-flex items-center gap-2 rounded-full",
+            "relative z-50 inline-flex items-center gap-2 rounded-full",
             "border border-(--outline) bg-(--card) shadow-lg px-4 py-3",
-            "text-body-4 font-medium text-(--on-bg-high) transition-all active:scale-[0.97]",
-            "max-w-[min(80vw,320px)]"
+            "text-body-4 font-medium text-(--on-bg-high) transition-all duration-300",
+            "max-w-[min(80vw,360px)]",
+            "hover:border-(--on-bg-low)/30 hover:shadow-xl active:scale-[0.97]",
+            mobileOpen && "border-(--primary)/50 ring-2 ring-(--primary)/20 shadow-xl"
           )}
         >
           <ListIcon className="size-4 shrink-0" />
           <span className="truncate">{activeHeading ? activeHeading.text : label}</span>
         </button>
-        {mobileOpen && (
-          <>
-            <button
-              type="button"
-              aria-hidden
-              tabIndex={-1}
-              onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-            />
-            <div
-              id="toc-mobile-panel"
-              role="dialog"
-              aria-label={ariaLabel}
-              className={cn(
-                "fixed bottom-40 md:bottom-24 right-4 md:right-8 z-50 w-[min(88vw,360px)] max-h-[55vh] overflow-y-auto",
-                "rounded-2xl border border-(--outline) bg-(--card) shadow-2xl p-3",
-                "animate-in fade-in slide-in-from-bottom-2 duration-200"
-              )}
-            >
-              <div className="flex items-center justify-between px-2 py-1.5 mb-1">
-                <p className="text-body-5 uppercase tracking-[0.25em] text-(--on-bg-low)">{label}</p>
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  className="text-(--on-bg-low) hover:text-(--on-bg-high)"
-                  aria-label="Close"
-                >
-                  <XIcon className="size-4" />
-                </button>
-              </div>
-              <ul className="space-y-0.5">
-                {headings.map((h) => {
-                  const isActive = h.id === activeId;
-                  return (
-                    <li key={h.id}>
-                      <button
-                        type="button"
-                        onClick={() => handleJump(h.id)}
-                        className={cn(
-                          "text-left w-full leading-snug py-2 px-3 rounded-lg transition-colors",
-                          h.level === 3 && "pl-6 text-body-5",
-                          isActive
-                            ? "bg-(--primary-glass) text-(--primary) font-medium"
-                            : "text-(--on-bg-medium) hover:bg-(--state-hover)"
-                        )}
-                      >
-                        {h.text}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </>
-        )}
       </div>
     </>
   );

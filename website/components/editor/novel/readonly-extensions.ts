@@ -127,31 +127,31 @@ export const ReadonlyGalleryNode = Node.create({
 // Readonly Code Block matching the editor's premium look.
 const ReadonlyCodeBlock = CodeBlockLowlight.extend({
   renderHTML({ node, HTMLAttributes }) {
+    const lang = node.attrs.language || "null";
     return [
       "div",
       { class: "my-8 rounded-xl border border-[#2a2a35] bg-[#111114] overflow-hidden shadow-2xl" },
       [
         "div",
-        { class: "flex items-center justify-between px-6 py-3 border-b border-[#2a2a35] bg-[#18181b]" },
+        { class: "flex items-center justify-between px-4 py-2 border-b border-[#2a2a35] bg-[#18181b]" },
         [
           "div",
-          { class: "flex items-center gap-2 text-[#e2e2e6]" },
+          { class: "flex items-center gap-2 pl-1" },
           [
             "svg",
-            { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 256 256", class: "size-4 fill-[#3178c6]" },
+            { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 256 256", class: "size-4 fill-[#8c8c9a]" },
             ["path", { d: "M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z" }]
-          ],
-          ["span", { class: "text-[13px] font-medium font-mono text-[#8c8c9a]" }, "index.tsx"]
+          ]
         ],
         [
           "div",
-          { class: "flex items-center gap-3" },
-          ["span", { class: "text-[13px] text-[#8c8c9a] font-medium font-mono" }, node.attrs.language || "Plain Text"]
+          { class: "flex items-center gap-3 pr-1" },
+          ["span", { class: "text-[12px] text-[#8c8c9a] font-medium font-mono uppercase tracking-wider" }, lang === "null" ? "TEXT" : lang]
         ]
       ],
       [
         "pre",
-        mergeAttributes(HTMLAttributes, { class: "px-6 py-5 m-0 overflow-x-auto text-[14px] font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.8] hljs" }),
+        mergeAttributes(HTMLAttributes, { class: "px-4 py-4 m-0 overflow-x-auto text-[13px] font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.7] hljs" }),
         ["code", 0]
       ]
     ];
@@ -193,7 +193,7 @@ export const readonlyExtensions = [
   // editor.storage.tableOfContents.content. getId must match the id
   // ReadonlyHeading.renderHTML writes so anchor links resolve.
   TableOfContents.configure({
-    getText: (node) => node.textContent,
-    getId: (node) => slugify(node.textContent || ""),
-  }),
+    getText: (node: any) => node.textContent,
+    getId: (node: any) => slugify(node.textContent || ""),
+  } as any),
 ];

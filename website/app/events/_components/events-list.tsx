@@ -122,7 +122,7 @@ function EventCard({
               <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(to right, #222 1px, transparent 1px), linear-gradient(to bottom, #222 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
               <div className="relative z-10 flex flex-col items-center gap-3 text-center px-6">
                 <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#CCFF00]">{"{ event }"}</span>
-                <h3 className="text-xl font-heading font-semibold text-white leading-tight">{event.title}</h3>
+                <h3 className="text-xl font-heading  text-white leading-tight">{event.title}</h3>
                 <span className="font-mono text-xs text-gray-500">{event.start_at ? new Date(event.start_at).toLocaleDateString("ru-RU") : "Дата уточняется"}</span>
               </div>
             </div>
@@ -134,7 +134,7 @@ function EventCard({
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/70">
               {monthLabel}
             </span>
-            <span className="text-display-3 font-heading font-semibold leading-none tabular-nums">
+            <span className="text-display-3 font-heading  leading-none tabular-nums">
               {dayLabel}
             </span>
           </div>
@@ -182,7 +182,7 @@ function EventCard({
             </div>
           )}
           {event.price && (
-            <div className="inline-flex items-center gap-1.5 text-body-5 text-(--primary) font-medium ml-auto">
+            <div className="inline-flex items-center gap-1.5 text-body-5 text-(--primary) ml-auto">
               <Ticket className="size-3.5" />
               {event.price}
             </div>
@@ -200,9 +200,7 @@ export function EventsList({ events }: { events: EventListItem[] }) {
   const past = events.filter((e) => isPast(e.start_at));
 
   return (
-    <main className="min-h-screen bg-(--bg)">
-      {/* Slim header - one heading, same vertical rhythm as the blog
-          strip. No subtitle, no eyebrow; the list below is the content. */}
+    <div className="min-h-screen bg-(--bg) mt-header">
       <section className="pt-8 md:pt-10 pb-5 border-b border-(--outline)">
         <Container>
           <h1 className="text-heading-2 md:text-heading-1 text-(--on-bg-high) tracking-tight">
@@ -216,7 +214,7 @@ export function EventsList({ events }: { events: EventListItem[] }) {
         <section className="py-10 md:py-14">
           <Container>
             <div className="flex items-baseline justify-between gap-4 mb-8">
-              <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) tracking-tight">
+              <h2 className="text-display-5 md:text-display-3 text-(--on-bg-high) tracking-tight">
                 {t("events.upcoming")}
               </h2>
               <span className="text-body-5 text-(--on-bg-low) tabular-nums">
@@ -237,7 +235,7 @@ export function EventsList({ events }: { events: EventListItem[] }) {
         <section className="pb-14 md:pb-20">
           <Container>
             <div className="flex items-baseline justify-between gap-4 mb-8">
-              <h2 className="text-display-4 md:text-display-3 text-(--on-bg-high) tracking-tight">
+              <h2 className="text-display-5 md:text-display-3 text-(--on-bg-high) tracking-tight">
                 {t("events.past")}
               </h2>
               <span className="text-body-5 text-(--on-bg-low) tabular-nums">
@@ -274,6 +272,6 @@ export function EventsList({ events }: { events: EventListItem[] }) {
           </Container>
         </section>
       )}
-    </main>
+    </div>
   );
 }

@@ -83,7 +83,7 @@ export default function BlogArticleNotFound() {
                 {recent.map((a) => (
                   <li key={a.id}>
                     <Link
-                      href={`/blog/${a.slug}`}
+                      href={`/blog/${a.id}/${a.slug}`}
                       className="block rounded-2xl border border-(--outline) bg-(--card) px-5 py-4 transition-colors hover:bg-(--state-hover) group"
                     >
                       <div className="flex items-center justify-between gap-4">

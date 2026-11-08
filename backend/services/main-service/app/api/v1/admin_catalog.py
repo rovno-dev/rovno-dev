@@ -109,7 +109,7 @@ def _stack_list(db: Session):
         {
             "id": str(r.id),
             "code": r.slug,
-            "labels": {"en": r.name},
+            "labels": r.labels or {"en": r.name},
             "kind": None,
         }
         for r in rows
@@ -117,7 +117,8 @@ def _stack_list(db: Session):
 
 
 def _stack_create(db: Session, payload: dict):
-    name = (payload.get("labels") or {}).get("en") or payload.get("label") or ""
+    labels = payload.get("labels") or {}
+    name = labels.get("en") or payload.get("label") or ""
     name = name.strip()
     if not name:
         raise HTTPException(422, "Name is required")
@@ -126,14 +127,14 @@ def _stack_create(db: Session, payload: dict):
         raise HTTPException(409, f"«{existing.name}» уже в стеке")
     base = slugify(name, max_len=60, fallback="stack")
     code = _unique_code(db, StackItem, base, code_col="slug")
-    row = StackItem(name=name, slug=code)
+    row = StackItem(name=name, slug=code, labels=labels)
     db.add(row)
     db.commit()
     db.refresh(row)
     return {
         "id": str(row.id),
         "code": row.slug,
-        "labels": {"en": row.name},
+        "labels": row.labels or {"en": row.name},
         "kind": None,
     }
 
@@ -143,9 +144,11 @@ def _stack_update(db: Session, id_: UUID, payload: dict):
     if not row:
         raise HTTPException(404, "Not found")
     if "labels" in payload:
-        name = (payload["labels"] or {}).get("en", "").strip()
+        labels = payload["labels"] or {}
+        name = labels.get("en", "").strip()
         if name:
             row.name = name
+        row.labels = labels
     if "code" in payload and payload["code"]:
         row.slug = _unique_code(
             db, StackItem, slugify(payload["code"]), exclude_id=row.id, code_col="slug"
@@ -155,7 +158,7 @@ def _stack_update(db: Session, id_: UUID, payload: dict):
     return {
         "id": str(row.id),
         "code": row.slug,
-        "labels": {"en": row.name},
+        "labels": row.labels or {"en": row.name},
         "kind": None,
     }
 
@@ -242,7 +245,7 @@ def _tag_list(db: Session):
         {
             "id": str(r.id),
             "code": r.slug,
-            "labels": {"en": r.name},
+            "labels": r.labels or {"en": r.name},
             "kind": r.kind.value if r.kind else "tag",
         }
         for r in rows
@@ -250,7 +253,8 @@ def _tag_list(db: Session):
 
 
 def _tag_create(db: Session, payload: dict):
-    name = (payload.get("labels") or {}).get("en") or payload.get("label") or ""
+    labels = payload.get("labels") or {}
+    name = labels.get("en") or payload.get("label") or ""
     name = name.strip()
     if not name:
         raise HTTPException(422, "Name is required")
@@ -264,14 +268,14 @@ def _tag_create(db: Session, payload: dict):
         raise HTTPException(409, f"«{existing.name}» уже есть в этой категории")
     base = slugify(name, max_len=60, fallback="tag")
     code = _unique_code(db, Tag, base, code_col="slug")
-    row = Tag(name=name, slug=code, kind=kind)
+    row = Tag(name=name, slug=code, kind=kind, labels=labels)
     db.add(row)
     db.commit()
     db.refresh(row)
     return {
         "id": str(row.id),
         "code": row.slug,
-        "labels": {"en": row.name},
+        "labels": row.labels or {"en": row.name},
         "kind": row.kind.value,
     }
 
@@ -281,9 +285,11 @@ def _tag_update(db: Session, id_: UUID, payload: dict):
     if not row:
         raise HTTPException(404, "Not found")
     if "labels" in payload:
-        name = (payload["labels"] or {}).get("en", "").strip()
+        labels = payload["labels"] or {}
+        name = labels.get("en", "").strip()
         if name:
             row.name = name
+        row.labels = labels
     if "kind" in payload and payload["kind"]:
         try:
             row.kind = TagKind(payload["kind"])
@@ -298,7 +304,7 @@ def _tag_update(db: Session, id_: UUID, payload: dict):
     return {
         "id": str(row.id),
         "code": row.slug,
-        "labels": {"en": row.name},
+        "labels": row.labels or {"en": row.name},
         "kind": row.kind.value,
     }
 

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { CveteyaLogo } from "../projects/[id]/[slug]/_components/cveteya/cveteya-logo";
 
 type LogoItem = {
   id: string;

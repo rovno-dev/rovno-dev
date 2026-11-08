@@ -19,11 +19,26 @@ import "@/app/novel-editor.css";
 export function NovelReadOnly({
   content,
   className,
+  onHeadingsChange,
 }: {
   content: any;
   className?: string;
+  onHeadingsChange?: (headings: TocHeading[]) => void;
 }) {
   if (!content) return null;
+
+  const handleUpdate = ({ editor }: { editor: any }) => {
+    if (onHeadingsChange && editor.storage.tableOfContents) {
+      const headings = editor.storage.tableOfContents.content || [];
+      onHeadingsChange(
+        headings.map((h: any) => ({
+          id: h.id,
+          text: h.textContent,
+          level: h.level as 2 | 3,
+        }))
+      );
+    }
+  };
   return (
     <>
       <EditorRoot>
@@ -35,6 +50,8 @@ export function NovelReadOnly({
           editorProps={{
             attributes: { class: "novel-prosemirror focus:outline-none" },
           }}
+          onCreate={handleUpdate}
+          onUpdate={handleUpdate}
         />
       </EditorRoot>
       <GalleryLightbox />

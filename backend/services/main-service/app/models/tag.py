@@ -1,7 +1,7 @@
 import uuid
 import enum
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Table, ForeignKey, Enum
+from sqlalchemy import Column, String, DateTime, Table, ForeignKey, Enum, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from database.database import Base
 
@@ -26,4 +26,5 @@ class Tag(Base):
     name = Column(String, nullable=False)
     slug = Column(String, nullable=False, index=True)
     kind = Column(Enum(TagKind, name="tag_kind"), nullable=False, default=TagKind.tag)
+    labels = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
