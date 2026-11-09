@@ -73,7 +73,15 @@ export function ExpertHero({
         <motion.div animate={{ x: mouse.x * 40, y: mouse.y * 40 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-2 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 50% 45% at 80% 18%, ${rgba(mesh.bright, 0.85)} 0%, ${rgba(mesh.bright, 0)} 60%)` }} />
         <motion.div animate={{ x: mouse.x * -50, y: mouse.y * -50 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-3 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 75% 65% at 82% 88%, ${rgba(mesh.shadow, 0.95)} 0%, ${rgba(mesh.shadow, 0)} 70%)` }} />
         <motion.div animate={{ x: mouse.x * 20, y: mouse.y * 20 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-4 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 50% 55% at 15% 15%, ${rgba(mesh.deep, 0.75)} 0%, ${rgba(mesh.deep, 0)} 62%)` }} />
-        <div className="hero-dot-drift pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1.4px)", backgroundSize: "22px 22px" }} />
+        <div
+          className="hero-ascii-drift pointer-events-none absolute inset-0 bg-(--on-bg-high)/20"
+          style={{
+            maskImage: `url("data:image/svg+xml,%3Csvg width='44' height='44' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='16' fill='black' font-family='monospace' font-size='14'%3E[%3C/text%3E%3Ctext x='26' y='16' fill='black' font-family='monospace' font-size='14'%3E]%3C/text%3E%3Ctext x='4' y='38' fill='black' font-family='monospace' font-size='14'%3E]%3C/text%3E%3Ctext x='26' y='38' fill='black' font-family='monospace' font-size='14'%3E[%3C/text%3E%3C/svg%3E")`,
+            maskSize: "44px 44px",
+            WebkitMaskImage: `url("data:image/svg+xml,%3Csvg width='44' height='44' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='4' y='16' fill='black' font-family='monospace' font-size='14'%3E[%3C/text%3E%3Ctext x='26' y='16' fill='black' font-family='monospace' font-size='14'%3E]%3C/text%3E%3Ctext x='4' y='38' fill='black' font-family='monospace' font-size='14'%3E]%3C/text%3E%3Ctext x='26' y='38' fill='black' font-family='monospace' font-size='14'%3E[%3C/text%3E%3C/svg%3E")`,
+            WebkitMaskSize: "44px 44px",
+          }}
+        />
 
         <svg className="pointer-events-none absolute inset-0 h-full w-full" style={{ opacity: 0.42, mixBlendMode: "overlay" }} xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
           <filter id="hero-grain-fine"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" /><feColorMatrix type="saturate" values="0" /></filter>

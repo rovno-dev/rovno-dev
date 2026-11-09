@@ -1206,3 +1206,36 @@
 .image-auto-contrast {
   filter: contrast(1.2) saturate(1.2) brightness(1.05) !important;
 }
+
+/* ── ASCII Drift Animation ───────────────────────────────────────────────
+   Animates the mask position instead of background-position so the ASCII
+   characters can adapt to light/dark mode using the component's background
+   color as the text fill. */
+@keyframes hero-ascii-drift {
+  to {
+    mask-position: 44px 44px;
+    -webkit-mask-position: 44px 44px;
+  }
+}
+.hero-ascii-drift {
+  animation: hero-ascii-drift 20s linear infinite;
+}
+
+/* ── ASCII Logo Animation ──────────────────────────────────────────────
+   Pure CSS animation applied to hundreds of spans. Far more performant
+   than a JS animation library for this many DOM nodes. */
+@keyframes ascii-flicker {
+  0%, 100% {
+    opacity: 0.05;
+    transform: scale(0.8) translateY(0);
+  }
+  50% {
+    opacity: var(--target-opacity, 1);
+    transform: scale(1.2) translateY(-1px);
+  }
+}
+.ascii-particle {
+  animation: ascii-flicker var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform, opacity;
+}

@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { ParticleLogo } from "@/components/layout/logo/particle-logo";
+import { AsciiLogo } from "@/components/layout/logo/ascii-logo";
 import { Container } from "@/components/ui/container";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useLanguage } from "@/providers/language-provider";
@@ -57,7 +57,7 @@ export default function HeroSection() {
                   delay: 1.9,
                 }}
               >
-                <ParticleLogo className="size-50 md:size-60" />
+                <AsciiLogo className="size-[300px] md:size-[400px] lg:size-[500px]" />
               </motion.div>
             </motion.div>
           </motion.div>
