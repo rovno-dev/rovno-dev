@@ -56,7 +56,7 @@ export const SlashMenu = forwardRef((props: any, ref) => {
             onClick={() => selectItem(index)}
             onMouseEnter={() => setSelectedIndex(index)}
             className={cn(
-              "w-full flex items-center text-left gap-3 px-2 py-1.5 text-sm rounded-lg cursor-pointer select-none transition-colors",
+              "w-full flex items-center text-left gap-3 px-2 py-1.5 text-body-4 rounded-lg cursor-pointer select-none transition-colors",
               index === selectedIndex ? "bg-(--state-hover)" : "hover:bg-(--state-hover)"
             )}
           >
@@ -65,12 +65,12 @@ export const SlashMenu = forwardRef((props: any, ref) => {
             </div>
             <div className="flex flex-col min-w-0">
               <span className=" text-(--on-bg-high) truncate">{item.title}</span>
-              <span className="text-xs text-(--on-bg-medium) truncate">{item.description}</span>
+              <span className="text-body-5 text-(--on-bg-medium) truncate">{item.description}</span>
             </div>
           </button>
         ))
       ) : (
-        <div className="px-3 py-4 text-center text-sm text-(--on-bg-medium)">
+        <div className="px-3 py-4 text-center text-body-4 text-(--on-bg-medium)">
           Ничего не найдено
         </div>
       )}

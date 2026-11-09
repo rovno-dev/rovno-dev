@@ -83,7 +83,7 @@ export function CustomProjectPage({
         ? headings
         : fallbackHeadings;
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
-  
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (typeof window === "undefined") return;
     setMouse({
@@ -334,26 +334,24 @@ export function CustomProjectPage({
       {related.length > 0 && (
         <section id="next-projects" className="py-12 pb-24 border-(--outline)">
           <Container>
-            <div className="max-w-[1200px] mx-auto">
-              <div className="flex items-end justify-between mb-12">
-                <h2 className="text-display-3 md:text-display-2 font-heading  tracking-tight">
-                  Следующие проекты
-                </h2>
-                <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">
-                  Все проекты
-                  <ArrowUpRight className="size-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {related.map((r, idx) => {
-                  const rp: Project = {
-                    id: r.id, slug: r.slug, title: r.title, description: "",
-                    shortDescription: "", cover: { imageSrc: r.coverImage },
-                    category: r.categoryLabel || "", clientId: "",
-                  };
-                  return <ProjectCard key={r.id || r.slug} project={rp} index={idx} variant="clean" />;
-                })}
-              </div>
+            <div className="flex items-end justify-between mb-12">
+              <h2 className="text-display-3 md:text-display-2 font-heading  tracking-tight">
+                Следующие проекты
+              </h2>
+              <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">
+                Все проекты
+                <ArrowUpRight className="size-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {related.map((r, idx) => {
+                const rp: Project = {
+                  id: r.id, slug: r.slug, title: r.title, description: "",
+                  shortDescription: "", cover: { imageSrc: r.coverImage },
+                  category: r.categoryLabel || "", clientId: "",
+                };
+                return <ProjectCard key={r.id || r.slug} project={rp} index={idx} variant="clean" />;
+              })}
             </div>
           </Container>
         </section>

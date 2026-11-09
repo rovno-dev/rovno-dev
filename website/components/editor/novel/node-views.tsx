@@ -161,12 +161,12 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs  text-(--on-bg-medium) uppercase tracking-wider">
+            <span className="text-body-5  text-(--on-bg-medium) uppercase tracking-wider">
               Галерея {images.length > 0 && `(${images.length})`}
             </span>
             {isFullWidth && (
               <span
-                className="text-[10px] uppercase tracking-wider text-(--primary) px-1.5 py-0.5 rounded bg-(--primary-glass) border border-(--primary)/30"
+                className="text-body-6 uppercase tracking-wider text-(--primary) px-1.5 py-0.5 rounded bg-(--primary-glass) border border-(--primary)/30"
                 title="На публичной странице галерея растянется на всю ширину экрана без отступов"
               >
                 Edge-to-edge
@@ -177,7 +177,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
             <button
               type="button"
               onClick={() => updateAttributes({ layout: layout === "masonry" ? "grid" : "masonry" })}
-              className="px-2.5 py-1 text-[11px] rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium) transition-colors"
+              className="px-2.5 py-1 text-body-5 rounded border border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium) transition-colors"
               title="Раскладка"
             >
               {layout === "masonry" ? "Мозаика" : "Сетка"}
@@ -185,7 +185,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
             <select
               value={columns}
               onChange={(e) => updateAttributes({ columns: Number(e.target.value) })}
-              className="px-2 py-1 text-[11px] rounded border border-(--outline) bg-transparent text-(--on-bg-medium) outline-none"
+              className="px-2 py-1 text-body-5 rounded border border-(--outline) bg-transparent text-(--on-bg-medium) outline-none"
               title="Количество колонок"
             >
               {[1, 2].map((n) => (
@@ -196,7 +196,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
               type="button"
               onClick={() => updateAttributes({ isFullWidth: !isFullWidth })}
               className={cn(
-                "px-2.5 py-1 text-[11px] rounded border transition-colors",
+                "px-2.5 py-1 text-body-5 rounded border transition-colors",
                 isFullWidth
                   ? "border-(--primary) bg-(--primary-glass) text-(--primary)"
                   : "border-(--outline) hover:bg-(--state-hover) text-(--on-bg-medium)"
@@ -208,7 +208,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
             <button
               type="button"
               onClick={deleteNode}
-              className="px-2.5 py-1 text-[11px] rounded border border-red-500/40 text-red-500 hover:bg-red-500/10 transition-colors"
+              className="px-2.5 py-1 text-body-5 rounded border border-red-500/40 text-red-500 hover:bg-red-500/10 transition-colors"
               title="Удалить галерею"
             >
               Удалить
@@ -218,7 +218,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
 
         {/* Preview grid */}
         {images.length === 0 ? (
-          <p className="text-xs text-(--on-bg-low) py-8 text-center">Нет изображений. Нажмите «Добавить».</p>
+          <p className="text-body-5 text-(--on-bg-low) py-8 text-center">Нет изображений. Нажмите «Добавить».</p>
         ) : (
           <div
             className={cn(
@@ -249,7 +249,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                   <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors duration-300 pointer-events-none" />
                   {captions[i] && !isEditingCaption && (
                     <div className="absolute inset-x-0 bottom-0 px-2 py-1 bg-black/60 backdrop-blur-sm transform translate-y-full group-hover/img:translate-y-0 transition-transform duration-300">
-                      <p className="text-[10px] text-white truncate">{captions[i]}</p>
+                      <p className="text-body-6 text-white truncate">{captions[i]}</p>
                     </div>
                   )}
                   {isEditingCaption && (
@@ -264,7 +264,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
                         }}
                         onBlur={() => saveCaption(i)}
                         placeholder="Заголовок..."
-                        className="w-full px-2 py-1 text-xs rounded bg-black/50 text-white border border-white/20 outline-none focus:border-(--primary)"
+                        className="w-full px-2 py-1 text-body-5 rounded bg-black/50 text-white border border-white/20 outline-none focus:border-(--primary)"
                       />
                     </div>
                   )}
@@ -316,7 +316,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
           <button
             type="button"
             onClick={handleAdd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs  rounded-lg border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) hover:bg-(--primary-glass) transition-all duration-200"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-body-5  rounded-lg border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) hover:bg-(--primary-glass) transition-all duration-200"
           >
             <Plus className="size-4" />
             Добавить изображения

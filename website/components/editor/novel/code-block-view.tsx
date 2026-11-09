@@ -99,7 +99,7 @@ export function CodeBlockNodeView(props: any) {
                   language: e.target.value === "null" ? null : e.target.value,
                 })
               }
-              className="appearance-none bg-transparent border-none text-[13px] text-[#8c8c9a] outline-none cursor-pointer hover:text-white transition-colors pr-5 "
+              className="appearance-none bg-transparent border-none text-body-4 text-[#8c8c9a] outline-none cursor-pointer hover:text-white transition-colors pr-5 "
               style={{ WebkitAppearance: "none", MozAppearance: "none" }}
             >
               {Object.entries(LANG_META).map(([key, meta]) => (
@@ -128,7 +128,7 @@ export function CodeBlockNodeView(props: any) {
           </button>
         </div>
       </div>
-      <pre className="px-4 py-4 m-0 overflow-x-auto text-[13px] font-mono text-[#e2e2e6] bg-transparent focus:outline-none border-none leading-[1.7] hljs">
+      <pre className="px-4 py-4 m-0 overflow-x-auto text-body-4 font-mono text-[#e2e2e6] bg-transparent focus:outline-none border-none leading-[1.7] hljs">
         <NodeViewContent
           as={"code" as any}
           className="bg-transparent border-none text-inherit p-0"

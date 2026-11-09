@@ -54,10 +54,10 @@ export const ReadonlyHeading = Node.create({
     let className = "";
     if (level === 1) className = "text-display-2 text-(--on-bg-high) mt-16 mb-6 tracking-tight scroll-mt-28";
     if (level === 2) className = "text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28";
-    if (level === 3) className = "text-heading-3 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28";
-    if (level === 4) className = "text-heading-4 text-(--on-bg-high) mt-6 mb-2 scroll-mt-28";
-    if (level === 5) className = "text-heading-5 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
-    if (level === 6) className = "text-heading-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
+    if (level === 3) className = "text-display-5 text-(--on-bg-high) mt-8 mb-3 scroll-mt-28";
+    if (level === 4) className = "text-display-6 text-(--on-bg-high) mt-6 mb-2 scroll-mt-28";
+    if (level === 5) className = "text-display-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
+    if (level === 6) className = "text-display-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
 
     return [
       `h${level}`,
@@ -151,7 +151,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
       ],
       [
         "pre",
-        mergeAttributes(HTMLAttributes, { class: "px-4 py-4 m-0 overflow-x-auto text-[13px] font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.7] hljs" }),
+        mergeAttributes(HTMLAttributes, { class: "px-4 py-4 m-0 overflow-x-auto text-body-4 font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.7] hljs" }),
         ["code", 0]
       ]
     ];
@@ -167,7 +167,7 @@ export const readonlyExtensions = [
     blockquote: { HTMLAttributes: { class: "border-l-2 border-(--outline) pl-4 italic" } },
     codeBlock: false,
     code: {
-      HTMLAttributes: { class: "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-sm text-(--primary)", spellcheck: "false" },
+      HTMLAttributes: { class: "rounded-sm bg-(--bg-disabled) px-1.5 py-0.5 font-mono text-body-4 text-(--primary)", spellcheck: "false" },
     },
     horizontalRule: false,
     dropcursor: false,

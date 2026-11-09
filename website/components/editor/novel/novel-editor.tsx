@@ -268,7 +268,7 @@ export function NovelEditor({
             </EditorBubbleItem>
           </EditorBubble>
           <EditorCommand className="z-50 h-auto max-h-[360px] w-[320px] overflow-y-auto rounded-xl border border-(--outline) bg-(--card) shadow-2xl p-2">
-            <EditorCommandEmpty className="px-3 py-4 text-center text-sm text-(--on-bg-medium)">
+            <EditorCommandEmpty className="px-3 py-4 text-center text-body-4 text-(--on-bg-medium)">
               Ничего не найдено
             </EditorCommandEmpty>
             <EditorCommandList>
@@ -277,14 +277,14 @@ export function NovelEditor({
                   key={item.title}
                   value={`${item.title} ${item.searchTerms.join(" ")}`}
                   onCommand={(val) => item.command(val as any)}
-                  className="w-full flex items-center text-left gap-3 px-2 py-1.5 text-sm rounded-lg cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
+                  className="w-full flex items-center text-left gap-3 px-2 py-1.5 text-body-4 rounded-lg cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
                 >
                   <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm shrink-0">
                     {item.icon}
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className=" text-(--on-bg-high) truncate">{item.title}</span>
-                    <span className="text-xs text-(--on-bg-medium) truncate">{item.description}</span>
+                    <span className="text-body-5 text-(--on-bg-medium) truncate">{item.description}</span>
                   </div>
                 </EditorCommandItem>
               ))}

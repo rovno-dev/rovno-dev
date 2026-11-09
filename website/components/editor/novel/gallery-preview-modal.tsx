@@ -120,7 +120,7 @@ export function GalleryPreviewModal({
               <p className="text-body-4 text-white/90 truncate max-w-[60vw]">
                 {items[current]?.caption || ""}
               </p>
-              <span className="font-mono text-xs text-white/60 tabular-nums shrink-0 bg-white/10 px-2 py-1 rounded backdrop-blur-sm">
+              <span className="font-mono text-body-5 text-white/60 tabular-nums shrink-0 bg-white/10 px-2 py-1 rounded backdrop-blur-sm">
                 {current + 1} / {items.length}
               </span>
             </div>
