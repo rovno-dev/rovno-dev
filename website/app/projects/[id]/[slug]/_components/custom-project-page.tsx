@@ -93,7 +93,7 @@ export function CustomProjectPage({
   };
 
   const hue = useCoverHue(isVideo ? undefined : project.coverImage);
-  const mesh = designMesh(hue ?? FALLBACK_HUE);
+  const mesh = designMesh(hue ?? 223);
   const isLight = isLightColor(mesh.base);
   const textColor = isLight ? "text-[var(--dark-8)]" : "text-white";
   const subTextColor = isLight ? "text-[var(--dark-8)]/80" : "text-white/80";

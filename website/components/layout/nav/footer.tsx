@@ -141,6 +141,9 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 pt-8 border-t border-(--outline)">
+          <p className="mb-2 text-body-4 text-(--on-bg-low)">
+            {t("footer.notice")}
+          </p>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <span className="text-body-5 text-(--on-bg-low)">
               {t("footer.copyright").replace("{year}", String(year))}

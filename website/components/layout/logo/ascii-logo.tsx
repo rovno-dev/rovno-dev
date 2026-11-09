@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function AsciiLogo({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -1000, y: -1000, radius: 90 });
+  const mouseRef = useRef({ x: -1000, y: -1000, radius: 150 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -125,15 +125,15 @@ export function AsciiLogo({ className }: { className?: string }) {
       // Calculate dt (clamped to avoid jumps if tab is backgrounded)
       const dt = Math.min((currentTime - lastTime) / 16.666, 3);
       lastTime = currentTime;
-      time += 0.001 * dt;
+      time += 0.0018 * dt;
 
       ctx.clearRect(0, 0, width, height);
 
       // Lerp speed (smooth interpolation)
       // 0.06 is very smooth, 0.15 is snappier
-      const lerpFactor = 1 - Math.pow(1 - 0.06, dt); 
-      const mouseRepelRadius = 70;
-      const maxRepel = 30; // Pixels
+      const lerpFactor = 1 - Math.pow(1 - 0.12, dt); 
+      const mouseRepelRadius = 150;
+      const maxRepel = 45; // Pixels
 
       particles.forEach((p) => {
         // 1. Calculate gentle AFK target
