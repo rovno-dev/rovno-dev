@@ -52,7 +52,7 @@ export function ExpertCTA({ displayName }: Props) {
     );
 
   return (
-    <section className="pt-24 md:pt-32">
+    <section className="pt-12 md:pt-16 pb-12">
       <div className="max-w-[1200px] mx-auto">
         <div className="relative rounded-5xl border border-(--outline) bg-(--card) p-8 md:p-14 overflow-hidden text-center">
           <div

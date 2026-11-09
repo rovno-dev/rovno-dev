@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import { Globe } from "@phosphor-icons/react/dist/ssr";
+import { Globe } from "@phosphor-icons/react";
 import RovnoLogotypeIcon from "@/components/layout/logo/logo-icon";
 import { AmorfaLogo } from "@/components/icons/logotypes/amorfa-logo";
 import { VershinyLogo } from "@/components/icons/logotypes/vershiny-logo";

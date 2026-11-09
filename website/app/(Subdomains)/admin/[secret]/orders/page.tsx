@@ -392,7 +392,7 @@ export default function AdminOrdersPage() {
                       <h3 className="text-heading-4 truncate">#{order.id.slice(0, 8)}</h3>
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap",
+                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px]  whitespace-nowrap",
                           meta.className,
                         )}
                       >
@@ -438,13 +438,13 @@ export default function AdminOrdersPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="font-medium text-body-3">О проекте:</span>
+                      <span className=" text-body-3">О проекте:</span>
                       <p className="text-muted-foreground line-clamp-2">
                         {order.about || "-"}
                       </p>
                     </div>
                     <div>
-                      <span className="font-medium text-body-3">Услуги:</span>
+                      <span className=" text-body-3">Услуги:</span>
                       <p className="text-muted-foreground line-clamp-2">
                         {order.service_types_json?.join(", ") || "-"}
                       </p>
@@ -454,21 +454,21 @@ export default function AdminOrdersPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-body-5 space-y-1">
                       <p>
-                        <span className="font-medium">Срок:</span>{" "}
+                        <span className="">Срок:</span>{" "}
                         {order.estimate_deadline || "-"}
                       </p>
                       <p>
-                        <span className="font-medium">Бюджет:</span>{" "}
+                        <span className="">Бюджет:</span>{" "}
                         {order.estimate_budget || "-"}
                       </p>
                       <p>
-                        <span className="font-medium">Нейминг:</span>{" "}
+                        <span className="">Нейминг:</span>{" "}
                         {order.naming_help || "-"}
                       </p>
                     </div>
                     <div className="text-body-5 space-y-1">
                       <p>
-                        <span className="font-medium">Имя:</span>{" "}
+                        <span className="">Имя:</span>{" "}
                         {order.contact?.name || "-"}
                       </p>
                       <div className="flex gap-1 items-center">
@@ -717,7 +717,7 @@ function StatusChip({
       {label}
       <span
         className={cn(
-          "ml-1 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px] font-medium tabular-nums rounded-full",
+          "ml-1 inline-flex items-center justify-center min-w-[18px] h-4 px-1 text-[10px]  tabular-nums rounded-full",
           active
             ? "bg-white/25 text-white"
             : "bg-(--state-hover) text-(--on-bg-low)",

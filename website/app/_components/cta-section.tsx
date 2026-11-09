@@ -83,7 +83,7 @@ export default function CtaSection() {
                 }
               />
             </span>
-            <span className="text-body-5 font-medium uppercase tracking-[0.2em] text-(--on-bg-medium)">
+            <span className="text-body-5  uppercase tracking-[0.2em] text-(--on-bg-medium)">
               {t("home.cta.note")}
             </span>
           </div>
@@ -134,7 +134,7 @@ export default function CtaSection() {
           </div>
           <a
             href={`mailto:${EMAIL}`}
-            className="group inline-flex items-center gap-1.5 mt-6 text-body-3 md:text-body-2 font-medium text-(--on-bg-medium) hover:text-(--primary) transition-colors"
+            className="group inline-flex items-center gap-1.5 mt-6 text-body-3 md:text-body-2  text-(--on-bg-medium) hover:text-(--primary) transition-colors"
           >
             {EMAIL}
             <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

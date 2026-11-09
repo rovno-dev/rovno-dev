@@ -169,7 +169,7 @@ export default function SettingsPage() {
                   <div className="min-w-0">
                     <Label
                       htmlFor="email-notif"
-                      className="text-body-3 font-medium cursor-pointer"
+                      className="text-body-3  cursor-pointer"
                     >
                       Email-уведомления
                     </Label>
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                     <div className="min-w-0">
                       <Label
                         htmlFor="tg-notif"
-                        className="text-body-3 font-medium cursor-pointer"
+                        className="text-body-3  cursor-pointer"
                       >
                         Telegram-уведомления
                       </Label>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
                     <div className="min-w-0">
                       <Label
                         htmlFor="marketing-notif"
-                        className="text-body-3 font-medium cursor-pointer"
+                        className="text-body-3  cursor-pointer"
                       >
                         Маркетинг
                       </Label>

@@ -299,7 +299,7 @@ function ClientTile({
 
         {/* Project count - bottom-right, tabular, subtle accent on hover. */}
         {client.project_count > 0 && (
-          <span className="absolute bottom-3 right-3 text-[10px] font-medium tabular-nums text-(--on-bg-low) group-hover:text-(--primary) transition-colors">
+          <span className="absolute bottom-3 right-3 text-[10px]  tabular-nums text-(--on-bg-low) group-hover:text-(--primary) transition-colors">
             {client.project_count}{" "}
             {pluralize(client.project_count, "проект", "проекта", "проектов")}
           </span>
@@ -307,7 +307,7 @@ function ClientTile({
 
         {/* Name overlay - hover-revealed, bottom gradient. */}
         <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="text-body-3 font-medium text-white truncate">
+          <p className="text-body-3  text-white truncate">
             {client.name}
           </p>
         </div>

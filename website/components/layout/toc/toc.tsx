@@ -89,7 +89,7 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
                         "text-left w-full leading-snug py-1 transition-colors border-l-2 pl-3",
                         h.level === 3 && "pl-6 text-body-5",
                         isActive
-                          ? "border-(--primary) text-(--primary) font-medium"
+                          ? "border-(--primary) text-(--primary) "
                           : "border-transparent text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--outline)"
                       )}
                     >
@@ -130,7 +130,7 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
 
                 <div className="relative z-10 flex flex-col h-full bg-(--card) rounded-2xl">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-(--outline)">
-                    <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-(--on-bg-low)">
+                    <p className="text-[11px]  uppercase tracking-[0.2em] text-(--on-bg-low)">
                       {label}
                     </p>
                     <button
@@ -160,7 +160,7 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
                                   "w-full text-left leading-snug py-2 px-3 rounded-xl transition-all duration-200",
                                   h.level === 3 && "pl-6 text-[13px]",
                                   isActive
-                                    ? "bg-(--primary-glass) text-(--primary) font-medium"
+                                    ? "bg-(--primary-glass) text-(--primary) "
                                     : "text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)"
                                 )}
                               >
@@ -186,7 +186,7 @@ export function Toc({ headings, label, ariaLabel, variant = "sidebar" }: TocProp
           className={cn(
             "relative z-50 inline-flex items-center gap-2 rounded-full",
             "border border-(--outline) bg-(--card) shadow-lg px-4 py-3",
-            "text-body-4 font-medium text-(--on-bg-high) transition-all duration-300",
+            "text-body-4  text-(--on-bg-high) transition-all duration-300",
             "max-w-[min(80vw,360px)]",
             "hover:border-(--on-bg-low)/30 hover:shadow-xl active:scale-[0.97]",
             mobileOpen && "border-(--primary)/50 ring-2 ring-(--primary)/20 shadow-xl"

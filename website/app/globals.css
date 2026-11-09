@@ -1165,3 +1165,44 @@
 .novel-prosemirror pre.hljs code {
   color: inherit;
 }
+/* ── Startup card illustration — "operations" pulse ───────────────────
+   A scattered subset of the 12×12 tile grid pulses with the brand colour,
+   each on its own animation-delay, so the illustration reads as active
+   cells processing jobs (build queues, deploy targets, monitoring probes)
+   rather than a static wallpaper. The animation carries its own
+   background + border + glow so it works regardless of the tile's
+   inherited border tint. */
+@keyframes startup-tile-pulse {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--on-bg-high), transparent 96%);
+    border-color: color-mix(in srgb, var(--on-bg-high), transparent 86%);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    background-color: color-mix(in srgb, var(--primary), transparent 88%);
+    border-color: color-mix(in srgb, var(--primary), transparent 40%);
+    box-shadow: 0 0 10px -2px
+      color-mix(in srgb, var(--primary), transparent 60%);
+  }
+}
+.startup-tile-pulse {
+  animation: startup-tile-pulse 2.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .startup-tile-pulse {
+    animation: none;
+  }
+}
+
+.pt-header {
+  @apply pt-[60px];
+}
+
+/* Reusable cinematic image treatment for hero photos */
+
+
+/* Reusable cinematic image treatment for hero photos */
+.image-auto-contrast {
+  filter: contrast(1.2) saturate(1.2) brightness(1.05) !important;
+}

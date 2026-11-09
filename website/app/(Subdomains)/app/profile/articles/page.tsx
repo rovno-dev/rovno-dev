@@ -305,7 +305,7 @@ export default function MyArticlesPage() {
                     <div className="mt-3 flex items-center gap-2 flex-wrap">
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium backdrop-blur-sm",
+                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]  backdrop-blur-sm",
                           status.className
                         )}
                       >

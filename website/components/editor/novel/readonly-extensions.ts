@@ -146,7 +146,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
         [
           "div",
           { class: "flex items-center gap-3 pr-1" },
-          ["span", { class: "text-[12px] text-[#8c8c9a] font-medium font-mono uppercase tracking-wider" }, lang === "null" ? "TEXT" : lang]
+          ["span", { class: "text-[12px] text-[#8c8c9a]  font-mono uppercase tracking-wider" }, lang === "null" ? "TEXT" : lang]
         ]
       ],
       [

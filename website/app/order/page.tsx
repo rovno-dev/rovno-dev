@@ -210,7 +210,7 @@ export default function OrderPage() {
     <>
       <Container className="pt-8 pb-12">
         <h1 className="text-display-2 mb-3 uppercase tracking-tighter leading-none">Сделать заказ</h1>
-        <p className="text-body-1 text-(--on-bg-low) leading-relaxed font-medium">Опишите вашу задачу и мы подготовим предложение.</p>
+        <p className="text-body-1 text-(--on-bg-low) leading-relaxed ">Опишите вашу задачу и мы подготовим предложение.</p>
       </Container>
       <Container className="pb-24">
         <form onSubmit={onSubmit} className="max-w-[800px] space-y-12 animate-reveal delay-100">
@@ -296,7 +296,7 @@ export default function OrderPage() {
                 </span>
               </Label>
             </div>
-            {errors.agreement && <p className="text-sm text-destructive font-medium">{errors.agreement}</p>}
+            {errors.agreement && <p className="text-sm text-destructive ">{errors.agreement}</p>}
           </div>
           <div className="pt-6">
             <Button type="submit" size="xlarge" className="w-full sm:w-fit! sm:px-16!" disabled={loading}>{loading ? "Отправка..." : "Отправить заявку"}</Button>

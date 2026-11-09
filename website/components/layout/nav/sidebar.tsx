@@ -188,7 +188,7 @@ export function Sidebar({
                 key={`${item.href}-${i}`}
                 href={href}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors",
+                  "flex items-center gap-2 px-3 py-2 rounded-full text-sm  transition-colors",
                   isActive
                     ? "bg-(--primary-glass) text-(--primary)"
                     : "text-(--on-bg-medium) hover:bg-(--state-hover)",
@@ -366,7 +366,7 @@ export function Sidebar({
                     >
                       <Icon className="size-5 shrink-0" />
                       {!isCollapsed && (
-                        <span className="text-sm font-medium">
+                        <span className="text-sm ">
                           {item.label}
                         </span>
                       )}

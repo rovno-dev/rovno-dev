@@ -125,7 +125,7 @@ export function EntityMultiPicker({
         {value.map((v) => (
           <span
             key={v.id}
-            className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs font-medium text-(--primary)"
+            className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs  text-(--primary)"
           >
             {v.label}
             <button

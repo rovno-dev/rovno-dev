@@ -182,7 +182,7 @@ export default function AdminDashboard() {
                   key={o.value}
                   onClick={() => setRange(o.value)}
                   className={cn(
-                    "inline-flex items-center rounded-full px-3 h-8 text-xs font-medium tabular-nums transition-colors",
+                    "inline-flex items-center rounded-full px-3 h-8 text-xs  tabular-nums transition-colors",
                     range === o.value
                       ? "bg-(--on-bg-high) text-(--bg)"
                       : "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:bg-(--state-hover)",

@@ -127,7 +127,7 @@ function CertificatesSection() {
               <div className="flex size-16 items-center justify-center rounded-2xl bg-(--primary-card) mb-4">
                 {cert.icon}
               </div>
-              <h3 className="text-body-2 font-medium text-(--on-bg-high) mb-1">
+              <h3 className="text-body-2  text-(--on-bg-high) mb-1">
                 {cert.title}
               </h3>
               <p className="text-body-4 text-(--on-bg-medium)">{cert.subtitle}</p>

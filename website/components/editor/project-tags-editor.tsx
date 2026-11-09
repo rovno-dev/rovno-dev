@@ -146,7 +146,7 @@ export function ProjectTagsEditor({ value, onChange }: Props) {
                 <div className="flex items-center gap-3 px-3 py-2 hover:bg-(--state-hover) transition-colors">
                   <span
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium shrink-0",
+                      "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]  shrink-0",
                       meta.accent
                     )}
                   >

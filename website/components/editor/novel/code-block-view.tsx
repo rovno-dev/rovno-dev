@@ -99,7 +99,7 @@ export function CodeBlockNodeView(props: any) {
                   language: e.target.value === "null" ? null : e.target.value,
                 })
               }
-              className="appearance-none bg-transparent border-none text-[13px] text-[#8c8c9a] outline-none cursor-pointer hover:text-white transition-colors pr-5 font-medium"
+              className="appearance-none bg-transparent border-none text-[13px] text-[#8c8c9a] outline-none cursor-pointer hover:text-white transition-colors pr-5 "
               style={{ WebkitAppearance: "none", MozAppearance: "none" }}
             >
               {Object.entries(LANG_META).map(([key, meta]) => (

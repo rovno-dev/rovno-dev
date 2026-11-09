@@ -134,7 +134,7 @@ export default function TaxonomiesPage() {
               type="button"
               onClick={() => setTab(id)}
               className={
-                "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors " +
+                "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm  transition-colors " +
                 (tab === id
                   ? "bg-(--on-bg-high) text-(--bg)"
                   : "text-(--on-bg-medium) hover:bg-(--state-hover)")

@@ -112,7 +112,7 @@ export function QuickOrderDialog({
                 className="min-h-[80px] bg-(--card) border-(--outline)"
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full h-12 text-base font-medium mt-2">
+            <Button type="submit" disabled={loading} className="w-full h-12 text-base  mt-2">
               {loading ? <CircleNotch className="size-5 animate-spin mr-2" /> : null}
               {loading ? "Отправка..." : "Отправить заявку"}
             </Button>
@@ -124,7 +124,7 @@ export function QuickOrderDialog({
             <Link
               href="/order"
               onClick={() => setOpen(false)}
-              className="text-body-4 text-(--primary) hover:underline mt-1 inline-flex items-center gap-1 font-medium"
+              className="text-body-4 text-(--primary) hover:underline mt-1 inline-flex items-center gap-1 "
             >
               Перейти к полной форме
               <ArrowRight className="size-3.5" />

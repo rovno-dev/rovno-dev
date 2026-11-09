@@ -182,7 +182,7 @@ export default function AdminClientsPage() {
                 className="rounded-3xl border-(--outline) p-5 flex flex-col sm:flex-row sm:items-center gap-4"
               >
                 {/* Avatar circle with initials */}
-                <div className="size-12 shrink-0 rounded-full bg-(--primary-card) flex items-center justify-center text-(--primary) font-medium">
+                <div className="size-12 shrink-0 rounded-full bg-(--primary-card) flex items-center justify-center text-(--primary) ">
                   {(c.name || "?").trim().slice(0, 2).toUpperCase()}
                 </div>
 

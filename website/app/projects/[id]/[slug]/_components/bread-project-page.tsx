@@ -618,7 +618,7 @@ function ImpactMetric({
       >
         {value}
       </div>
-      <p className="text-body-3 text-(--on-bg-high) font-medium mb-1">{label}</p>
+      <p className="text-body-3 text-(--on-bg-high)  mb-1">{label}</p>
       <p className="text-body-5 text-(--on-bg-low) uppercase tracking-[0.18em]">
         {sub}
       </p>

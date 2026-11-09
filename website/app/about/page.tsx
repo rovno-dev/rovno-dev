@@ -2,11 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Users } from "@phosphor-icons/react/dist/ssr";
 import { fetchPublicTeamServer, type PublicTeamMember } from "@/utils/api/team";
 import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
+import { HandshakeIcon } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata = pageMetadata({
   title: "О нас",
@@ -38,53 +38,48 @@ function ExpertCard({ member, index }: { member: PublicTeamMember; index: number
       className="group block animate-reveal fill-mode-both"
       style={{ animationDelay: `${200 + index * 100}ms` }}
     >
-      <Card className="border-none bg-transparent shadow-none ring-0 p-0 overflow-visible">
-        <div className="relative mb-6 overflow-hidden rounded-4xl border border-(--outline) bg-(--card) transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-(--primary)/10 group-hover:-translate-y-1">
-          <AspectRatio ratio={4 / 5}>
-            {avatar ? (
-              <Image
-                src={avatar}
-                alt={displayName}
-                fill
-                unoptimized
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card) flex items-center justify-center">
-                <span className="text-display-1 font-heading  tracking-tighter text-(--on-bg-high) opacity-30">
-                  {displayName.slice(0, 1)}
-                </span>
-              </div>
-            )}
-          </AspectRatio>
-          <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-            {member.project_count > 0 && (
-              <p className="text-[10px] uppercase tracking-[0.24em] text-white/60 mb-1.5 tabular-nums">
-                {member.project_count} {projectsWord}
-              </p>
-            )}
-            <p className="text-body-4 text-white/95 leading-tight">
-              {member.role}
-            </p>
-          </div>
-          <div className="absolute top-4 right-4 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="flex size-10 items-center justify-center rounded-full bg-white text-black shadow-lg">
-              <ArrowUpRight className="size-5" />
+      {/* Image: 4:5, no rounding, no border. */}
+      <div className="relative w-full aspect-square overflow-hidden bg-(--card)">
+        {avatar ? (
+          <Image
+            src={avatar}
+            alt={displayName}
+            fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card) flex items-center justify-center">
+            <span className="text-display-1 font-heading tracking-tighter text-(--on-bg-high) opacity-30">
+              {displayName.slice(0, 1)}
             </span>
           </div>
+        )}
+        <div className="absolute top-4 right-4 z-10 flex items-center justify-center size-10 bg-black/40 backdrop-blur-md text-white opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+          <ArrowUpRight className="size-5" weight="bold" />
         </div>
-        <div className="px-1">
-          <h3 className="text-display-4 text-(--on-bg-high) mb-1">
-            {displayName}
-          </h3>
-          {bio && (
-            <p className="text-body-4 text-(--on-bg-medium) line-clamp-2 leading-relaxed">
-              {bio}
-            </p>
+      </div>
+
+      {/* Text block under the image */}
+      <div className="pt-4 md:pt-5">
+        <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading  group-hover:text-(--primary) transition-colors">
+          {displayName}
+        </h3>
+        <p className="mt-2 text-body-4 text-(--on-bg-medium)">
+          {member.role}
+          {member.project_count > 0 && (
+            <span>
+              {" "}• {member.project_count} {projectsWord}
+            </span>
           )}
-        </div>
-      </Card>
+        </p>
+        {/* {bio && (
+          <p className="mt-2 text-sm text-(--on-bg-low) line-clamp-2 leading-relaxed">
+            {bio}
+          </p>
+        )} */}
+      </div>
     </Link>
   );
 }
@@ -94,20 +89,17 @@ export default async function AboutPage() {
 
   return (
     <main className="min-h-screen bg-(--bg) py-20 md:py-32">
-      <section className="bg-(--card)/40">
+      <section >
         <Container>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
-            <div className="max-w-[640px]">
-              <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) tracking-tight">
-                Наши эксперты
-              </h1>
-            </div>
+            <h1 className="text-display-3 md:text-display-2 text-(--on-bg-high) tracking-tight">
+              Наши эксперты
+            </h1>
             <Button
-              variant="glass"
-              size="large"
-              shape="round"
+              variant="text"
+              size="small"
               asChild
-              className="shrink-0"
+              className="shrink-0 text-(--on-bg-medium)"
             >
               <Link
                 href="https://forms.yandex.com/u/69975d0849af47b15b4c80df"
@@ -115,7 +107,7 @@ export default async function AboutPage() {
                 rel="noopener noreferrer"
               >
                 Присоединиться к нам
-                <ArrowUpRight className="size-4" />
+                <HandshakeIcon className="size-4" />
               </Link>
             </Button>
           </div>
@@ -132,10 +124,10 @@ export default async function AboutPage() {
           ) : (
             <div
               className={`grid grid-cols-1 sm:grid-cols-2 ${members.length >= 4
-                  ? "lg:grid-cols-4"
-                  : members.length === 3
-                    ? "lg:grid-cols-3"
-                    : "lg:grid-cols-2"
+                ? "lg:grid-cols-4"
+                : members.length === 3
+                  ? "lg:grid-cols-3"
+                  : "lg:grid-cols-2"
                 } gap-6 md:gap-8`}
             >
               {members.map((m, idx) => (

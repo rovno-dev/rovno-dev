@@ -146,7 +146,7 @@ export function TagsAutocomplete({
         {value.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs font-medium text-(--primary)"
+            className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs  text-(--primary)"
           >
             {tag}
             <button

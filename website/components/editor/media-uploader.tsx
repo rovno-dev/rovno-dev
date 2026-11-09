@@ -273,7 +273,7 @@ export function ProjectMediaUploader({ value, onChange }: Props) {
         {uploading ? (
           <>
             <CircleNotchIcon className="size-6 animate-spin text-(--primary)" />
-            <span className="text-xs font-medium text-(--on-bg-medium)">Загрузка…</span>
+            <span className="text-xs  text-(--on-bg-medium)">Загрузка…</span>
           </>
         ) : (
           <>

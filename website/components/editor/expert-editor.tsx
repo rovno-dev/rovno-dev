@@ -11,9 +11,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  PlusIcon, XIcon, MapPin, ChartBar, Lightning, 
-  Briefcase, Tag, ShareNetwork 
+import {
+  PlusIcon, XIcon, MapPin, ChartBar, Lightning,
+  Briefcase, Tag, ShareNetwork
 } from "@phosphor-icons/react";
 import {
   EXPERT_ICON_OPTIONS,
@@ -50,7 +50,7 @@ export function ExpertEditor({ value, onChange, disabled = false }: {
   disabled?: boolean;
 }) {
   const set = <K extends keyof ExpertFieldsValue>(k: K, v: ExpertFieldsValue[K]) => onChange({ ...value, [k]: v });
-  
+
   const tabsListRef = useRef<HTMLDivElement>(null);
 
   const handleTabChange = (val: string) => {
@@ -127,7 +127,7 @@ export function ExpertEditor({ value, onChange, disabled = false }: {
               </Field>
               <div className="flex-1 w-full sm:max-w-[200px] pb-1">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-(--on-bg-high)">Уровень</span>
+                  <span className="text-sm  text-(--on-bg-high)">Уровень</span>
                   <span className="text-xs font-mono text-(--primary) font-bold">{s.level}%</span>
                 </div>
                 <Slider value={[s.level]} min={0} max={100} step={1} onValueChange={([val]) => { const n = [...value.expert_skills]; n[i].level = val; set("expert_skills", n); }} disabled={disabled} />

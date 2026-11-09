@@ -166,7 +166,7 @@ export function MentionPicker({ open, onOpenChange, onInsert }: Props) {
                   className={cn(
                     "text-body-4 truncate",
                     item.kind === "user"
-                      ? "text-(--primary) font-medium"
+                      ? "text-(--primary) "
                       : "text-(--on-bg-high)",
                   )}
                 >

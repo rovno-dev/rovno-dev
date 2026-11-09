@@ -57,7 +57,7 @@ export function ProjectTagChip({
       className={cn(
         "relative inline-flex items-center gap-2 rounded-full select-none whitespace-nowrap",
         isSmall ? "h-7 pl-2 pr-3 text-[11px]" : "h-9 pl-2.5 pr-4 text-xs",
-        "font-medium text-white transition-transform duration-200",
+        " text-white transition-transform duration-200",
         "hover:-translate-y-px",
         className,
       )}

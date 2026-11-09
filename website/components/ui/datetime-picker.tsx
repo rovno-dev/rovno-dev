@@ -71,7 +71,7 @@ export function DateTimePicker({
           className="p-3 border-b border-(--outline)"
         />
         <div className="p-3 flex items-center gap-2 bg-(--bg)">
-          <span className="text-sm font-medium">Время:</span>
+          <span className="text-sm ">Время:</span>
           <Input
             type="time"
             value={time}

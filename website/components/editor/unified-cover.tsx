@@ -29,7 +29,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       toast.error("Файл больше 20 МБ");
       return;
     }
-    
+
     if (file.type.startsWith("video/")) {
       setVideoFile(file);
       setVideoEditorOpen(true);
@@ -55,7 +55,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       fd.append("file", new File([blob], filename, { type: blob.type }));
       const res = await $fetch("/api/v1/uploads/media", { method: "POST", body: fd, isToast: false });
       if (!res?.response?.ok) throw new Error("Upload failed");
-      onChange(res.json.url, ""); 
+      onChange(res.json.url, "");
       toast.success("Обложка обновлена");
     } finally {
       setUploading(false);
@@ -70,7 +70,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       const posterFd = new FormData();
       posterFd.append("file", new File([posterBlob], "poster.jpg", { type: "image/jpeg" }));
       const posterRes = await $fetch("/api/v1/uploads/media", { method: "POST", body: posterFd, isToast: false });
-      
+
       // 2. Upload video with crop
       const videoFd = new FormData();
       videoFd.append("file", videoFile);
@@ -80,11 +80,11 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       videoFd.append("crop_y", crop.y.toString());
       videoFd.append("crop_w", crop.w.toString());
       videoFd.append("crop_h", crop.h.toString());
-      
+
       const videoRes = await $fetch("/api/v1/uploads/media", { method: "POST", body: videoFd, isToast: false });
-      
+
       if (!posterRes?.response?.ok || !videoRes?.response?.ok) throw new Error("Upload failed");
-      
+
       onChange(posterRes.json.url, videoRes.json.url);
       toast.success("Видео загружено");
     } catch (err: any) {
@@ -101,15 +101,15 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
       {activeUrl ? (
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group max-w-md">
           {videoUrl ? (
-          videoUrl.endsWith(".webm") || videoUrl.endsWith(".mp4") ? (
-            <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+            videoUrl.endsWith(".webm") || videoUrl.endsWith(".mp4") ? (
+              <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+            ) : (
+              <iframe src={`${videoUrl}?autoplay=1&muted=1&loop=1`} className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
+            )
           ) : (
-            <iframe src={`${videoUrl}?autoplay=1&muted=1&loop=1`} className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
-          )
-        ) : (
-           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        )}
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          )}
           {videoUrl && (
             <div className="absolute top-2 left-2 bg-black/60 text-white rounded-md px-2 py-0.5 text-xs font-mono flex items-center gap-1 backdrop-blur-sm">
               <VideoCameraIcon /> Video
@@ -122,25 +122,25 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
           </div>
         </div>
       ) : (
-        <div 
+        <div
           className="w-full max-w-md aspect-[4/3] rounded-2xl border-2 border-dashed border-(--outline) bg-(--card)/50 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-(--primary) hover:bg-(--primary-glass) transition-colors"
           onClick={() => inputRef.current?.click()}
         >
           <CloudArrowUpIcon className="size-8 text-(--on-bg-low)" />
-          <span className="text-sm font-medium text-(--on-bg-high)">Загрузить фото или видео</span>
+          <span className="text-sm  text-(--on-bg-high)">Загрузить фото или видео</span>
           <span className="text-xs text-(--on-bg-low)">до 20 МБ</span>
         </div>
       )}
-      
+
       {activeUrl && (
         <div>
-           <Button variant="outlined" size="small" onClick={() => inputRef.current?.click()} disabled={uploading}>
+          <Button variant="outlined" size="small" onClick={() => inputRef.current?.click()} disabled={uploading}>
             {uploading ? <CircleNotchIcon className="size-4 animate-spin" /> : <CloudArrowUpIcon className="size-4" />}
             Заменить обложку
           </Button>
         </div>
       )}
-      
+
       <input
         ref={inputRef}
         type="file"
@@ -157,7 +157,7 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
         lockedAspect={true}
         onApply={handleApplyImage}
       />
-      
+
       <VideoEditorDialog
         open={videoEditorOpen}
         onOpenChange={setVideoEditorOpen}

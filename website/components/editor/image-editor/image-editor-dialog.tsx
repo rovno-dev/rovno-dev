@@ -223,7 +223,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
               type="button"
               onClick={() => setTab("crop")}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs  transition-colors",
                 tab === "crop" ? "bg-(--card) text-(--on-bg-high) shadow-sm" : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
@@ -233,7 +233,7 @@ export const ImageEditorDialog = React.memo(function ImageEditorDialog({
               type="button"
               onClick={() => setTab("draw")}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs  transition-colors",
                 tab === "draw" ? "bg-(--card) text-(--on-bg-high) shadow-sm" : "text-(--on-bg-medium) hover:text-(--on-bg-high)"
               )}
             >
@@ -397,7 +397,7 @@ function CropTab({
             type="button"
             onClick={() => setAspect(p.id)}
             className={cn(
-              "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+              "rounded-full px-3 py-1.5 text-xs  transition-colors",
               aspect === p.id
                 ? "bg-(--on-bg-high) text-(--bg)"
                 : "bg-(--card) text-(--on-bg-medium) hover:text-(--on-bg-high) border border-(--outline)"

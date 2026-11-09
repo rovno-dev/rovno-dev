@@ -240,7 +240,7 @@ export default function AdminNotificationsPage() {
                     <EnvelopeSimple className="size-5" />
                   </div>
                   <div className="min-w-0">
-                    <Label htmlFor="notify-email" className="text-body-3 font-medium cursor-pointer">
+                    <Label htmlFor="notify-email" className="text-body-3  cursor-pointer">
                       Email-уведомления
                     </Label>
                     <p className="text-body-5 text-(--on-bg-low)">
@@ -260,7 +260,7 @@ export default function AdminNotificationsPage() {
                     <TelegramLogo className="size-5" />
                   </div>
                   <div className="min-w-0">
-                    <Label htmlFor="notify-tg" className="text-body-3 font-medium cursor-pointer">
+                    <Label htmlFor="notify-tg" className="text-body-3  cursor-pointer">
                       Telegram-уведомления
                     </Label>
                     <p className="text-body-5 text-(--on-bg-low)">

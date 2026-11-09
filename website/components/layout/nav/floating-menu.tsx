@@ -29,7 +29,7 @@ export function FloatingMenu({
   triggerIconClassName,
 }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
-    const [isOrderOpen, setIsOrderOpen] = useState(false);
+  const [isOrderOpen, setIsOrderOpen] = useState(false);
   const { t } = useLanguage();
   const pathname = usePathname();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -124,24 +124,24 @@ export function FloatingMenu({
             )} />
 
             <nav className="flex flex-col gap-1">
-            {links.map((link, i) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    "block px-4 py-3 rounded-2xl text-base font-medium text-center transition-colors",
-                    isActive
-                      ? "bg-(--primary-glass) text-(--primary)"
-                      : "text-(--on-bg-high) hover:bg-(--state-hover)"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+              {links.map((link, i) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "block px-4 py-3 rounded-2xl text-base  text-center transition-colors",
+                      isActive
+                        ? "bg-(--primary-glass) text-(--primary)"
+                        : "text-(--on-bg-high) hover:bg-(--state-hover)"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
           </motion.div>
         )}

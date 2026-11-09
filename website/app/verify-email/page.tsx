@@ -122,7 +122,7 @@ function VerifyEmailInner() {
             {t("forms.verify.subtitle")}
           </p>
           {formData.email && (
-            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-(--outline) bg-(--card) px-3 py-1.5 text-xs font-medium text-(--on-bg-high)">
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-(--outline) bg-(--card) px-3 py-1.5 text-xs  text-(--on-bg-high)">
               <EnvelopeIcon className="size-3.5" />
               {formData.email}
             </p>
@@ -131,7 +131,7 @@ function VerifyEmailInner() {
         <div className="mb-6 flex gap-3 rounded-2xl border border-(--outline) bg-(--card) p-4">
           <span className="text-lg leading-none" aria-hidden>📬</span>
           <div className="space-y-1">
-            <p className="text-body-4 font-medium text-(--on-bg-high)">{t("errors.code_check_spam")}</p>
+            <p className="text-body-4  text-(--on-bg-high)">{t("errors.code_check_spam")}</p>
             <p className="text-body-5 text-(--on-bg-medium) leading-relaxed">
               {t("errors.code_check_spam_hint")}
             </p>

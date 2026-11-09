@@ -316,7 +316,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
           <button
             type="button"
             onClick={handleAdd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) hover:bg-(--primary-glass) transition-all duration-200"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs  rounded-lg border-2 border-dashed border-(--outline) text-(--on-bg-low) hover:text-(--primary) hover:border-(--primary) hover:bg-(--primary-glass) transition-all duration-200"
           >
             <Plus className="size-4" />
             Добавить изображения

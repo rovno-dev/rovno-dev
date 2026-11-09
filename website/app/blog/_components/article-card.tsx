@@ -178,7 +178,7 @@ export function ArticleCard({
             b: Math.round(b / count),
           });
         }
-      } catch (err) {}
+      } catch (err) { }
     };
     return () => {
       isCancelled = true;
@@ -233,7 +233,7 @@ export function ArticleCard({
         className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500"
         style={gradientStyle}
       />
-      
+
       {/* Bottom subtle gradient */}
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
 
@@ -242,7 +242,7 @@ export function ArticleCard({
         <div className="flex flex-col max-w-full min-w-0">
           <MarqueeText
             text={article.title}
-            className={`text-xl md:text-2xl font-heading font-medium leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
+            className={`text-xl md:text-2xl font-heading  leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
           />
           {article.description && (
             <p className={`mt-2 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? "text-[var(--dark-8)]/80" : "text-[var(--gray-0)]/80"} ${shadowClass}`}>
@@ -262,7 +262,7 @@ export function ArticleCard({
             {article.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag.id}
-                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
+                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px]  uppercase tracking-[0.12em] text-white"
               >
                 {tag.name}
               </span>
@@ -272,11 +272,10 @@ export function ArticleCard({
           <div />
         )}
         <div
-          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ml-auto pointer-events-auto ${
-            isLight
+          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ml-auto pointer-events-auto ${isLight
               ? "bg-white text-[var(--dark-8)] border-transparent"
               : "bg-black/20 backdrop-blur-md text-white border border-white/20"
-          }`}
+            }`}
         >
           <ArrowUpRightIcon className="size-5" weight="bold" />
         </div>

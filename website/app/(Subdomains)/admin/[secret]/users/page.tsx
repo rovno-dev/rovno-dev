@@ -399,7 +399,7 @@ export default function AdminUsersPage() {
               aria-controls="admin-users-filters"
               title={filtersOpen ? "Свернуть фильтры" : "Развернуть фильтры"}
               className={cn(
-                "inline-flex items-center gap-1.5 shrink-0 h-10 rounded-lg border border-(--outline) bg-(--card) px-3 text-body-4 font-medium transition-colors",
+                "inline-flex items-center gap-1.5 shrink-0 h-10 rounded-lg border border-(--outline) bg-(--card) px-3 text-body-4  transition-colors",
                 "text-(--on-bg-medium) hover:text-(--on-bg-high) hover:border-(--on-bg-low)/40",
                 filtersOpen && "bg-(--state-hover) text-(--on-bg-high)",
               )}
@@ -649,7 +649,7 @@ function ViewSwitcher({
             onClick={() => onChange(opt.id)}
             title={opt.label}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-md px-2.5 h-8 text-xs font-medium transition-colors",
+              "inline-flex items-center gap-1.5 rounded-md px-2.5 h-8 text-xs  transition-colors",
               isActive
                 ? "bg-(--on-bg-high) text-(--bg)"
                 : "text-(--on-bg-medium) hover:text-(--on-bg-high)",
@@ -690,7 +690,7 @@ function FilterGroup({
             type="button"
             onClick={() => onChange(o.value)}
             className={cn(
-              "inline-flex items-center rounded px-2 h-7 text-xs font-medium transition-colors whitespace-nowrap",
+              "inline-flex items-center rounded px-2 h-7 text-xs  transition-colors whitespace-nowrap",
               value === o.value
                 ? "bg-(--on-bg-high) text-(--bg)"
                 : "text-(--on-bg-medium) hover:text-(--on-bg-high)",
@@ -712,7 +712,7 @@ function RoleTag({ role }: { role: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded border px-1.5 h-5 text-[10px] uppercase tracking-[0.12em] font-medium",
+        "inline-flex items-center rounded border px-1.5 h-5 text-[10px] uppercase tracking-[0.12em] ",
         s.className,
       )}
     >
@@ -759,13 +759,13 @@ function UserCard({
       <div className="p-4 flex items-start gap-3">
         <Avatar className="size-10 shrink-0 ring-1 ring-(--outline)">
           {user.avatar_url && <AvatarImage src={user.avatar_url} alt="" />}
-          <AvatarFallback className="text-body-3 font-medium">
+          <AvatarFallback className="text-body-3 ">
             {initials(user)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <h3 className="text-body-2 font-medium truncate">
+            <h3 className="text-body-2  truncate">
               {displayName(user)}
             </h3>
             {user.verified && (
@@ -931,13 +931,13 @@ function UserTable({
                         {u.avatar_url && (
                           <AvatarImage src={u.avatar_url} alt="" />
                         )}
-                        <AvatarFallback className="text-[11px] font-medium">
+                        <AvatarFallback className="text-[11px] ">
                           {initials(u)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-body-3 font-medium truncate">
+                          <span className="text-body-3  truncate">
                             {displayName(u)}
                           </span>
                           {u.verified && (
@@ -1066,7 +1066,7 @@ function Th({
   return (
     <th
       className={cn(
-        "px-4 py-3 text-[11px] uppercase tracking-[0.08em] font-medium text-(--on-bg-low) whitespace-nowrap",
+        "px-4 py-3 text-[11px] uppercase tracking-[0.08em]  text-(--on-bg-low) whitespace-nowrap",
         align === "right" ? "text-right" : "text-left",
       )}
     >
@@ -1266,7 +1266,7 @@ function UserEditorDialog({
                 {form.avatar_url && (
                   <AvatarImage src={form.avatar_url} alt="" />
                 )}
-                <AvatarFallback className="text-heading-2 font-medium">
+                <AvatarFallback className="text-heading-2 ">
                   {initials({
                     ...emptyForm(),
                     email: form.email,

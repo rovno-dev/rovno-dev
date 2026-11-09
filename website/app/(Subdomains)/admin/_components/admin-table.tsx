@@ -46,7 +46,7 @@ export function AdminTable<T>({ data, columns, isLoading = false, emptyMessage =
                   <TableHead
                     key={col.key as string}
                     className={cn(
-                      "h-10 px-3 sm:px-4 text-[11px] uppercase tracking-wider text-(--on-bg-low) font-medium whitespace-nowrap",
+                      "h-10 px-3 sm:px-4 text-[11px] uppercase tracking-wider text-(--on-bg-low)  whitespace-nowrap",
                       !isLast && "border-r border-(--outline)/40",
                       isLast && "sticky right-0 bg-(--primary-glass) z-10 shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.06)]",
                       col.className

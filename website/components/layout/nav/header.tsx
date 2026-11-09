@@ -92,7 +92,7 @@ export default function Header() {
 
   const navLinkClass =
     "inline-flex items-center h-8 px-2.5 text-[13px] leading-none whitespace-nowrap transition-colors";
-  const navActiveClass = "text-(--on-bg-high) font-medium";
+  const navActiveClass = "text-(--on-bg-high) ";
   const navInactiveClass = "text-(--on-bg-medium) hover:text-(--on-bg-high)";
 
   return (
@@ -121,7 +121,7 @@ export default function Header() {
                   >
                     <Link href={back.href}>
                       <CaretLeftIcon className="size-4" weight="bold" />
-                      <span className="text-[13px] font-medium truncate max-w-[120px]">
+                      <span className="text-[13px]  truncate max-w-[120px]">
                         {back.label}
                       </span>
                     </Link>
@@ -221,7 +221,7 @@ export default function Header() {
                             href={profileHref}
                             prefetch={false}
                             onClick={() => setProfileOpen(false)}
-                            className="block px-4 py-3 rounded-2xl text-base font-medium text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                            className="block px-4 py-3 rounded-2xl text-base  text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                           >
                             {t("nav.profile")}
                           </Link>
@@ -230,7 +230,7 @@ export default function Header() {
                               <Link
                                 href={adminHref}
                                 onClick={() => setProfileOpen(false)}
-                                className="block px-4 py-3 rounded-2xl text-base font-medium text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                                className="block px-4 py-3 rounded-2xl text-base  text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                               >
                                 {t("nav.admin")}
                               </Link>
@@ -240,7 +240,7 @@ export default function Header() {
                               logout();
                               setProfileOpen(false);
                             }}
-                            className="block w-full px-4 py-3 rounded-2xl text-base font-medium text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                            className="block w-full px-4 py-3 rounded-2xl text-base  text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                           >
                             {t("nav.logout")}
                           </button>
@@ -250,14 +250,14 @@ export default function Header() {
                           <Link
                             href={rootLink("/login")}
                             onClick={() => setProfileOpen(false)}
-                            className="block px-4 py-3 rounded-2xl text-base font-medium text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                            className="block px-4 py-3 rounded-2xl text-base  text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                           >
                             {t("nav.login")}
                           </Link>
                           <Link
                             href={rootLink("/register")}
                             onClick={() => setProfileOpen(false)}
-                            className="block px-4 py-3 rounded-2xl text-base font-medium text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                            className="block px-4 py-3 rounded-2xl text-base  text-center text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                           >
                             {t("nav.register")}
                           </Link>

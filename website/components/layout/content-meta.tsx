@@ -118,7 +118,7 @@ export function ContentMeta({
             ) : (
               <span
                 className={cn(
-                  "text-body-2 font-medium text-(--on-bg-high) truncate",
+                  "text-body-2  text-(--on-bg-high) truncate",
                   it.tabular && "tabular-nums",
                 )}
               >

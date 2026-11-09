@@ -354,7 +354,7 @@ export function FilterBar({
         <Container>
           {filtered.length === 0 ? (
             <div className="py-32 text-center">
-              <p className="text-2xl font-heading font-medium text-(--on-bg-medium) mb-4">
+              <p className="text-2xl font-heading  text-(--on-bg-medium) mb-4">
                 {projects.length === 0
                   ? "Здесь пока нет проектов"
                   : "Ничего не найдено"}
@@ -363,7 +363,7 @@ export function FilterBar({
                 <button
                   type="button"
                   onClick={resetAll}
-                  className="text-sm font-medium text-(--primary) underline underline-offset-4 hover:opacity-80 transition-opacity"
+                  className="text-sm  text-(--primary) underline underline-offset-4 hover:opacity-80 transition-opacity"
                 >
                   Сбросить фильтры
                 </button>
@@ -376,7 +376,7 @@ export function FilterBar({
                   key={project.id || project.slug}
                   project={project}
                   index={idx}
-                  variant="featured"
+                  variant="clean"
                   categoryMap={categoryMap}
                   tags={(project.tags || [])
                     .filter((t) => t.title)
@@ -546,7 +546,7 @@ function FilterSection({
 }) {
   return (
     <section className="space-y-3">
-      <h4 className="text-[11px] uppercase tracking-[0.18em] font-medium text-(--on-bg-low)">
+      <h4 className="text-[11px] uppercase tracking-[0.18em]  text-(--on-bg-low)">
         {title}
       </h4>
       <div className="flex flex-wrap gap-2">{children}</div>
@@ -562,7 +562,7 @@ function RemovableChip({
   onRemove: () => void;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 h-8 pl-3 pr-1 rounded-full border border-(--outline) text-body-5 font-medium text-(--on-bg-high)">
+    <span className="inline-flex items-center gap-1 h-8 pl-3 pr-1 rounded-full border border-(--outline) text-body-5  text-(--on-bg-high)">
       <span className="truncate max-w-[240px]">{label}</span>
       <button
         type="button"
@@ -595,12 +595,12 @@ function DrawerChip({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-body-4 font-medium transition-all duration-200",
+        "inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-body-4  transition-all duration-200",
         active
           ? "bg-(--on-bg-high) text-(--bg) shadow-sm"
           : "bg-(--card) border border-(--outline) text-(--on-bg-medium) hover:border-(--on-bg-low)/40 hover:text-(--on-bg-high)",
         disabled &&
-          "opacity-30 cursor-not-allowed hover:border-(--outline) hover:text-(--on-bg-medium)",
+        "opacity-30 cursor-not-allowed hover:border-(--outline) hover:text-(--on-bg-medium)",
       )}
     >
       <span>{label}</span>

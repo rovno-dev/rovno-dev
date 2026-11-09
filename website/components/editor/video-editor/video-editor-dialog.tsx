@@ -393,7 +393,7 @@ export function VideoEditorDialog({ open, onOpenChange, file, onApply }: Props) 
 
             {/* Sound Toggle */}
             <div className="flex items-center justify-between pt-4 border-t border-white/5">
-              <span className="text-sm font-medium text-white">Звук включен</span>
+              <span className="text-sm  text-white">Звук включен</span>
               <Switch
                 checked={!isMuted}
                 onCheckedChange={(checked) => setIsMuted(!checked)}

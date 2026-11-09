@@ -117,7 +117,7 @@ export default function SocialsSection() {
   return (
     <Container variant="full-screen" className="py-12 md:py-20 pb-0!">
       <div className="space-y-8">
-        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans font-medium tracking-[-0.03em] uppercase text-center w-full break-words text-(--on-bg-high) animate-reveal mb-8">
+        <h2 className="text-[clamp(3rem,8vw,7rem)] leading-[0.9] font-sans  tracking-[-0.03em] uppercase text-center w-full break-words text-(--on-bg-high) animate-reveal mb-8">
           {t("home.socials_title")}
         </h2>
         {/* Mobile: preview at top + horizontal scroll badges */}

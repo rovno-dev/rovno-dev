@@ -41,7 +41,7 @@ export function ServiceSelection({ selectedServices, setSelectedServices, error 
           </CheckboxCard>
         ))}
       </div>
-      {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+      {error && <p className="text-sm text-destructive ">{error}</p>}
     </div>
   );
 }

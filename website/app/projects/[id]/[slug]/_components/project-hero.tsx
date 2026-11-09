@@ -70,7 +70,7 @@ export function ProjectHero({
         <div className="grid lg:grid-cols-12 gap-8 items-center w-full">
           <div className="lg:col-span-5 space-y-6 w-full max-w-full overflow-hidden">
             {category && (
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-(--outline)/50 bg-(--card)/40 backdrop-blur-sm text-xs font-medium text-(--on-bg-low)">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-(--outline)/50 bg-(--card)/40 backdrop-blur-sm text-xs  text-(--on-bg-low)">
                 <Badge variant="glass-static" size="chip-small" className="font-heading">{category}</Badge>
                 <span className="font-sans text-white">Проект</span>
               </div>
@@ -98,13 +98,13 @@ export function ProjectHero({
               {clientName && (
                 <div>
                   <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-0.5">КЛИЕНТ</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{clientName}</p>
+                  <p className="text-body-3 text-(--on-bg-high) ">{clientName}</p>
                 </div>
               )}
               {period && (
                 <div>
                   <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-0.5">ПЕРИОД</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{period}</p>
+                  <p className="text-body-3 text-(--on-bg-high) ">{period}</p>
                 </div>
               )}
             </div>

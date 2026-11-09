@@ -192,7 +192,7 @@ export default function SecurityPage() {
                       <Icon className="size-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-body-3 font-medium text-(--on-bg-high) truncate">
+                      <p className="text-body-3  text-(--on-bg-high) truncate">
                         {deviceName} · {browserName} {isCurrent && <span className="text-(--primary) ml-1">(Текущая)</span>}
                       </p>
                       <div className="flex items-center gap-2 text-body-5 text-(--on-bg-low) mt-0.5">

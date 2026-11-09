@@ -31,7 +31,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "group flex items-center gap-1.5 rounded-full border border-(--outline) bg-(--card) px-3 h-9 text-sm font-medium transition-all duration-200",
+            "group flex items-center gap-1.5 rounded-full border border-(--outline) bg-(--card) px-3 h-9 text-sm  transition-all duration-200",
             "hover:border-(--primary)/50 hover:shadow-sm cursor-pointer",
             "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           )}
@@ -56,7 +56,7 @@ export function LanguageSwitcher() {
         >
           <span className="flex items-center gap-2.5">
             <span className="text-lg leading-none">🇬🇧</span>
-            <span className="text-sm font-medium">English</span>
+            <span className="text-sm ">English</span>
           </span>
           {lang === "en" && <Check className="size-4" />}
         </DropdownMenuItem>
@@ -69,7 +69,7 @@ export function LanguageSwitcher() {
         >
           <span className="flex items-center gap-2.5">
             <span className="text-lg leading-none">🇷🇺</span>
-            <span className="text-sm font-medium">Русский</span>
+            <span className="text-sm ">Русский</span>
           </span>
           {lang === "ru" && <Check className="size-4" />}
         </DropdownMenuItem>

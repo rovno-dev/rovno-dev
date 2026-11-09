@@ -118,7 +118,7 @@ export function EntityPicker({
         onClick={() => { inputRef.current?.focus(); setOpen(true); }}
       >
         {value ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs font-medium text-(--primary)">
+          <span className="inline-flex items-center gap-1 rounded-full bg-(--primary-card) px-2 py-0.5 text-xs  text-(--primary)">
             {value.label}
             <button
               type="button"

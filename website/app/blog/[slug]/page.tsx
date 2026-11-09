@@ -243,7 +243,7 @@ export default async function ArticlePage({
                 </p>
               )}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-4 text-white/60 animate-reveal [animation-delay:200ms] fill-mode-both">
-                <span className="font-medium text-white/85">{authorName}</span>
+                <span className=" text-white/85">{authorName}</span>
                 <span aria-hidden>·</span>
                 <time dateTime={article.date}>{formatDate(article.date)}</time>
               </div>

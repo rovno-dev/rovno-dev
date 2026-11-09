@@ -144,7 +144,7 @@ export default function LoginPage() {
               </div>
               <div>
                 <span className="text-[var(--text-secondary)]">No account? </span>
-                <Link href="/register" className="text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-medium transition-colors underline-offset-2 hover:underline">
+                <Link href="/register" className="text-[var(--accent-color)] hover:text-[var(--accent-hover)]  transition-colors underline-offset-2 hover:underline">
                   Register
                 </Link>
               </div>

@@ -28,15 +28,15 @@ export function MentionAwareLink({
         type === "user"
           ? `/${id}`
           : type === "project"
-          ? `/projects/${id}`
-          : `/clients/${id}`;
+            ? `/projects/${id}`
+            : `/clients/${id}`;
 
       return (
         <Link
           href={to}
           className={cn(
             "inline-flex items-center gap-0.5 rounded-full bg-(--primary-card) px-1.5 py-0.5",
-            "text-[0.95em] font-medium text-(--primary) no-underline",
+            "text-[0.95em]  text-(--primary) no-underline",
             "hover:bg-(--primary-glass) transition-colors",
             className,
           )}

@@ -52,7 +52,7 @@ export function PullQuote({ children }: { children: ReactNode }) {
       >
         “
       </span>
-      <blockquote className="relative text-2xl md:text-3xl lg:text-4xl font-heading font-medium tracking-[-0.02em] leading-[1.15] text-(--on-bg-high) max-w-[820px]">
+      <blockquote className="relative text-2xl md:text-3xl lg:text-4xl font-heading  tracking-[-0.02em] leading-[1.15] text-(--on-bg-high) max-w-[820px]">
         {children}
       </blockquote>
       <span

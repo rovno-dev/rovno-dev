@@ -136,7 +136,7 @@ export function MDXHr() { return <hr className="my-8 border-(--outline)" />; }
 export function MDXLink({ href, children }: { href: string; children: ReactNode }) { return <a href={href} className="text-(--primary) underline underline-offset-2 hover:opacity-80">{children}</a>; }
 export function MDXTable({ children }: { children: ReactNode }) { return <div className="my-6 overflow-x-auto rounded-xl border border-(--outline)"><table className="w-full text-sm">{children}</table></div>; }
 export function MDXThead({ children }: { children: ReactNode }) { return <thead className="bg-(--bg-disabled)">{children}</thead>; }
-export function MDXTh({ children }: { children: ReactNode }) { return <th className="px-4 py-2 text-left font-medium">{children}</th>; }
+export function MDXTh({ children }: { children: ReactNode }) { return <th className="px-4 py-2 text-left ">{children}</th>; }
 export function MDXTd({ children }: { children: ReactNode }) { return <td className="px-4 py-2 border-t border-(--outline)">{children}</td>; }
 export function MDXCard({ children, className }: { children: ReactNode; className?: string; }) { return <Card className={cn("p-6", className)}>{children}</Card>; }
 

@@ -283,7 +283,7 @@ export function NovelEditor({
                     {item.icon}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-medium text-(--on-bg-high) truncate">{item.title}</span>
+                    <span className=" text-(--on-bg-high) truncate">{item.title}</span>
                     <span className="text-xs text-(--on-bg-medium) truncate">{item.description}</span>
                   </div>
                 </EditorCommandItem>

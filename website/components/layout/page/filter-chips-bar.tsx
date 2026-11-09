@@ -46,7 +46,7 @@ export function FilterChipsBar({
             type="button"
             onClick={() => onSelect(c.id)}
             className={cn(
-              "shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all",
+              "shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm  transition-all",
               c.active
                 ? "bg-(--on-bg-high) text-(--bg)"
                 : "text-(--on-bg-medium) hover:bg-(--state-hover) hover:text-(--on-bg-high)",

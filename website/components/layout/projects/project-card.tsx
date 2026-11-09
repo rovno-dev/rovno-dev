@@ -31,7 +31,7 @@ function CoverFallback({ label, hint }: { label: string; hint: string }) {
           <ImageBrokenIcon className="size-7 text-(--on-bg-low)" weight="duotone" />
         </div>
         <div>
-          <p className="text-body-3 font-medium leading-tight text-(--on-bg-high)">{label}</p>
+          <p className="text-body-3  leading-tight text-(--on-bg-high)">{label}</p>
           <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-(--on-bg-low)">{hint}</p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function ProjectCard({
               alt={project.title}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
               onError={() => setFailed(true)}
             />
           )}
@@ -265,14 +265,14 @@ export default function ProjectCard({
               {normalizedTags.map((tag, i) => (
                 <span
                   key={`${tag}-${i}`}
-                  className="inline-flex items-center text-[10px] font-medium uppercase tracking-[0.16em] text-(--on-bg-low) transition-colors group-hover:text-(--primary)"
+                  className="inline-flex items-center text-[10px]  uppercase tracking-[0.16em] text-(--on-bg-low) transition-colors group-hover:text-(--primary)"
                 >
                   {tag}
                 </span>
               ))}
             </div>
           )}
-          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading font-medium">
+          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading ">
             {project.title}
           </h3>
           {project.shortDescription && (
@@ -305,7 +305,7 @@ export default function ProjectCard({
           alt={project.title}
           fill
           sizes={variant === "featured" ? "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"}
-          className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
           onError={() => setFailed(true)}
         />
       )}
@@ -318,7 +318,7 @@ export default function ProjectCard({
         <div className="flex flex-col max-w-full min-w-0">
           <MarqueeText
             text={project.title}
-            className={`text-xl md:text-2xl font-heading font-medium leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
+            className={`text-xl md:text-2xl font-heading  leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
           />
           {project.shortDescription && (
             <p className={`mt-2 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? 'text-[var(--dark-8)]/80' : 'text-[var(--gray-0)]/80'} ${shadowClass}`}>
@@ -333,7 +333,7 @@ export default function ProjectCard({
             {normalizedTags.map((tag, i) => (
               <span
                 key={`${tag}-${i}`}
-                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
+                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px]  uppercase tracking-[0.12em] text-white"
               >
                 {tag}
               </span>

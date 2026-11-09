@@ -251,13 +251,13 @@ ${DEFAULT_TSX}`;
         <div className="flex items-center gap-1 bg-(--bg) rounded-lg p-1 border border-(--outline)">
           <button
             onClick={() => setViewMode("visual")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "visual" ? "bg-(--card) text-(--on-bg-high) shadow-sm ring-1 ring-(--outline)" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs  rounded-md transition-colors ${viewMode === "visual" ? "bg-(--card) text-(--on-bg-high) shadow-sm ring-1 ring-(--outline)" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}
           >
             <Layout className="size-3.5" /> Visual
           </button>
           <button
             onClick={() => setViewMode("code")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === "code" ? "bg-(--card) text-(--on-bg-high) shadow-sm ring-1 ring-(--outline)" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs  rounded-md transition-colors ${viewMode === "code" ? "bg-(--card) text-(--on-bg-high) shadow-sm ring-1 ring-(--outline)" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}
           >
             <Code className="size-3.5" /> Code (TSX)
           </button>
@@ -417,25 +417,25 @@ ${DEFAULT_TSX}`;
                 </h3>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-(--on-bg-medium)">Режим</label>
+                    <label className="text-xs  text-(--on-bg-medium)">Режим</label>
                     <div className="flex bg-(--bg) rounded-lg p-1 border border-(--outline)">
-                      <button onClick={() => updateTheme("mode", "light")} className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-medium rounded-md transition-colors ${(activeSlide.theme?.mode || "dark") === "light" ? "bg-white text-black shadow-sm" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}>
+                      <button onClick={() => updateTheme("mode", "light")} className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs  rounded-md transition-colors ${(activeSlide.theme?.mode || "dark") === "light" ? "bg-white text-black shadow-sm" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}>
                         <Sun className="size-3.5" /> Light
                       </button>
-                      <button onClick={() => updateTheme("mode", "dark")} className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-medium rounded-md transition-colors ${(activeSlide.theme?.mode || "dark") === "dark" ? "bg-black text-white shadow-sm" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}>
+                      <button onClick={() => updateTheme("mode", "dark")} className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs  rounded-md transition-colors ${(activeSlide.theme?.mode || "dark") === "dark" ? "bg-black text-white shadow-sm" : "text-(--on-bg-low) hover:text-(--on-bg-high)"}`}>
                         <Moon className="size-3.5" /> Dark
                       </button>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-(--on-bg-medium)">Фоновый цвет</label>
+                    <label className="text-xs  text-(--on-bg-medium)">Фоновый цвет</label>
                     <div className="flex gap-2">
                       <Input type="color" value={activeSlide.theme?.bg || (activeSlide.theme?.mode === 'light' ? '#ffffff' : '#000000')} onChange={(e) => updateTheme("bg", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
                       <Input value={activeSlide.theme?.bg || ""} onChange={(e) => updateTheme("bg", e.target.value)} placeholder="auto" className="flex-1 font-mono text-xs h-10" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-(--on-bg-medium)">Бренд-цвет</label>
+                    <label className="text-xs  text-(--on-bg-medium)">Бренд-цвет</label>
                     <div className="flex gap-2">
                       <Input type="color" value={activeSlide.theme?.brand || '#CCFF00'} onChange={(e) => updateTheme("brand", e.target.value)} className="w-10 h-10 p-1 cursor-pointer" />
                       <Input value={activeSlide.theme?.brand || ""} onChange={(e) => updateTheme("brand", e.target.value)} placeholder="site default" className="flex-1 font-mono text-xs h-10" />
@@ -468,11 +468,11 @@ ${DEFAULT_TSX}`;
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Настройки презентации</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2"><label className="text-sm font-medium">Название</label><Input value={title} onChange={e => setTitle(e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-sm font-medium">Slug</label><Input value={slug} onChange={e => setSlug(e.target.value)} placeholder="auto" /></div>
+            <div className="space-y-2"><label className="text-sm ">Название</label><Input value={title} onChange={e => setTitle(e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-sm ">Slug</label><Input value={slug} onChange={e => setSlug(e.target.value)} placeholder="auto" /></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2"><label className="text-sm font-medium">Доступ с</label><DateTimePicker date={startsAt} setDate={setStartsAt} /></div>
-              <div className="space-y-2"><label className="text-sm font-medium">Доступ до</label><DateTimePicker date={endsAt} setDate={setEndsAt} /></div>
+              <div className="space-y-2"><label className="text-sm ">Доступ с</label><DateTimePicker date={startsAt} setDate={setStartsAt} /></div>
+              <div className="space-y-2"><label className="text-sm ">Доступ до</label><DateTimePicker date={endsAt} setDate={setEndsAt} /></div>
             </div>
           </div>
           <DialogFooter><Button onClick={() => setSettingsOpen(false)}>Готово</Button></DialogFooter>

@@ -60,7 +60,7 @@ const mdxComponents = {
     return (
       <h3
         id={id}
-        className="text-lg md:text-xl font-medium text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
+        className="text-lg md:text-xl  text-(--on-bg-high) mt-8 mb-3 scroll-mt-28"
       >
         {children}
       </h3>
@@ -158,11 +158,11 @@ export default async function ServicePage({
               <div className="flex gap-8 sm:pl-8 sm:border-l border-(--outline)">
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">Срок</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{doc.leadTime}</p>
+                  <p className="text-body-3 text-(--on-bg-high) ">{doc.leadTime}</p>
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.14em] text-(--on-bg-low) mb-1">Стоимость</p>
-                  <p className="text-body-3 text-(--on-bg-high) font-medium">{doc.startingAt}</p>
+                  <p className="text-body-3 text-(--on-bg-high) ">{doc.startingAt}</p>
                 </div>
               </div>
             </div>

@@ -142,12 +142,12 @@ function EventCard({
           {/* Status pill top-right */}
           <div className="absolute top-3 right-3 flex gap-1.5">
             {past && (
-              <span className="inline-flex items-center rounded-full border border-white/20 bg-black/50 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/70">
+              <span className="inline-flex items-center rounded-full border border-white/20 bg-black/50 backdrop-blur-sm px-2 py-0.5 text-[10px]  uppercase tracking-wider text-white/70">
                 {t("events.past_badge")}
               </span>
             )}
             {event.is_featured && !past && (
-              <span className="inline-flex items-center rounded-full border border-(--primary)/40 bg-(--primary)/20 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+              <span className="inline-flex items-center rounded-full border border-(--primary)/40 bg-(--primary)/20 backdrop-blur-sm px-2 py-0.5 text-[10px]  uppercase tracking-wider text-white">
                 {t("events.featured_badge")}
               </span>
             )}
