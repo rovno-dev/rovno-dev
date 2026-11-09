@@ -409,7 +409,7 @@ export default function AdminUsersPage() {
                 {filtersOpen ? "Скрыть" : "Фильтры"}
               </span>
               {!filtersOpen && activeFilterCount > 0 && (
-                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-(--primary) text-(--on-primary) text-[10px] font-semibold tabular-nums">
+                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-(--primary) text-(--on-primary) text-[10px]  tabular-nums">
                   {activeFilterCount}
                 </span>
               )}

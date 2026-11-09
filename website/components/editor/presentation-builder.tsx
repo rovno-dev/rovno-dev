@@ -270,7 +270,7 @@ ${DEFAULT_TSX}`;
           {/* Code Toolbar */}
           <div className="flex items-center justify-between p-4 border-b border-(--outline)">
             <div>
-              <h2 className="text-lg font-semibold flex items-center gap-2">
+              <h2 className="text-lg  flex items-center gap-2">
                 <Code className="size-5 text-(--primary)" /> TSX Deck Editor
               </h2>
               <p className="text-xs text-(--on-bg-medium)">
@@ -346,7 +346,7 @@ ${DEFAULT_TSX}`;
           {/* Left Sidebar - Slide List */}
           <div className="w-64 flex flex-col border-r border-(--outline) bg-(--card) shrink-0 z-10">
             <div className="p-3 border-b border-(--outline) flex items-center justify-between bg-(--bg)">
-              <span className="text-xs font-semibold uppercase tracking-wider text-(--on-bg-medium)">Слайды</span>
+              <span className="text-xs  uppercase tracking-wider text-(--on-bg-medium)">Слайды</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="filled" size="icon-small" className="size-8 rounded-full shadow-md hover:scale-105 transition-transform">
@@ -412,7 +412,7 @@ ${DEFAULT_TSX}`;
           {activeSlide && (
             <div className="w-72 flex flex-col border-l border-(--outline) bg-(--card) shrink-0 z-10 p-4 space-y-6 overflow-y-auto scrollbar-admin">
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-(--on-bg-medium) mb-4 flex items-center gap-2">
+                <h3 className="text-sm  uppercase tracking-wider text-(--on-bg-medium) mb-4 flex items-center gap-2">
                   <Palette className="size-4" /> Тема слайда
                 </h3>
                 <div className="space-y-4">
@@ -446,7 +446,7 @@ ${DEFAULT_TSX}`;
 
               {activeSlide.type !== "CustomTsx" && (
                 <div className="pt-4 border-t border-(--outline)">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-(--on-bg-medium) mb-3">Фоновое изображение</h3>
+                  <h3 className="text-sm  uppercase tracking-wider text-(--on-bg-medium) mb-3">Фоновое изображение</h3>
                   <ImageUploadField
                     value={activeSlide.content.image_url || ""}
                     onChange={(url) => updateSlide("image_url", url)}
@@ -456,7 +456,7 @@ ${DEFAULT_TSX}`;
               )}
 
               <div className="pt-4 border-t border-(--outline)">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-(--on-bg-medium) mb-3">Заметки спикера</h3>
+                <h3 className="text-sm  uppercase tracking-wider text-(--on-bg-medium) mb-3">Заметки спикера</h3>
                 <Textarea className="min-h-[120px] bg-(--bg) text-sm" value={activeSlide.notes || ""} onChange={e => { const next = [...slides]; next[activeIdx].notes = e.target.value; setSlides(next); }} placeholder="Видны только вам..." />
               </div>
             </div>

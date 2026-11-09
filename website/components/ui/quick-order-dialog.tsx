@@ -24,7 +24,7 @@ export function QuickOrderDialog({
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
-  
+
   const setOpen = (val: boolean) => {
     if (!isControlled) setUncontrolledOpen(val);
     controlledOnOpenChange?.(val);
@@ -84,19 +84,19 @@ export function QuickOrderDialog({
       >
         <div className="p-6 md:p-8 space-y-6 max-h-[85vh] overflow-y-auto scrollbar-admin">
           <div>
-            <h2 className="text-2xl font-heading font-semibold tracking-tight text-(--on-bg-high)">
+            <h2 className="text-2xl font-heading  tracking-tight text-(--on-bg-high)">
               Обсудить проект
             </h2>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-(--on-bg-high)">Ваше имя *</Label>
-              <Input 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                placeholder="Иван" 
-                className="bg-(--card) border-(--outline) h-11" 
-                required 
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Иван"
+                className="bg-(--card) border-(--outline) h-11"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -105,11 +105,11 @@ export function QuickOrderDialog({
             </div>
             <div className="space-y-2">
               <Label className="text-(--on-bg-high)">Комментарий</Label>
-              <Textarea 
-                value={desc} 
-                onChange={(e) => setDesc(e.target.value)} 
-                placeholder="Кратко о задаче..." 
-                className="min-h-[80px] bg-(--card) border-(--outline)" 
+              <Textarea
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                placeholder="Кратко о задаче..."
+                className="min-h-[80px] bg-(--card) border-(--outline)"
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full h-12 text-base font-medium mt-2">
@@ -121,8 +121,8 @@ export function QuickOrderDialog({
             <p className="text-body-5 text-(--on-bg-medium)">
               Нужно прикрепить файлы или выбрать несколько услуг?
             </p>
-            <Link 
-              href="/order" 
+            <Link
+              href="/order"
               onClick={() => setOpen(false)}
               className="text-body-4 text-(--primary) hover:underline mt-1 inline-flex items-center gap-1 font-medium"
             >

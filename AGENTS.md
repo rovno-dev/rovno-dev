@@ -60,4 +60,4 @@ We use a root `CHANGELOG.md` instead of a `VERSION` file.
 
 ### Other additionals
 
-Please stop adding subheaidngs (with number of card, desc, etc.) please. Use components from components/ui. Don't make them from scratch please.
+Please stop adding subheaidngs (with number of card, desc, etc.) please. Use components from components/ui. Don't make them from scratch please. Use text styles defined in tailwind.config.mjs

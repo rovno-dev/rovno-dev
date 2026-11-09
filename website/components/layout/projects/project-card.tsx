@@ -164,7 +164,7 @@ export default function ProjectCard({
   index?: number;
   categoryMap?: Record<string, string>;
   tags?: ProjectTagRef[];
-  variant?: "classic" | "featured";
+  variant?: "classic" | "featured" | "clean";
 }) {
   const { t } = useLanguage();
   const [failed, setFailed] = useState(false);
@@ -212,9 +212,7 @@ export default function ProjectCard({
         }
       } catch (err) { }
     };
-    return () => {
-      isCancelled = true;
-    };
+    return () => { isCancelled = true; };
   }, [project.cover?.imageSrc, showFallback]);
 
   const isLight = useMemo(() => {
@@ -229,14 +227,69 @@ export default function ProjectCard({
 
   const textColorClass = isLight ? "text-[var(--dark-8)]" : "text-[var(--gray-0)]";
   const shadowClass = isLight ? "drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]";
-
   const href = `/projects/${project.id}/${project.slug}`;
+
+  if (variant === "clean") {
+    return (
+      <Link
+        href={href}
+        className="group block animate-reveal fill-mode-both relative w-full"
+        style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
+      >
+        {/* Image: 4:3, no rounding, no border. Text lives below it. */}
+        <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card)">
+          {showFallback ? (
+            <CoverFallback
+              label={t("projects.cover.fallback")}
+              hint={t("projects.cover.fallback_hint")}
+            />
+          ) : (
+            <Image
+              src={project.cover.imageSrc}
+              alt={project.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+              onError={() => setFailed(true)}
+            />
+          )}
+          <div className="absolute top-4 right-4 z-10 flex items-center justify-center size-10 bg-black/40 backdrop-blur-md text-white opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+            <ArrowUpRight className="size-5" weight="bold" />
+          </div>
+        </div>
+
+        {/* Text block under the image */}
+        <div className="pt-4 md:pt-5">
+          {normalizedTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
+              {normalizedTags.map((tag, i) => (
+                <span
+                  key={`${tag}-${i}`}
+                  className="inline-flex items-center text-[10px] font-medium uppercase tracking-[0.16em] text-(--on-bg-low) transition-colors group-hover:text-(--primary)"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading font-medium">
+            {project.title}
+          </h3>
+          {project.shortDescription && (
+            <p className="mt-2 text-sm md:text-body-4 text-(--on-bg-medium) leading-relaxed line-clamp-2">
+              {project.shortDescription}
+            </p>
+          )}
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link
       href={href}
       className={cn(
-        "group block animate-reveal fill-mode-both relative w-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card) transition-all duration-500 hover:border-(--primary)/40 hover:shadow-2xl hover:shadow-(--primary)/5",
+        "group block animate-reveal fill-mode-both relative w-full overflow-hidden transition-all duration-500 rounded-3xl border border-(--outline) bg-(--card) hover:border-(--primary)/40 hover:shadow-2xl hover:shadow-(--primary)/5",
         variant === "featured" ? "aspect-[4/3]" : "aspect-[4/3] md:aspect-[3/4]"
       )}
       style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
@@ -256,13 +309,11 @@ export default function ProjectCard({
           onError={() => setFailed(true)}
         />
       )}
-
       <div
         className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500"
         style={gradientStyle}
       />
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
-
       <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 pointer-events-none">
         <div className="flex flex-col max-w-full min-w-0">
           <MarqueeText
@@ -276,7 +327,6 @@ export default function ProjectCard({
           )}
         </div>
       </div>
-
       <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
         {normalizedTags.length > 0 && (
           <div className="flex flex-wrap justify-start gap-2 pointer-events-auto min-w-0">

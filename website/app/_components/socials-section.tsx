@@ -170,7 +170,7 @@ export default function SocialsSection() {
                   : "hover:bg-(--state-hover)"
                   }`}
               >
-                <span className="text-body-3 font-semibold text-(--on-bg-low) group-hover:text-(--on-bg-high) transition-colors">
+                <span className="text-body-3  text-(--on-bg-low) group-hover:text-(--on-bg-high) transition-colors">
                   {t(`home.socials.type.${type.id}`)}
                 </span>
                 <div className="flex items-center gap-1 pointer-events-none">

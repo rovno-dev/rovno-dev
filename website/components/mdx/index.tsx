@@ -43,9 +43,9 @@ export function Gallery({
   const gridClass = cn(
     "grid gap-4",
     columns === 1 ? "grid-cols-1" :
-    columns === 2 ? "grid-cols-1 md:grid-cols-2" : 
-    columns === 4 ? "grid-cols-2 md:grid-cols-4" :
-    "grid-cols-2 md:grid-cols-3"
+      columns === 2 ? "grid-cols-1 md:grid-cols-2" :
+        columns === 4 ? "grid-cols-2 md:grid-cols-4" :
+          "grid-cols-2 md:grid-cols-3"
   );
   return (
     <div className={wrapperClass}>
@@ -85,13 +85,13 @@ export function Gallery({
             <XIcon className="size-6 text-white" />
           </Button>
           {media[activeIndex] && (
-             media[activeIndex].type === "image" ? (
-               <div className="relative w-full h-full">
-                 <Image src={media[activeIndex].src} alt="" fill className="object-contain" />
-               </div>
-             ) : (
-               <video src={media[activeIndex].src} controls autoPlay className="max-w-full max-h-full" />
-             )
+            media[activeIndex].type === "image" ? (
+              <div className="relative w-full h-full">
+                <Image src={media[activeIndex].src} alt="" fill className="object-contain" />
+              </div>
+            ) : (
+              <video src={media[activeIndex].src} controls autoPlay className="max-w-full max-h-full" />
+            )
           )}
         </DialogContent>
       </Dialog>
@@ -101,7 +101,7 @@ export function Gallery({
 
 export function MDXHeading({ level, children, className }: { level: 1 | 2 | 3 | 4 | 5 | 6; children: ReactNode; className?: string; }) {
   const Tag = `h${level}` as ElementType;
-  const classes = { 1: "text-display-2 md:text-display-1 mb-6 mt-12", 2: "text-display-3 md:text-display-2 mb-4 mt-8", 3: "text-display-4 mb-3 mt-6", 4: "text-display-5 mb-2 mt-4", 5: "text-display-6 mb-2 mt-4", 6: "text-body-1 font-semibold mb-2 mt-4" };
+  const classes = { 1: "text-display-2 md:text-display-1 mb-6 mt-12", 2: "text-display-3 md:text-display-2 mb-4 mt-8", 3: "text-display-4 mb-3 mt-6", 4: "text-display-5 mb-2 mt-4", 5: "text-display-6 mb-2 mt-4", 6: "text-body-1  mb-2 mt-4" };
   return <Tag className={cn(classes[level], className)}>{children}</Tag>;
 }
 

@@ -1,6 +1,6 @@
 import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
 import BestWorksSection from "./_components/best-projects-section";
-import ServicesSection from "./_components/sercices-section";
+import ServicesSection from "./_components/services-section";
 import NumbersSection from "./_components/numbers-section";
 import VideoShowcaseSection from "./_components/video-showcase-section";
 import { fetchPublishedProjectsServer } from "@/utils/api/projects";

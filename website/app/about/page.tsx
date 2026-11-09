@@ -52,7 +52,7 @@ function ExpertCard({ member, index }: { member: PublicTeamMember; index: number
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card) flex items-center justify-center">
-                <span className="text-display-1 font-heading font-semibold tracking-tighter text-(--on-bg-high) opacity-30">
+                <span className="text-display-1 font-heading  tracking-tighter text-(--on-bg-high) opacity-30">
                   {displayName.slice(0, 1)}
                 </span>
               </div>
@@ -131,13 +131,12 @@ export default async function AboutPage() {
             </Card>
           ) : (
             <div
-              className={`grid grid-cols-1 sm:grid-cols-2 ${
-                members.length >= 4
+              className={`grid grid-cols-1 sm:grid-cols-2 ${members.length >= 4
                   ? "lg:grid-cols-4"
                   : members.length === 3
                     ? "lg:grid-cols-3"
                     : "lg:grid-cols-2"
-              } gap-6 md:gap-8`}
+                } gap-6 md:gap-8`}
             >
               {members.map((m, idx) => (
                 <ExpertCard key={m.id} member={m} index={idx} />

@@ -49,7 +49,7 @@ const mdxComponents = {
     return (
       <h2
         id={id}
-        className="text-2xl md:text-3xl font-semibold text-(--on-bg-high) mt-12 mb-4 tracking-tight scroll-mt-28"
+        className="text-2xl md:text-3xl  text-(--on-bg-high) mt-12 mb-4 tracking-tight scroll-mt-28"
       >
         {children}
       </h2>
@@ -81,7 +81,7 @@ const mdxComponents = {
     <li className="pl-1">{children}</li>
   ),
   strong: ({ children }: { children: React.ReactNode }) => (
-    <strong className="font-semibold text-(--on-bg-high)">{children}</strong>
+    <strong className=" text-(--on-bg-high)">{children}</strong>
   ),
   a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
     <a
@@ -139,7 +139,7 @@ export default async function ServicePage({
               Все услуги
             </Link>
 
-            <h1 className="text-5xl md:text-7xl font-heading font-semibold text-(--on-bg-high) leading-[1.05] tracking-[-0.03em] mb-6">
+            <h1 className="text-5xl md:text-7xl font-heading  text-(--on-bg-high) leading-[1.05] tracking-[-0.03em] mb-6">
               {doc.shortTitle}
             </h1>
 

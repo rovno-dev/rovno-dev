@@ -88,7 +88,7 @@ export default function CtaSection() {
             </span>
           </div>
 
-          <h2 className="text-[3rem] sm:text-[4rem] md:text-[5.5rem] font-heading font-semibold leading-[0.95] tracking-[-0.035em] text-(--on-bg-high) mb-8">
+          <h2 className="text-[3rem] sm:text-[4rem] md:text-[5.5rem] font-heading  leading-[0.95] tracking-[-0.035em] text-(--on-bg-high) mb-8">
             {t("home.cta.title")}
           </h2>
 

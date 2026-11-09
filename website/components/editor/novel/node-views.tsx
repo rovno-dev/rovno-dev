@@ -161,7 +161,7 @@ export function GalleryNodeView({ node, deleteNode, updateAttributes }: any) {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-(--on-bg-medium) uppercase tracking-wider">
+            <span className="text-xs  text-(--on-bg-medium) uppercase tracking-wider">
               Галерея {images.length > 0 && `(${images.length})`}
             </span>
             {isFullWidth && (

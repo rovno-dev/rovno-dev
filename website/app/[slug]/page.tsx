@@ -96,7 +96,7 @@ export default async function ExpertPage({ params }: { params: Promise<{ slug: s
           <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-3 gap-px bg-(--outline) border border-(--outline) rounded-3xl overflow-hidden">
             {stats.map((s, i) => (
               <div key={i} className="bg-(--bg) p-6 md:p-8">
-                <div className="text-4xl md:text-5xl font-heading font-semibold text-(--primary) leading-none mb-2">{s.value}</div>
+                <div className="text-4xl md:text-5xl font-heading  text-(--primary) leading-none mb-2">{s.value}</div>
                 <p className="text-body-5 uppercase tracking-[0.16em] text-(--on-bg-low)">{s.label}</p>
               </div>
             ))}
@@ -155,7 +155,7 @@ export default async function ExpertPage({ params }: { params: Promise<{ slug: s
               <div>
                 {milestones.map((m, i) => (
                   <div key={i} className="grid grid-cols-1 md:grid-cols-[140px_1fr] gap-4 md:gap-10 py-8 border-b border-(--outline) last:border-b-0">
-                    <div className="font-mono text-display-3 md:text-display-2 text-(--primary) font-semibold leading-none mt-1">{m.year}</div>
+                    <div className="font-mono text-display-3 md:text-display-2 text-(--primary)  leading-none mt-1">{m.year}</div>
                     <div>
                       <h3 className="text-heading-2 md:text-display-4 text-(--on-bg-high) mb-3 tracking-tight">{m.title}</h3>
                       <p className="text-body-2 md:text-body-1 text-(--on-bg-medium) leading-relaxed max-w-2xl">{m.body}</p>

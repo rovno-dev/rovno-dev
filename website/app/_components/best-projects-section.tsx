@@ -8,6 +8,7 @@ import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { useLanguage } from "@/providers/language-provider";
 import { dbRowToProject, type DbProjectList } from "@/utils/api/projects";
 import type { Project } from "@/utils/api/projects";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 
 /**
  * Featured projects on the home page. Data comes down as a prop from the
@@ -33,10 +34,23 @@ export default function BestWorksSection({
 
   return (
     <section className="py-8 md:py-10">
-      <Container>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl leading-[1.1] font-sans font-medium tracking-[-0.02em] uppercase text-center w-full break-words mb-10">
-          {t("home.best_works_title")}
-        </h2>
+      <Container className="">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-display-4 sm:text-display-2">
+            {t("home.best_works_title")}
+          </h2>
+          <Button
+            className="text-(--on-bg-medium)"
+            variant="text"
+            size="small"
+            asChild
+          >
+            <Link href="/projects">
+              {t("home.view_all_projects")}
+              <ArrowRightIcon className="size-4" />
+            </Link>
+          </Button>
+        </div>
 
         {cards.length === 0 ? (
           <div className="py-16 text-center rounded-3xl border border-dashed border-(--outline)">
@@ -48,13 +62,13 @@ export default function BestWorksSection({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {cards.map((project, idx) => (
               <ProjectCard
                 key={project.id || project.slug}
                 project={project}
                 index={idx}
-                variant="featured"
+                variant="clean"
                 tags={(project.tags || [])
                   .map((tg) => tg.title)
                   .filter((v): v is string => !!v)
@@ -66,18 +80,6 @@ export default function BestWorksSection({
             ))}
           </div>
         )}
-
-        <Button
-          className="w-full md:w-fit mt-8"
-          variant="glass"
-          size="large"
-          asChild
-        >
-          <Link href="/projects">
-            {t("home.view_all_projects")}
-            <CaretRightIcon className="size-4" />
-          </Link>
-        </Button>
       </Container>
     </section>
   );

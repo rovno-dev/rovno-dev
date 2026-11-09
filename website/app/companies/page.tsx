@@ -284,7 +284,7 @@ function ClientTile({
               />
             </div>
           ) : (
-            <span className="text-display-2 font-heading font-semibold tracking-tighter text-(--on-bg-high) opacity-40 group-hover:opacity-70 transition-opacity">
+            <span className="text-display-2 font-heading  tracking-tighter text-(--on-bg-high) opacity-40 group-hover:opacity-70 transition-opacity">
               {initials(client.name)}
             </span>
           )}

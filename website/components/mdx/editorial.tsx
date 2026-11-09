@@ -74,7 +74,7 @@ export function StatRow({
       {items.map((s, i) => (
         <div key={i} className="bg-(--bg) p-6 md:p-7">
           <div className="flex items-baseline gap-1 mb-2 tabular-nums">
-            <span className="text-4xl md:text-5xl font-heading font-semibold tracking-[-0.03em] text-(--on-bg-high) leading-none">
+            <span className="text-4xl md:text-5xl font-heading  tracking-[-0.03em] text-(--on-bg-high) leading-none">
               {s.value}
             </span>
             {s.unit && (

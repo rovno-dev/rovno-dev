@@ -159,7 +159,7 @@ export default function AdminClientsPage() {
                       />
                     </div>
                   ) : (
-                    <span className="text-display-2 font-heading font-semibold tracking-tighter text-(--on-bg-high) opacity-40">
+                    <span className="text-display-2 font-heading  tracking-tighter text-(--on-bg-high) opacity-40">
                       {initials(c.name)}
                     </span>
                   )}

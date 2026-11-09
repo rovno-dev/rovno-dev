@@ -119,7 +119,7 @@ const mdxComponents = {
   ol: (props: any) => <MDXList ordered={true} {...props} />,
   li: MDXListItem,
   strong: ({ children }: { children: React.ReactNode }) => (
-    <strong className="font-semibold text-(--on-bg-high)">{children}</strong>
+    <strong className=" text-(--on-bg-high)">{children}</strong>
   ),
   a: MDXLink,
   img: MDXImage,
@@ -221,12 +221,12 @@ export default async function PreviewArticlePage({
   const legacyContent = article.content_json
     ? null
     : (
-        await compileMDX({
-          source: article.mdx_content || "",
-          components: mdxComponents,
-          options: { parseFrontmatter: false },
-        })
-      ).content;
+      await compileMDX({
+        source: article.mdx_content || "",
+        components: mdxComponents,
+        options: { parseFrontmatter: false },
+      })
+    ).content;
 
   return (
     <div className="space-y-6">

@@ -420,7 +420,7 @@ export function CustomProjectPage({
           <Container>
             <div className="max-w-[1200px] mx-auto">
               <div className="flex items-end justify-between mb-12">
-                <h2 className="text-display-3 md:text-display-2 font-heading font-semibold tracking-tight">
+                <h2 className="text-display-3 md:text-display-2 font-heading  tracking-tight">
                   Следующие проекты
                 </h2>
                 <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">

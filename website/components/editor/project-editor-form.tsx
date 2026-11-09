@@ -243,7 +243,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       {/* Header Layout Fixed */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-6">
         <div className="min-w-0">
-          <h1 className="text-2xl md:text-3xl font-heading font-semibold mb-1 tracking-tight truncate">
+          <h1 className="text-2xl md:text-3xl font-heading  mb-1 tracking-tight truncate">
             {isEdit ? "Редактирование проекта" : "Новый проект"}
           </h1>
           {initial && (
@@ -254,27 +254,27 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           {isEdit && (
-            <Button 
-              variant="glass-red" 
-              size="icon-medium" 
-              onClick={handleDelete} 
+            <Button
+              variant="glass-red"
+              size="icon-medium"
+              onClick={handleDelete}
               disabled={saving}
               className="shrink-0"
             >
               <TrashIcon className="size-4" />
             </Button>
           )}
-          <Button 
-            variant="outlined" 
-            onClick={() => handleSave("draft")} 
+          <Button
+            variant="outlined"
+            onClick={() => handleSave("draft")}
             disabled={saving}
             className="flex-1 sm:flex-none"
           >
             <FloppyDiskIcon className="size-4" />
             Сохранить черновик
           </Button>
-          <Button 
-            onClick={() => handleSave("published")} 
+          <Button
+            onClick={() => handleSave("published")}
             disabled={saving}
             className="flex-1 sm:flex-none"
           >

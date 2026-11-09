@@ -297,7 +297,7 @@ export function BreadProjectPage({
                   <SectionLabel number="02" title="Manifesto" accent={ACCENT} />
                 </div>
                 <div className="lg:col-span-9">
-                  <p className="text-3xl md:text-5xl lg:text-6xl font-heading font-semibold tracking-[-0.02em] leading-[1.05] text-(--on-bg-high)">
+                  <p className="text-3xl md:text-5xl lg:text-6xl font-heading  tracking-[-0.02em] leading-[1.05] text-(--on-bg-high)">
                     {project.description}
                   </p>
                 </div>
@@ -314,7 +314,7 @@ export function BreadProjectPage({
             <div className="max-w-[1400px] mx-auto">
               <div className="mb-14">
                 <SectionLabel number="03" title="Process" accent={ACCENT} />
-                <h2 className="mt-5 text-3xl md:text-5xl font-heading font-semibold tracking-[-0.02em] leading-[1.05] text-(--on-bg-high) max-w-[820px]">
+                <h2 className="mt-5 text-3xl md:text-5xl font-heading  tracking-[-0.02em] leading-[1.05] text-(--on-bg-high) max-w-[820px]">
                   От раскадровки до финального грейда.
                 </h2>
               </div>
@@ -339,7 +339,7 @@ export function BreadProjectPage({
                         />
                       </div>
                       <div>
-                        <h3 className="text-xl md:text-2xl font-heading font-semibold mb-3 tracking-tight">
+                        <h3 className="text-xl md:text-2xl font-heading  mb-3 tracking-tight">
                           {step.title}
                         </h3>
                         <p className="text-body-4 text-(--on-bg-medium) leading-relaxed">
@@ -539,7 +539,7 @@ export function BreadProjectPage({
             <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-(--on-bg-low) mb-6">
               End of case
             </p>
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading font-semibold tracking-[-0.03em] leading-[1.02] mb-10">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading  tracking-[-0.03em] leading-[1.02] mb-10">
               Хотите такой же{" "}
               <span style={{ color: ACCENT }}>ролик?</span>
             </h2>
@@ -613,7 +613,7 @@ function ImpactMetric({
   return (
     <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 ring-0">
       <div
-        className="text-4xl md:text-5xl font-heading font-semibold tracking-[-0.02em] leading-none mb-3 tabular-nums"
+        className="text-4xl md:text-5xl font-heading  tracking-[-0.02em] leading-none mb-3 tabular-nums"
         style={{ color: accent }}
       >
         {value}

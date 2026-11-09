@@ -39,7 +39,7 @@ export function FileUpload({
               ) : (
                 <>
                   <div className={cn("size-14 rounded-xl flex items-center justify-center mb-2", attr.type === 'pdf' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}><NewspaperIcon className="size-8! fill-current" /></div>
-                  <span className="text-[11px] font-semibold text-(--on-bg-medium) text-center line-clamp-2 px-1">{attr.file.name}</span>
+                  <span className="text-[11px]  text-(--on-bg-medium) text-center line-clamp-2 px-1">{attr.file.name}</span>
                 </>
               )}
             </div>

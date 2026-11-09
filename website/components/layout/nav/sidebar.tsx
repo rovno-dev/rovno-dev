@@ -311,7 +311,7 @@ export function Sidebar({
                   sideOffset={8}
                   className="p-1 flex flex-col gap-0.5 min-w-[160px] bg-(--card) border-(--outline) shadow-lg"
                 >
-                  <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-(--on-bg-low)">
+                  <div className="px-2 py-1.5 text-[10px]  uppercase tracking-[0.14em] text-(--on-bg-low)">
                     {item.label}
                   </div>
                   <div className="h-px bg-(--outline) my-0.5" />

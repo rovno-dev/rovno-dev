@@ -17,7 +17,7 @@ export default function NotFound() {
         <p className="text-body-5 uppercase tracking-[0.35em] text-(--on-bg-low) mb-6">
           404
         </p>
-        <h1 className="text-display-1 md:text-[7rem] font-heading font-semibold leading-none tracking-tighter text-(--on-bg-high) mb-6">
+        <h1 className="text-display-1 md:text-[7rem] font-heading  leading-none tracking-tighter text-(--on-bg-high) mb-6">
           Страница не найдена
         </h1>
         <p className="text-body-2 text-(--on-bg-medium) max-w-md mx-auto mb-10 leading-relaxed">

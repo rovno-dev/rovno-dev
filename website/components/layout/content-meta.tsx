@@ -110,7 +110,7 @@ export function ContentMeta({
             {it.icon}
           </span>
           <div className="flex flex-col min-w-0">
-            <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-(--on-bg-low)">
+            <span className="text-[10px] uppercase tracking-[0.14em]  text-(--on-bg-low)">
               {it.label}
             </span>
             {it.value === null ? (
