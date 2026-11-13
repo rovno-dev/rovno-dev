@@ -12,8 +12,6 @@ import { Toc } from "@/components/layout/toc/toc";
 import {
   Gallery,
   MetricCard,
-  TextGrid,
-  TextColumn,
   MDXHeading,
   MDXImage,
   MDXBlockquote,
@@ -29,6 +27,8 @@ import {
   MDXTh,
   MDXTd,
   MDXCard,
+  TextGrid,
+  TextColumn,
 } from "@/components/mdx";
 import { Callout, PullQuote, StatRow } from "@/components/mdx/editorial";
 import { pageMetadata, resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
@@ -36,11 +36,12 @@ import { pageMetadata, resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/se
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string; slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);
   if (!dbProject) return { title: "Проект не найден · Rovno.dev" };
+  
   const title = dbProject.seo_title || dbProject.title;
   const description =
     dbProject.meta_description ||
@@ -51,10 +52,11 @@ export async function generateMetadata({
     dbProject.cover_image_src,
     `/api/og/project/${slug}`,
   );
-  const url = absoluteUrl(`/projects/${dbProject.id}/${slug}`);
+  const url = absoluteUrl(`/projects/${slug}`);
   const fullTitle = title.includes("Rovno.dev")
     ? title
     : `${title} · ${SITE_NAME}`;
+
   return {
     title: { absolute: fullTitle },
     description,
@@ -92,12 +94,14 @@ interface DBProjectTag {
   label: string;
   value?: any;
 }
+
 interface DBProjectMedia {
   id: string;
   type: "image" | "video";
   url: string;
   caption?: string | null;
 }
+
 interface DBProject {
   id: string;
   slug: string;
@@ -229,7 +233,7 @@ function dbToContext(db: DBProject, content: React.ReactNode): CustomPageContext
 export default async function ProjectPage({
   params,
 }: {
-  params: Promise<{ id: string; slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
   const dbProject = await fetchDbProject(slug);

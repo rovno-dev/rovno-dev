@@ -109,8 +109,6 @@ export function CustomProjectPage({
   const fallbackHeadings: TocHeading[] = [];
   if (content)
     fallbackHeadings.push({ id: "content", text: "Описание", level: 2 });
-  if (project.media.length > 0)
-    fallbackHeadings.push({ id: "gallery", text: "Галерея", level: 2 });
   if (related.length > 0)
     fallbackHeadings.push({
       id: "next-projects",
@@ -176,9 +174,7 @@ export function CustomProjectPage({
       </section>
 
       <Container className="pt-12 md:pt-16">
-        {/* Two column layout - TOC column only when headings exist.
-            No `items-start` on the grid so the TOC wrapper stretches to
-            the row height, giving the sticky aside room to travel. */}
+        {/* Two column layout - TOC column only when headings exist. */}
         <div
           className={`mx-auto grid grid-cols-1 gap-12 ${
             hasToc
@@ -214,56 +210,9 @@ export function CustomProjectPage({
                 </article>
               </section>
             )}
-
-            {project.media.length > 0 && (
-              <section id="gallery" className="mt-16">
-                <div className="mb-8">
-                  <h2 className="text-display-4">Галерея</h2>
-                </div>
-
-                <div className="w-screen relative left-1/2 -translate-x-1/2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
-                    {project.media.map((m) => (
-                      <figure
-                        key={m.id}
-                        className="group overflow-hidden bg-(--card) relative aspect-[4/3]"
-                      >
-                        {m.type === "video" ? (
-                          <video
-                            src={m.url}
-                            controls
-                            playsInline
-                            preload="metadata"
-                            className="w-full h-full object-cover bg-black"
-                          />
-                        ) : (
-                          <Image
-                            src={m.url}
-                            alt={m.caption || ""}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          />
-                        )}
-                        {m.caption && (
-                          <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
-                            {m.caption}
-                          </figcaption>
-                        )}
-                      </figure>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
           </div>
 
-          {/* Right Column: TOC.
-              The wrapper renders on all screens so `Toc` can decide:
-                - desktop: sticky sidebar <aside> (visible)
-                - mobile:  fixed floating button <div> (visible)
-              No `hidden lg:block` wrapper - that was hiding the mobile
-              button AND preventing sticky layout on desktop. */}
+          {/* Right Column: TOC. */}
           {hasToc && (
             <div>
               <Toc

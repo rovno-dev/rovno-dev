@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -14,16 +15,14 @@ import { UnifiedCover } from "./unified-cover";
 import { EntityPicker, type PickerItem } from "./entity-picker";
 import { EntityMultiPicker, type MultiPickerItem } from "./entity-multi-picker";
 import { ProjectTagsEditor } from "./project-tags-editor";
-import { ProjectMediaUploader } from "./media-uploader";
 import { GithubReadmePreview } from "./github-readme-preview";
 import { revalidateTags } from "@/utils/revalidate";
 import {
   CUSTOM_PAGES_META,
   findCustomPageMeta,
-} from "@/app/projects/[id]/[slug]/_components/custom-pages-meta";
+} from "@/app/projects/[slug]/_components/custom-pages-meta";
 import { NovelEditor } from "./novel/novel-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
 import {
   createProject, updateProject, deleteProject,
   type ProjectDetail, type ProjectPayload,
@@ -121,10 +120,13 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   const router = useRouter();
   const isEdit = !!initial;
   const isPublished = initial?.publication_status === "published";
+
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
+
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [companies, setCompanies] = useState<ClientListItem[]>([]);
   const [stackPool, setStackPool] = useState<StackItem[]>([]);
+
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [companiesLoading, setCompaniesLoading] = useState(true);
   const [stackLoading, setStackLoading] = useState(true);
@@ -152,11 +154,13 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     id: c.id,
     label: c.label,
   }));
+
   const companyItems: PickerItem[] = companies.map((c) => ({
     id: c.id,
     label: c.name,
     meta: c.industry || null,
   }));
+
   const stackItems: MultiPickerItem[] = stackPool.map((s) => ({
     id: s.id,
     label: s.name,
@@ -193,7 +197,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
     is_featured: form.is_featured,
     publication_status: status,
     tags: form.tags,
-    media: form.media, // Убедись, что form.media содержит полный массив
+    // media is no longer sent from the editor, so it won't overwrite existing data if it's left out.
     custom_page: form.custom_page,
   });
 
@@ -410,6 +414,27 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         </div>
       </Card>
 
+      {/* Flags */}
+      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
+        <h2 className="text-heading-3">Флаги</h2>
+        <div className="flex items-center gap-3">
+          <Switch
+            id="is_featured"
+            checked={form.is_featured}
+            onCheckedChange={(v) => update("is_featured", v)}
+          />
+          <Label htmlFor="is_featured">Показывать в избранных на главной</Label>
+        </div>
+        <div className="flex items-center gap-3">
+          <Switch
+            id="published"
+            checked={form.publication_status === "published"}
+            onCheckedChange={(v) => update("publication_status", v ? "published" : "draft")}
+          />
+          <Label htmlFor="published">Опубликован</Label>
+        </div>
+      </Card>
+
       {/* Cover */}
       <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
         <h2 className="text-heading-3">Обложка</h2>
@@ -462,17 +487,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         )}
       </Card>
 
-      {/* Media gallery */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-        <div>
-          <h2 className="text-heading-3 mb-1">Медиа (Галерея)</h2>
-          <p className="text-body-4 text-(--on-bg-medium)">
-            Изображения и короткие видео до 20 МБ. Автоматически рендерятся в галерее на странице проекта.
-          </p>
-        </div>
-        <ProjectMediaUploader value={form.media} onChange={(v) => update("media", v)} />
-      </Card>
-
       {/* Content */}
       <div className="space-y-3">
         <h2 className="text-heading-3">Содержимое</h2>
@@ -498,27 +512,6 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
               className="min-h-[72px]"
             />
           </Field>
-        </div>
-      </Card>
-
-      {/* Flags */}
-      <Card className="rounded-3xl border-(--outline) bg-(--card) p-6 space-y-4 overflow-visible">
-        <h2 className="text-heading-3">Флаги</h2>
-        <div className="flex items-center gap-3">
-          <Switch
-            id="is_featured"
-            checked={form.is_featured}
-            onCheckedChange={(v) => update("is_featured", v)}
-          />
-          <Label htmlFor="is_featured">Показывать в избранных на главной</Label>
-        </div>
-        <div className="flex items-center gap-3">
-          <Switch
-            id="published"
-            checked={form.publication_status === "published"}
-            onCheckedChange={(v) => update("publication_status", v ? "published" : "draft")}
-          />
-          <Label htmlFor="published">Опубликован</Label>
         </div>
       </Card>
     </div>

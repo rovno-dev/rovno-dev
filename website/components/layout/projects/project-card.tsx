@@ -108,7 +108,6 @@ function MarqueeText({
       >
         {text}
       </span>
-
       {isMarquee ? (
         <div className="overflow-hidden pl-2 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
           <style>{`
@@ -224,10 +223,10 @@ export default function ProjectCard({
   const gradientStyle = bgColor
     ? { background: `linear-gradient(to bottom, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.95) 0%, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.4) 50%, transparent 100%)` }
     : { background: "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)" };
-
   const textColorClass = isLight ? "text-[var(--dark-8)]" : "text-[var(--gray-0)]";
   const shadowClass = isLight ? "drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]";
-  const href = `/projects/${project.id}/${project.slug}`;
+
+  const href = `/projects/${project.slug}`;
 
   if (variant === "clean") {
     return (
@@ -257,7 +256,6 @@ export default function ProjectCard({
             <ArrowUpRight className="size-5" weight="bold" />
           </div>
         </div>
-
         {/* Text block under the image */}
         <div className="pt-4 md:pt-5">
           {normalizedTags.length > 0 && (
@@ -272,7 +270,7 @@ export default function ProjectCard({
               ))}
             </div>
           )}
-          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-medium) leading-[1.15] tracking-tight font-heading ">
+          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading ">
             {project.title}
           </h3>
           {project.shortDescription && (
@@ -309,11 +307,14 @@ export default function ProjectCard({
           onError={() => setFailed(true)}
         />
       )}
+
       <div
         className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500"
         style={gradientStyle}
       />
+
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
+
       <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 pointer-events-none">
         <div className="flex flex-col max-w-full min-w-0">
           <MarqueeText
@@ -327,6 +328,7 @@ export default function ProjectCard({
           )}
         </div>
       </div>
+
       <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
         {normalizedTags.length > 0 && (
           <div className="flex flex-wrap justify-start gap-2 pointer-events-auto min-w-0">

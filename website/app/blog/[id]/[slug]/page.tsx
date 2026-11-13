@@ -34,6 +34,8 @@ import {
   MDXTh,
   MDXTd,
   MDXCard,
+  TextGrid,
+  TextColumn,
 } from "@/components/mdx";
 import { resolveOgImage, absoluteUrl, SITE_NAME } from "@/utils/seo";
 
@@ -94,6 +96,8 @@ const mdxComponents = {
   Card: MDXCard,
   Gallery,
   MetricCard,
+  TextGrid,
+  TextColumn,
 };
 
 export async function generateMetadata({
@@ -104,6 +108,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
   if (!article) return { title: "Статья не найдена · Rovno.dev" };
+
   const title = article.seo_title || article.title;
   const description = article.meta_description || article.description || "";
   const ogImage = resolveOgImage(article.image_url, `/api/og/article/${slug}`);
@@ -111,6 +116,7 @@ export async function generateMetadata({
   const fullTitle = title.includes("Rovno.dev")
     ? title
     : `${title} · ${SITE_NAME}`;
+
   return {
     title: { absolute: fullTitle },
     description,
@@ -157,6 +163,7 @@ export default async function ArticlePage({
     fetchArticleServer(slug),
     fetchPublishedArticlesServer({ limit: 4 }),
   ]);
+
   if (!article) notFound();
 
   const otherArticles = recentArticles
@@ -212,6 +219,7 @@ export default async function ArticlePage({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+            
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
               <Button variant="glass" size="icon-medium" shape="round" asChild>
                 <Link href="/blog" aria-label="Все статьи">
@@ -219,6 +227,7 @@ export default async function ArticlePage({
                 </Link>
               </Button>
             </div>
+            
             {article.tags && article.tags.length > 0 && (
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
                 {article.tags.slice(0, 4).map((tag) => (
@@ -233,6 +242,7 @@ export default async function ArticlePage({
                 ))}
               </div>
             )}
+            
             <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
               <h1 className="text-display-3 md:text-display-2 text-white leading-[1.05] tracking-tight mb-3 max-w-2xl animate-reveal">
                 {article.title}
@@ -251,7 +261,7 @@ export default async function ArticlePage({
           </div>
         </div>
       </Container>
-
+      
       <Container className="pt-4">
         <div className="max-w-[860px] mx-auto">
           <ContentMeta
@@ -263,7 +273,7 @@ export default async function ArticlePage({
           />
         </div>
       </Container>
-
+      
       <Container className="py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
           <article className="min-w-0 max-w-[760px] prose-case">
@@ -272,44 +282,7 @@ export default async function ArticlePage({
             ) : (
               legacyContent
             )}
-
-            {article.attachments && article.attachments.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-(--outline)">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {article.attachments.map((m: any, i: number) => (
-                    <figure
-                      key={i}
-                      className="rounded-3xl border border-(--outline) overflow-hidden bg-(--card)"
-                    >
-                      {m.type === "image" ? (
-                        <div className="relative aspect-video">
-                          <Image
-                            src={m.url}
-                            alt={m.caption || ""}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <video
-                          src={m.url}
-                          controls
-                          preload="metadata"
-                          className="w-full aspect-video bg-black"
-                        />
-                      )}
-                      {m.caption && (
-                        <figcaption className="px-4 py-2 text-body-5 text-(--on-bg-medium)">
-                          {m.caption}
-                        </figcaption>
-                      )}
-                    </figure>
-                  ))}
-                </div>
-              </div>
-            )}
-
+            
             {otherArticles.length > 0 && (
               <div className="mt-16 pt-12 border-t border-(--outline) not-prose">
                 <h2 className="text-display-4 mb-6 tracking-tight">Другие статьи</h2>
@@ -321,7 +294,6 @@ export default async function ArticlePage({
               </div>
             )}
           </article>
-
           <div className="space-y-8">
             {headings.length > 0 && (
               <Toc

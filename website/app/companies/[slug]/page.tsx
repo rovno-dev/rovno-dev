@@ -56,7 +56,7 @@ export default async function ClientProfilePage({
             <ArrowLeftIcon className="size-4" />
             Все компании
           </Link>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 md:gap-12 items-start">
             {/* Logo tile */}
             <div className="relative size-40 md:size-[200px] rounded-4xl border border-(--outline) bg-(--card) overflow-hidden flex items-center justify-center shrink-0">
@@ -75,7 +75,7 @@ export default async function ClientProfilePage({
                 </span>
               )}
             </div>
-
+            
             {/* Text */}
             <div className="min-w-0">
               {client.industry && (
@@ -91,7 +91,7 @@ export default async function ClientProfilePage({
                   {client.description}
                 </p>
               )}
-
+              
               <div className="flex flex-wrap items-center gap-3">
                 {client.website && (
                   <Button variant="outlined" size="small" asChild>
@@ -118,14 +118,14 @@ export default async function ClientProfilePage({
           </div>
         </Container>
       </section>
-
+      
       {/* Projects grid */}
       <section className="py-12 md:py-16">
         <Container>
           <h2 className="text-display-3 md:text-display-2 text-(--on-bg-high) mb-8">
             {projectCount > 0 ? "Проекты" : "Пока нет проектов"}
           </h2>
-
+          
           {projectCount === 0 ? (
             <Card className="rounded-3xl border-(--outline) p-10 text-center">
               <p className="text-body-3 text-(--on-bg-medium)">
@@ -137,7 +137,7 @@ export default async function ClientProfilePage({
               {client.projects.map((p, idx) => (
                 <Link
                   key={p.id}
-                  href={`/projects/${p.id}/${p.slug}`}
+                  href={`/projects/${p.slug}`}
                   className="group block animate-reveal fill-mode-both"
                   style={{ animationDelay: `${idx * 80}ms` }}
                 >

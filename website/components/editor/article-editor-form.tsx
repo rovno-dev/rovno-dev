@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -16,7 +17,6 @@ import { useUser } from "@/entities/user/model/user-context";
 import { NovelEditor } from "./novel/novel-editor";
 import { TagsAutocomplete } from "./tags-autocomplete";
 import { ImageUploadField } from "./image-upload-field";
-import { ProjectMediaUploader } from "./media-uploader";
 import { Article, ArticlePayload, createArticle, updateArticle, deleteArticle, publishArticle, unpublishArticle } from "@/utils/api/articles";
 
 interface FormState {
@@ -73,9 +73,11 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
   const router = useRouter();
   const isEdit = !!initial;
   const isTeam = !!user?.is_team_member;
+
   const isPublished = initial?.publication_status === "published";
   const isPending = initial?.publication_status === "pending_review";
   const isRejected = initial?.publication_status === "rejected";
+
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
   const [saving, setSaving] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
@@ -88,6 +90,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
     if (!form.raw_json.trim()) { toast.error(t("editor.ai_empty")); return; }
     let parsed: any;
     try { parsed = JSON.parse(form.raw_json); } catch { toast.error(t("editor.ai_invalid")); return; }
+
     setForm((prev) => ({
       ...prev,
       title: typeof parsed.title === "string" ? parsed.title : prev.title,
@@ -128,8 +131,10 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
     try {
       const payload = buildPayload(status);
       const saved = isEdit && initial ? await updateArticle(initial.slug, payload) : await createArticle(payload);
+      
       if (status === "published" && !isTeam) toast.success("Статья отправлена на проверку");
       else toast.success(status === "published" ? t("editor.published") : t("editor.saved"));
+      
       if (!isEdit) router.replace(`${basePath}/${saved.slug}/edit`);
       else router.refresh();
     } catch (err: any) {
@@ -244,12 +249,6 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       </Card>
 
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
-        <h2 className="text-heading-3">Медиа</h2>
-        <p className="text-body-4 text-(--on-bg-medium)">Изображения и короткие видео до 10 МБ. Рендерятся галереей в конце статьи.</p>
-        <ProjectMediaUploader value={form.attachments} onChange={(v) => update("attachments", v)} />
-      </Card>
-
-      <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">
         <button type="button" className="flex items-center justify-between w-full" onClick={() => setAiOpen((v) => !v)}>
           <span className="flex items-center gap-2 text-heading-3"><SparkleIcon className="size-4 text-(--primary)" />{t("editor.section_ai")}</span>
           {aiOpen ? <CaretUpIcon className="size-4" /> : <CaretDownIcon className="size-4" />}
@@ -288,7 +287,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
         {seoOpen && (
           <div className="grid grid-cols-1 gap-3">
             <Field><FieldLabel>{t("editor.field_seo_title")}</FieldLabel><Input value={form.seo_title} onChange={(e) => update("seo_title", e.target.value)} /></Field>
-            <Field><FieldLabel>{t("editor.field_seo_description")}</FieldLabel><Textarea value={form.meta_description} onChange={(e) => update("meta_description", e.target.value)} className="min-h-[72px]" /></Field>
+            <Field><FieldLabel>{t("field_seo_description")}</FieldLabel><Textarea value={form.meta_description} onChange={(e) => update("meta_description", e.target.value)} className="min-h-[72px]" /></Field>
           </div>
         )}
       </Card>
