@@ -12,6 +12,8 @@ import { Toc } from "@/components/layout/toc/toc";
 import {
   Gallery,
   MetricCard,
+  TextGrid,
+  TextColumn,
   MDXHeading,
   MDXImage,
   MDXBlockquote,
@@ -177,6 +179,8 @@ const components = {
   Card: MDXCard,
   Gallery,
   MetricCard,
+  TextGrid,
+  TextColumn,
   Callout,
   PullQuote,
   StatRow,

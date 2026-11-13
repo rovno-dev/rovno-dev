@@ -42,7 +42,13 @@
       "**/.agents/skills/image-to-code/**/*",
       "**/.agents/skills/imagegen-frontend-mobile/**/*",
       "**/.agents/skills/imagegen-frontend-web/**/*",
-      "**/.agents/skills/design-taste-frontend/**/*"
+      "**/.agents/skills/design-taste-frontend/**/*",
+      "**/.agents/skills/brandkit/**/*",
+      "**/.agents/skills/grill-with-docs/**/*",
+      "**/.agents/skills/handoff/**/*",
+      "**/.agents/skills/resolving-merge-conflicts/**/*",
+      "**/.agents/skills/to-spec/**/*",
+      "**/.agents/skills/to-tickets/**/*"
     ]
   }
 }

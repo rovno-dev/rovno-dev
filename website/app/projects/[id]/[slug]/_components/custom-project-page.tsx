@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "motion/react";
@@ -8,7 +8,6 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 import { ArrowUpRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
-import { cn } from "@/lib/utils";
 import ProjectCard from "@/components/layout/projects/project-card";
 import type { Project } from "@/utils/api/projects";
 import { ContentMeta } from "@/components/layout/content-meta";
@@ -42,10 +41,64 @@ export interface RelatedRef {
   categoryLabel?: string;
 }
 
-import { useCoverHue, designMesh, rgba, isLightColor } from "@/hooks/use-color-mesh";
+// Minimalist case-info table: label left / value right, thin row rules.
+// No chips, no icons, no numbers.
+function CaseInfo({ project }: { project: CustomProject }) {
+  const rows: { label: string; value: React.ReactNode }[] = [];
+  if (project.categoryLabel)
+    rows.push({ label: "Industry", value: project.categoryLabel });
+  if (project.clientName)
+    rows.push({ label: "Client", value: project.clientName });
+  if (project.period) rows.push({ label: "Year", value: project.period });
+  if (project.platform)
+    rows.push({ label: "Platform", value: project.platform });
+  if (project.techStack.length > 0)
+    rows.push({ label: "Stack", value: project.techStack.join(", ") });
+  if (project.href)
+    rows.push({
+      label: "Link",
+      value: (
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-(--primary) underline-offset-2 hover:underline"
+        >
+          {project.href.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+          <ArrowUpRight className="size-3.5" />
+        </a>
+      ),
+    });
+
+  if (rows.length === 0) return null;
+
+  return (
+    <section className="pt-10 md:pt-14">
+      <Container>
+        <div className="mx-auto max-w-[1200px] divide-y divide-(--outline) border-y border-(--outline)">
+          {rows.map((r, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-[120px_1fr] md:grid-cols-[200px_1fr] items-baseline gap-4 md:gap-8 py-4 md:py-5"
+            >
+              <span className="text-body-4 text-(--on-bg-low)">{r.label}</span>
+              <span className="text-body-3 text-(--on-bg-high) md:text-right">
+                {r.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
 
 export function CustomProjectPage({
-  project, content, contentJson, related, headings,
+  project,
+  content,
+  contentJson,
+  related,
+  headings,
   forceMobileToc = true,
 }: {
   project: CustomProject & { id: string };
@@ -53,189 +106,105 @@ export function CustomProjectPage({
   contentJson?: any;
   related: RelatedRef[];
   headings?: TocHeading[];
-  /** Render the TOC as the mobile-style floating button on every viewport.
-   *  Set to false to fall back to the sticky sidebar on lg+. */
   forceMobileToc?: boolean;
 }) {
-  useEffect(() => {
-    console.log(headings);
-  }, [headings]);
-
   const [liveHeadings, setLiveHeadings] = useState<TocHeading[]>([]);
+
   const isVideo =
     project.coverVideo?.endsWith(".webm") ||
     project.coverVideo?.endsWith(".mp4");
 
-  // If the admin never wrote an MDX/JSON body with h2/h3 headings, the
-  // TOC would have nothing to show and the floating button would never
-  // render. Derive fallback headings from the sections this page
-  // actually renders, so the button always opens a useful menu.
   const fallbackHeadings: TocHeading[] = [];
-  if (content) fallbackHeadings.push({ id: "content", text: "Описание", level: 2 });
+  if (content)
+    fallbackHeadings.push({ id: "content", text: "Описание", level: 2 });
   if (project.media.length > 0)
     fallbackHeadings.push({ id: "gallery", text: "Галерея", level: 2 });
   if (related.length > 0)
-    fallbackHeadings.push({ id: "next-projects", text: "Следующие проекты", level: 2 });
+    fallbackHeadings.push({
+      id: "next-projects",
+      text: "Следующие проекты",
+      level: 2,
+    });
+
   const effectiveHeadings: TocHeading[] =
     liveHeadings.length > 0
       ? liveHeadings
       : headings && headings.length > 0
         ? headings
         : fallbackHeadings;
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (typeof window === "undefined") return;
-    setMouse({
-      x: (e.clientX / window.innerWidth) * 2 - 1,
-      y: (e.clientY / window.innerHeight) * 2 - 1,
-    });
-  };
-
-  const hue = useCoverHue(isVideo ? undefined : project.coverImage);
-  const mesh = designMesh(hue ?? 223);
-  const isLight = isLightColor(mesh.base);
-  const textColor = isLight ? "text-[var(--dark-8)]" : "text-white";
-  const subTextColor = isLight ? "text-[var(--dark-8)]/80" : "text-white/80";
-  const textShadow = isLight ? "drop-shadow-[0_2px_10px_rgba(255,255,255,0.4)]" : "drop-shadow-[0_2px_10px_rgba(0,0,0,0.4)]";
-
+  // Parallax: cover drifts + grows as the hero scrolls out. Oversized
+  // inset so no edge appears during the drift.
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const headingY = useTransform(scrollYProgress, [0, 1], ["0%", "-22%"]);
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const mediaY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
 
   return (
-    <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary)">
-      {/* ──────────────────────────── HERO ──────────────────────────── */}
-      <section ref={heroRef} onMouseMove={handleMouseMove} className="relative isolate overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-          style={{
-            WebkitMaskImage: `linear-gradient(to bottom,
-              rgba(0,0,0,0.92) 0%,
-              black 5%,
-              black 100%)`,
-            maskImage: `linear-gradient(to bottom,
-              rgba(0,0,0,0.92) 0%,
-              black 5%,
-              black 100%)`,
-            opacity: hue === null ? 0 : 1,
-          }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundColor: `color-mix(in srgb, var(--bg) 20%, ${rgba(mesh.base, 1)} 80%)`,
-            }}
-          />
-          <motion.div animate={{ x: mouse.x * -30, y: mouse.y * -30 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-1 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 60% 55% at 20% 82%, ${rgba(mesh.highlight, 1)} 0%, ${rgba(mesh.highlight, 0)} 65%)` }} />
-          <motion.div animate={{ x: mouse.x * 40, y: mouse.y * 40 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-2 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 50% 45% at 80% 18%, ${rgba(mesh.bright, 0.85)} 0%, ${rgba(mesh.bright, 0)} 60%)` }} />
-          <motion.div animate={{ x: mouse.x * -50, y: mouse.y * -50 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-3 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 75% 65% at 82% 88%, ${rgba(mesh.shadow, 0.95)} 0%, ${rgba(mesh.shadow, 0)} 70%)` }} />
-          <motion.div animate={{ x: mouse.x * 20, y: mouse.y * 20 }} transition={{ type: "spring", stiffness: 40, damping: 20 }} className="mesh-blob-4 absolute inset-[-18%]" style={{ background: `radial-gradient(ellipse 50% 55% at 15% 15%, ${rgba(mesh.deep, 0.75)} 0%, ${rgba(mesh.deep, 0)} 62%)` }} />
-          <div
-            className="hero-dot-drift pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1.4px)",
-              backgroundSize: "22px 22px",
-            }}
-          />
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            style={{ opacity: 0.42, mixBlendMode: "overlay" }}
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-          >
-            <filter id="hero-grain-fine">
-              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect
-              x="-20%"
-              y="-20%"
-              width="140%"
-              height="140%"
-              filter="url(#hero-grain-fine)"
-              className="hero-grain-drift"
-            />
-          </svg>
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            style={{ opacity: 0.16, mixBlendMode: "soft-light" }}
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-          >
-            <filter id="hero-grain-coarse">
-              <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect x="-20%" y="-20%" width="140%" height="140%" filter="url(#hero-grain-coarse)" />
-          </svg>
-          <div
-            className="hero-light-sweep pointer-events-none absolute"
-            style={{
-              inset: "-30%",
-              background:
-                "radial-gradient(circle at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.12) 30%, transparent 60%)",
-              mixBlendMode: "soft-light",
-              opacity: 0.5,
-            }}
-          />
-        </div>
-
-        <Container variant="full-width" className="relative z-10">
-          <motion.div
-            style={{ y: headingY, opacity: headingOpacity }}
-            className="mx-auto max-w-[1400px] pt-16 md:pt-24 pb-16 md:pb-20 lg:pb-28 text-center"
-          >
-            <motion.h1
-              initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-              className={cn(
-                "text-[2.75rem] sm:text-6xl md:text-7xl lg:text-8xl xl:text-[8.5rem]  tracking-[-0.045em] leading-[0.9] mb-6 text-balance",
-                textColor,
-                textShadow,
+    <main className="mt-20">
+      {/* HERO - cover block, no page gradient, display-4 title at bottom */}
+      <section ref={heroRef} className="relative isolate overflow-hidden ">
+        <Container variant="full-width">
+          <div className="mx-auto max-w-[1400px] space-y-6 md:space-y-8">
+            <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-3xl md:rounded-4xl bg-(--card) border border-(--outline)">
+              {isVideo ? (
+                <motion.div
+                  style={{ scale: mediaScale, y: mediaY }}
+                  className="absolute inset-[-15%]"
+                >
+                  <video
+                    src={project.coverVideo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              ) : project.coverImage ? (
+                <motion.div
+                  style={{ scale: mediaScale, y: mediaY }}
+                  className="absolute inset-[-15%]"
+                >
+                  <Image
+                    src={project.coverImage}
+                    alt={project.title}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                </motion.div>
+              ) : (
+                <div className="absolute inset-0 bg-(--bg)" />
               )}
-            >
+            </div>
+            <h1 className="text-display-4 text-(--on-bg-medium) tracking-tight px-1 md:px-0">
               {project.title}
-            </motion.h1>
-            {project.shortDescription && (
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
-                className={cn(
-                  "text-lg md:text-xl max-w-[640px] mx-auto leading-relaxed text-balance",
-                  subTextColor,
-                  textShadow,
-                )}
-              >
-                {project.shortDescription}
-              </motion.p>
-            )}
-          </motion.div>
+            </h1>
+          </div>
         </Container>
       </section>
 
-      {/* ──────────────────────────── META ──────────────────────────── */}
-      <Container className="relative pt-10 md:pt-12">
-        <ContentMeta
-          entityType="project"
-          entityId={project.slug}
-          content={content}
-          updatedAt={project.period || new Date().toISOString()}
-          imageUrl={project.coverImage}
-        />
+      <CaseInfo project={project} />
+
+      <Container>
+        <div className="mx-auto max-w-[1200px]">
+          <ContentMeta
+            entityType="project"
+            entityId={project.slug}
+            content={contentJson || content}
+            updatedAt={project.period || new Date().toISOString()}
+            imageUrl={project.coverImage}
+          />
+        </div>
       </Container>
 
-      {/* ──────────────────────────── CONTENT ──────────────────────────── */}
       {(contentJson || content) && (
-        <section className="py-12">
+        <section id="content" className="py-12">
           <Container>
             <article className="min-w-0">
               {contentJson ? (
@@ -261,7 +230,6 @@ export function CustomProjectPage({
         </section>
       )}
 
-      {/* ──────────────────────────── GALLERY ──────────────────────────── */}
       {project.media.length > 0 && (
         <section id="gallery" className="py-12 border-(--outline)">
           <Container>
@@ -273,9 +241,21 @@ export function CustomProjectPage({
                     className="group rounded-2xl overflow-hidden border border-(--outline) bg-(--card) relative aspect-[4/3]"
                   >
                     {m.type === "video" ? (
-                      <video src={m.url} controls playsInline preload="metadata" className="w-full h-full object-cover bg-black" />
+                      <video
+                        src={m.url}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="w-full h-full object-cover bg-black"
+                      />
                     ) : (
-                      <Image src={m.url} alt={m.caption || ""} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <Image
+                        src={m.url}
+                        alt={m.caption || ""}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
                     )}
                     {m.caption && (
                       <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
@@ -290,9 +270,15 @@ export function CustomProjectPage({
         </section>
       )}
 
-      {/* ──────────────────────────── CTA ──────────────────────────── */}
       <section className="py-12 border-(--outline) relative overflow-hidden">
-        <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 60% 60% at 50% 50%, var(--primary-glass), transparent 70%)" }} />
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 60% at 50% 50%, var(--primary-glass), transparent 70%)",
+          }}
+        />
         <Container className="relative z-10">
           <div className="w-full mx-auto">
             <div className="relative rounded-3xl p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
@@ -302,7 +288,18 @@ export function CustomProjectPage({
                 xmlns="http://www.w3.org/2000/svg"
                 shapeRendering="geometricPrecision"
               >
-                <rect x="0" y="0" width="100%" height="100%" rx="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="0.01 11" strokeLinecap="round" />
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  rx="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeDasharray="0.01 11"
+                  strokeLinecap="round"
+                />
               </svg>
               <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 px-4">
                 <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high)">
@@ -314,13 +311,19 @@ export function CustomProjectPage({
                 <span className="italic font-serif text-(--on-bg-medium)">
                   такой же
                 </span>{" "}
-                <br />проект?
+                <br />
+                проект?
               </h2>
               <p className="text-body-2 text-(--on-bg-medium) max-w-md mx-auto mb-10 leading-relaxed">
-                Расскажите о задаче. Мы ответим в течение рабочего дня, обсудим детали и предложим пошаговый план реализации.
+                Расскажите о задаче. Мы ответим в течение рабочего дня,
+                обсудим детали и предложим пошаговый план реализации.
               </p>
               <QuickOrderDialog serviceName={project.title || "Разработка"}>
-                <Button size="xlarge" shape="round" className="group px-8 hover:scale-105 transition-transform">
+                <Button
+                  size="xlarge"
+                  shape="round"
+                  className="group px-8 hover:scale-105 transition-transform"
+                >
                   Обсудить задачу
                   <ArrowUpRight className="size-5 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Button>
@@ -330,15 +333,17 @@ export function CustomProjectPage({
         </Container>
       </section>
 
-      {/* ──────────────────────────── RELATED ──────────────────────────── */}
       {related.length > 0 && (
         <section id="next-projects" className="py-12 pb-24 border-(--outline)">
           <Container>
             <div className="flex items-end justify-between mb-12">
-              <h2 className="text-display-3 md:text-display-2 font-heading  tracking-tight">
+              <h2 className="text-display-3 md:text-display-2 font-heading tracking-tight">
                 Следующие проекты
               </h2>
-              <Link href="/projects" className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors">
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors"
+              >
                 Все проекты
                 <ArrowUpRight className="size-4" />
               </Link>
@@ -346,11 +351,23 @@ export function CustomProjectPage({
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {related.map((r, idx) => {
                 const rp: Project = {
-                  id: r.id, slug: r.slug, title: r.title, description: "",
-                  shortDescription: "", cover: { imageSrc: r.coverImage },
-                  category: r.categoryLabel || "", clientId: "",
+                  id: r.id,
+                  slug: r.slug,
+                  title: r.title,
+                  description: "",
+                  shortDescription: "",
+                  cover: { imageSrc: r.coverImage },
+                  category: r.categoryLabel || "",
+                  clientId: "",
                 };
-                return <ProjectCard key={r.id || r.slug} project={rp} index={idx} variant="clean" />;
+                return (
+                  <ProjectCard
+                    key={r.id || r.slug}
+                    project={rp}
+                    index={idx}
+                    variant="clean"
+                  />
+                );
               })}
             </div>
           </Container>

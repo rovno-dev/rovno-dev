@@ -1,9 +1,12 @@
 "use client";
-import { Eye, Clock, CalendarCheck } from "@phosphor-icons/react";
+
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { hitView, type ViewEntityType } from "@/utils/api/views";
 
+// Walks the Novel / Tiptap JSON tree and concatenates the plain text of
+// every node. This is the only input the read-time calculation accepts
+// when the caller passes structured content - no MDX parsing.
 function extractTextFromTiptap(node: any): string {
   if (!node) return "";
   if (typeof node === "string") return node;
@@ -23,16 +26,19 @@ function calculateReadTime(content: any): number {
 }
 
 /**
- * The meta strip under a hero.
+ * Meta strip under a hero: views, read time, last-updated date.
  *
- * View counter behaviour:
- *   - starts `null` → renders a pulse skeleton, not an em-dash. The
- *     em-dash was the reason the counter looked broken in production:
- *     any transient backend error left it there permanently.
- *   - resolves to a number → real value
- *   - fails → falls back to `0`, not to `null`. A site with 0-2 views is
- *     far more common than the counter being reachable; 0 reads as "not
- *     broken", em-dash reads as "bug".
+ * Same visual language as `CaseInfo` (see custom-project-page.tsx):
+ *   - outer wrapper: `border-y divide-y divide-(--outline)`
+ *   - each row:      `grid grid-cols-[120px_1fr] md:grid-cols-[200px_1fr]
+ *                     items-baseline gap-4 md:gap-8 py-4 md:py-5`
+ *   - label:         `text-body-4 text-(--on-bg-low)`
+ *   - value:         `text-body-3 text-(--on-bg-high) md:text-right tabular-nums`
+ *
+ * Kept on one line so the two strips read as a single ruled block when
+ * stacked (Year → Просмотры → Чтение → Обновлено). A missing view count
+ * resolves to `0`, never to an em-dash - the counter reads as "not
+ * broken" on a brand-new page.
  */
 export function ContentMeta({
   entityType,
@@ -75,57 +81,35 @@ export function ContentMeta({
     year: "numeric",
   });
 
-  const items = [
+  const rows: { label: string; value: string | null }[] = [
     {
-      icon: <Eye className="size-4" weight="duotone" />,
       label: "Просмотры",
       value: views === null ? null : views.toLocaleString("ru-RU"),
-      tabular: true,
     },
-    {
-      icon: <Clock className="size-4" weight="duotone" />,
-      label: "Чтение",
-      value: `${readTime} мин`,
-      tabular: false,
-    },
-    {
-      icon: <CalendarCheck className="size-4" weight="duotone" />,
-      label: "Обновлено",
-      value: formattedDate,
-      tabular: true,
-    },
+    { label: "Чтение", value: `${readTime} мин` },
+    { label: "Обновлено", value: formattedDate },
   ];
 
   return (
     <div
-      data-cover={imageUrl || undefined}
       className={cn(
-        "grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden border border-(--outline) bg-(--outline)",
+        "divide-y divide-(--outline) border-y border-(--outline)",
         className,
       )}
     >
-      {items.map((it, i) => (
-        <div key={i} className="bg-(--card) px-4 py-4 flex items-center gap-3 min-w-0">
-          <span className="flex items-center justify-center size-9 shrink-0 rounded-xl bg-(--primary-glass) text-(--primary)">
-            {it.icon}
-          </span>
-          <div className="flex flex-col min-w-0">
-            <span className="text-[10px] uppercase tracking-[0.14em]  text-(--on-bg-low)">
-              {it.label}
+      {rows.map((r, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-[120px_1fr] md:grid-cols-[200px_1fr] items-baseline gap-4 md:gap-8 py-4 md:py-5"
+        >
+          <span className="text-body-4 text-(--on-bg-low)">{r.label}</span>
+          {r.value === null ? (
+            <div className="h-4 w-10 rounded bg-(--on-bg-low)/20 animate-pulse md:ml-auto" />
+          ) : (
+            <span className="text-body-3 text-(--on-bg-high) md:text-right tabular-nums">
+              {r.value}
             </span>
-            {it.value === null ? (
-              <span className="inline-block h-5 w-8 mt-0.5 rounded bg-(--on-bg-low)/20 animate-pulse" />
-            ) : (
-              <span
-                className={cn(
-                  "text-body-2  text-(--on-bg-high) truncate",
-                  it.tabular && "tabular-nums",
-                )}
-              >
-                {it.value}
-              </span>
-            )}
-          </div>
+          )}
         </div>
       ))}
     </div>

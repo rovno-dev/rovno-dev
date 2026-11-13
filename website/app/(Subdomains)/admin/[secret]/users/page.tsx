@@ -56,10 +56,6 @@ import {
   fetchTeamMembers,
 } from "@/utils/api/team";
 
-// ———---------
-// Types + constants
-// ———---------
-
 interface User {
   id: string;
   email: string;
@@ -82,9 +78,6 @@ const ROLE_OPTIONS = [
   { value: "root", label: "Супер-администратор" },
 ];
 
-// Role treatment is deliberately quiet. Only root takes the brand accent
-// - everything else sits in the neutral outline so a role never competes
-// with the content for attention.
 const ROLE_STYLE: Record<string, { label: string; className: string }> = {
   root: {
     label: "Root",
@@ -106,10 +99,6 @@ const ROLE_STYLE: Record<string, { label: string; className: string }> = {
 
 type ViewMode = "cards" | "table";
 
-// ———---------
-// Helpers
-// ———---------
-
 function fullName(u: User): string {
   return [u.name, u.surname].filter(Boolean).join(" ").trim();
 }
@@ -128,10 +117,6 @@ function initials(u: User): string {
   return (u.email[0] ?? "?").toUpperCase();
 }
 
-// ———---------
-// Page
-// ———---------
-
 export default function AdminUsersPage() {
   const { user: currentUser, isLoading: userLoading } = useUser();
   const router = useRouter();
@@ -140,18 +125,13 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>("cards");
 
-  // Text search
   const [query, setQuery] = useState("");
 
-  // Filter panel is collapsed by default; the toggle persists state in
-  // localStorage so an admin who expands it once keeps it open across
-  // navigations and reloads.
   const [filtersOpen, setFiltersOpen] = useState(false);
   useEffect(() => {
     try {
       setFiltersOpen(localStorage.getItem("admin-users-filters-open") === "1");
     } catch {
-      /* private mode / disabled storage */
     }
   }, []);
   const toggleFilters = () => {
@@ -160,13 +140,11 @@ export default function AdminUsersPage() {
       try {
         localStorage.setItem("admin-users-filters-open", next ? "1" : "0");
       } catch {
-        /* ignore */
       }
       return next;
     });
   };
 
-  // Filters - every dimension is independent; "all" is a no-op pass-through.
   const [roleFilter, setRoleFilter] =
     useState<"all" | "client" | "user" | "admin" | "root">("all");
   const [verifiedFilter, setVerifiedFilter] =
@@ -176,14 +154,11 @@ export default function AdminUsersPage() {
   const [teamFilter, setTeamFilter] =
     useState<"all" | "team" | "external">("all");
 
-  // teamUserId → role. Loaded once alongside the user list.
   const [teamRoles, setTeamRoles] = useState<Record<string, string>>({});
 
-  // Dialog state.
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
 
-  // "Make team member" dialog state.
   const [teamDialogUser, setTeamDialogUser] = useState<User | null>(null);
   const [teamRole, setTeamRole] = useState("");
   const [teamBio, setTeamBio] = useState("");
@@ -228,9 +203,6 @@ export default function AdminUsersPage() {
     return u.role !== "admin";
   };
 
-  // --- Filtering ---------
-  // Every dimension ANDs together. Team membership is derived from the
-  // teamRoles map loaded alongside the user list.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return users.filter((u) => {
@@ -267,9 +239,6 @@ export default function AdminUsersPage() {
     blockedFilter !== "all" ||
     teamFilter !== "all";
 
-  // Count of active chips (query excluded - it is visible in the input).
-  // Drives the badge on the collapsed toggle button so an admin sees at a
-  // glance that filters are narrowing the list.
   const activeFilterCount =
     (roleFilter !== "all" ? 1 : 0) +
     (verifiedFilter !== "all" ? 1 : 0) +

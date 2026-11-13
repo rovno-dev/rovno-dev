@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { XIcon } from "@phosphor-icons/react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-// Helper to fix common React DOM warnings caused by raw HTML habits in MDX
 function sanitizeProps(props: any) {
   const clean = { ...props };
   if (clean.classname) {
@@ -42,10 +41,13 @@ export function Gallery({
   const cssAspectRatio = aspectRatio.replace("/", " / ");
   const gridClass = cn(
     "grid gap-4",
-    columns === 1 ? "grid-cols-1" :
-      columns === 2 ? "grid-cols-1 md:grid-cols-2" :
-        columns === 4 ? "grid-cols-2 md:grid-cols-4" :
-          "grid-cols-2 md:grid-cols-3"
+    columns === 1
+      ? "grid-cols-1"
+      : columns === 2
+        ? "grid-cols-1 md:grid-cols-2"
+        : columns === 4
+          ? "grid-cols-2 md:grid-cols-4"
+          : "grid-cols-2 md:grid-cols-3"
   );
   return (
     <div className={wrapperClass}>
@@ -81,18 +83,22 @@ export function Gallery({
       </div>
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="!fixed !inset-0 !z-50 !max-w-none !max-h-none !w-screen !h-screen !p-0 !border-0 !bg-black/95 flex items-center justify-center">
-          <Button variant="glass" className="absolute top-4 right-4 z-[60]" size="icon-medium" onClick={() => setLightboxOpen(false)}>
+          <Button
+            variant="glass"
+            className="absolute top-4 right-4 z-[60]"
+            size="icon-medium"
+            onClick={() => setLightboxOpen(false)}
+          >
             <XIcon className="size-6 text-white" />
           </Button>
-          {media[activeIndex] && (
-            media[activeIndex].type === "image" ? (
+          {media[activeIndex] &&
+            (media[activeIndex].type === "image" ? (
               <div className="relative w-full h-full">
                 <Image src={media[activeIndex].src} alt="" fill className="object-contain" />
               </div>
             ) : (
               <video src={media[activeIndex].src} controls autoPlay className="max-w-full max-h-full" />
-            )
-          )}
+            ))}
         </DialogContent>
       </Dialog>
     </div>
@@ -101,7 +107,14 @@ export function Gallery({
 
 export function MDXHeading({ level, children, className }: { level: 1 | 2 | 3 | 4 | 5 | 6; children: ReactNode; className?: string; }) {
   const Tag = `h${level}` as ElementType;
-  const classes = { 1: "text-display-2 md:text-display-1 mb-6 mt-12", 2: "text-display-3 md:text-display-2 mb-4 mt-8", 3: "text-display-4 mb-3 mt-6", 4: "text-display-5 mb-2 mt-4", 5: "text-display-6 mb-2 mt-4", 6: "text-body-1  mb-2 mt-4" };
+  const classes = {
+    1: "text-display-2 md:text-display-1 mb-6 mt-12",
+    2: "text-display-3 md:text-display-2 mb-4 mt-8",
+    3: "text-display-4 mb-3 mt-6",
+    4: "text-display-5 mb-2 mt-4",
+    5: "text-display-6 mb-2 mt-4",
+    6: "text-body-1 mb-2 mt-4",
+  };
   return <Tag className={cn(classes[level], className)}>{children}</Tag>;
 }
 
@@ -109,39 +122,174 @@ export function MDXImage({ src, alt, ...props }: { src: string; alt?: string }) 
   const safeProps = sanitizeProps(props);
   return (
     <span className="my-6 block rounded-2xl overflow-hidden border border-(--outline) bg-(--card)">
-      <Image src={src} alt={alt || ""} width={1200} height={800} className={cn("w-full h-auto object-cover", safeProps.className)} {...safeProps} />
+      <Image
+        src={src}
+        alt={alt || ""}
+        width={1200}
+        height={800}
+        className={cn("w-full h-auto object-cover", safeProps.className)}
+        {...safeProps}
+      />
     </span>
   );
 }
 
-export function MDXBlockquote({ children }: { children: ReactNode }) { return <blockquote className="my-6 border-l-4 border-(--primary) pl-4 italic text-(--on-bg-medium)">{children}</blockquote>; }
-export function MDXCode({ children }: { children: ReactNode }) { return <code className="rounded bg-(--bg-disabled) px-1.5 py-0.5 text-sm font-mono">{children}</code>; }
-export function MDXPre({ children }: { children: ReactNode }) { return <pre className="my-6 rounded-xl bg-(--bg-disabled) p-4 overflow-x-auto text-sm">{children}</pre>; }
-export function MDXList({ children, ordered }: { children: ReactNode; ordered?: boolean; }) { const Tag: ElementType = ordered ? "ol" : "ul"; return <Tag className={cn("my-4 ml-6 space-y-1", ordered ? "list-decimal" : "list-disc")}>{children}</Tag>; }
-export function MDXListItem({ children }: { children: ReactNode }) { return <li className="pl-1">{children}</li>; }
+export function MDXBlockquote({ children }: { children: ReactNode }) {
+  return (
+    <blockquote className="my-6 border-l-4 border-(--primary) pl-4 italic text-(--on-bg-medium)">
+      {children}
+    </blockquote>
+  );
+}
+
+export function MDXCode({ children }: { children: ReactNode }) {
+  return (
+    <code className="rounded bg-(--bg-disabled) px-1.5 py-0.5 text-sm font-mono">
+      {children}
+    </code>
+  );
+}
+
+export function MDXPre({ children }: { children: ReactNode }) {
+  return (
+    <pre className="my-6 rounded-xl bg-(--bg-disabled) p-4 overflow-x-auto text-sm">
+      {children}
+    </pre>
+  );
+}
+
+export function MDXList({ children, ordered }: { children: ReactNode; ordered?: boolean; }) {
+  const Tag: ElementType = ordered ? "ol" : "ul";
+  return (
+    <Tag className={cn("my-4 ml-6 space-y-1", ordered ? "list-decimal" : "list-disc")}>
+      {children}
+    </Tag>
+  );
+}
+
+export function MDXListItem({ children }: { children: ReactNode }) {
+  return <li className="pl-1">{children}</li>;
+}
 
 function hasBlockChild(children: ReactNode): boolean {
   if (!children) return false;
   const arr = Array.isArray(children) ? children : [children];
-  for (const child of arr) { if (typeof child === "object" && child !== null && "type" in child && typeof (child as { type: unknown }).type === "string" && ["div", "section", "article", "figure", "form", "header", "footer"].includes((child as { type: string }).type)) { return true; } }
+  for (const child of arr) {
+    if (
+      typeof child === "object" &&
+      child !== null &&
+      "type" in child &&
+      typeof (child as { type: unknown }).type === "string" &&
+      ["div", "section", "article", "figure", "form", "header", "footer"].includes(
+        (child as { type: string }).type
+      )
+    ) {
+      return true;
+    }
+  }
   return false;
 }
 
 export function MDXParagraph({ children }: { children: ReactNode }) {
-  if (hasBlockChild(children)) { return <span className="my-4 block leading-relaxed text-(--on-bg-medium)">{children}</span>; }
+  if (hasBlockChild(children)) {
+    return (
+      <span className="my-4 block leading-relaxed text-(--on-bg-medium)">
+        {children}
+      </span>
+    );
+  }
   return <p className="my-4 leading-relaxed text-(--on-bg-medium)">{children}</p>;
 }
 
-export function MDXHr() { return <hr className="my-8 border-(--outline)" />; }
-export function MDXLink({ href, children }: { href: string; children: ReactNode }) { return <a href={href} className="text-(--primary) underline underline-offset-2 hover:opacity-80">{children}</a>; }
-export function MDXTable({ children }: { children: ReactNode }) { return <div className="my-6 overflow-x-auto rounded-xl border border-(--outline)"><table className="w-full text-sm">{children}</table></div>; }
-export function MDXThead({ children }: { children: ReactNode }) { return <thead className="bg-(--bg-disabled)">{children}</thead>; }
-export function MDXTh({ children }: { children: ReactNode }) { return <th className="px-4 py-2 text-left ">{children}</th>; }
-export function MDXTd({ children }: { children: ReactNode }) { return <td className="px-4 py-2 border-t border-(--outline)">{children}</td>; }
-export function MDXCard({ children, className }: { children: ReactNode; className?: string; }) { return <Card className={cn("p-6", className)}>{children}</Card>; }
+export function MDXHr() {
+  return <hr className="my-8 border-(--outline)" />;
+}
+
+export function MDXLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a href={href} className="text-(--primary) underline underline-offset-2 hover:opacity-80">
+      {children}
+    </a>
+  );
+}
+
+export function MDXTable({ children }: { children: ReactNode }) {
+  return (
+    <div className="my-6 overflow-x-auto rounded-xl border border-(--outline)">
+      <table className="w-full text-sm">{children}</table>
+    </div>
+  );
+}
+
+export function MDXThead({ children }: { children: ReactNode }) {
+  return <thead className="bg-(--bg-disabled)">{children}</thead>;
+}
+
+export function MDXTh({ children }: { children: ReactNode }) {
+  return <th className="px-4 py-2 text-left">{children}</th>;
+}
+
+export function MDXTd({ children }: { children: ReactNode }) {
+  return <td className="px-4 py-2 border-t border-(--outline)">{children}</td>;
+}
+
+export function MDXCard({ children, className }: { children: ReactNode; className?: string; }) {
+  return <Card className={cn("p-6", className)}>{children}</Card>;
+}
 
 export function MetricCard({ label, value, description }: { label: string; value: string; description: string; }) {
-  return <div className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0"><p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">{label}</p><p className="text-display-1 text-(--on-bg-high) mb-2">{value}</p><p className="text-body-3 text-(--on-bg-medium)">{description}</p></div>;
+  return (
+    <div className="rounded-3xl border border-(--outline) bg-(--card) p-8 ring-0">
+      <p className="text-body-5 text-(--on-bg-low) uppercase tracking-wider mb-2">
+        {label}
+      </p>
+      <p className="text-display-1 text-(--on-bg-high) mb-2">{value}</p>
+      <p className="text-body-3 text-(--on-bg-medium)">{description}</p>
+    </div>
+  );
+}
+
+/** Two flat columns on desktop, one on mobile. No numbers, no cards. */
+export function TextGrid({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "my-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function TextColumn({
+  title,
+  children,
+  className,
+}: {
+  title?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("min-w-0 space-y-3", className)}>
+      {title && (
+        <h3 className="text-heading-3 text-(--on-bg-high) tracking-tight">
+          {title}
+        </h3>
+      )}
+      <div className="text-body-3 text-(--on-bg-medium) leading-relaxed space-y-3">
+        {children}
+      </div>
+    </div>
+  );
 }
 
 export const defaultMDXComponents = {
@@ -168,4 +316,6 @@ export const defaultMDXComponents = {
   Card: MDXCard,
   Gallery,
   MetricCard,
+  TextGrid,
+  TextColumn,
 };
