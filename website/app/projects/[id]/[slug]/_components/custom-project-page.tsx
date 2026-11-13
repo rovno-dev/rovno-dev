@@ -41,8 +41,6 @@ export interface RelatedRef {
   categoryLabel?: string;
 }
 
-// Minimalist case-info table: label left / value right, thin row rules.
-// No chips, no icons, no numbers.
 function CaseInfo({ project }: { project: CustomProject }) {
   const rows: { label: string; value: React.ReactNode }[] = [];
   if (project.categoryLabel)
@@ -73,23 +71,19 @@ function CaseInfo({ project }: { project: CustomProject }) {
   if (rows.length === 0) return null;
 
   return (
-    <section className="pt-10 md:pt-14">
-      <Container>
-        <div className="mx-auto max-w-[1200px] divide-y divide-(--outline) border-y border-(--outline)">
-          {rows.map((r, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[120px_1fr] md:grid-cols-[200px_1fr] items-baseline gap-4 md:gap-8 py-4 md:py-5"
-            >
-              <span className="text-body-4 text-(--on-bg-low)">{r.label}</span>
-              <span className="text-body-3 text-(--on-bg-high) md:text-right">
-                {r.value}
-              </span>
-            </div>
-          ))}
+    <div className="divide-y divide-(--outline)">
+      {rows.map((r, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-[140px_1fr] md:grid-cols-[200px_1fr] items-baseline gap-4 md:gap-8 py-4 md:py-5"
+        >
+          <span className="text-body-3 text-(--on-bg-low)">{r.label}</span>
+          <span className="text-body-2 text-(--on-bg-high) md:text-right">
+            {r.value}
+          </span>
         </div>
-      </Container>
-    </section>
+      ))}
+    </div>
   );
 }
 
@@ -99,14 +93,12 @@ export function CustomProjectPage({
   contentJson,
   related,
   headings,
-  forceMobileToc = true,
 }: {
   project: CustomProject & { id: string };
   content: React.ReactNode;
   contentJson?: any;
   related: RelatedRef[];
   headings?: TocHeading[];
-  forceMobileToc?: boolean;
 }) {
   const [liveHeadings, setLiveHeadings] = useState<TocHeading[]>([]);
 
@@ -133,158 +125,164 @@ export function CustomProjectPage({
         ? headings
         : fallbackHeadings;
 
-  // Parallax: cover drifts + grows as the hero scrolls out. Oversized
-  // inset so no edge appears during the drift.
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-  const mediaY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+  const mediaY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
   return (
-    <main className="mt-20">
-      {/* HERO - cover block, no page gradient, display-4 title at bottom */}
-      <section ref={heroRef} className="relative isolate overflow-hidden ">
-        <Container variant="full-width">
-          <div className="mx-auto max-w-[1400px] space-y-6 md:space-y-8">
-            <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-3xl md:rounded-4xl bg-(--card) border border-(--outline)">
-              {isVideo ? (
-                <motion.div
-                  style={{ scale: mediaScale, y: mediaY }}
-                  className="absolute inset-[-15%]"
-                >
-                  <video
-                    src={project.coverVideo}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-              ) : project.coverImage ? (
-                <motion.div
-                  style={{ scale: mediaScale, y: mediaY }}
-                  className="absolute inset-[-15%]"
-                >
-                  <Image
-                    src={project.coverImage}
-                    alt={project.title}
-                    fill
-                    priority
-                    sizes="100vw"
-                    className="object-cover"
-                  />
-                </motion.div>
-              ) : (
-                <div className="absolute inset-0 bg-(--bg)" />
-              )}
-            </div>
-            <h1 className="text-display-4 text-(--on-bg-medium) tracking-tight px-1 md:px-0">
-              {project.title}
-            </h1>
+    <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary) pb-24">
+      {/* Standardized Container Hero */}
+      <section ref={heroRef} className="relative isolate overflow-hidden mt-header">
+        <Container>
+          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-3xl md:rounded-4xl bg-(--card) border border-(--outline)">
+            {isVideo ? (
+              <motion.div
+                style={{ y: mediaY }}
+                className="absolute inset-[-20%]"
+              >
+                <video
+                  src={project.coverVideo}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            ) : project.coverImage ? (
+              <motion.div
+                style={{ y: mediaY }}
+                className="absolute inset-[-20%]"
+              >
+                <Image
+                  src={project.coverImage}
+                  alt={project.title}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              </motion.div>
+            ) : (
+              <div className="absolute inset-0 bg-(--bg)" />
+            )}
           </div>
         </Container>
       </section>
 
-      <CaseInfo project={project} />
+      <Container className="pt-12 md:pt-16">
+        {/* Two column layout for content + sticky TOC */}
+        <div className="mx-auto max-w-[1200px] grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-12 items-start">
+          
+          {/* Left Column: Main Content */}
+          <div className="min-w-0 max-w-[900px]">
+            
+            {/* Seamless metadata block */}
+            <div className="divide-y divide-(--outline) border-y border-(--outline)">
+              <CaseInfo project={project} />
+              <ContentMeta
+                bare
+                entityType="project"
+                entityId={project.slug}
+                content={contentJson || content}
+                updatedAt={project.period || new Date().toISOString()}
+              />
+            </div>
 
-      <Container>
-        <div className="mx-auto max-w-[1200px]">
-          <ContentMeta
-            entityType="project"
-            entityId={project.slug}
-            content={contentJson || content}
-            updatedAt={project.period || new Date().toISOString()}
-            imageUrl={project.coverImage}
-          />
+            {(contentJson || content) && (
+              <section id="content" className="mt-12 md:mt-16">
+                <article className="min-w-0">
+                  {contentJson ? (
+                    <NovelReadOnly
+                      content={contentJson}
+                      onHeadingsChange={setLiveHeadings}
+                    />
+                  ) : (
+                    content
+                  )}
+                </article>
+              </section>
+            )}
+
+            {project.media.length > 0 && (
+              <section id="gallery" className="mt-16">
+                {/* Title stays in the reading column */}
+                <div className="mb-8">
+                  <h2 className="text-display-4">Галерея</h2>
+                </div>
+                
+                {/* Gallery breaks out to 100% width of the screen */}
+                <div className="w-screen relative left-1/2 -translate-x-1/2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
+                    {project.media.map((m) => (
+                      <figure
+                        key={m.id}
+                        className="group overflow-hidden bg-(--card) relative aspect-[4/3]"
+                      >
+                        {m.type === "video" ? (
+                          <video
+                            src={m.url}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            className="w-full h-full object-cover bg-black"
+                          />
+                        ) : (
+                          <Image
+                            src={m.url}
+                            alt={m.caption || ""}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        )}
+                        {m.caption && (
+                          <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
+                            {m.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* Right Column: Sticky TOC */}
+          <div className="hidden lg:block">
+            {effectiveHeadings.length > 0 && (
+              <Toc
+                variant="sidebar"
+                headings={effectiveHeadings}
+                label="Содержание"
+                ariaLabel="Содержание проекта"
+              />
+            )}
+          </div>
         </div>
       </Container>
 
-      {(contentJson || content) && (
-        <section id="content" className="py-12">
-          <Container>
-            <article className="min-w-0">
-              {contentJson ? (
-                <NovelReadOnly
-                  content={contentJson}
-                  onHeadingsChange={setLiveHeadings}
-                />
-              ) : (
-                content
-              )}
-            </article>
-            <div className="space-y-8">
-              {effectiveHeadings.length > 0 && (
-                <Toc
-                  variant={forceMobileToc ? "floating" : "sidebar"}
-                  headings={effectiveHeadings}
-                  label="Содержание"
-                  ariaLabel="Содержание проекта"
-                />
-              )}
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {project.media.length > 0 && (
-        <section id="gallery" className="py-12 border-(--outline)">
-          <Container>
-            <div className="max-w-[1200px] mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-                {project.media.map((m) => (
-                  <figure
-                    key={m.id}
-                    className="group rounded-2xl overflow-hidden border border-(--outline) bg-(--card) relative aspect-[4/3]"
-                  >
-                    {m.type === "video" ? (
-                      <video
-                        src={m.url}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="w-full h-full object-cover bg-black"
-                      />
-                    ) : (
-                      <Image
-                        src={m.url}
-                        alt={m.caption || ""}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    )}
-                    {m.caption && (
-                      <figcaption className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white text-sm">
-                        {m.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
-              </div>
-            </div>
-          </Container>
-        </section>
-      )}
-
-      <section className="py-12 border-(--outline) relative overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 60% at 50% 50%, var(--primary-glass), transparent 70%)",
-          }}
-        />
-        <Container className="relative z-10">
-          <div className="w-full mx-auto">
+      {/* CTA & Related */}
+      <div className="mt-20">
+        <section className="py-16 md:py-24 relative overflow-hidden">
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 60% at 50% 50%, var(--primary-glass), transparent 70%)",
+            }}
+          />
+          <Container className="relative z-10 text-center max-w-3xl">
+            {/* CTA Box with Dotted Border */}
             <div className="relative rounded-3xl p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
               <svg
                 aria-hidden
-                className="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-(--on-bg-medium)"
+                className="pointer-events-none absolute inset-0 h-full w-full overflow-visible text-(--on-bg-low)/40"
                 xmlns="http://www.w3.org/2000/svg"
                 shapeRendering="geometricPrecision"
               >
@@ -293,25 +291,22 @@ export function CustomProjectPage({
                   y="0"
                   width="100%"
                   height="100%"
-                  rx="12"
+                  rx="24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2.5"
-                  strokeDasharray="0.01 11"
+                  strokeDasharray="0.01 12"
                   strokeLinecap="round"
                 />
               </svg>
               <div className="absolute -top-[22px] left-1/2 -translate-x-1/2 px-4">
-                <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high)">
+                <div className="flex size-11 items-center justify-center bg-(--bg) text-(--on-bg-high) rounded-full border border-(--outline)">
                   <Sparkle className="size-5" weight="fill" />
                 </div>
               </div>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-heading tracking-tighter text-(--on-bg-high) mb-6 leading-[1.05]">
-                Хотите{" "}
-                <span className="italic font-serif text-(--on-bg-medium)">
-                  такой же
-                </span>{" "}
-                <br />
+              
+              <h2 className="text-4xl md:text-6xl font-heading tracking-tighter text-(--on-bg-high) mb-6 leading-[1.05]">
+                Хотите <span className="italic font-serif text-(--on-bg-medium)">такой же</span> <br />
                 проект?
               </h2>
               <p className="text-body-2 text-(--on-bg-medium) max-w-md mx-auto mb-10 leading-relaxed">
@@ -329,50 +324,50 @@ export function CustomProjectPage({
                 </Button>
               </QuickOrderDialog>
             </div>
-          </div>
-        </Container>
-      </section>
-
-      {related.length > 0 && (
-        <section id="next-projects" className="py-12 pb-24 border-(--outline)">
-          <Container>
-            <div className="flex items-end justify-between mb-12">
-              <h2 className="text-display-3 md:text-display-2 font-heading tracking-tight">
-                Следующие проекты
-              </h2>
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-2 text-sm text-(--on-bg-medium) hover:text-(--primary) transition-colors"
-              >
-                Все проекты
-                <ArrowUpRight className="size-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {related.map((r, idx) => {
-                const rp: Project = {
-                  id: r.id,
-                  slug: r.slug,
-                  title: r.title,
-                  description: "",
-                  shortDescription: "",
-                  cover: { imageSrc: r.coverImage },
-                  category: r.categoryLabel || "",
-                  clientId: "",
-                };
-                return (
-                  <ProjectCard
-                    key={r.id || r.slug}
-                    project={rp}
-                    index={idx}
-                    variant="clean"
-                  />
-                );
-              })}
-            </div>
           </Container>
         </section>
-      )}
+
+        {related.length > 0 && (
+          <section className="py-16 md:py-24">
+            <Container className="max-w-[1200px]">
+              <div className="flex items-end justify-between mb-12">
+                <h2 className="text-3xl md:text-4xl font-heading tracking-tight">
+                  Следующие проекты
+                </h2>
+                <Link
+                  href="/projects"
+                  className="inline-flex items-center gap-2 text-body-4 text-(--on-bg-medium) hover:text-(--primary) transition-colors"
+                >
+                  Все проекты
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {related.map((r, idx) => {
+                  const rp: Project = {
+                    id: r.id,
+                    slug: r.slug,
+                    title: r.title,
+                    description: "",
+                    shortDescription: "",
+                    cover: { imageSrc: r.coverImage },
+                    category: r.categoryLabel || "",
+                    clientId: "",
+                  };
+                  return (
+                    <ProjectCard
+                      key={r.id || r.slug}
+                      project={rp}
+                      index={idx}
+                      variant="clean"
+                    />
+                  );
+                })}
+              </div>
+            </Container>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

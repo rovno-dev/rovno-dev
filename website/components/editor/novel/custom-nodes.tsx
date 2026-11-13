@@ -15,19 +15,15 @@ export const VideoNode = Node.create({
   group: "block",
   atom: true,
   isolating: true,
-
   addAttributes() {
     return { src: { default: null }, poster: { default: null } };
   },
-
   parseHTML() {
     return [{ tag: "video" }];
   },
-
   renderHTML({ HTMLAttributes }) {
     return ["video", mergeAttributes(HTMLAttributes, { controls: true, class: "rounded-sm border border-(--outline) w-full my-4" })];
   },
-
   addNodeView() {
     return ReactNodeViewRenderer(VideoNodeView) as any;
   },
@@ -38,7 +34,6 @@ export const GalleryNode = Node.create({
   group: "block",
   atom: true,
   isolating: true,
-
   addAttributes() {
     return {
       images: { default: [] },
@@ -46,16 +41,12 @@ export const GalleryNode = Node.create({
       isFullWidth: { default: false },
       layout: { default: "grid" },
       columns: { default: 2 },
-      // Kept only so old JSON with a `gap` value stays parseable; it is
-      // ignored by the renderer (gap is always zero).
       gap: { default: "none", rendered: false },
     };
   },
-
   parseHTML() {
     return [{ tag: "div[data-gallery]" }];
   },
-
   renderHTML({ HTMLAttributes, node }) {
     const out = renderGalleryHTML({
       images: node.attrs.images || [],
@@ -67,8 +58,50 @@ export const GalleryNode = Node.create({
     const [tag, attrs, ...children] = out;
     return [tag, mergeAttributes(HTMLAttributes, attrs), ...children];
   },
-
   addNodeView() {
     return ReactNodeViewRenderer(GalleryNodeView) as any;
+  },
+});
+
+export const ColumnNode = Node.create({
+  name: "column",
+  content: "block+",
+  isolating: true,
+  parseHTML() {
+    return [{ tag: "div[data-column]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes(HTMLAttributes, { "data-column": true, class: "min-w-0" }), 0];
+  },
+});
+
+export const ColumnsNode = Node.create({
+  name: "columns",
+  group: "block",
+  content: "column column",
+  defining: true,
+  addAttributes() {
+    return {
+      layout: {
+        default: "1-1",
+        parseHTML: (element) => element.getAttribute("data-layout") || "1-1",
+        renderHTML: (attributes) => ({ "data-layout": attributes.layout }),
+      },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "div[data-columns]" }];
+  },
+  renderHTML({ HTMLAttributes, node }) {
+    const layout = node.attrs.layout;
+    const colsClass = layout === "1-2" ? "md:grid-cols-[1fr_2fr]" : "md:grid-cols-2";
+    return [
+      "div",
+      mergeAttributes(HTMLAttributes, {
+        "data-columns": true,
+        class: `my-8 grid grid-cols-1 ${colsClass} gap-6 md:gap-8`,
+      }),
+      0,
+    ];
   },
 });

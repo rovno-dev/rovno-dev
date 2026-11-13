@@ -14,16 +14,11 @@ import { slugify } from "@/utils/slugify";
 
 const lowlight = createLowlight(common);
 
-// Custom Heading node built directly from @tiptap/core to avoid the
-// missing @tiptap/extension-heading dependency. It injects the slugified
-// text as the `id` attribute so the TOC can scroll to it, and adds the
-// exact Tailwind classes used by the MDX renderer so they look identical.
 export const ReadonlyHeading = Node.create({
   name: "heading",
   group: "block",
   content: "inline*",
   defining: true,
-
   addAttributes() {
     return {
       level: {
@@ -32,7 +27,6 @@ export const ReadonlyHeading = Node.create({
       },
     };
   },
-
   parseHTML() {
     return [
       { tag: "h1", attrs: { level: 1 } },
@@ -43,14 +37,10 @@ export const ReadonlyHeading = Node.create({
       { tag: "h6", attrs: { level: 6 } },
     ];
   },
-
   renderHTML({ node, HTMLAttributes }) {
-    // node is a ProseMirror Node, not a JSON object. textContent is the
-    // native getter for the plain text inside it.
     const text = node.textContent || "";
     const id = slugify(text);
     const level = node.attrs.level;
-
     let className = "";
     if (level === 1) className = "text-display-2 text-(--on-bg-high) mt-16 mb-6 tracking-tight scroll-mt-28";
     if (level === 2) className = "text-display-4 text-(--on-bg-high) mt-14 mb-4 tracking-tight scroll-mt-28";
@@ -58,7 +48,6 @@ export const ReadonlyHeading = Node.create({
     if (level === 4) className = "text-display-6 text-(--on-bg-high) mt-6 mb-2 scroll-mt-28";
     if (level === 5) className = "text-display-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
     if (level === 6) className = "text-display-6 text-(--on-bg-high) mt-4 mb-2 scroll-mt-28";
-
     return [
       `h${level}`,
       mergeAttributes(HTMLAttributes, { id, class: className }),
@@ -71,15 +60,12 @@ export const ReadonlyVideoNode = Node.create({
   name: "video",
   group: "block",
   atom: true,
-
   addAttributes() {
     return { src: { default: null }, poster: { default: null } };
   },
-
   parseHTML() {
     return [{ tag: "video" }];
   },
-
   renderHTML({ HTMLAttributes }) {
     return [
       "video",
@@ -95,7 +81,6 @@ export const ReadonlyGalleryNode = Node.create({
   name: "gallery",
   group: "block",
   atom: true,
-
   addAttributes() {
     return {
       images: { default: [] },
@@ -106,11 +91,9 @@ export const ReadonlyGalleryNode = Node.create({
       gap: { default: "none", rendered: false },
     };
   },
-
   parseHTML() {
     return [{ tag: "div[data-gallery]" }];
   },
-
   renderHTML({ HTMLAttributes, node }) {
     const out = renderGalleryHTML({
       images: node.attrs.images || [],
@@ -124,7 +107,49 @@ export const ReadonlyGalleryNode = Node.create({
   },
 });
 
-// Readonly Code Block matching the editor's premium look.
+export const ReadonlyColumnNode = Node.create({
+  name: "column",
+  content: "block+",
+  isolating: true,
+  parseHTML() {
+    return [{ tag: "div[data-column]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes(HTMLAttributes, { "data-column": true, class: "min-w-0" }), 0];
+  },
+});
+
+export const ReadonlyColumnsNode = Node.create({
+  name: "columns",
+  group: "block",
+  content: "column column",
+  defining: true,
+  addAttributes() {
+    return {
+      layout: {
+        default: "1-1",
+        parseHTML: (element) => element.getAttribute("data-layout") || "1-1",
+        renderHTML: (attributes) => ({ "data-layout": attributes.layout }),
+      },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "div[data-columns]" }];
+  },
+  renderHTML({ HTMLAttributes, node }) {
+    const layout = node.attrs.layout;
+    const colsClass = layout === "1-2" ? "md:grid-cols-[1fr_2fr]" : "md:grid-cols-2";
+    return [
+      "div",
+      mergeAttributes(HTMLAttributes, {
+        "data-columns": true,
+        class: `my-8 grid grid-cols-1 ${colsClass} gap-6 md:gap-8`,
+      }),
+      0,
+    ];
+  },
+});
+
 const ReadonlyCodeBlock = CodeBlockLowlight.extend({
   renderHTML({ node, HTMLAttributes }) {
     const lang = node.attrs.language || "null";
@@ -160,7 +185,7 @@ const ReadonlyCodeBlock = CodeBlockLowlight.extend({
 
 export const readonlyExtensions = [
   StarterKit.configure({
-    heading: false, // Replaced by our custom ReadonlyHeading
+    heading: false,
     bulletList: { HTMLAttributes: { class: "list-disc list-outside leading-relaxed" } },
     orderedList: { HTMLAttributes: { class: "list-decimal list-outside leading-relaxed" } },
     listItem: { HTMLAttributes: { class: "leading-normal" } },
@@ -185,13 +210,12 @@ export const readonlyExtensions = [
   }),
   ReadonlyVideoNode,
   ReadonlyGalleryNode,
+  ReadonlyColumnsNode,
+  ReadonlyColumnNode,
   ReadonlyCodeBlock,
   HorizontalRule.configure({
     HTMLAttributes: { class: "mt-8 mb-8 border-t border-(--outline)" },
   }),
-  // TOC: walks the parsed document and stores every heading in
-  // editor.storage.tableOfContents.content. getId must match the id
-  // ReadonlyHeading.renderHTML writes so anchor links resolve.
   TableOfContents.configure({
     getText: (node: any) => node.textContent,
     getId: (node: any) => slugify(node.textContent || ""),

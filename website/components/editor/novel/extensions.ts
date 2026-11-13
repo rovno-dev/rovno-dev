@@ -1,17 +1,21 @@
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import {
-  Command,
   HorizontalRule,
   Placeholder,
   StarterKit,
   TiptapLink,
   UploadImagesPlugin,
 } from "novel";
-import { CustomImage, VideoNode, GalleryNode } from "./custom-nodes";
+import { CustomImage, VideoNode, GalleryNode, ColumnsNode, ColumnNode } from "./custom-nodes";
 import { suggestionItems } from "./suggestion-items";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { CodeBlockNodeView } from "./code-block-view";
+import Suggestion from "@tiptap/suggestion";
+import { ReactRenderer } from "@tiptap/react";
+import tippy from "tippy.js";
+import { SlashMenu } from "./slash-menu";
+import { Extension } from "@tiptap/core";
 
 const lowlight = createLowlight(common);
 
@@ -51,6 +55,84 @@ const CustomCodeBlock = CodeBlockLowlight.extend({
   },
 });
 
+export const SlashCommand = Extension.create({
+  name: "slash-command",
+  addOptions() {
+    return {
+      suggestion: {
+        char: "/",
+        command: ({ editor, range, props }: any) => {
+          props.command({ editor, range });
+        },
+      },
+    };
+  },
+  addProseMirrorPlugins() {
+    return [
+      Suggestion({
+        editor: this.editor,
+        ...this.options.suggestion,
+      }),
+    ];
+  },
+}).configure({
+  suggestion: {
+    items: ({ query }: { query: string }) => {
+      const q = query.toLowerCase();
+      return suggestionItems
+        .filter(
+          (item) =>
+            item.title.toLowerCase().includes(q) ||
+            item.searchTerms.some((term) => term.includes(q)),
+        )
+        .slice(0, 10);
+    },
+    render: () => {
+      let component: ReactRenderer;
+      let popup: any;
+
+      return {
+        onStart: (props) => {
+          component = new ReactRenderer(SlashMenu, {
+            props,
+            editor: props.editor,
+          });
+
+          if (!props.clientRect) return;
+
+          popup = tippy("body", {
+            getReferenceClientRect: props.clientRect as any,
+            appendTo: () => document.body,
+            content: component.element,
+            showOnCreate: true,
+            interactive: true,
+            trigger: "manual",
+            placement: "bottom-start",
+          });
+        },
+        onUpdate(props) {
+          component.updateProps(props);
+          if (!props.clientRect) return;
+          popup[0].setProps({
+            getReferenceClientRect: props.clientRect as any,
+          });
+        },
+        onKeyDown(props) {
+          if (props.event.key === "Escape") {
+            popup[0].hide();
+            return true;
+          }
+          return (component.ref as any)?.onKeyDown(props);
+        },
+        onExit() {
+          popup[0].destroy();
+          component.destroy();
+        },
+      };
+    },
+  },
+});
+
 export const extensions = [
   StarterKit.configure({
     bulletList: { HTMLAttributes: { class: "list-disc list-outside leading-relaxed" } },
@@ -72,27 +154,15 @@ export const extensions = [
     placeholder: ({ node }) =>
       node.type.name === "heading" ? "Заголовок…" : "Введите '/' для меню или начните писать…",
   }),
-  Command.configure({
-    suggestion: {
-      char: "/",
-      items: ({ query }: { query: string }) => {
-        const q = query.toLowerCase();
-        return suggestionItems
-          .filter(
-            (item) =>
-              item.title.toLowerCase().includes(q) ||
-              item.searchTerms.some((term) => term.includes(q)),
-          )
-          .slice(0, 10);
-      },
-    },
-  }),
+  SlashCommand,
   TiptapLink.configure({
     HTMLAttributes: { class: "text-(--primary) underline underline-offset-2" },
   }),
   tiptapImage,
   VideoNode,
   GalleryNode,
+  ColumnsNode,
+  ColumnNode,
   CustomCodeBlock,
   HorizontalRule.configure({
     HTMLAttributes: { class: "mt-8 mb-8 border-t border-(--outline)" },

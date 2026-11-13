@@ -1,21 +1,17 @@
 "use client";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EditorBubble,
   EditorBubbleItem,
-  EditorCommand,
-  EditorCommandEmpty,
-  EditorCommandItem,
-  EditorCommandList,
   EditorContent,
   EditorRoot,
-  handleCommandNavigation,
   handleImageDrop,
   handleImagePaste,
 } from "novel";
 import { extensions } from "./extensions";
 import { uploadFn } from "./image-upload";
-import { suggestionItems, registerUploadCallbacks } from "./suggestion-items";
+import { registerUploadCallbacks } from "./suggestion-items";
 import { cn } from "@/lib/utils";
 import "@/app/novel-editor.css";
 import "tippy.js/dist/tippy.css";
@@ -30,13 +26,11 @@ import {
   TextHTwo,
   TextHThree,
   ImageSquare,
-  TextT,
   ArrowCounterClockwise,
   ArrowClockwise,
   VideoCamera,
   SquaresFour,
   CodeBlock,
-  Minus,
 } from "@phosphor-icons/react";
 import { ImageEditorDialog } from "../image-editor/image-editor-dialog";
 import { readFileAsDataURL } from "../image-editor/canvas-utils";
@@ -185,21 +179,7 @@ export function NovelEditor({
     () => ({
       attributes: {
         class: "novel-prosemirror focus:outline-none",
-        // Disables the red squiggly on identifiers, filenames and code
-        // text. The browser's spellchecker is user-locale-dependent and
-        // fires on every camelCase or snake_case token, which is wrong
-        // for every code editor ever built.
         spellcheck: "false",
-      },
-      handleDOMEvents: {
-        keydown: (_view: any, event: KeyboardEvent) => {
-          try {
-            return handleCommandNavigation(event);
-          } catch (err) {
-            console.error("Command navigation error:", err);
-            return false;
-          }
-        },
       },
       handlePaste: (view: any, event: ClipboardEvent) =>
         handleImagePaste(view, event, uploadFn),
@@ -225,7 +205,6 @@ export function NovelEditor({
             onGalleryUpload={handleGalleryUpload}
           />
         )}
-
         <EditorContent
           initialContent={initialContent ?? undefined}
           extensions={extensions as any}
@@ -267,33 +246,8 @@ export function NovelEditor({
               </div>
             </EditorBubbleItem>
           </EditorBubble>
-          <EditorCommand className="z-50 h-auto max-h-[360px] w-[320px] overflow-y-auto rounded-xl border border-(--outline) bg-(--card) shadow-2xl p-2">
-            <EditorCommandEmpty className="px-3 py-4 text-center text-body-4 text-(--on-bg-medium)">
-              Ничего не найдено
-            </EditorCommandEmpty>
-            <EditorCommandList>
-              {suggestionItems.map((item) => (
-                <EditorCommandItem
-                  key={item.title}
-                  value={`${item.title} ${item.searchTerms.join(" ")}`}
-                  onCommand={(val) => item.command(val as any)}
-                  className="w-full flex items-center text-left gap-3 px-2 py-1.5 text-body-4 rounded-lg cursor-pointer select-none data-[selected=true]:bg-(--state-hover)"
-                >
-                  <div className="flex items-center justify-center w-10 h-10 border border-(--outline) bg-(--bg) rounded-md shadow-sm shrink-0">
-                    {item.icon}
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className=" text-(--on-bg-high) truncate">{item.title}</span>
-                    <span className="text-body-5 text-(--on-bg-medium) truncate">{item.description}</span>
-                  </div>
-                </EditorCommandItem>
-              ))}
-            </EditorCommandList>
-          </EditorCommand>
-
         </EditorContent>
       </div>
-
       <ImageEditorDialog
         open={!!cropFile}
         onOpenChange={(open) => !open && setCropFile(null)}
@@ -348,9 +302,7 @@ function Toolbar({
         isActive={editor.isActive("code")}
         icon={<Code className="size-4" />}
       />
-
       <div className="w-px h-5 bg-(--outline) mx-1" />
-
       <ToolbarButton
         onClick={() =>
           editor.chain().focus().toggleHeading({ level: 1 }).run()
@@ -372,9 +324,7 @@ function Toolbar({
         isActive={editor.isActive("heading", { level: 3 })}
         icon={<TextHThree className="size-4" />}
       />
-
       <div className="w-px h-5 bg-(--outline) mx-1" />
-
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         isActive={editor.isActive("bulletList")}
@@ -390,9 +340,7 @@ function Toolbar({
         isActive={editor.isActive("codeBlock")}
         icon={<CodeBlock className="size-4" />}
       />
-
       <div className="w-px h-5 bg-(--outline) mx-1" />
-
       <ToolbarButton
         onClick={() => onImageUpload(editor.view.state.selection.from)}
         icon={<ImageSquare className="size-4" />}
@@ -405,9 +353,7 @@ function Toolbar({
         onClick={() => onGalleryUpload(editor.view.state.selection.from)}
         icon={<SquaresFour className="size-4" />}
       />
-
       <div className="w-px h-5 bg-(--outline) mx-1" />
-
       <ToolbarButton
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().undo()}

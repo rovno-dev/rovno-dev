@@ -272,7 +272,7 @@ export default function ProjectCard({
               ))}
             </div>
           )}
-          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading ">
+          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-medium) leading-[1.15] tracking-tight font-heading ">
             {project.title}
           </h3>
           {project.shortDescription && (

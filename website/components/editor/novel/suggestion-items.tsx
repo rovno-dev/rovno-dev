@@ -1,4 +1,5 @@
 "use client";
+
 import type { Editor, Range } from "@tiptap/react";
 import {
   TextT,
@@ -12,6 +13,7 @@ import {
   ImageSquare,
   VideoCamera,
   SquaresFour,
+  Columns,
 } from "@phosphor-icons/react";
 
 export interface SuggestionItem {
@@ -52,12 +54,7 @@ export const suggestionItems: SuggestionItem[] = [
     searchTerms: ["h1", "heading1", "заголовок"],
     icon: <TextHOne className="size-4" />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .setNode("heading", { level: 1 })
-        .run();
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 1 }).run();
     },
   },
   {
@@ -66,12 +63,7 @@ export const suggestionItems: SuggestionItem[] = [
     searchTerms: ["h2", "heading2", "заголовок"],
     icon: <TextHTwo className="size-4" />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .setNode("heading", { level: 2 })
-        .run();
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 2 }).run();
     },
   },
   {
@@ -80,12 +72,7 @@ export const suggestionItems: SuggestionItem[] = [
     searchTerms: ["h3", "heading3", "заголовок"],
     icon: <TextHThree className="size-4" />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .setNode("heading", { level: 3 })
-        .run();
+      editor.chain().focus().deleteRange(range).setNode("heading", { level: 3 }).run();
     },
   },
   {
@@ -104,6 +91,22 @@ export const suggestionItems: SuggestionItem[] = [
     icon: <ListNumbers className="size-4" />,
     command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+    },
+  },
+  {
+    title: "2 колонки (1/3 + 2/3)",
+    description: "Разделить текст на две колонки",
+    searchTerms: ["columns", "grid", "layout", "колонки"],
+    icon: <Columns className="size-4" />,
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).insertContentAt(range, {
+        type: "columns",
+        attrs: { layout: "1-2" },
+        content: [
+          { type: "column", content: [{ type: "paragraph" }] },
+          { type: "column", content: [{ type: "paragraph" }] },
+        ],
+      }).run();
     },
   },
   {
