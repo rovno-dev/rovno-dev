@@ -132,6 +132,8 @@ export function CustomProjectPage({
   });
   const mediaY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
+  const hasToc = effectiveHeadings.length > 0;
+
   return (
     <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary) pb-24">
       {/* Standardized Container Hero */}
@@ -174,12 +176,18 @@ export function CustomProjectPage({
       </section>
 
       <Container className="pt-12 md:pt-16">
-        {/* Two column layout for content + sticky TOC */}
-        <div className="mx-auto max-w-[1200px] grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-12 items-start">
-          
+        {/* Two column layout - TOC column only when headings exist.
+            No `items-start` on the grid so the TOC wrapper stretches to
+            the row height, giving the sticky aside room to travel. */}
+        <div
+          className={`mx-auto grid grid-cols-1 gap-12 ${
+            hasToc
+              ? "max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_240px]"
+              : "max-w-[900px]"
+          }`}
+        >
           {/* Left Column: Main Content */}
           <div className="min-w-0 max-w-[900px]">
-            
             {/* Seamless metadata block */}
             <div className="divide-y divide-(--outline) border-y border-(--outline)">
               <CaseInfo project={project} />
@@ -209,12 +217,10 @@ export function CustomProjectPage({
 
             {project.media.length > 0 && (
               <section id="gallery" className="mt-16">
-                {/* Title stays in the reading column */}
                 <div className="mb-8">
                   <h2 className="text-display-4">Галерея</h2>
                 </div>
-                
-                {/* Gallery breaks out to 100% width of the screen */}
+
                 <div className="w-screen relative left-1/2 -translate-x-1/2">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-2">
                     {project.media.map((m) => (
@@ -252,17 +258,22 @@ export function CustomProjectPage({
             )}
           </div>
 
-          {/* Right Column: Sticky TOC */}
-          <div className="hidden lg:block">
-            {effectiveHeadings.length > 0 && (
+          {/* Right Column: TOC.
+              The wrapper renders on all screens so `Toc` can decide:
+                - desktop: sticky sidebar <aside> (visible)
+                - mobile:  fixed floating button <div> (visible)
+              No `hidden lg:block` wrapper - that was hiding the mobile
+              button AND preventing sticky layout on desktop. */}
+          {hasToc && (
+            <div>
               <Toc
                 variant="sidebar"
                 headings={effectiveHeadings}
                 label="Содержание"
                 ariaLabel="Содержание проекта"
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Container>
 
@@ -278,7 +289,6 @@ export function CustomProjectPage({
             }}
           />
           <Container className="relative z-10 text-center max-w-3xl">
-            {/* CTA Box with Dotted Border */}
             <div className="relative rounded-3xl p-8 md:p-16 flex flex-col items-center text-center bg-(--bg)/50 backdrop-blur-sm">
               <svg
                 aria-hidden
@@ -304,9 +314,13 @@ export function CustomProjectPage({
                   <Sparkle className="size-5" weight="fill" />
                 </div>
               </div>
-              
+
               <h2 className="text-4xl md:text-6xl font-heading tracking-tighter text-(--on-bg-high) mb-6 leading-[1.05]">
-                Хотите <span className="italic font-serif text-(--on-bg-medium)">такой же</span> <br />
+                Хотите{" "}
+                <span className="italic font-serif text-(--on-bg-medium)">
+                  такой же
+                </span>{" "}
+                <br />
                 проект?
               </h2>
               <p className="text-body-2 text-(--on-bg-medium) max-w-md mx-auto mb-10 leading-relaxed">

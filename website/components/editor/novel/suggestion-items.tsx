@@ -99,14 +99,24 @@ export const suggestionItems: SuggestionItem[] = [
     searchTerms: ["columns", "grid", "layout", "колонки"],
     icon: <Columns className="size-4" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).insertContentAt(range, {
-        type: "columns",
-        attrs: { layout: "1-2" },
-        content: [
-          { type: "column", content: [{ type: "paragraph" }] },
-          { type: "column", content: [{ type: "paragraph" }] },
-        ],
-      }).run();
+      // Insert the columns block followed immediately by a paragraph.
+      // This prevents the user from getting trapped in the last column.
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContentAt(range, [
+          {
+            type: "columns",
+            attrs: { layout: "1-2" },
+            content: [
+              { type: "column", content: [{ type: "paragraph" }] },
+              { type: "column", content: [{ type: "paragraph" }] },
+            ],
+          },
+          { type: "paragraph" },
+        ])
+        .run();
     },
   },
   {

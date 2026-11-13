@@ -80,6 +80,7 @@ export const ColumnsNode = Node.create({
   group: "block",
   content: "column column",
   defining: true,
+  isolating: true,
   addAttributes() {
     return {
       layout: {
@@ -103,5 +104,62 @@ export const ColumnsNode = Node.create({
       }),
       0,
     ];
+  },
+  addKeyboardShortcuts() {
+    return {
+      Enter: () => {
+        const { state } = this.editor;
+        const { selection } = state;
+        const { $from } = selection;
+
+        let columnsDepth = -1;
+        let columnDepth = -1;
+        let columnsPos = -1;
+        let columnsNode = null;
+        let columnNode = null;
+
+        // Find the columns and column nodes by walking up the tree
+        for (let d = $from.depth; d > 0; d--) {
+          const node = $from.node(d);
+          if (node.type.name === "columns") {
+            columnsDepth = d;
+            columnsPos = $from.before(d);
+            columnsNode = node;
+            break;
+          }
+        }
+
+        if (!columnsNode || columnsDepth === -1) return false;
+
+        for (let d = $from.depth; d > columnsDepth; d--) {
+          const node = $from.node(d);
+          if (node.type.name === "column") {
+            columnDepth = d;
+            columnNode = node;
+            break;
+          }
+        }
+
+        if (!columnNode || columnDepth === -1) return false;
+
+        const isLastColumn = $from.index(columnsDepth) === columnsNode.childCount - 1;
+        const isLastBlock = $from.index(columnDepth) === columnNode.childCount - 1;
+        const isTopLevel = $from.depth === columnDepth + 1;
+        const isCurrentBlockEmpty = $from.parent.content.size === 0;
+
+        // If we are in an empty paragraph at the end of the last column, escape the columns block
+        if (isLastColumn && isLastBlock && isTopLevel && isCurrentBlockEmpty) {
+          const pos = columnsPos + columnsNode.nodeSize;
+          this.editor
+            .chain()
+            .insertContentAt(pos, { type: "paragraph" })
+            .focus(pos + 1)
+            .run();
+          return true;
+        }
+
+        return false;
+      },
+    };
   },
 });
