@@ -11,7 +11,10 @@ import { suggestionItems } from "./suggestion-items";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { CodeBlockNodeView } from "./code-block-view";
-import Suggestion from "@tiptap/suggestion";
+import Suggestion, {
+  type SuggestionKeyDownProps,
+  type SuggestionProps,
+} from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
 import tippy from "tippy.js";
 import { SlashMenu } from "./slash-menu";
@@ -92,7 +95,7 @@ export const SlashCommand = Extension.create({
       let popup: any;
 
       return {
-        onStart: (props) => {
+        onStart: (props: SuggestionProps) => {
           component = new ReactRenderer(SlashMenu, {
             props,
             editor: props.editor,
@@ -110,14 +113,14 @@ export const SlashCommand = Extension.create({
             placement: "bottom-start",
           });
         },
-        onUpdate(props) {
+        onUpdate(props: SuggestionProps) {
           component.updateProps(props);
           if (!props.clientRect) return;
           popup[0].setProps({
             getReferenceClientRect: props.clientRect as any,
           });
         },
-        onKeyDown(props) {
+        onKeyDown(props: SuggestionKeyDownProps) {
           if (props.event.key === "Escape") {
             popup[0].hide();
             return true;
