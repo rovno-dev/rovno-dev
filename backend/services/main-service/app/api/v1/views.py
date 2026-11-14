@@ -9,6 +9,7 @@ first request from an IP wins and every later one is a no-op read - the
 counter itself is only written when the key was actually created.
 """
 from typing import Optional, Tuple
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -17,6 +18,7 @@ from config.rate_limiter import get_client_ip
 from database.cache import cache_client
 from database.database import get_db
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/views", tags=["views"])
 
 ALLOWED_TYPES = {"project", "article", "event"}
@@ -84,25 +86,30 @@ def hit_view(
 ):
     t, eid = _normalize(entity_type, entity_id)
     ip = get_client_ip(request)
-    dedupe_key = f"view:{t}:{eid}:{ip}"
+    viewer_id = request.headers.get("x-viewer-id", "").strip()
 
-    # Fail open: if Valkey is down we count every hit rather than dropping
-    # all views. The dedupe degrades to "no dedupe", which is the correct
-    # bias for a metric - under-counting is worse than over-counting.
+    # Prefer viewer_id for dedupe because it is stable across IP changes
+    # (e.g., mobile networks that rotate IPs on every reload).
+    identifier = viewer_id if viewer_id else ip
+    dedupe_key = f"view:{t}:{eid}:{identifier}"
+
     try:
         counted = bool(
             cache_client.set(dedupe_key, "1", nx=True, ex=DEDUPE_TTL_SECONDS)
         )
-    except Exception:
-        counted = True
+    except Exception as e:
+        logger.error("View dedupe Redis error: %s", e)
+        # Fail closed: never over-count if we cannot verify the cache.
+        counted = False
 
     row, created = _get_or_create(db, t, eid, create=True)
-    if counted and row is not None:
-        row.view_count = (row.view_count or 0) + 1
 
-    if counted or created:
+    if created or counted:
+        if row is not None:
+            row.view_count = (row.view_count or 0) + 1
         db.commit()
-        db.refresh(row)
+        if row is not None:
+            db.refresh(row)
 
     return ViewsOut(
         entity_type=t, entity_id=eid, view_count=(row.view_count if row else 0)

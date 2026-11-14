@@ -55,7 +55,7 @@ export function buildOgImageUrl(title: string, subtitle?: string): string {
 
 /**
  * Normalizes a title to exactly one site suffix. Callers may pass
- * "Journal", "Journal · Rovno.dev", or "Разработка на 1С | Rovno.dev"
+ * "Blog", "Blog · Rovno.dev", or "Разработка на 1С | Rovno.dev"
  * - all three resolve to "X · Rovno.dev". Without this a page whose
  * title already carried a suffix would render "X · Rovno.dev · Rovno.dev".
  */

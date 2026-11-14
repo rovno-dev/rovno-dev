@@ -18,6 +18,7 @@ export function MediaLightbox({ src, alt, children }: { src: string; alt: string
         showCloseButton={false}
         style={{ transform: 'none' }}
       >
+        <DialogTitle className="sr-only">Просмотр медиа</DialogTitle>
         <Button
           variant="text"
           className="absolute top-4 right-4 z-50 text-white hover:bg-white/20"

@@ -30,7 +30,7 @@ export default function BlogArticleError({
           </h1>
           <p className="text-body-2 text-(--on-bg-medium) leading-relaxed mb-10">
             Похоже, у нас временные проблемы с сервером. Попробуйте ещё раз через минуту - если не поможет,
-            вернитесь в журнал.
+            вернитесь в блог.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button variant="filled" size="large" onClick={reset}>
@@ -40,7 +40,7 @@ export default function BlogArticleError({
             <Button variant="outlined" size="large" asChild>
               <Link href="/blog">
                 <ArrowLeft className="size-4" />
-                В журнал
+                В блог
               </Link>
             </Button>
           </div>

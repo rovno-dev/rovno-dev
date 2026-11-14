@@ -12,16 +12,16 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
-  
+
   let article = null;
   try {
     const res = await fetch(`${API_BASE}/api/v1/articles/${slug}`, { cache: "no-store" });
     if (res.ok) article = await res.json();
-  } catch (e) {}
+  } catch (e) { }
 
-  const title = article?.title || "Журнал Rovno.dev";
+  const title = article?.title || "Блог";
   const author = article?.author?.name || article?.author?.username || "Rovno.dev";
-  const date = article?.date 
+  const date = article?.date
     ? new Date(article.date).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
     : "";
 
@@ -50,7 +50,7 @@ export async function GET(
             display: "flex",
           }}
         />
-        
+
         <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between", zIndex: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", color: "#336DFF", fontSize: 24, textTransform: "uppercase", letterSpacing: "0.2em" }}>
             <span>{"$"} cat article.mdx</span>

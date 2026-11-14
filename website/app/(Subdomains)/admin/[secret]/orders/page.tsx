@@ -635,6 +635,7 @@ export default function AdminOrdersPage() {
           showCloseButton={false}
           className="!fixed !inset-0 !top-0 !left-0 !translate-none !max-w-none !max-h-none !w-screen !h-screen !p-0 !border-0 !rounded-none !bg-black/95 flex items-center justify-center"
         >
+          <DialogTitle className="sr-only">Просмотр файлов заявки</DialogTitle>
           <Button
             variant="glass"
             size="icon-medium"

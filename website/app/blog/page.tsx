@@ -4,11 +4,11 @@ import { fetchPublishedArticlesServer } from "@/utils/api/articles";
 import { pageMetadata, buildOgImageUrl } from "@/utils/seo";
 
 export const metadata = pageMetadata({
-  title: "Журнал",
+  title: "Блог",
   description:
-    "Статьи о дизайне, разработке, кейсах и инсайтах команды Rovno.dev.",
+    "Статьи о дизайне, разработке, кейсах, бизнесе, инновациях и инсайтах команды Rovno.dev.",
   path: "/blog",
-  ogImage: buildOgImageUrl("Журнал", "Rovno.dev"),
+  ogImage: buildOgImageUrl("Блог", "Rovno.dev"),
 });
 
 // RSC page - fetches published articles at request time (ISR 60s) and

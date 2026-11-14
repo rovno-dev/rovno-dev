@@ -33,7 +33,7 @@ export default function NotFound() {
           <Button variant="outlined" size="large" asChild>
             <Link href="/blog">
               <ArrowLeftIcon className="size-4" />
-              В журнал
+              В блог
             </Link>
           </Button>
         </div>

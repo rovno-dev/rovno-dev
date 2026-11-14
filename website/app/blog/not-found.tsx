@@ -50,7 +50,7 @@ export default function BlogArticleNotFound() {
       <Container>
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-body-5 uppercase tracking-[0.35em] text-(--on-bg-low) mb-4">
-            404 · Journal
+            404 · Blog
           </p>
           <h1 className="text-display-2 md:text-display-1 text-(--on-bg-high) mb-6 leading-tight">
             Такой статьи нет

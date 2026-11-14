@@ -52,7 +52,7 @@ const CATALOGS: CatalogDef[] = [
   {
     id: "article-categories",
     label: "Категории статей",
-    description: "Рубрики для журнала.",
+    description: "Рубрики для блога.",
     icon: Newspaper,
   },
   {
