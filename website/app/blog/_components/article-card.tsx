@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, type CSSProperties } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import type { ArticleListItem } from "@/utils/api/articles";
 
 function formatDate(iso: string, lang: string) {
@@ -141,146 +140,63 @@ export function ArticleCard({
   index?: number;
   lang: string;
 }) {
-  const [bgColor, setBgColor] = useState<{ r: number; g: number; b: number } | null>(null);
-
-  useEffect(() => {
-    if (!article.image_url || article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4")) {
-      setBgColor(null);
-      return;
-    }
-    let isCancelled = false;
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.src = article.image_url;
-    img.onload = () => {
-      if (isCancelled) return;
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = 10;
-        canvas.height = 10;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        const sampleHeight = img.naturalHeight * 0.3;
-        ctx.drawImage(img, 0, 0, img.naturalWidth, sampleHeight, 0, 0, 10, 10);
-        const data = ctx.getImageData(0, 0, 10, 10).data;
-        let r = 0, g = 0, b = 0, count = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i + 3] < 128) continue;
-          r += data[i];
-          g += data[i + 1];
-          b += data[i + 2];
-          count++;
-        }
-        if (count > 0) {
-          setBgColor({
-            r: Math.round(r / count),
-            g: Math.round(g / count),
-            b: Math.round(b / count),
-          });
-        }
-      } catch (err) { }
-    };
-    return () => {
-      isCancelled = true;
-    };
-  }, [article.image_url]);
-
-  const isLight = useMemo(() => {
-    if (!bgColor) return false;
-    const luminance = (0.299 * bgColor.r + 0.587 * bgColor.g + 0.114 * bgColor.b) / 255;
-    return luminance > 0.55;
-  }, [bgColor]);
-
-  const gradientStyle = bgColor
-    ? { background: `linear-gradient(to bottom, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.95) 0%, rgba(${bgColor.r},${bgColor.g},${bgColor.b}, 0.4) 50%, transparent 100%)` }
-    : { background: "linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)" };
-
-  const textColorClass = isLight ? "text-[var(--dark-8)]" : "text-[var(--gray-0)]";
-  const shadowClass = isLight ? "drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]";
+  const isVideo =
+    article.image_url?.endsWith(".webm") || article.image_url?.endsWith(".mp4");
 
   return (
     <Link
       href={`/blog/${article.id}/${article.slug}`}
-      className="group block animate-reveal fill-mode-both relative w-full overflow-hidden rounded-3xl border border-(--outline) bg-(--card) transition-all duration-500 hover:border-(--primary)/40 hover:shadow-2xl hover:shadow-(--primary)/5 aspect-[4/3]"
+      className="group block animate-reveal fill-mode-both relative w-full"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      {article.image_url ? (
-        article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
-          <video
-            src={article.image_url}
-            preload="metadata"
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-            onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
-            onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
-          />
+      {/* Image: 4:3, no rounding, no border. Text lives below it. */}
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card)">
+        {article.image_url ? (
+          isVideo ? (
+            <video
+              src={article.image_url}
+              preload="metadata"
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+              onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+              onMouseLeave={(e) => {
+                e.currentTarget.pause();
+                e.currentTarget.currentTime = 0;
+              }}
+            />
+          ) : (
+            <Image
+              fill
+              src={article.image_url}
+              alt={article.title}
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
+              quality={90}
+              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
+            />
+          )
         ) : (
-          <Image
-            fill
-            src={article.image_url}
-            alt={article.title}
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-            quality={90}
-            className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-          />
-        )
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
-      )}
-
-      {/* Top dynamic gradient */}
-      <div
-        className="absolute inset-x-0 top-0 h-[55%] pointer-events-none z-[1] transition-colors duration-500"
-        style={gradientStyle}
-      />
-
-      {/* Bottom subtle gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-[1]" />
-
-      {/* Top Section: Title, Description, Date */}
-      <div className="absolute inset-x-0 top-0 p-4 md:p-6 z-10 pointer-events-none">
-        <div className="flex flex-col max-w-full min-w-0">
-          <MarqueeText
-            text={article.title}
-            className={`text-xl md:text-2xl font-heading  leading-tight tracking-tight ${textColorClass} ${shadowClass}`}
-          />
-          {article.description && (
-            <p className={`mt-2 text-xs md:text-sm leading-snug line-clamp-2 ${isLight ? "text-[var(--dark-8)]/80" : "text-[var(--gray-0)]/80"} ${shadowClass}`}>
-              {article.description}
-            </p>
-          )}
-          <p className={`mt-3 text-[11px] font-mono uppercase tracking-wider ${isLight ? "text-[var(--dark-8)]/60" : "text-[var(--gray-0)]/60"} ${shadowClass}`}>
-            {formatDate(article.date, lang)}
-          </p>
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
+        )}
       </div>
 
-      {/* Bottom Section: Tags and Arrow */}
-      <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 z-10 flex items-end justify-between gap-4 pointer-events-none">
-        {article.tags && article.tags.length > 0 ? (
-          <div className="flex flex-wrap justify-start gap-2 pointer-events-auto min-w-0">
-            {article.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag.id}
-                className="inline-flex items-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px]  uppercase tracking-[0.12em] text-white"
-              >
-                {tag.name}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <div />
+      {/* Text block under the image */}
+      <div className="pt-4 md:pt-5">
+        <p className="mb-2 text-[10px] uppercase tracking-[0.16em] text-(--on-bg-low)">
+          {formatDate(article.date, lang)}
+        </p>
+
+        <MarqueeText
+          text={article.title}
+          className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-medium) leading-[1.15] tracking-tight font-heading"
+        />
+
+        {article.description && (
+          <p className="mt-2 text-sm md:text-body-4 text-(--on-bg-medium) leading-relaxed line-clamp-2">
+            {article.description}
+          </p>
         )}
-        <div
-          className={`flex items-center justify-center shrink-0 size-10 rounded-full shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:bg-(--primary) group-hover:text-(--on-primary) group-hover:border-(--primary) ml-auto pointer-events-auto ${isLight
-              ? "bg-white text-[var(--dark-8)] border-transparent"
-              : "bg-black/20 backdrop-blur-md text-white border border-white/20"
-            }`}
-        >
-          <ArrowUpRightIcon className="size-5" weight="bold" />
-        </div>
       </div>
     </Link>
   );

@@ -137,3 +137,56 @@ export function CodeBlockNodeView(props: any) {
     </NodeViewWrapper>
   );
 }
+
+
+/**
+ * Read-only twin of <CodeBlockNodeView>. Same chrome (header strip + copy
+ * button) but no language <select> — the language is fixed at render time.
+ * The header uses a plain ">" glyph instead of the per-language file icon
+ * so the block reads as "terminal output" on the public page, and the
+ * language label sits on the LEFT where the eye lands first.
+ */
+export function ReadonlyCodeBlockNodeView(props: any) {
+  const { node } = props;
+  const { language } = node.attrs;
+  const [copied, setCopied] = useState(false);
+  const meta = LANG_META[language] ?? LANG_META.null;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(node.textContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <NodeViewWrapper className="relative my-8 rounded-xl border border-(--outline) bg-(--card) overflow-hidden shadow-sm">
+      <div
+        contentEditable={false}
+        className="flex items-center justify-between px-5 py-3 border-b border-(--outline) bg-(--bg)"
+      >
+        <div className="flex items-center gap-2 text-xs font-mono text-(--on-bg-low)">
+          <span className="text-(--primary)">{">"}</span>
+          <span className="uppercase tracking-wider">{meta.label}</span>
+        </div>
+        <button
+          onClick={handleCopy}
+          type="button"
+          className="text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors"
+          title="Copy code"
+        >
+          {copied ? (
+            <Check className="size-4 text-emerald-500" />
+          ) : (
+            <Copy className="size-4" />
+          )}
+        </button>
+      </div>
+      <pre className="px-6 py-5 m-0 overflow-x-auto text-sm font-mono text-(--on-bg-high) bg-transparent border-none leading-relaxed hljs">
+        <NodeViewContent
+          as={"code" as any}
+          className="bg-transparent border-none text-inherit p-0"
+        />
+      </pre>
+    </NodeViewWrapper>
+  );
+}

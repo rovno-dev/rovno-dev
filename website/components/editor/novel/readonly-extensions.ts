@@ -6,6 +6,8 @@ import {
   TiptapLink,
 } from "novel";
 import { Node, mergeAttributes } from "@tiptap/core";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { ReadonlyCodeBlockNodeView } from "./code-block-view";
 import { TableOfContents } from "@tiptap/extension-table-of-contents";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
@@ -151,36 +153,9 @@ export const ReadonlyColumnsNode = Node.create({
 });
 
 const ReadonlyCodeBlock = CodeBlockLowlight.extend({
-  renderHTML({ node, HTMLAttributes }) {
-    const lang = node.attrs.language || "null";
-    return [
-      "div",
-      { class: "my-8 rounded-xl border border-[#2a2a35] bg-[#111114] overflow-hidden shadow-2xl" },
-      [
-        "div",
-        { class: "flex items-center justify-between px-4 py-2 border-b border-[#2a2a35] bg-[#18181b]" },
-        [
-          "div",
-          { class: "flex items-center gap-2 pl-1" },
-          [
-            "svg",
-            { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 256 256", class: "size-4 fill-[#8c8c9a]" },
-            ["path", { d: "M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Z" }]
-          ]
-        ],
-        [
-          "div",
-          { class: "flex items-center gap-3 pr-1" },
-          ["span", { class: "text-[12px] text-[#8c8c9a]  font-mono uppercase tracking-wider" }, lang === "null" ? "TEXT" : lang]
-        ]
-      ],
-      [
-        "pre",
-        mergeAttributes(HTMLAttributes, { class: "px-4 py-4 m-0 overflow-x-auto text-body-4 font-mono text-[#e2e2e6] bg-transparent border-none leading-[1.7] hljs" }),
-        ["code", 0]
-      ]
-    ];
-  }
+  addNodeView() {
+    return ReactNodeViewRenderer(ReadonlyCodeBlockNodeView);
+  },
 }).configure({ lowlight });
 
 export const readonlyExtensions = [

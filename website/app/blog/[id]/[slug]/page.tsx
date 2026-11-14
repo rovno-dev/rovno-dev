@@ -191,7 +191,7 @@ export default async function ArticlePage({
     <div className="mt-header bg-(--bg) pb-24">
       <Container className="pt-4 md:pt-8">
         <div className="max-w-[860px] mx-auto">
-          <div className="relative w-full aspect-[4/3] rounded-4xl overflow-hidden bg-(--card) border border-(--outline) animate-reveal">
+          <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card) animate-reveal">
             {article.image_url ? (
               article.image_url.endsWith(".webm") ||
                 article.image_url.endsWith(".mp4") ? (
@@ -219,30 +219,21 @@ export default async function ArticlePage({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
-            
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
-              <Button variant="glass" size="icon-medium" shape="round" asChild>
-                <Link href="/blog" aria-label="Все статьи">
-                  <ArrowLeftIcon className="size-5" />
-                </Link>
-              </Button>
-            </div>
-            
+
             {article.tags && article.tags.length > 0 && (
-              <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
+              <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 flex flex-wrap gap-2 justify-end max-w-[60%]">
                 {article.tags.slice(0, 4).map((tag) => (
                   <Badge
                     key={tag.id}
                     variant="glass-static"
                     size="chip-small"
-                    className="text-white border-white/20"
                   >
                     {tag.name}
                   </Badge>
                 ))}
               </div>
             )}
-            
+
             <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
               <h1 className="text-display-3 md:text-display-2 text-white leading-[1.05] tracking-tight mb-3 max-w-2xl animate-reveal">
                 {article.title}
@@ -261,8 +252,8 @@ export default async function ArticlePage({
           </div>
         </div>
       </Container>
-      
-      <Container className="pt-4">
+
+      <Container>
         <div className="max-w-[860px] mx-auto">
           <ContentMeta
             entityType="article"
@@ -273,7 +264,7 @@ export default async function ArticlePage({
           />
         </div>
       </Container>
-      
+
       <Container className="py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
           <article className="min-w-0 max-w-[760px] prose-case">
@@ -282,7 +273,7 @@ export default async function ArticlePage({
             ) : (
               legacyContent
             )}
-            
+
             {otherArticles.length > 0 && (
               <div className="mt-16 pt-12 border-t border-(--outline) not-prose">
                 <h2 className="text-display-4 mb-6 tracking-tight">Другие статьи</h2>
