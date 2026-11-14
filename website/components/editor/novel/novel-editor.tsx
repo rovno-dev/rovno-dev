@@ -40,12 +40,14 @@ import { toast } from "sonner";
 export interface NovelEditorProps {
   initialContent: any | null;
   onChange: (json: any) => void;
+  onDirty?: () => void;
   className?: string;
 }
 
 export function NovelEditor({
   initialContent,
   onChange,
+  onDirty,
   className,
 }: NovelEditorProps) {
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -209,7 +211,11 @@ export function NovelEditor({
           initialContent={initialContent ?? undefined}
           extensions={extensions as any}
           editorProps={editorProps}
-          onUpdate={({ editor }) => schedule(editor.getJSON())}
+          onUpdate={({ editor }) => {
+            // Only mark dirty on real user edits, not programmatic setContent
+            if (onDirty) onDirty();
+            schedule(editor.getJSON());
+          }}
           onCreate={({ editor }) => setEditor(editor)}
           className="flex-1 overflow-y-auto overflow-x-hidden relative"
         >

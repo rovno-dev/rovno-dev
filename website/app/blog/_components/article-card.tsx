@@ -208,11 +208,13 @@ export function ArticleCard({
         article.image_url.endsWith(".webm") || article.image_url.endsWith(".mp4") ? (
           <video
             src={article.image_url}
-            autoPlay
+            preload="metadata"
             muted
             loop
             playsInline
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+            onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+            onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
           />
         ) : (
           <Image

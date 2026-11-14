@@ -21,6 +21,7 @@ import { rootDomainUrl } from "@/utils/root-domain";
 import { SERVICES_META } from "@/app/_data/services/meta";
 import { MadeOnAmorfa } from "@/components/made-on-amorfa";
 import { LanguageSwitcher } from "../language-switcher";
+import { ScrollReveal } from "../animation/scroll-reveal";
 
 const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE || "";
 
@@ -86,7 +87,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 lg:gap-24 mb-20">
           <div className="flex flex-col gap-6 max-w-sm">
             <Link href={logoHref} className="w-fit">
-              <RovnoLogotypeWordmark className="h-8! w-auto" />
+              <ScrollReveal threshold={0.1} delay={200}>
+                <RovnoLogotypeWordmark animated className="h-8! w-auto" />
+              </ScrollReveal>
             </Link>
             <div className="flex items-center gap-1 mt-2">
               {CONTACT_PHONE && (

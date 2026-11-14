@@ -1,6 +1,5 @@
 """Admin CRUD for projects + GitHub README proxy."""
 import os
-import random
 import time
 from datetime import datetime
 from typing import List, Optional
@@ -29,17 +28,14 @@ router = APIRouter(prefix="/admin/projects", tags=["admin-projects"])
 from app.shared.slugify import slugify
 
 
-def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
+def _ensure_unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
     slug = base
-    suffix = random.randint(10000, 99999)
-    while True:
-        q = db.query(Project.id).filter(Project.slug == slug)
-        if exclude_id:
-            q = q.filter(Project.id != exclude_id)
-        if not q.first():
-            return slug
-        slug = f"{base}-{suffix}"
-        suffix = random.randint(10000, 99999)
+    q = db.query(Project.id).filter(Project.slug == slug)
+    if exclude_id:
+        q = q.filter(Project.id != exclude_id)
+    if q.first():
+        raise HTTPException(status_code=409, detail=f"Slug '{slug}' уже существует")
+    return slug
 
 
 # ---------- Project picker (used by team-member editor) ------------------
@@ -166,7 +162,7 @@ def create_project(
         raise HTTPException(422, "publication_status must be 'draft' or 'published'")
 
     base_slug = slugify(payload.slug or payload.title)
-    slug = _unique_slug(db, base_slug)
+    slug = _ensure_unique_slug(db, base_slug)
 
     project = Project(
         id=str(uuid4()),
@@ -214,7 +210,7 @@ def update_project(
     update = payload.model_dump(exclude_unset=True)
 
     if "slug" in update and update["slug"] and update["slug"] != p.slug:
-        update["slug"] = _unique_slug(db, slugify(update["slug"]), exclude_id=p.id)
+        update["slug"] = _ensure_unique_slug(db, slugify(update["slug"]), exclude_id=p.id)
 
     if "publication_status" in update and update["publication_status"] is not None:
         if update["publication_status"] not in {"draft", "published"}:

@@ -19,22 +19,18 @@ from app.services.tag_service import resolve_tags
 from app.models.tag import TagKind
 from app.shared.slugify import slugify
 from database.database import get_db
-import random
 
 router = APIRouter(prefix="/admin/events", tags=["admin-events"])
 
 
-def _unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
+def _ensure_unique_slug(db: Session, base: str, exclude_id: Optional[str] = None) -> str:
     slug = base
-    n = random.randint(10000, 99999)
-    while True:
-        q = db.query(Event.id).filter(Event.slug == slug)
-        if exclude_id:
-            q = q.filter(Event.id != exclude_id)
-        if not q.first():
-            return slug
-        slug = f"{base}-{n}"
-        n = random.randint(10000, 99999)
+    q = db.query(Event.id).filter(Event.slug == slug)
+    if exclude_id:
+        q = q.filter(Event.id != exclude_id)
+    if q.first():
+        raise HTTPException(status_code=409, detail=f"Slug '{slug}' уже существует")
+    return slug
 
 
 @router.get("", response_model=List[EventListItem])
@@ -78,7 +74,7 @@ def create_event(payload: EventCreate, db: Session = Depends(get_db), _: User = 
     if status_val not in {"draft", "published"}:
         raise HTTPException(422, "publication_status must be 'draft' or 'published'")
 
-    slug = _unique_slug(db, slugify(payload.slug or payload.title))
+    slug = _ensure_unique_slug(db, slugify(payload.slug or payload.title))
 
     ev = Event(
         id=str(uuid4()),
@@ -127,7 +123,7 @@ def update_event(
     update = payload.model_dump(exclude_unset=True)
 
     if "slug" in update and update["slug"] and update["slug"] != ev.slug:
-        update["slug"] = _unique_slug(db, slugify(update["slug"]), exclude_id=ev.id)
+        update["slug"] = _ensure_unique_slug(db, slugify(update["slug"]), exclude_id=ev.id)
 
     if "publication_status" in update and update["publication_status"] is not None:
         if update["publication_status"] not in {"draft", "published"}:

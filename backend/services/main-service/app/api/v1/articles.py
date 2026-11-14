@@ -1,4 +1,3 @@
-import random
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
@@ -47,17 +46,14 @@ def _ensure_owner_or_admin(article: Article, user: User | None) -> None:
         raise HTTPException(403, "Not your article")
 
 
-def _unique_slug(db: Session, base: str, exclude_id: Optional[UUID] = None) -> str:
+def _ensure_unique_slug(db: Session, base: str, exclude_id: Optional[UUID] = None) -> str:
     slug = base or "article"
-    suffix = random.randint(10000, 99999)
-    while True:
-        q = db.query(Article.id).filter(Article.slug == slug)
-        if exclude_id:
-            q = q.filter(Article.id != exclude_id)
-        if not q.first():
-            return slug
-        slug = f"{base}-{suffix}"
-        suffix = random.randint(10000, 99999)
+    q = db.query(Article.id).filter(Article.slug == slug)
+    if exclude_id:
+        q = q.filter(Article.id != exclude_id)
+    if q.first():
+        raise HTTPException(status_code=409, detail=f"Slug '{slug}' уже существует")
+    return slug
 
 
 def _resolve_publish_status(
@@ -136,7 +132,7 @@ def create_article(
     current_user: User = Depends(get_current_user),
 ):
     base_slug = slugify(payload.slug or payload.title)
-    slug = _unique_slug(db, base_slug)
+    slug = _ensure_unique_slug(db, base_slug)
 
     requested = payload.publication_status or "draft"
     if requested not in {"draft", "published"}:
@@ -187,7 +183,7 @@ def update_article(
     update = payload.model_dump(exclude_unset=True)
 
     if "slug" in update and update["slug"] != article.slug:
-        update["slug"] = _unique_slug(db, slugify(update["slug"]), exclude_id=article.id)
+        update["slug"] = _ensure_unique_slug(db, slugify(update["slug"]), exclude_id=article.id)
 
     if "publication_status" in update and update["publication_status"] is not None:
         requested = update["publication_status"]

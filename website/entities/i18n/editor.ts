@@ -81,6 +81,7 @@ export const editorTranslations: Record<Language, Record<string, string>> = {
     'editor.event_template_default': 'Default event template',
     'editor.event_flags': 'SEO & flags',
     'editor.event_featured': 'Featured on /events',
+    'editor.unsaved_changes': 'You have unsaved changes. Are you sure you want to leave?',
   },
   ru: {
     'editor.my_articles': 'Мои статьи',
@@ -160,5 +161,6 @@ export const editorTranslations: Record<Language, Record<string, string>> = {
     'editor.event_template_default': 'Общий шаблон события',
     'editor.event_flags': 'SEO и флаги',
     'editor.event_featured': 'Featured на /events',
+    'editor.unsaved_changes': 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?',
   },
 };

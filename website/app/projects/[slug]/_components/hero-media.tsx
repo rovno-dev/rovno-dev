@@ -25,7 +25,7 @@ export function HeroMedia({ imageSrc, title, videoSrc, className = "" }: HeroMed
         fill
         className="object-cover"
         priority
-        onLoadingComplete={() => setLoaded(true)}
+        onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
       />
       {videoSrc && loaded && (

@@ -133,11 +133,11 @@ export function CustomProjectPage({
   const hasToc = effectiveHeadings.length > 0;
 
   return (
-    <main className="min-h-screen bg-(--bg) text-(--on-bg-high) selection:bg-(--primary) selection:text-(--on-primary) pb-24">
+    <div className="mt-20 pb-20">
       {/* Standardized Container Hero */}
-      <section ref={heroRef} className="relative isolate overflow-hidden mt-header">
+      <section ref={heroRef} className="relative isolate overflow-hidden">
         <Container>
-          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-3xl md:rounded-4xl bg-(--card) border border-(--outline)">
+          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-(--card)">
             {isVideo ? (
               <motion.div
                 style={{ y: mediaY }}
@@ -170,17 +170,17 @@ export function CustomProjectPage({
               <div className="absolute inset-0 bg-(--bg)" />
             )}
           </div>
+          <h1 className="mt-6 text-display-4 sm:text-display-3">{project.title}</h1>
         </Container>
       </section>
 
       <Container className="pt-12 md:pt-16">
         {/* Two column layout - TOC column only when headings exist. */}
         <div
-          className={`mx-auto grid grid-cols-1 gap-12 ${
-            hasToc
-              ? "max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_240px]"
-              : "max-w-[900px]"
-          }`}
+          className={`mx-auto grid grid-cols-1 gap-12 ${hasToc
+            ? "max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_240px]"
+            : "max-w-[900px]"
+            }`}
         >
           {/* Left Column: Main Content */}
           <div className="min-w-0 max-w-[900px]">
@@ -331,6 +331,6 @@ export function CustomProjectPage({
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

@@ -96,15 +96,17 @@ function EventCard({
               <video
                 src={event.cover_video_src}
                 poster={event.cover_image_src}
-                autoPlay
+                preload="metadata"
                 muted
                 loop
                 playsInline
-                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${past ? "grayscale" : ""}`}
+                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 `}
+                onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+                onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
               />
             ) : (
               <iframe
-                src={`${event.cover_video_src}?autoplay=1&muted=1&loop=1`}
+                src={`${event.cover_video_src}?autoplay=0&muted=1`}
                 className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0"
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
               />

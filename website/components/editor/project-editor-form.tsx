@@ -23,6 +23,8 @@ import {
 } from "@/app/projects/[slug]/_components/custom-pages-meta";
 import { NovelEditor } from "./novel/novel-editor";
 import { FloppyDiskIcon, RocketIcon, TrashIcon } from "@phosphor-icons/react";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { useLanguage } from "@/providers/language-provider";
 import {
   createProject, updateProject, deleteProject,
   type ProjectDetail, type ProjectPayload,
@@ -121,7 +123,11 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
   const isEdit = !!initial;
   const isPublished = initial?.publication_status === "published";
 
+  const { t } = useLanguage();
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
+  const [isDirty, setIsDirty] = useState(false);
+
+  useUnsavedChanges(isDirty, t("editor.unsaved_changes"));
 
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [companies, setCompanies] = useState<ClientListItem[]>([]);
@@ -174,8 +180,10 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
       : { id: `name:${name}`, label: name };
   });
 
-  const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+  const update = <K extends keyof FormState>(k: K, v: FormState[K]) => {
     setForm((prev) => ({ ...prev, [k]: v }));
+    setIsDirty(true);
+  };
 
   const buildPayload = (status: "draft" | "published"): ProjectPayload => ({
     title: form.title.trim(),
@@ -210,6 +218,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         ? await updateProject(initial.slug, payload)
         : await createProject(payload);
       toast.success(status === "published" ? "Проект опубликован" : "Проект сохранён");
+      setIsDirty(false);
       await revalidateTags(["projects"]);
       if (!isEdit) {
         const basePath = window.location.pathname.replace(/\/new\/?$/, "");
@@ -493,6 +502,7 @@ export function ProjectEditorForm({ initial }: { initial?: ProjectDetail | null 
         <NovelEditor
           initialContent={form.content_json}
           onChange={(json) => update("content_json", json)}
+          onDirty={() => setIsDirty(true)}
         />
       </div>
 

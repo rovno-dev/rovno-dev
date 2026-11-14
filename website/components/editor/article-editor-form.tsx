@@ -13,6 +13,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUUpLeftIcon, CaretDownIcon, CaretUpIcon, ClockIcon, FloppyDiskIcon, RocketIcon, SparkleIcon, TrashIcon, XCircleIcon, WarningIcon } from "@phosphor-icons/react";
 import { useLanguage } from "@/providers/language-provider";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useUser } from "@/entities/user/model/user-context";
 import { NovelEditor } from "./novel/novel-editor";
 import { TagsAutocomplete } from "./tags-autocomplete";
@@ -79,12 +80,17 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
   const isRejected = initial?.publication_status === "rejected";
 
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
+  const [isDirty, setIsDirty] = useState(false);
+
+  useUnsavedChanges(isDirty, t("editor.unsaved_changes"));
   const [saving, setSaving] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(true);
 
-  const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
+  const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    setIsDirty(true);
+  };
 
   const applyAiJson = () => {
     if (!form.raw_json.trim()) { toast.error(t("editor.ai_empty")); return; }
@@ -134,6 +140,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
       
       if (status === "published" && !isTeam) toast.success("Статья отправлена на проверку");
       else toast.success(status === "published" ? t("editor.published") : t("editor.saved"));
+      setIsDirty(false);
       
       if (!isEdit) router.replace(`${basePath}/${saved.slug}/edit`);
       else router.refresh();
@@ -276,7 +283,8 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
 
       <div className="space-y-3">
         <h2 className="text-heading-3">{t("editor.section_content")}</h2>
-        <NovelEditor initialContent={form.content_json} onChange={(json) => update("content_json", json)} />
+        <NovelEditor initialContent={form.content_json} onChange={(json) => update("content_json", json)}
+          onDirty={() => setIsDirty(true)} />
       </div>
 
       <Card className="rounded-3xl border border-(--outline) bg-(--card) p-6 ring-0 space-y-3">

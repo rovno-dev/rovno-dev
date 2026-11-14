@@ -147,7 +147,7 @@ export default function Header() {
                 }}
                 className="inline-flex items-center"
               >
-                <Logo className="!h-5" />
+                <Logo animated className="!h-5" />
               </motion.span>
             </Link>
             <nav className="hidden lg:flex items-center h-8">

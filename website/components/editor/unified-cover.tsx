@@ -102,9 +102,9 @@ export const UnifiedCover = React.memo(function UnifiedCover({ imageUrl, videoUr
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group max-w-md">
           {videoUrl ? (
             videoUrl.endsWith(".webm") || videoUrl.endsWith(".mp4") ? (
-              <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
+              <video src={videoUrl} poster={imageUrl} className="absolute inset-0 w-full h-full object-cover" muted playsInline controls />
             ) : (
-              <iframe src={`${videoUrl}?autoplay=1&muted=1&loop=1`} className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
+              <iframe src={`${videoUrl}?autoplay=0&muted=1`} className="absolute inset-0 w-full h-full object-cover pointer-events-none border-0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
             )
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */

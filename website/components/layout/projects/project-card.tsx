@@ -167,7 +167,7 @@ export default function ProjectCard({
 }) {
   const { t } = useLanguage();
   const [failed, setFailed] = useState(false);
-  const hasCover = Boolean(project.cover?.imageSrc?.trim());
+  const hasCover = Boolean(project.cover?.imageSrc?.trim() || project.cover?.videoSrc?.trim());
   const showFallback = !hasCover || failed;
 
   const normalizedTags = (tags || [])
@@ -237,7 +237,18 @@ export default function ProjectCard({
       >
         {/* Image: 4:3, no rounding, no border. Text lives below it. */}
         <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card)">
-          {showFallback ? (
+          {
+          project.cover.videoSrc ? (
+            <video
+              src={project.cover.videoSrc}
+              poster={project.cover.imageSrc || undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+            />
+          ) : showFallback ? (
             <CoverFallback
               label={t("projects.cover.fallback")}
               hint={t("projects.cover.fallback_hint")}
@@ -270,7 +281,7 @@ export default function ProjectCard({
               ))}
             </div>
           )}
-          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-high) leading-[1.15] tracking-tight font-heading ">
+          <h3 className="text-xl md:text-2xl lg:text-3xl text-(--on-bg-medium) leading-[1.15] tracking-tight font-heading ">
             {project.title}
           </h3>
           {project.shortDescription && (

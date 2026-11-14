@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useLanguage } from "@/providers/language-provider";
+import { ScrollReveal } from "@/components/layout/animation/scroll-reveal";
 
 export default function ClientRootLayout({
   children,
@@ -26,7 +27,9 @@ export default function ClientRootLayout({
         >
           {children}
         </main>
+
         <Footer />
+
         <BottomAppBar />
         <Toaster
           position="bottom-right"

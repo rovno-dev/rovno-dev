@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useLanguage } from "@/providers/language-provider";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,11 +96,16 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
   const router = useRouter();
   const isEdit = !!initial;
   const [form, setForm] = useState<FormState>(() => toFormState(initial));
+  const [isDirty, setIsDirty] = useState(false);
+
+  useUnsavedChanges(isDirty, t("editor.unsaved_changes"));
   const [saving, setSaving] = useState(false);
   const isCustomPage = !!form.custom_page;
 
-  const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+  const update = <K extends keyof FormState>(k: K, v: FormState[K]) => {
     setForm((p) => ({ ...p, [k]: v }));
+    setIsDirty(true);
+  };
 
   const addSeatType = () => {
     update("seat_types", [...form.seat_types, { type: "", count: "" }]);
@@ -159,6 +165,7 @@ export function EventEditorForm({ initial }: { initial?: EventDetail | null }) {
       const payload = buildPayload(status);
       const saved = isEdit && initial ? await updateEvent(initial.slug, payload) : await createEvent(payload);
       toast.success(status === "published" ? "Событие опубликовано" : "Черновик сохранён");
+      setIsDirty(false);
       await revalidateTags(["events"]);
       if (!isEdit) {
         const basePath = window.location.pathname.replace(/\/new\/?$/, "");
