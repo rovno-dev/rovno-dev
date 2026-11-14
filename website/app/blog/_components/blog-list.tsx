@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -208,10 +209,11 @@ export function BlogList({ articles }: { articles: ArticleListItem[] }) {
       <div className="pb-10">
         <Container>
           <div className="flex flex-col gap-4">
-            <div className="flex items-stretch gap-2">
+            <div className="flex items-end gap-3 pb-2">
               <div className="relative flex-1 min-w-0 group">
-                <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-(--on-bg-low) pointer-events-none transition-colors group-focus-within:text-(--primary)" />
-                <input
+                <MagnifyingGlassIcon className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-(--on-bg-low) pointer-events-none transition-colors group-focus-within:text-(--primary)" />
+                <Input
+                  variant="underline"
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -219,22 +221,14 @@ export function BlogList({ articles }: { articles: ArticleListItem[] }) {
                   inputMode="search"
                   autoComplete="off"
                   spellCheck={false}
-                  className={cn(
-                    "w-full h-11 pl-10 pr-10 bg-transparent rounded-xl",
-                    "border border-(--outline) text-body-3 text-(--on-bg-high)",
-                    "placeholder:text-(--on-bg-low)",
-                    "transition-all duration-200 outline-none",
-                    "hover:border-(--on-bg-low)/40",
-                    "focus:border-(--primary)",
-                    "focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary),transparent_90%)]",
-                  )}
+                  className="pl-6 text-body-3 h-10"
                 />
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch("")}
                     aria-label="Очистить"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                   >
                     <XIcon className="size-3.5" />
                   </button>
@@ -242,21 +236,19 @@ export function BlogList({ articles }: { articles: ArticleListItem[] }) {
               </div>
               <Button
                 onClick={() => setDrawerOpen(true)}
-                variant={activeFilterCount > 0 ? "filled" : "outlined"}
-                className="h-11! shrink-0 px-3 sm:px-4 gap-2"
+                variant="text"
+                className="h-10 w-10 shrink-0 relative group rounded-full"
+                title="Фильтры"
               >
                 <SlidersHorizontalIcon
-                  className="size-4"
+                  className="size-5 transition-transform duration-300 group-hover:scale-110"
                   weight={activeFilterCount > 0 ? "bold" : "regular"}
                 />
-                <span className="hidden sm:inline">Фильтры</span>
                 {activeFilterCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-(--on-primary)/25 text-(--on-primary) text-[10px] font-bold tabular-nums">
-                    {activeFilterCount}
-                  </span>
+                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-(--primary) ring-2 ring-(--bg)" />
                 )}
               </Button>
-              <div className="hidden lg:flex items-center shrink-0 pl-2">
+              <div className="hidden lg:flex items-center shrink-0 h-10 pb-1">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-(--on-bg-low) tabular-nums">
                   {filtered.length}
                   <span className="mx-1.5 opacity-40">/</span>

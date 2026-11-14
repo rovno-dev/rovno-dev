@@ -227,8 +227,8 @@ export function CustomProjectPage({
       </Container>
 
       {/* CTA & Related */}
-      <div className="mt-20">
-        <section className="py-16 md:py-24 relative overflow-hidden">
+      <div>
+        <section className="pt-8 pb-14 md:pt-10 md:pb-18 relative overflow-hidden">
           <div
             aria-hidden
             className="absolute inset-0 pointer-events-none"

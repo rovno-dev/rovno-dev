@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,8 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import ProjectCard from "@/components/layout/projects/project-card";
+import { ActiveFilters, type ActiveFilter } from "@/components/layout/filter/active-filters";
+import { FilterDrawer } from "@/components/layout/filter/filter-drawer";
 import type { Project } from "@/utils/api/projects";
 import type { Taxonomy } from "@/utils/api/taxonomies";
 import {
@@ -242,10 +245,11 @@ export function FilterBar({
       <div className="pb-10">
         <Container>
           <div className="flex flex-col gap-4">
-            <div className="flex items-stretch gap-2">
+            <div className="flex items-end gap-3 pb-2">
               <div className="relative flex-1 min-w-0 group">
-                <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-(--on-bg-low) pointer-events-none transition-colors group-focus-within:text-(--primary)" />
-                <input
+                <MagnifyingGlassIcon className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-(--on-bg-low) pointer-events-none transition-colors group-focus-within:text-(--primary)" />
+                <Input
+                  variant="underline"
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -253,46 +257,34 @@ export function FilterBar({
                   inputMode="search"
                   autoComplete="off"
                   spellCheck={false}
-                  className={cn(
-                    "w-full h-11 pl-10 pr-10 bg-transparent rounded-xl",
-                    "border border-(--outline) text-body-3 text-(--on-bg-high)",
-                    "placeholder:text-(--on-bg-low)",
-                    "transition-all duration-200 outline-none",
-                    "hover:border-(--on-bg-low)/40",
-                    "focus:border-(--primary)",
-                    "focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary),transparent_90%)]",
-                  )}
+                  className="pl-6 text-body-3 h-10"
                 />
                 {search && (
                   <button
                     type="button"
                     onClick={() => setSearch("")}
                     aria-label="Очистить"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
                   >
                     <XIcon className="size-3.5" />
                   </button>
                 )}
               </div>
-
               <Button
                 onClick={() => setDrawerOpen(true)}
-                variant={activeFilterCount > 0 ? "filled" : "outlined"}
-                className="h-11! shrink-0 px-3 sm:px-4 gap-2"
+                variant="text"
+                className="h-10 w-10 shrink-0 relative group rounded-full"
+                title="Фильтры"
               >
                 <SlidersHorizontalIcon
-                  className="size-4"
+                  className="size-5 transition-transform duration-300 group-hover:scale-110"
                   weight={activeFilterCount > 0 ? "bold" : "regular"}
                 />
-                <span className="hidden sm:inline">Фильтры</span>
                 {activeFilterCount > 0 && (
-                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-(--on-primary)/25 text-(--on-primary) text-[10px] font-bold tabular-nums">
-                    {activeFilterCount}
-                  </span>
+                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-(--primary) ring-2 ring-(--bg)" />
                 )}
               </Button>
-
-              <div className="hidden lg:flex items-center shrink-0 pl-2">
+              <div className="hidden lg:flex items-center shrink-0 h-10 pb-1">
                 <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-(--on-bg-low) tabular-nums">
                   {filtered.length}
                   <span className="mx-1.5 opacity-40">/</span>
@@ -300,52 +292,23 @@ export function FilterBar({
                 </span>
               </div>
             </div>
-
-            <AnimatePresence initial={false}>
-              {activeFilterCount > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {activeCategory && (
-                      <RemovableChip
-                        label={activeCategoryLabel ?? activeCategory}
-                        onRemove={() => setActiveCategory(null)}
-                      />
-                    )}
-                    {activePeriod && (
-                      <RemovableChip
-                        label={activePeriod}
-                        onRemove={() => setActivePeriod(null)}
-                      />
-                    )}
-                    {featuredOnly && (
-                      <RemovableChip
-                        label="Избранные"
-                        onRemove={() => setFeaturedOnly(false)}
-                      />
-                    )}
-                    {activeTag && (
-                      <RemovableChip
-                        label={`${TAG_KIND_LABELS[activeTag.kind] ?? activeTag.kind}: ${activeTag.label}`}
-                        onRemove={() => setActiveTag(null)}
-                      />
-                    )}
-                    <button
-                      type="button"
-                      onClick={resetAll}
-                      className="ml-1 text-body-5 text-(--on-bg-low) hover:text-(--on-bg-high) transition-colors underline-offset-4 hover:underline"
-                    >
-                      Очистить всё
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <ActiveFilters
+              filters={[
+                activeCategory
+                  ? { id: "category", label: activeCategoryLabel ?? activeCategory, onRemove: () => setActiveCategory(null) }
+                  : null,
+                activePeriod
+                  ? { id: "period", label: activePeriod, onRemove: () => setActivePeriod(null) }
+                  : null,
+                featuredOnly
+                  ? { id: "featured", label: "Избранные", onRemove: () => setFeaturedOnly(false) }
+                  : null,
+                activeTag
+                  ? { id: "tag", label: `${TAG_KIND_LABELS[activeTag.kind] ?? activeTag.kind}: ${activeTag.label}`, onRemove: () => setActiveTag(null) }
+                  : null,
+              ].filter((f): f is ActiveFilter => f !== null)}
+              onClearAll={resetAll}
+            />
           </div>
         </Container>
       </div>
@@ -396,143 +359,92 @@ export function FilterBar({
           `projects.period`, `projects.is_featured`, `project_tags`
           split by its `kind` enum. Only sections with actual content
           render, so the drawer scales down to a bare site automatically. */}
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetContent
-          side="right"
-          showCloseButton={false}
-          className="w-full sm:max-w-md p-0 gap-0 flex flex-col"
-        >
-          <SheetHeader className="px-6 py-5 border-b border-(--outline) shrink-0">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <SheetTitle className="flex items-center gap-2.5 text-heading-2 tracking-tight">
-                  <SlidersHorizontalIcon className="size-5 shrink-0" weight="bold" />
-                  Фильтры
-                </SheetTitle>
-                <SheetDescription className="text-body-4 text-(--on-bg-low) mt-1 tabular-nums">
-                  {filtered.length} из {projects.length} проектов
-                </SheetDescription>
-              </div>
-              <SheetClose asChild>
-                <Button
-                  variant="text"
-                  size="icon-small"
-                  className="shrink-0 -mr-2"
-                  aria-label="Закрыть"
-                >
-                  <XIcon className="size-4" />
-                </Button>
-              </SheetClose>
-            </div>
-          </SheetHeader>
-
-          <div className="flex-1 overflow-y-auto scrollbar-admin">
-            <div className="px-6 py-6 space-y-8">
-              {/* Category — projects.category_id → project_categories */}
-              {categoryChips.length > 1 && (
-                <FilterSection title="Категория">
-                  {categoryChips.map((c) => {
-                    const code = c.id === "__all__" ? null : c.id;
-                    const count = liveCategoryCount(code);
-                    return (
-                      <DrawerChip
-                        key={c.id}
-                        label={c.label}
-                        count={count}
-                        active={c.active}
-                        disabled={count === 0 && !c.active}
-                        onClick={() =>
-                          setActiveCategory(c.active ? null : code)
-                        }
-                      />
-                    );
-                  })}
-                </FilterSection>
-              )}
-
-              {/* Period — projects.period */}
-              {periods.length > 1 && (
-                <FilterSection title="Период">
-                  {periods.map((p) => {
-                    const count = livePeriodCount(p);
-                    const active = activePeriod === p;
-                    return (
-                      <DrawerChip
-                        key={p}
-                        label={p}
-                        count={count}
-                        active={active}
-                        disabled={count === 0 && !active}
-                        onClick={() => setActivePeriod(active ? null : p)}
-                      />
-                    );
-                  })}
-                </FilterSection>
-              )}
-
-              {/* Featured — projects.is_featured */}
-              {featuredCount > 0 && (
-                <FilterSection title="Особенности">
-                  <DrawerChip
-                    label="Только избранные"
-                    count={featuredCount}
-                    active={featuredOnly}
-                    onClick={() => setFeaturedOnly((v) => !v)}
-                  />
-                </FilterSection>
-              )}
-
-              {/* Tags — project_tags grouped by its `kind` enum */}
-              {tagsByKind.map((group) => (
-                <FilterSection key={group.kind} title={group.label}>
-                  {group.entries.map(([label, count]) => {
-                    const active =
-                      activeTag?.kind === group.kind && activeTag?.label === label;
-                    return (
-                      <DrawerChip
-                        key={label}
-                        label={label}
-                        count={count}
-                        active={active}
-                        disabled={count === 0 && !active}
-                        onClick={() =>
-                          setActiveTag(active ? null : { kind: group.kind, label })
-                        }
-                      />
-                    );
-                  })}
-                </FilterSection>
-              ))}
-
-              {categoryChips.length <= 1 &&
-                periods.length <= 1 &&
-                featuredCount === 0 &&
-                tagsByKind.length === 0 && (
-                  <p className="text-body-4 text-(--on-bg-low) text-center py-12">
-                    Пока нет фильтров, которые можно применить.
-                  </p>
-                )}
-            </div>
-          </div>
-
-          <SheetFooter className="px-6 py-4 border-t border-(--outline) shrink-0 flex-row gap-2">
-            <Button
-              variant="outlined"
-              onClick={resetAll}
-              disabled={!hasActiveFilters}
-              className="flex-1 h-11"
-            >
-              Сбросить
-            </Button>
-            <Button
-              onClick={() => setDrawerOpen(false)}
-              className="flex-1 h-11"
-            >
-              Показать {filtered.length}
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+      <FilterDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        title="Фильтры"
+        description={`${filtered.length} из ${projects.length} проектов`}
+        onReset={resetAll}
+        hasActiveFilters={hasActiveFilters}
+        resultCount={filtered.length}
+      >
+        {categoryChips.length > 1 && (
+          <FilterSection title="Категория">
+            {categoryChips.map((c) => {
+              const code = c.id === "__all__" ? null : c.id;
+              const count = liveCategoryCount(code);
+              return (
+                <DrawerChip
+                  key={c.id}
+                  label={c.label}
+                  count={count}
+                  active={c.active}
+                  disabled={count === 0 && !c.active}
+                  onClick={() =>
+                    setActiveCategory(c.active ? null : code)
+                  }
+                />
+              );
+            })}
+          </FilterSection>
+        )}
+        {periods.length > 1 && (
+          <FilterSection title="Период">
+            {periods.map((p) => {
+              const count = livePeriodCount(p);
+              const active = activePeriod === p;
+              return (
+                <DrawerChip
+                  key={p}
+                  label={p}
+                  count={count}
+                  active={active}
+                  disabled={count === 0 && !active}
+                  onClick={() => setActivePeriod(active ? null : p)}
+                />
+              );
+            })}
+          </FilterSection>
+        )}
+        {featuredCount > 0 && (
+          <FilterSection title="Особенности">
+            <DrawerChip
+              label="Только избранные"
+              count={featuredCount}
+              active={featuredOnly}
+              onClick={() => setFeaturedOnly((v) => !v)}
+            />
+          </FilterSection>
+        )}
+        {tagsByKind.map((group) => (
+          <FilterSection key={group.kind} title={group.label}>
+            {group.entries.map(([label, count]) => {
+              const active =
+                activeTag?.kind === group.kind && activeTag?.label === label;
+              return (
+                <DrawerChip
+                  key={label}
+                  label={label}
+                  count={count}
+                  active={active}
+                  disabled={count === 0 && !active}
+                  onClick={() =>
+                    setActiveTag(active ? null : { kind: group.kind, label })
+                  }
+                />
+              );
+            })}
+          </FilterSection>
+        ))}
+        {categoryChips.length <= 1 &&
+          periods.length <= 1 &&
+          featuredCount === 0 &&
+          tagsByKind.length === 0 && (
+            <p className="text-body-4 text-(--on-bg-low) text-center py-12">
+              Пока нет фильтров, которые можно применить.
+            </p>
+          )}
+      </FilterDrawer>
     </>
   );
 }
@@ -554,27 +466,6 @@ function FilterSection({
   );
 }
 
-function RemovableChip({
-  label,
-  onRemove,
-}: {
-  label: string;
-  onRemove: () => void;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1 h-8 pl-3 pr-1 rounded-full border border-(--outline) text-body-5  text-(--on-bg-high)">
-      <span className="truncate max-w-[240px]">{label}</span>
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={`Убрать фильтр ${label}`}
-        className="size-6 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
-      >
-        <XIcon className="size-3" />
-      </button>
-    </span>
-  );
-}
 
 function DrawerChip({
   label,
