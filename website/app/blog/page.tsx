@@ -22,9 +22,7 @@ export default async function BlogPage() {
   return (
     <div className="mt-header bg-(--bg)">
       <BlogHeader />
-      <div className="pt-8">
-        <BlogList articles={articles} />
-      </div>
+      <BlogList articles={articles} />
     </div>
   );
 }

@@ -11,7 +11,7 @@ import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
 import { ContentMeta } from "@/components/layout/content-meta";
 import { Toc } from "@/components/layout/toc/toc";
 import { extractMdxHeadings } from "@/utils/mdx-headings";
-import { ArticleCard } from "../../_components/article-card";
+import { ArticleCard } from "../_components/article-card";
 import { extractTiptapHeadings } from "@/utils/tiptap-headings";
 import {
   fetchArticleServer,
@@ -103,7 +103,7 @@ const mdxComponents = {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string; slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
@@ -156,7 +156,7 @@ function formatDate(iso: string) {
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ id: string; slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
   const [article, recentArticles] = await Promise.all([

@@ -34,10 +34,10 @@ export default async function ProjectsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-(--bg) mt-header">
+    <main className="mt-header">
       <Container>
         {/* Simple, clean heading as requested */}
-        <h1 className="mb-6 pt-6 md:pt-8 text-display-4 md:text-display-3 tracking-[-0.02em] leading-none">
+        <h1 className="mb-6 pt-6 md:pt-8 text-display-4 md:text-display-3">
           Проекты
         </h1>
       </Container>

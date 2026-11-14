@@ -145,7 +145,7 @@ export function ArticleCard({
 
   return (
     <Link
-      href={`/blog/${article.id}/${article.slug}`}
+      href={`/blog/${article.slug}`}
       className="group block animate-reveal fill-mode-both relative w-full"
       style={{ animationDelay: `${index * 100}ms` }}
     >
@@ -160,7 +160,7 @@ export function ArticleCard({
               loop
               playsInline
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-              onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+              onMouseEnter={(e) => e.currentTarget.play().catch(() => { })}
               onMouseLeave={(e) => {
                 e.currentTarget.pause();
                 e.currentTarget.currentTime = 0;
@@ -173,7 +173,7 @@ export function ArticleCard({
               alt={article.title}
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
               quality={90}
-              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
+              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
             />
           )
         ) : (

@@ -12,12 +12,10 @@ import { useLanguage } from "@/providers/language-provider";
 export function BlogHeader() {
   const { t } = useLanguage();
   return (
-    <section className="pt-8 md:pt-10 pb-5">
-      <Container>
-        <h1 className="text-heading-2 md:text-heading-1 text-(--on-bg-high) tracking-tight">
-          {t("blog.title")}
-        </h1>
-      </Container>
-    </section>
+    <Container>
+      <h1 className="mb-6 pt-6 md:pt-8 text-display-4 md:text-display-3">
+        {t("blog.title")}
+      </h1>
+    </Container>
   );
 }
