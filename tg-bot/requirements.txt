@@ -1,7 +1,7 @@
 aiogram==3.10.0
-python-dotenv
-openpyxl
-Pillow
+python-dotenv==1.2.4
+openpyxl==3.1.5
+Pillow==13.0.0
 sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
 httpx==0.28.1
