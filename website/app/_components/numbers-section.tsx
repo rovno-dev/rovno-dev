@@ -35,7 +35,7 @@ export default function NumbersSection() {
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col group"
             >
-              <Icon className="size-16 md:size-20 mb-6 text-(--on-bg-high) transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3" />
+              <Icon className="size-28 md:size-40 mb-8 text-(--on-bg-high) transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-rotate-2 group-hover:scale-[1.03]" />
               <div className="text-display-1 tracking-[-0.04em] leading-none text-(--on-bg-high) mb-4 tabular-nums">
                 {value}
               </div>
