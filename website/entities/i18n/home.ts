@@ -50,6 +50,9 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.socials.preview.articles.description': 'A deep dive into our tech stack decisions.',
     'home.socials.preview.dev.title': 'Open source: Amorfa (by Niyaz Gimadiev)',
     'home.socials.preview.dev.description': 'Explore the framework created by the founder of Unidoka.',
+    'home.recommended_video.title': 'Recommended watch',
+    'home.recommended_video.subtitle': 'The latest video from our channel.',
+    'home.recommended_video.open_channel': 'Watch all videos',
   },
   ru: {
     'home.numbers_title': 'Ровные цифры',
@@ -100,5 +103,8 @@ export const homeTranslations: Record<Language, Record<string, string>> = {
     'home.socials.preview.articles.description': 'Разбираем решения по нашему техстеку.',
     'home.socials.preview.dev.title': 'Open source: Amorfa (от Нияза Гимадиева)',
     'home.socials.preview.dev.description': 'Изучите фреймворк, созданный основателем Unidoka.',
+    'home.recommended_video.title': 'Рекомендуем посмотреть',
+    'home.recommended_video.subtitle': 'Свежее видео с нашего канала.',
+    'home.recommended_video.open_channel': 'Смотреть все видео',
   },
 };

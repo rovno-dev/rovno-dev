@@ -2,7 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { AsciiLogo } from "@/components/layout/logo/ascii-logo";
 import { Container } from "@/components/ui/container";
-import { motion, useScroll, useTransform } from "motion/react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useLanguage } from "@/providers/language-provider";
 
 export default function HeroSection() {
@@ -34,25 +41,34 @@ export default function HeroSection() {
   const logoScale = useTransform(scrollYProgress, [0, 0.35], [1, 0.86]);
   const logoY = useTransform(scrollYProgress, [0, 0.35], [0, -40]);
 
-  const textOpacity = useTransform(scrollYProgress, [0.4, 0.8], [1, 0]);
+  const textOpacity = useTransform(scrollYProgress, [0.55, 0.92], [1, 0]);
   const textBlur = useTransform(
     scrollYProgress,
-    [0.4, 0.8],
-    ["blur(0px)", "blur(24px)"]
+    [0.55, 0.92],
+    ["blur(0px)", "blur(18px)"]
   );
-  // Grow once while the illustration dissolves, then hold that size so the
-  // text leaves at a stable scale instead of continuously zooming.
-  const textScale = useTransform(
-    scrollYProgress,
-    [0.04, 0.34],
-    [1, isNarrow ? 1.08 : 1.26]
-  );
-  const textY = useTransform(scrollYProgress, [0.4, 0.8], [0, -24]);
+
+  // One-time, spring-driven scale: trigger once as the illustration dissolves,
+  // then stay at that size while the reader scrolls through the statement.
+  const textScale = useMotionValue(1);
+  const hasScaled = useRef(false);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (hasScaled.current || latest < 0.16) return;
+    hasScaled.current = true;
+    animate(textScale, isNarrow ? 1.08 : 1.24, {
+      type: "spring",
+      stiffness: 90,
+      damping: 20,
+      mass: 1.1,
+    });
+  });
+
+  const textY = useTransform(scrollYProgress, [0.55, 0.92], [0, -20]);
 
   return (
     <section
       ref={heroRef}
-      className="relative bg-(--bg) text-(--on-bg-high) min-h-[40dvh] flex flex-col justify-between overflow-hidden selection:bg-(--primary) selection:text-(--on-primary)"
+      className="relative bg-(--bg) text-(--on-bg-high) min-h-[70dvh] md:min-h-[85dvh] flex flex-col justify-between overflow-hidden selection:bg-(--primary) selection:text-(--on-primary)"
     >
       <Container className="relative z-10 flex flex-col justify-between h-full flex-1 pt-32 pb-16 md:pt-40 md:pb-20">
         {/* Mount blur → scroll dissolve → ambient float → particle hover.
@@ -99,7 +115,7 @@ export default function HeroSection() {
           }}
           className="w-full flex justify-center md:justify-start origin-bottom md:origin-bottom-left"
         >
-          <div className="max-w-lg">
+          <div className="max-w-xl">
             <p className="text-(--on-bg-high) text-heading-2">
               <motion.span
                 initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
