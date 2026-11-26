@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CoverMedia } from "@/components/layout/media/cover-media";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
 import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
@@ -190,33 +190,22 @@ export default async function ArticlePage({
   return (
     <div className="mt-header bg-(--bg) pb-24">
       <Container className="pt-4 md:pt-8">
-        <div className="max-w-[860px] mx-auto">
-          <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card) animate-reveal">
-            {article.image_url ? (
-              article.image_url.endsWith(".webm") ||
-                article.image_url.endsWith(".mp4") ? (
-                <video
-                  src={article.image_url}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover object-center"
-                />
-              ) : (
-                <Image
-                  src={article.image_url}
-                  alt={article.title}
-                  fill
-                  priority
-                  sizes="(max-width: 900px) 100vw, 860px"
-                  quality={90}
-                  className="object-cover object-center"
-                />
-              )
-            ) : (
+        <div className="max-w-[1100px] mx-auto">
+          <CoverMedia
+            src={article.image_url}
+            alt={article.title}
+            aspectRatio="16/9"
+            priority
+            autoPlay
+            muted
+            loop
+            sizes="(max-width: 1100px) 100vw, 1100px"
+            quality={90}
+            className="animate-reveal"
+            fallback={
               <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
-            )}
+            }
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
 
@@ -249,12 +238,12 @@ export default async function ArticlePage({
                 <time dateTime={article.date}>{formatDate(article.date)}</time>
               </div>
             </div>
-          </div>
+          </CoverMedia>
         </div>
       </Container>
 
       <Container>
-        <div className="max-w-[860px] mx-auto">
+        <div className="max-w-[1100px] mx-auto">
           <ContentMeta
             entityType="article"
             entityId={article.slug}
@@ -266,8 +255,8 @@ export default async function ArticlePage({
       </Container>
 
       <Container className="py-12 md:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-10 lg:gap-16">
-          <article className="min-w-0 max-w-[760px] prose-case">
+        <div className="mx-auto grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,900px)_240px] lg:justify-center lg:gap-12">
+          <article className="min-w-0 prose-case">
             {article.content_json ? (
               <NovelReadOnly content={article.content_json} />
             ) : (

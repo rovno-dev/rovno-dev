@@ -126,10 +126,22 @@ export function ImageUploadField({
   const isEmbed = value ? (value.includes("youtube.com") || value.includes("youtu.be") || value.includes("kinescope.io") || value.includes("vimeo.com")) : false;
   const canEdit = !isVideoFile && !isEmbed;
 
+  // Keep the preview honest about the crop the field will produce.
+  const previewAspect =
+    defaultAspect === "1:1"
+      ? "aspect-square"
+      : defaultAspect === "4:3"
+        ? "aspect-[4/3]"
+        : defaultAspect === "16:9"
+          ? "aspect-[16/9]"
+          : defaultAspect === "21:8"
+            ? "aspect-[21/8]"
+            : "aspect-[16/8]";
+
   return (
     <div className="space-y-2">
       {value && (
-        <div className="relative aspect-[16/8] w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group">
+        <div className={`relative ${previewAspect} w-full overflow-hidden rounded-2xl border border-(--outline) bg-(--card) group`}>
           {isVideoFile ? (
             <video src={value} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline />
           ) : isEmbed ? (

@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowUpRight } from "@phosphor-icons/react";
 import { Container } from "@/components/ui/container";
+import { PagePeel } from "@/components/ui/page-peel";
 import { useLanguage } from "@/providers/language-provider";
 import { cn } from "@/lib/utils";
 
-// Typographic grid: the three services are chapters, not cards. No illustration
-// competes with the titles — the hairlines and the scale of the type carry the
-// section, and the whole column is the link.
-const SERVICES = [
+const SERVICES: {
+  href: string;
+  titleKey: string;
+  descKey: string;
+}[] = [
   {
     href: "/services/audit",
     titleKey: "services.audit.short",
@@ -28,6 +29,23 @@ const SERVICES = [
   },
 ];
 
+/** Layer revealed by the folded corner: blueprint paper under the card. */
+function CardUnderlay() {
+  return (
+    <div className="absolute inset-0 bg-(--bg)">
+      <div
+        className="absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--outline) 1px, transparent 1px), linear-gradient(to bottom, var(--outline) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(110%_110%_at_100%_100%,var(--primary-card),transparent_65%)]" />
+    </div>
+  );
+}
+
 export default function ServicesSection() {
   const { t } = useLanguage();
 
@@ -44,7 +62,7 @@ export default function ServicesSection() {
           {t("services.page.title")}
         </motion.h2>
 
-        <div className="grid grid-cols-1 border-t border-(--outline) md:grid-cols-3 md:border-b md:divide-x md:divide-(--outline)">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
           {SERVICES.map(({ href, titleKey, descKey }, i) => (
             <motion.div
               key={href}
@@ -56,29 +74,40 @@ export default function ServicesSection() {
                 delay: i * 0.08,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="border-b border-(--outline) md:border-b-0"
+              className={cn(i === 2 && "md:col-span-2 lg:col-span-1")}
             >
               <Link
                 href={href}
-                className={cn(
-                  "group flex h-full flex-col py-10 transition-colors duration-500 hover:bg-(--state-hover) md:px-8 md:py-12",
-                  i === 0 && "md:pl-0",
-                  i === SERVICES.length - 1 && "md:pr-0"
-                )}
+                className="group relative block aspect-[16/9] overflow-hidden rounded-xl border border-(--outline) bg-(--card) transition-colors duration-300 hover:border-(--on-bg-disabled) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--primary)"
               >
-                <span className="text-body-5 tabular-nums tracking-[0.2em] text-(--on-bg-low) transition-colors duration-300 group-hover:text-(--on-bg-high)">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+                <PagePeel demoDelay={i * 220} under={<CardUnderlay />}>
+                  <div className="relative flex h-full flex-col justify-start overflow-hidden bg-(--card) p-5 md:p-6">
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 opacity-30"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(to right, var(--outline) 1px, transparent 1px), linear-gradient(to bottom, var(--outline) 1px, transparent 1px)",
+                        backgroundSize: "32px 32px",
+                        maskImage:
+                          "linear-gradient(to bottom, black, transparent 78%)",
+                      }}
+                    />
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_70%_at_88%_-10%,var(--primary-card),transparent_70%)]"
+                    />
 
-                <div className="mt-8 flex items-start justify-between gap-4 md:mt-10">
-                  <h3 className="text-display-2 tracking-tight">
-                    {t(titleKey)}
-                  </h3>
-                  <ArrowUpRight className="mt-2 size-5 shrink-0 text-(--on-bg-low) transition-all duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-(--on-bg-high)" />
-                </div>
-                <p className="mt-3 max-w-xs text-body-3 text-(--on-bg-medium)">
-                  {t(descKey)}
-                </p>
+                    <div className="relative">
+                      <h3 className="text-[1.75rem] leading-[1.1] tracking-tight xl:text-[2rem]">
+                        {t(titleKey)}
+                      </h3>
+                      <p className="mt-2.5 text-body-4 text-(--on-bg-medium) xl:text-body-3">
+                        {t(descKey)}
+                      </p>
+                    </div>
+                  </div>
+                </PagePeel>
               </Link>
             </motion.div>
           ))}

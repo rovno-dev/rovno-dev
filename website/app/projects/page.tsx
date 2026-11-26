@@ -1,4 +1,3 @@
-import { Container } from "@/components/ui/container";
 import { FilterBar } from "./filter-bar";
 import {
   fetchProjectCategories,
@@ -35,14 +34,8 @@ export default async function ProjectsPage() {
 
   return (
     <main className="mt-header">
-      <Container>
-        {/* Simple, clean heading as requested */}
-        <h1 className="mb-6 pt-6 md:pt-8 text-display-4 md:text-display-3">
-          Проекты
-        </h1>
-      </Container>
-
       <FilterBar
+        title="Проекты"
         projects={projects}
         categories={categories}
         categoryMap={categoryMap}

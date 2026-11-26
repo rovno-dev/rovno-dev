@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, type CSSProperties } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { CoverMedia } from "@/components/layout/media/cover-media";
 import type { ArticleListItem } from "@/utils/api/articles";
 
 function formatDate(iso: string, lang: string) {
@@ -140,46 +140,27 @@ export function ArticleCard({
   index?: number;
   lang: string;
 }) {
-  const isVideo =
-    article.image_url?.endsWith(".webm") || article.image_url?.endsWith(".mp4");
-
   return (
     <Link
       href={`/blog/${article.slug}`}
       className="group block animate-reveal fill-mode-both relative w-full"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      {/* Image: 4:3, no rounding, no border. Text lives below it. */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card)">
-        {article.image_url ? (
-          isVideo ? (
-            <video
-              src={article.image_url}
-              preload="metadata"
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-              onMouseEnter={(e) => e.currentTarget.play().catch(() => { })}
-              onMouseLeave={(e) => {
-                e.currentTarget.pause();
-                e.currentTarget.currentTime = 0;
-              }}
-            />
-          ) : (
-            <Image
-              fill
-              src={article.image_url}
-              alt={article.title}
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
-              quality={90}
-              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-            />
-          )
-        ) : (
+      {/* Article covers are always cropped to 16:9. */}
+      <CoverMedia
+        src={article.image_url}
+        alt={article.title}
+        aspectRatio="16/9"
+        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw"
+        quality={90}
+        muted
+        loop
+        playOnHover
+        mediaClassName="transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+        fallback={
           <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
-        )}
-      </div>
+        }
+      />
 
       {/* Text block under the image */}
       <div className="pt-4 md:pt-5">

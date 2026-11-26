@@ -1,29 +1,13 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-  SheetClose,
-} from "@/components/ui/sheet";
+import { ListToolbar } from "@/components/layout/filter/list-toolbar";
+import { FilterSection, DrawerChip } from "@/components/layout/filter/filter-chip";
 import ProjectCard from "@/components/layout/projects/project-card";
 import { ActiveFilters, type ActiveFilter } from "@/components/layout/filter/active-filters";
 import { FilterDrawer } from "@/components/layout/filter/filter-drawer";
 import type { Project } from "@/utils/api/projects";
 import type { Taxonomy } from "@/utils/api/taxonomies";
-import {
-  MagnifyingGlassIcon,
-  XIcon,
-  SlidersHorizontalIcon,
-} from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "motion/react";
 
 /** Russian labels for `project_tag_kind` - the DB enum values. */
 const TAG_KIND_LABELS: Record<string, string> = {
@@ -37,10 +21,12 @@ const TAG_KIND_LABELS: Record<string, string> = {
 const TAG_KIND_ORDER = ["from_chief", "github", "license", "custom"];
 
 export function FilterBar({
+  title,
   projects,
   categories,
   categoryMap,
 }: {
+  title: string;
   projects: Project[];
   categories: Taxonomy[];
   categoryMap: Record<string, string>;
@@ -242,54 +228,21 @@ export function FilterBar({
   // ──────────────────────────────────────────────────────────────────
   return (
     <>
-      <div className="pb-10">
+      <div className="pt-6 pb-10 md:pt-8">
         <Container>
           <div className="flex flex-col gap-4">
-            <div className="flex items-end gap-3 pb-2">
-              <div className="relative flex-1 min-w-0 group">
-                <MagnifyingGlassIcon className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-(--on-bg-low) pointer-events-none transition-colors group-focus-within:text-(--primary)" />
-                <Input
-                  variant="underline"
-                  type="text"
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+              <h1 className="text-display-4 md:text-display-3">{title}</h1>
+              <div className="sm:min-w-0 sm:max-w-[520px] sm:flex-1">
+                <ListToolbar
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={setSearch}
                   placeholder="Поиск по названию..."
-                  inputMode="search"
-                  autoComplete="off"
-                  spellCheck={false}
-                  className="pl-6 text-body-3 h-10"
+                  onFilters={() => setDrawerOpen(true)}
+                  activeFilterCount={activeFilterCount}
+                  resultCount={filtered.length}
+                  total={projects.length}
                 />
-                {search && (
-                  <button
-                    type="button"
-                    onClick={() => setSearch("")}
-                    aria-label="Очистить"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 size-7 inline-flex items-center justify-center rounded-full text-(--on-bg-low) hover:text-(--on-bg-high) hover:bg-(--state-hover) transition-colors"
-                  >
-                    <XIcon className="size-3.5" />
-                  </button>
-                )}
-              </div>
-              <Button
-                onClick={() => setDrawerOpen(true)}
-                variant="text"
-                className="h-10 w-10 shrink-0 relative group rounded-full"
-                title="Фильтры"
-              >
-                <SlidersHorizontalIcon
-                  className="size-5 transition-transform duration-300 group-hover:scale-110"
-                  weight={activeFilterCount > 0 ? "bold" : "regular"}
-                />
-                {activeFilterCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-(--primary) ring-2 ring-(--bg)" />
-                )}
-              </Button>
-              <div className="hidden lg:flex items-center shrink-0 h-10 pb-1">
-                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-(--on-bg-low) tabular-nums">
-                  {filtered.length}
-                  <span className="mx-1.5 opacity-40">/</span>
-                  {projects.length}
-                </span>
               </div>
             </div>
             <ActiveFilters
@@ -446,63 +399,5 @@ export function FilterBar({
           )}
       </FilterDrawer>
     </>
-  );
-}
-
-function FilterSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-3">
-      <h4 className="text-[11px] uppercase tracking-[0.18em]  text-(--on-bg-low)">
-        {title}
-      </h4>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </section>
-  );
-}
-
-
-function DrawerChip({
-  label,
-  count,
-  active,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  active: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        "inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-body-4  transition-all duration-200",
-        active
-          ? "bg-(--on-bg-high) text-(--bg) shadow-sm"
-          : "bg-(--card) border border-(--outline) text-(--on-bg-medium) hover:border-(--on-bg-low)/40 hover:text-(--on-bg-high)",
-        disabled &&
-        "opacity-30 cursor-not-allowed hover:border-(--outline) hover:text-(--on-bg-medium)",
-      )}
-    >
-      <span>{label}</span>
-      <span
-        className={cn(
-          "tabular-nums text-[10px] leading-none",
-          active ? "text-(--bg)/60" : "text-(--on-bg-low)",
-        )}
-      >
-        {count}
-      </span>
-    </button>
   );
 }

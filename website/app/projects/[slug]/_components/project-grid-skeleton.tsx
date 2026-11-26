@@ -13,7 +13,7 @@ export function ProjectGridSkeleton({ count = 6 }: { count?: number }) {
           key={i}
           className="relative overflow-hidden rounded-3xl border border-(--outline) bg-(--card) ring-0"
         >
-          <div className="relative aspect-[16/9] w-full overflow-hidden bg-(--bg-disabled)">
+          <div className="relative aspect-[4/3] w-full overflow-hidden bg-(--bg-disabled)">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.6s_infinite] bg-gradient-to-r from-transparent via-(--state-hover) to-transparent" />
           </div>
           <div className="p-5 md:p-6 space-y-3">

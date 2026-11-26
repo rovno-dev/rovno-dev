@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import Image from "next/image";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CoverMedia } from "@/components/layout/media/cover-media";
 import { ArrowLeftIcon, PencilSimpleIcon, EyeIcon, ArrowClockwiseIcon, WarningIcon } from "@phosphor-icons/react/dist/ssr";
 import { slugify } from "@/utils/slugify";
 import { NovelReadOnly } from "@/components/editor/novel/novel-readonly";
@@ -269,20 +269,18 @@ export default async function PreviewArticlePage({
       {/* Same hero pattern as the public article - cover as full-bleed
           background, gradient overlay, title/description/badges layered
           on top. What you see here is what readers see. */}
-      <div className="relative w-full h-[420px] md:h-[520px] rounded-5xl md:rounded-7xl overflow-hidden bg-(--card) border border-(--outline)">
-        {article.image_url ? (
-          <Image
-            src={article.image_url}
-            alt={article.title}
-            fill
-            priority
-            sizes="(max-width: 1200px) 100vw, 1200px"
-            quality={90}
-            className="object-cover object-center"
-          />
-        ) : (
+      <CoverMedia
+        src={article.image_url}
+        alt={article.title}
+        aspectRatio="16/9"
+        priority
+        sizes="(max-width: 1200px) 100vw, 1200px"
+        quality={90}
+        className="rounded-5xl md:rounded-7xl border border-(--outline)"
+        fallback={
           <div className="absolute inset-0 bg-gradient-to-br from-(--primary-glass) to-(--card)" />
-        )}
+        }
+      >
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
         {/* Tags, top-right - same treatment as the public page */}
@@ -311,7 +309,7 @@ export default async function PreviewArticlePage({
             </p>
           )}
         </div>
-      </div>
+      </CoverMedia>
 
       {/* Body */}
       <article className="rounded-3xl border border-(--outline) bg-(--card) p-6 md:p-10">

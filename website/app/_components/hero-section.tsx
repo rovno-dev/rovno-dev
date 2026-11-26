@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AsciiLogo } from "@/components/layout/logo/ascii-logo";
 import { Container } from "@/components/ui/container";
 import { motion, useScroll, useTransform } from "motion/react";
@@ -8,13 +8,23 @@ import { useLanguage } from "@/providers/language-provider";
 export default function HeroSection() {
   const { t } = useLanguage();
   const heroRef = useRef<HTMLElement>(null);
+  const [isNarrow, setIsNarrow] = useState(false);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  // Scroll-driven dissolve. Plays forward as the hero scrolls out and
-  // reverses on the way back, so the logo "reassembles" on up-scroll.
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsNarrow(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  // Scroll-driven dissolve. The logo goes first, then the statement text
+  // follows in a later slice of the same scroll progress, so they hide in
+  // sequence and reassemble in reverse on up-scroll.
   const logoOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
   const logoBlur = useTransform(
     scrollYProgress,
@@ -23,6 +33,21 @@ export default function HeroSection() {
   );
   const logoScale = useTransform(scrollYProgress, [0, 0.35], [1, 0.86]);
   const logoY = useTransform(scrollYProgress, [0, 0.35], [0, -40]);
+
+  const textOpacity = useTransform(scrollYProgress, [0.4, 0.8], [1, 0]);
+  const textBlur = useTransform(
+    scrollYProgress,
+    [0.4, 0.8],
+    ["blur(0px)", "blur(24px)"]
+  );
+  // Grow once while the illustration dissolves, then hold that size so the
+  // text leaves at a stable scale instead of continuously zooming.
+  const textScale = useTransform(
+    scrollYProgress,
+    [0.04, 0.34],
+    [1, isNarrow ? 1.08 : 1.26]
+  );
+  const textY = useTransform(scrollYProgress, [0.4, 0.8], [0, -24]);
 
   return (
     <section
@@ -63,8 +88,17 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Bottom statement — reveals on section entry */}
-        <div className="w-full flex justify-center md:justify-start">
+        {/* Bottom statement — reveals on section entry, then dissolves only
+            after the logo has faded out. */}
+        <motion.div
+          style={{
+            opacity: textOpacity,
+            filter: textBlur,
+            scale: textScale,
+            y: textY,
+          }}
+          className="w-full flex justify-center md:justify-start origin-bottom md:origin-bottom-left"
+        >
           <div className="max-w-lg">
             <p className="text-(--on-bg-high) text-heading-2">
               <motion.span
@@ -93,7 +127,7 @@ export default function HeroSection() {
               </span>
             </p>
           </div>
-        </div>
+        </motion.div>
       </Container>
     </section>
   );

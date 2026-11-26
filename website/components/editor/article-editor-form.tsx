@@ -246,7 +246,7 @@ export function ArticleEditorForm({ initial, basePath = "/app/profile/articles" 
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>{t("editor.field_image")}</FieldLabel>
-            <ImageUploadField value={form.image_url} onChange={(v) => update("image_url", v)} placeholder={t("editor.field_image_ph")} defaultAspect="4:3" fileType="both" />
+            <ImageUploadField value={form.image_url} onChange={(v) => update("image_url", v)} placeholder={t("editor.field_image_ph")} defaultAspect="16:9" fileType="both" />
           </Field>
           <Field className="md:col-span-2">
             <FieldLabel>{t("editor.field_tags")}</FieldLabel>

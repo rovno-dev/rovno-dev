@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { CoverMedia, isVideoSource } from "@/components/layout/media/cover-media";
 import { QuickOrderDialog } from "@/components/ui/quick-order-dialog";
 import { ArrowUpRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import ProjectCard from "@/components/layout/projects/project-card";
@@ -102,9 +102,7 @@ export function CustomProjectPage({
 }) {
   const [liveHeadings, setLiveHeadings] = useState<TocHeading[]>([]);
 
-  const isVideo =
-    project.coverVideo?.endsWith(".webm") ||
-    project.coverVideo?.endsWith(".mp4");
+  const isVideo = isVideoSource(project.coverVideo);
 
   const fallbackHeadings: TocHeading[] = [];
   if (content)
@@ -137,39 +135,26 @@ export function CustomProjectPage({
       {/* Standardized Container Hero */}
       <section ref={heroRef} className="relative isolate overflow-hidden">
         <Container>
-          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden bg-(--card)">
-            {isVideo ? (
+          <CoverMedia
+            src={isVideo ? project.coverVideo : project.coverImage}
+            poster={project.coverImage}
+            alt={project.title}
+            aspectRatio="4/3"
+            priority
+            autoPlay
+            muted
+            loop
+            sizes="100vw"
+            fallback={<div className="absolute inset-0 bg-(--bg)" />}
+            renderMedia={(media) => (
               <motion.div
                 style={{ y: mediaY }}
                 className="absolute inset-[-20%]"
               >
-                <video
-                  src={project.coverVideo}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
+                {media}
               </motion.div>
-            ) : project.coverImage ? (
-              <motion.div
-                style={{ y: mediaY }}
-                className="absolute inset-[-20%]"
-              >
-                <Image
-                  src={project.coverImage}
-                  alt={project.title}
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              </motion.div>
-            ) : (
-              <div className="absolute inset-0 bg-(--bg)" />
             )}
-          </div>
+          />
           <h1 className="mt-6 text-display-4 sm:text-display-3">{project.title}</h1>
         </Container>
       </section>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, type CSSProperties } from "react"
 import Image from "next/image";
 import Link from "next/link";
 import { ImageBrokenIcon, ArrowUpRight } from "@phosphor-icons/react";
+import { CoverMedia } from "@/components/layout/media/cover-media";
 import { useLanguage } from "@/providers/language-provider";
 import { Project } from "@/utils/api/projects";
 import { cn } from "@/lib/utils";
@@ -235,38 +236,29 @@ export default function ProjectCard({
         className="group block animate-reveal fill-mode-both relative w-full"
         style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
       >
-        {/* Image: 4:3, no rounding, no border. Text lives below it. */}
-        <div className="relative w-full aspect-[4/3] overflow-hidden bg-(--card)">
-          {
-          project.cover.videoSrc ? (
-            <video
-              src={project.cover.videoSrc}
-              poster={project.cover.imageSrc || undefined}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-            />
-          ) : showFallback ? (
+        {/* Project covers are always cropped to 4:3. */}
+        <CoverMedia
+          src={showFallback ? undefined : project.cover.videoSrc || project.cover.imageSrc}
+          poster={project.cover.imageSrc}
+          alt={project.title}
+          aspectRatio="4/3"
+          autoPlay
+          muted
+          loop
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          mediaClassName="transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
+          onError={() => setFailed(true)}
+          fallback={
             <CoverFallback
               label={t("projects.cover.fallback")}
               hint={t("projects.cover.fallback_hint")}
             />
-          ) : (
-            <Image
-              src={project.cover.imageSrc}
-              alt={project.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
-              onError={() => setFailed(true)}
-            />
-          )}
+          }
+        >
           <div className="absolute top-4 right-4 z-10 flex items-center justify-center size-10 bg-black/40 backdrop-blur-md text-white opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
             <ArrowUpRight className="size-5" weight="bold" />
           </div>
-        </div>
+        </CoverMedia>
         {/* Text block under the image */}
         <div className="pt-4 md:pt-5">
           {normalizedTags.length > 0 && (
@@ -299,7 +291,7 @@ export default function ProjectCard({
       href={href}
       className={cn(
         "group block animate-reveal fill-mode-both relative w-full overflow-hidden transition-all duration-500 rounded-3xl border border-(--outline) bg-(--card) hover:border-(--primary)/40 hover:shadow-2xl hover:shadow-(--primary)/5",
-        variant === "featured" ? "aspect-[4/3]" : "aspect-[4/3] md:aspect-[3/4]"
+        "aspect-[4/3]"
       )}
       style={{ animationDelay: `${index ? index * 100 : 100}ms` }}
     >
