@@ -14,6 +14,7 @@ The `docs/` folder is the source of truth.
 
 - [`docs/SPEC.md`](docs/SPEC.md) - The rules and contract.
 - [`docs/architecture.md`](docs/architecture.md) - How the services connect.
+- [`docs/BACKUP.md`](docs/BACKUP.md) - Production backups and restore drills.
 - [`docs/DEV.md`](docs/DEV.md) - Local development workflow.
 - [`docs/TESTING.md`](docs/TESTING.md) - How to verify your work.
 - [`CHANGELOG.md`](CHANGELOG.md) - Major updates and versions.

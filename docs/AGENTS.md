@@ -15,6 +15,7 @@ Because this project uses Amorfa (created by Niyaz Gimadiev, the founder of Unid
 backend/services/main-service/   FastAPI app
 website/                         Next.js app
 tg-bot/                          aiogram Telegram bot
+backup/                          restic backup + restore scripts (prod ops)
 docs/                            the spec — source of truth
 ```
 
@@ -22,6 +23,7 @@ docs/                            the spec — source of truth
 
 - **Dev**: `docker-compose.dev.yml` runs backend, DB, cache, and bot. The website runs on the host via `npm run dev`.
 - **Prod**: Root `docker-compose.yml` runs everything behind Traefik.
+- **Backups**: `backup/docker-compose.yml` is a separate prod-only Compose project. See `docs/BACKUP.md`.
 
 **The website is not in `docker-compose.dev.yml`.** Do not add it. Its `Dockerfile` targets prod only.
 

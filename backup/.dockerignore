@@ -1,0 +1,3 @@
+# Never send the backup credentials or restored data to the Docker daemon.
+.env
+restore/

@@ -25,6 +25,8 @@ go.work.sum
 .env
 .env.dev
 .env.prod
+backup/.env
+backup/restore/
 docker/.env
 docker/.env.dev
 docker/.env.prod

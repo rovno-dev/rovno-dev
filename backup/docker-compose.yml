@@ -1,0 +1,43 @@
+name: rovno-dev-backup
+
+services:
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rovno-backup
+    # ../.env supplies the database credentials, ./.env supplies the backup
+    # destination and encryption password. The second file wins on conflicts.
+    env_file:
+      - ../.env
+      - ./.env
+    environment:
+      # The database is addressed by its compose service name, not the
+      # public hostname that may be set in ../.env.
+      - MAIN_DB_HOST=main-db
+    volumes:
+      # Everything that cannot be recreated from git. Read-only: the backup
+      # job has no business writing to production data.
+      - ../backend/services/main-service/storage:/media/backend:ro
+      - ../website/public:/media/website-public:ro
+      - ../.env:/config/app.env:ro
+      - ../website/.env:/config/website.env:ro
+      - ../letsencrypt:/config/letsencrypt:ro
+    networks:
+      - main-network
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      # The media and .env files may be root-only (0600); restic must read
+      # them. No other capabilities are needed.
+      - DAC_OVERRIDE
+    stop_grace_period: 30s
+
+networks:
+  # Created by the production stack (docker-compose.yml).
+  main-network:
+    name: main-network
+    external: true
