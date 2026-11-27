@@ -246,7 +246,7 @@ export default function ProjectCard({
           muted
           loop
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          mediaClassName="transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
+          mediaClassName="transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           onError={() => setFailed(true)}
           fallback={
             <CoverFallback
@@ -306,7 +306,7 @@ export default function ProjectCard({
           alt={project.title}
           fill
           sizes={variant === "featured" ? "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"}
-          className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] image-auto-contrast"
+          className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           onError={() => setFailed(true)}
         />
       )}

@@ -1169,14 +1169,6 @@
   @apply pt-[60px];
 }
 
-/* Reusable cinematic image treatment for hero photos */
-
-
-/* Reusable cinematic image treatment for hero photos */
-.image-auto-contrast {
-  filter: contrast(1.2) saturate(1.2) brightness(1.05) !important;
-}
-
 /* ── ASCII Drift Animation ───────────────────────────────────────────────
    Animates the mask position instead of background-position so the ASCII
    characters can adapt to light/dark mode using the component's background
