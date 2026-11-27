@@ -75,16 +75,16 @@ export function CoverMedia({
   onLoad,
   onError,
 }: CoverMediaProps) {
-  const hasSrc = !!src?.trim();
-  const video = hasSrc && isVideoSource(src);
+  const mediaSrc = src?.trim() || null;
+  const video = isVideoSource(mediaSrc);
   const objectStyle: CSSProperties | undefined = objectPosition
     ? { objectPosition }
     : undefined;
 
-  const media = hasSrc ? (
+  const media = mediaSrc ? (
     video ? (
       <video
-        src={src}
+        src={mediaSrc}
         poster={poster || undefined}
         autoPlay={autoPlay}
         muted={muted ?? autoPlay}
@@ -115,7 +115,7 @@ export function CoverMedia({
       />
     ) : (
       <Image
-        src={src}
+        src={mediaSrc}
         alt={alt}
         fill
         sizes={sizes}
@@ -134,7 +134,7 @@ export function CoverMedia({
       className={cn("relative w-full overflow-hidden bg-(--card)", className)}
       style={aspectRatio ? { aspectRatio } : undefined}
     >
-      {hasSrc ? (renderMedia ? renderMedia(media) : media) : fallback}
+      {mediaSrc ? (renderMedia ? renderMedia(media) : media) : fallback}
       {children}
     </div>
   );
